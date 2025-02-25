@@ -10,7 +10,7 @@ def init():
     global analyzer_instance 
     analyzer_instance = analyzer()
 
-def readCsv(csvPath):
+def read_csv(csvPath):
     if analyzer_instance is None:
         raise RuntimeError("Call init() before using readCsv()")
     analyzer_instance.read_csv(csvPath)

@@ -1,5 +1,5 @@
 [project]
-name = "peralyzer"
+name = "perda"
 version = "0.1.0"
 description = "Penn Electric Racing Data Analyzer"
 authors = [
