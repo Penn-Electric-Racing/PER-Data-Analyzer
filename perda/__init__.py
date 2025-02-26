@@ -15,7 +15,7 @@ def read_csv(csvPath):
         raise RuntimeError("Call init() before using readCsv()")
     analyzer_instance.read_csv(csvPath)
 
-def plot(variables, same_graph=False):
+def plot(variables, same_graph, unit_ms):
     if analyzer_instance is None:
         raise RuntimeError("Call init() before using plot()")
-    analyzer_instance.plot(variables, same_graph)
+    analyzer_instance.plot(variables, same_graph, 0, -1, unit_ms)

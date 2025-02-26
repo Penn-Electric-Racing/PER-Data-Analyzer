@@ -56,7 +56,7 @@ class analyzer:
                                 self.start_time = val
                                 start_time_read = True
                             elif self.name_matches("sdl.currentTime", name):
-                                time_stamp = val / 1e6
+                                time_stamp = val / 1e3
                             elif self.name_matches("ams.airsState", name):
                                 if high_voltage and val == 0:
                                     high_voltage = False
@@ -80,7 +80,7 @@ class analyzer:
         self.end_time = raw_time
         self.file_read = True
 
-    def plot(self, variables, same_graph, start_time = 0, end_time = -1, unit_ms = False):
+    def plot(self, variables, start_time = 0, end_time = -1, same_graph = True, unit_ms = False):
         if not self.file_read:
             print("No csv read. Call .read_csv() before plotting.")
             return
@@ -89,32 +89,27 @@ class analyzer:
                 self.plot(var, True)
                 continue
 
-            short_name = var[0] if type(var) is tuple else var
+            short_name = var
 
             vals = self.find_variable(short_name, self.value_map)
 
             if vals is None:
                 continue
 
-            # if not unit_ms:
-            #     t = vals[::, 0]/1e6
-            #     plt.xlabel("Timestamp (s)")
-            # else:
-            #     t = vals[::, 0]
-            #     plt.xlabel("Timestamp (ms)")
+            if not unit_ms:
+                t = vals[::, 0]/1e3
+                plt.xlabel("Timestamp (s)")
+            else:
+                t = vals[::, 0]
+                plt.xlabel("Timestamp (ms)")
 
-            t = vals[::, 0]
             y = vals[::, 1]
 
-            # if type(var) is tuple:
-            #     f = var[1]
-            #     y = [f(n) for n in y]
-
             plt.plot(t, y, label=short_name)
-            plt.xlabel("Timestamp (s)")
             plt.legend()
 
             for hvT, hvOn in self.high_voltage_changes:
+                hvT = hvT if unit_ms else hvT/1e3
                 color = "red" if hvOn else "green"
                 plt.axvline(x=hvT, color=color)
 
