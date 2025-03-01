@@ -41,7 +41,6 @@ class analyzer:
         self.__value_map = {}
         self.__ID_map = {}
         self.__high_voltage_changes = []
-        self.__file_read = False
         self.__data_start_time = None
         self.__data_end_time = None
 
