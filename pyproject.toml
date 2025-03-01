@@ -1,0 +1,18 @@
+[project]
+name = "perda"
+version = "0.1.0"
+description = "Penn Electric Racing Data Analyzer"
+authors = [
+    {name = "laytcai",email = "1715782167@qq.com"}
+]
+readme = "README.md"
+requires-python = ">=3.7"
+dependencies = [
+    "numpy",
+    "tqdm",
+    "matplotlib"
+]
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
