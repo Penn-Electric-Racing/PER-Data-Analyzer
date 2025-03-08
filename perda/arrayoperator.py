@@ -15,6 +15,69 @@ class arrayoperator:
     def get_csvparser(self, cp: csvparser):
         self.__csvparser = cp
         self.__file_read = True
+    
+    def get_filtered_nparr(self, arr, start_time = 0, end_time = -1, unit = "s"):
+        if not self.__file_read:
+            print("No csv read. Call .get_csvparser() before taking integral.")
+            return None
+
+        if type(arr) is str:
+            short_name = arr
+            vals = self.__csvparser.get_np_array(short_name)
+            if vals is None:
+                print("Abroated: Cannot Find Input Name")
+                return None
+        elif isinstance(arr, np.ndarray):
+            if arr.ndim != 2 or arr.shape[1] < 2:
+                print("Invalid Input Array For Integral")
+                return None
+            short_name = "Input Array"
+            vals = arr
+        else:
+            print("Invalid Input For Integral")
+            return None
+
+        max_start = start_time
+        min_end = end_time
+        if min_end == -1:
+            min_end = self.__csvparser.get_data_end_time()
+        if unit == "s":
+            max_start = max_start * 1e3
+            if min_end != -1:
+                min_end = min_end * 1e3
+        max_start = max(max_start, vals[0,0])
+        min_end = min(vals[-1,0],min(min_end, self.__csvparser.get_data_end_time()))
+
+        filtered_arr = vals[(vals[:, 0] >= max_start) & (vals[:, 0] <= min_end)]
+
+        return filtered_arr
+    
+    def get_integral_avg(self, filtered_arr):
+
+        time_diff = filtered_arr[-1,0] - filtered_arr[0,0]
+        timestamps = filtered_arr[:, 0]
+        values = filtered_arr[:, 1]
+
+        integral = np.trapz(values, timestamps)
+        avg = integral/time_diff
+
+        return integral, avg
+    
+    def get_max_min(self, filtered_arr):
+        timestamps = filtered_arr[:, 0]
+        values = filtered_arr[:, 1]
+
+        min_index = np.argmin(values)  # Index of min value
+        max_index = np.argmax(values)  # Index of max value
+
+        min_value = values[min_index]
+        max_value = values[max_index]
+
+        min_timestamp = timestamps[min_index]
+        max_timestamp = timestamps[max_index]
+
+        return max_value, max_timestamp, min_value, min_timestamp
+        
 
     def get_compute_arrays(self, op_list: list[str], match_type: str = "extend", start_time = 0, end_time = -1, unit = "s"):
         if not self.__file_read:
@@ -38,7 +101,7 @@ class arrayoperator:
             if is_var:
                 var_np = self.__csvparser.get_np_array(ops)
                 if var_np is None:
-                    print("Abroated: Missing Information")
+                    print("Abroated: Missing Information: Cannot Find Input Name")
                     return None
                 max_start = max(var_np[0,0], max_start)
                 min_end = min(var_np[-1,0], min_end)
