@@ -3,7 +3,9 @@ name = "perda"
 version = "0.1.0"
 description = "Penn Electric Racing Data Analyzer"
 authors = [
-    {name = "laytcai", email = "1715782167@qq.com"}
+    {name = "laytcai", email = "1715782167@qq.com"},
+    {name = "odzjeffreyjr"},
+    {name = "Penn Electric Racing Software"}
 ]
 readme = "README.md"
 requires-python = ">=3.7"

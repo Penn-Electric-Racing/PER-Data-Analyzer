@@ -1,7 +1,6 @@
-# peralyzer/__init__.py
-from .analyzer import analyzer  # Import Analyzer from core.py
+from .analyzer import analyzer
 
-__all__ = ["create"]  # Defines what gets imported with `from peralyzer import *`
+__all__ = ["create"]
 
 def create():
     return analyzer()
