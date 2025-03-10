@@ -19,11 +19,11 @@ class analyzer:
 
         print("Reset Analyzer")
 
-    def read_csv(self, path: str):
+    def read_csv(self, path: str, input_align_name = "default"):
         if self.__file_read:
             print("Call .reset() before reading new csv")
             return
-        self.__csvparser.read_csv(path)
+        self.__csvparser.read_csv(path, input_align_name)
         self.__dataplotter.get_csvparser(self.__csvparser)
         self.__operator.get_csvparser(self.__csvparser)
         self.__file_read = True
@@ -60,16 +60,18 @@ class analyzer:
         for arr in arr_list:
             if type(arr) is str:
                 var_name = arr
+                canid = self.__csvparser.get_can_id(arr)
             else:
                 var_name = f"Input Data {arr_num}"
-            
+                canid = -1
+
             filtered_arr = self.__operator.get_filtered_nparr(arr, start_time, end_time, unit)
             data_start_time = filtered_arr[0,0]
             data_end_time = filtered_arr[-1,0]
             duration = data_end_time - data_start_time
             integral, average = self.__operator.get_integral_avg(filtered_arr)
             max_value, max_timestamp, min_value, min_timestamp = self.__operator.get_max_min(filtered_arr)
-            decimals = 3
+            decimals = 0
 
             if unit == "s":
                 max_timestamp /= 1e3
@@ -78,9 +80,9 @@ class analyzer:
                 data_end_time /= 1e3
                 duration /= 1e3
                 integral /= 1e3
-                decimals = 6
+                decimals = 3
 
-            print(f"Statistics for **{var_name}**:")
+            print(f"Statistics for **{var_name}** | Can ID: {canid}:")
             print(f"Start: {format(data_start_time,f",.{decimals}f")}" + unit + f" | End: {format(data_end_time,f",.{decimals}f")}" + unit + f" | Duration: {format(duration,f",.{decimals}f")}" + unit)
             print(f"Max Value: {max_value} ({format(max_timestamp,f",.{decimals}f")}" + unit + ")")
             print(f"Min Value: {min_value} ({format(min_timestamp,f",.{decimals}f")}" + unit + ")")
