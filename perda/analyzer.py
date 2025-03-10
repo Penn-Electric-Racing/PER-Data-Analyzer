@@ -21,8 +21,7 @@ class analyzer:
 
     def read_csv(self, path: str, input_align_name = "default"):
         if self.__file_read:
-            print("Call .reset() before reading new csv")
-            return
+            raise AttributeError("Call .reset() before reading new csv")
         self.__csvparser.read_csv(path, input_align_name)
         self.__dataplotter.get_csvparser(self.__csvparser)
         self.__operator.get_csvparser(self.__csvparser)
@@ -40,7 +39,7 @@ class analyzer:
     def get_filtered_nparray(self, arr, start_time = 0, end_time = -1, unit = "s"):
         return self.__operator.get_filtered_nparr(arr, start_time, end_time, unit)
 
-    def get_compute_arrays(self, op_list: list[str], match_type: str = "extend", start_time = 0, end_time = -1, unit = "s"):
+    def get_compute_arrays(self, op_list: list[str], match_type: str = "connect", start_time = 0, end_time = -1, unit = "s"):
         return self.__operator.get_compute_arrays(op_list, match_type, start_time, end_time, unit)
     
     def get_integral(self, arr, start_time = 0, end_time = -1, unit = "s"):
@@ -66,6 +65,7 @@ class analyzer:
                 canid = -1
 
             filtered_arr = self.__operator.get_filtered_nparr(arr, start_time, end_time, unit)
+            num_data = len(filtered_arr)
             data_start_time = filtered_arr[0,0]
             data_end_time = filtered_arr[-1,0]
             duration = data_end_time - data_start_time
@@ -82,11 +82,13 @@ class analyzer:
                 integral /= 1e3
                 decimals = 3
 
-            print(f"Statistics for **{var_name}** | Can ID: {canid}:")
+            print(f"Statistics for **{var_name}**")
+            if canid != -1:
+                print(f"Can ID: {canid}")
+            print(f"Data amount: {num_data}")
             print(f"Start: {format(data_start_time,f",.{decimals}f")}" + unit + f" | End: {format(data_end_time,f",.{decimals}f")}" + unit + f" | Duration: {format(duration,f",.{decimals}f")}" + unit)
             print(f"Max Value: {max_value} ({format(max_timestamp,f",.{decimals}f")}" + unit + ")")
             print(f"Min Value: {min_value} ({format(min_timestamp,f",.{decimals}f")}" + unit + ")")
             print(f"Average: {average}")
             print(f"Integral: {integral}")
             print("\n")
-

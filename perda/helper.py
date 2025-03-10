@@ -7,7 +7,7 @@ def align_nparr(np_list: list[np.ndarray]):
     sorted_hv_imp = []
     curr_idx = -1
     this_tsp = 0
-    last_tsp = 0
+    last_tsp = -1
     for arr in sorted_arr:
         this_tsp = arr[0]
         arr_input_num = int(arr[-1])
@@ -82,25 +82,7 @@ def fill_missing_values(arr, math_type="connect"):
             while next_i < m and filled[next_i, 1] is None:
                 next_i += 1
 
-            if math_type == "connect":
-                # Both neighbors found: interpolate.
-                if prev_i >= 0 and next_i < m:
-                    t_prev, v_prev = filled[prev_i, 0], filled[prev_i, 1]
-                    t_next, v_next = filled[next_i, 0], filled[next_i, 1]
-                    t_current = filled[i, 0]
-                    # Avoid division by zero.
-                    if t_next != t_prev:
-                        interpolated_val = v_prev + (v_next - v_prev) * (t_current - t_prev) / (t_next - t_prev)
-                        filled[i, 1] = interpolated_val
-                    else:
-                        filled[i, 1] = v_prev
-                # If only one neighbor is available, fallback to that value.
-                elif prev_i >= 0:
-                    filled[i, 1] = filled[prev_i, 1]
-                elif next_i < m:
-                    filled[i, 1] = filled[next_i, 1]
-
-            elif math_type == "extend_forward":
+            if math_type == "extend_forward":
                 # Use the previous valid value.
                 if prev_i >= 0:
                     filled[i, 1] = filled[prev_i, 1]
@@ -117,7 +99,24 @@ def fill_missing_values(arr, math_type="connect"):
                     filled[i, 1] = filled[prev_i, 1]
 
             else:
-                raise ValueError("Invalid math_type. Choose 'connect', 'extend_forward', or 'extend_back'.")
+                if math_type != "connect":
+                    print("Invalid math_type. Please input 'connect', 'extend_forward', or 'extend_back'. Default to 'connect'")
+                # Both neighbors found: interpolate.
+                if prev_i >= 0 and next_i < m:
+                    t_prev, v_prev = filled[prev_i, 0], filled[prev_i, 1]
+                    t_next, v_next = filled[next_i, 0], filled[next_i, 1]
+                    t_current = filled[i, 0]
+                    # Avoid division by zero.
+                    if t_next != t_prev:
+                        interpolated_val = v_prev + (v_next - v_prev) * (t_current - t_prev) / (t_next - t_prev)
+                        filled[i, 1] = interpolated_val
+                    else:
+                        filled[i, 1] = v_prev
+                # If only one neighbor is available, fallback to that value.
+                elif prev_i >= 0:
+                    filled[i, 1] = filled[prev_i, 1]
+                elif next_i < m:
+                    filled[i, 1] = filled[next_i, 1]
                 
     return filled
 

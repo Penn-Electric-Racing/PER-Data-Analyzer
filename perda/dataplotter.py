@@ -38,8 +38,7 @@ class dataplotter:
 
     def plot(self, variables: list):
         if not self.__file_read:
-            print("No csv read. Call .get_csvparser() before plotting.")
-            return
+            raise AttributeError("No csv read. Call .get_csvparser() before plotting.")
         for var in variables:
             if type(var) is list:
                 self.plot(var, True)

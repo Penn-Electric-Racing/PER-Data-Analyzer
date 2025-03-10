@@ -11,7 +11,6 @@ class csvparser:
         self.__data_start_time = None
         self.__data_end_time = None
         self.__file_read = False
-        self.__dic_count = {}
 
     def reset(self):
         self.__value_map = {}
@@ -20,12 +19,10 @@ class csvparser:
         self.__data_start_time = None
         self.__data_end_time = None
         self.__file_read = False
-        self.__dic_count = {}
     
     def read_csv(self, path: str, input_align_name = "default"):
         if self.__file_read:
-            print("Call .reset() before reading new csv")
-            return
+            raise AttributeError("Call .reset() before reading new csv")
         # Reset but do not print
         self.__value_map = {}
         self.__ID_map = {}
@@ -41,6 +38,8 @@ class csvparser:
         align_id = None
         align_name = input_align_name
 
+        bad_data = 0
+
         if input_align_name == "default":
 
             count_dic = {}
@@ -50,6 +49,8 @@ class csvparser:
                 line_num = 2
                 with tqdm(desc="Finding Highest Freq Value", unit="lines", initial = 1) as pbar:
                     for pre_line in pre_log:
+                        if (bad_data >= 100):
+                            raise Exception("Bad data exceeds 100, aborted.")
                         if (pre_line.startswith("Value")):
                             canID_name_value = pre_line[6:].strip().split(": ")
                             try:
@@ -57,7 +58,8 @@ class csvparser:
                                 self.__ID_map[this_id] = canID_name_value[0]
                             except Exception as e:
                                 print(f"Error parsing ID | Line number {line_num} | Line: {line} | Error: {e}")
-                                break
+                                bad_data += 1
+                                continue
                         else:
                             data = pre_line.strip().split(",")
                             try:
@@ -70,14 +72,14 @@ class csvparser:
 
                             except Exception as e:
                                 print(f"Error parsing ID | Line number {line_num} | Line: {line} | Error: {e}")
-                                break
+                                bad_data += 1
+                                continue
                         line_num += 1
                         pbar.update(1)
             align_id = max(count_dic, key=count_dic.get)
             num_data = count_dic[align_id]
             max_name = self.__ID_map[align_id]
             align_name = max_name
-            self.__dic_count = count_dic
             print(f"Timestamp aligned to {max_name} | canID: {align_id} | Number of data: {num_data}\n")
 
         with open(path, 'r') as log:
@@ -86,6 +88,8 @@ class csvparser:
             line_num = 2
             with tqdm(desc="Processing CSV", unit="lines", initial = 1) as pbar:
                 for line in log:
+                    if (bad_data >= 100):
+                        raise Exception("Bad data exceeds 100, aborted.")
                     if (line.startswith("Value")):
                         if input_align_name == "default":
                             continue
@@ -97,7 +101,8 @@ class csvparser:
                                 align_id = this_id
                         except Exception as e:
                             print(f"Error parsing ID | Line number {line_num} | Line: {line} | Error: {e}")
-                            break
+                            bad_data += 1
+                            continue
                     else:
                         if align_id is None:
                             print("Cannot Find Align Variable Name.")
@@ -133,16 +138,19 @@ class csvparser:
 
                         except Exception as e:
                             print(f"Error parsing ID | Line number {line_num} | Line: {line} | Error: {e}")
-                            break
+                            bad_data += 1
+                            continue
                     line_num += 1
                     pbar.update(1)
         self.__data_end_time = raw_time
         self.__file_read = True
+        print("Csv parsing complete.")
+        if bad_data != 0:
+            print(f"Number of bad data: {bad_data}")
     
     def get_np_array(self, short_name: str):
         if not self.__file_read:
-            print("Empty parser, read csv before calling.")
-            return None
+            raise AttributeError("Empty parser, read csv before calling.")
         full_name = None
         for var_name in self.__value_map.keys():
             if helper.name_matches(short_name, var_name):
@@ -150,47 +158,40 @@ class csvparser:
                 break
 
         if full_name is None:
-            print("Error: could not find data for " + short_name)
-            return None
+            raise AttributeError("Error: could not find data for " + short_name)
         return np.array(self.__value_map[full_name])
     
     def get_value_map(self):
         if not self.__file_read:
-            print("Empty parser, read csv before calling.")
-            return
+            raise AttributeError("Empty parser, read csv before calling.")
         return self.__value_map
     
     def get_ID_map(self):
         if not self.__file_read:
-            print("Empty parser, read csv before calling.")
-            return
+            raise AttributeError("Empty parser, read csv before calling.")
         return self.__ID_map
     
     def get_can_id(self, name: str):
         if not self.__file_read:
-            print("Empty parser, read csv before calling.")
-            return
+            raise AttributeError("Empty parser, read csv before calling.")
         canID = next((k for k, v in self.__ID_map.items() if helper.name_matches(name, v)), None)
         if canID is None:
-            print("No Can ID Found")
+            raise AttributeError("No Can ID Found")
         return canID
     
     def get_HV_changes(self):
         if not self.__file_read:
-            print("Empty parser, read csv before calling.")
-            return
+            raise AttributeError("Empty parser, read csv before calling.")
         return self.__high_voltage_changes
     
     def get_data_start_time(self):
         if not self.__file_read:
-            print("Empty parser, read csv before calling.")
-            return
+            raise AttributeError("Empty parser, read csv before calling.")
         return self.__data_start_time
     
     def get_data_end_time(self):
         if not self.__file_read:
-            print("Empty parser, read csv before calling.")
-            return
+            raise AttributeError("Empty parser, read csv before calling.")
         return self.__data_end_time
     
     def is_empty(self):

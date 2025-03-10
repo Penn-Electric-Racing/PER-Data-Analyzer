@@ -18,24 +18,20 @@ class arrayoperator:
     
     def get_filtered_nparr(self, arr, start_time = 0, end_time = -1, unit = "s"):
         if not self.__file_read:
-            print("No csv read. Call .get_csvparser() before taking integral.")
-            return None
+            raise AttributeError("No csv read. Call .get_csvparser() before taking integral.")
 
         if type(arr) is str:
             short_name = arr
             vals = self.__csvparser.get_np_array(short_name)
             if vals is None:
-                print("Abroated: Cannot Find Input Name")
-                return None
+                raise AttributeError("Abroated: Cannot Find Input Name")
         elif isinstance(arr, np.ndarray):
             if arr.ndim != 2 or arr.shape[1] < 2:
-                print("Invalid Input Array For Integral")
-                return None
+                raise AttributeError("Invalid Input Array For Integral")
             short_name = "Input Array"
             vals = arr
         else:
-            print("Invalid Input For Integral")
-            return None
+            raise AttributeError("Invalid Input For Integral")
 
         max_start = start_time
         min_end = end_time
@@ -49,6 +45,9 @@ class arrayoperator:
         min_end = min(vals[-1,0],min(min_end, self.__csvparser.get_data_end_time()))
 
         filtered_arr = vals[(vals[:, 0] >= max_start) & (vals[:, 0] <= min_end)]
+
+        if len(filtered_arr) == 0:
+            raise ValueError("No data within time stamp.")
 
         return filtered_arr
     
@@ -79,10 +78,9 @@ class arrayoperator:
         return max_value, max_timestamp, min_value, min_timestamp
         
 
-    def get_compute_arrays(self, op_list: list[str], match_type: str = "extend", start_time = 0, end_time = -1, unit = "s"):
+    def get_compute_arrays(self, op_list: list[str], match_type: str = "connect", start_time = 0, end_time = -1, unit = "s"):
         if not self.__file_read:
-            print("No csv read. Call .get_csvparser() before plotting.")
-            return
+            raise AttributeError("No csv read. Call .get_csvparser() before plotting.")
         var_arrs = []
         operations = []
         max_start = start_time
@@ -101,15 +99,13 @@ class arrayoperator:
             if is_var:
                 var_np = self.__csvparser.get_np_array(ops)
                 if var_np is None:
-                    print("Abroated: Missing Information: Cannot Find Input Name")
-                    return None
+                    raise AttributeError("Abroated: Missing Information: Cannot Find Input Name")
                 max_start = max(var_np[0,0], max_start)
                 min_end = min(var_np[-1,0], min_end)
                 var_arrs.append(var_np)
             else:
                 if ops != "+" and ops != "-" and ops != "*" and ops != "/":
-                    print("Abroated: Invalid Operations Format")
-                    return None
+                    raise AttributeError("Abroated: Invalid Operations Format")
                 operations.append(ops)
             is_var = not is_var
         filtered_arrs = []
@@ -139,8 +135,7 @@ class arrayoperator:
                     calculated_val *= filled_data[j+1][i][1]
                 else:
                     if filled_data[j+1][i][1] == 0:
-                        print("Cannot Divide By 0")
-                        return None
+                        raise ZeroDivisionError("Cannot Divide By 0")
                     calculated_val /= filled_data[j+1][i][1]
             final_arr.append([this_timestamp, calculated_val, this_hv, this_imp])
         
