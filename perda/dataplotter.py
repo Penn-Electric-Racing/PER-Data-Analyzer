@@ -142,7 +142,7 @@ class dataplotter:
             y = vals[:, 1]
 
             mask = (t >= (minTime[1] * 1000)) & (t <= (minTime[2] * 1000))
-            t = t[mask]
+            t = t[mask]/1e3
             y = y[mask]
 
             plt.plot(t, y, label = short_names[i])
