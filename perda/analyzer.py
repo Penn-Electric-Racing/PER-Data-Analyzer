@@ -1,4 +1,4 @@
-from .csvparser import csvparser
+from csvparser import csvparser
 from .dataplotter import dataplotter
 from .arrayoperator import arrayoperator
 
@@ -86,9 +86,14 @@ class analyzer:
             if canid != -1:
                 print(f"Can ID: {canid}")
             print(f"Data amount: {num_data}")
-            print(f"Start: {format(data_start_time,f",.{decimals}f")}" + unit + f" | End: {format(data_end_time,f",.{decimals}f")}" + unit + f" | Duration: {format(duration,f",.{decimals}f")}" + unit)
-            print(f"Max Value: {max_value} ({format(max_timestamp,f",.{decimals}f")}" + unit + ")")
-            print(f"Min Value: {min_value} ({format(min_timestamp,f",.{decimals}f")}" + unit + ")")
+            start_time = format(data_start_time, f",.{decimals}f")
+            end_time = format(data_end_time, f",.{decimals}f")
+            duration = format(duration, f",.{decimals}f")
+            max_time = format(max_timestamp,f",.{decimals}f")
+            min_time = format(min_timestamp,f",.{decimals}f")
+            print(f"Start: {start_time}{unit} | End: {end_time}{unit} | Duration: {duration}{unit}")
+            print(f"Max Value: {max_value} ({max_time}{unit})")
+            print(f"Min Value: {min_value} ({min_time}{unit})")
             print(f"Average: {average}")
             print(f"Integral: {integral}")
             print("\n")
