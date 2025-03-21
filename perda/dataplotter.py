@@ -97,19 +97,22 @@ class dataplotter:
 
     def plot0to60(self, numWheels):
         self.set_plot()
-        short_names = ["pcm.wheelSpeeds.frontLeft", "pcm.wheelSpeeds.frontRight", "pcm.wheelSpeeds.backLeft", "pcm.wheelSpeeds.backRight"]
+        short_names = ["pcm.wheelSpeeds.frontLeft", "pcm.wheelSpeeds.frontRight", 
+                       "pcm.wheelSpeeds.backLeft", "pcm.wheelSpeeds.backRight"]
 
         minTime = (float('inf'), -1, -1, -1) # duration, startTime, endTime, endSpeed
-        startTime = -1
-        endTime = -1
-
+    
         for i in range(numWheels):
             vals = self.__csvparser.get_np_array(short_names[i])
 
-            lastTime = -1
-            lastSpeed = -1
+            if vals.shape[1] < 2:  # Ensure vals has at least 2 columns (time, speed)
+                print(f"Skipping {short_names[i]} due to unexpected format")
+                continue
 
-            for t, y, _, _, _ in vals:
+            lastTime, lastSpeed, startTime, endTime = -1, -1, -1, -1
+
+            for row in vals:
+                t, y = row[:2] 
                 # wheel speed sensor is NaN if 0
                 if np.isnan(y):
                     startTime = t
@@ -118,8 +121,8 @@ class dataplotter:
 
                     duration = endTime - startTime
 
-                if duration < minTime[0]:
-                    minTime = (duration, startTime, t, y)
+                    if duration < minTime[0]:
+                        minTime = (duration, startTime, t, y)
 
                 lastTime = t
                 lastSpeed = y
@@ -136,9 +139,11 @@ class dataplotter:
             y = y[mask]
 
             plt.plot(t, y, label = short_names[i])
-            plt.legend()
+            
     
-        plt.axhline(y=60, color='red')
+        plt.axhline(y=60, color='red', linestyle="--",)
         plt.xlabel("Timestamp (s)")
+        plt.ylabel("Speed (MPH)")
         plt.title("0-60 MPH in " + str(minTime[0]) + "s")
+        plt.legend()
         plt.show()
