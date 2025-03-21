@@ -24,7 +24,7 @@ class arrayoperator:
             short_name = arr
             vals = self.__csvparser.get_np_array(short_name)
             if vals is None:
-                raise AttributeError("Abroated: Cannot Find Input Name")
+                raise AttributeError("Aborted: Cannot Find Input Name")
         elif isinstance(arr, np.ndarray):
             if arr.ndim != 2 or arr.shape[1] < 2:
                 raise AttributeError("Invalid Input Array For Integral")
@@ -38,6 +38,8 @@ class arrayoperator:
         if min_end == -1:
             min_end = self.__csvparser.get_data_end_time()
         if unit == "s":
+            print(max_start)
+            print(min_end)
             max_start = max_start * 1e3
             if min_end != -1:
                 min_end = min_end * 1e3
