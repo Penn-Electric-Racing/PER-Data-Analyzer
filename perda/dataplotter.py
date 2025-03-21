@@ -41,7 +41,7 @@ class dataplotter:
             raise AttributeError("No csv read. Call .get_csvparser() before plotting.")
         for var in variables:
             if type(var) is list:
-                self.plot(var, True)
+                self.plot(var)
                 continue
             elif type(var) is str:
                 short_name = var
