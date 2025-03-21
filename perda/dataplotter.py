@@ -115,16 +115,17 @@ class dataplotter:
             reached60 = False
             for row in vals:
                 t, y = row[:2] 
+                t /= 1000
                 # wheel speed sensor is NaN if 0
                 if np.isnan(y) or y <= 0:
-                    startTime = t
+                    startTime = t/1000
                 elif y >= 60 and lastSpeed < 60:
                     endTime = lastTime + (60 - lastSpeed) * (t - lastTime) / (y - lastSpeed)
 
                     duration = endTime - startTime
 
                     if duration < minTime[0]:
-                        minTime = (duration, startTime, t, y)
+                        minTime = (duration, startTime, endTime, y)
                     
                     reached60 = True
                     break
