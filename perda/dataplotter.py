@@ -141,7 +141,7 @@ class dataplotter:
             t = vals[:, 0]
             y = vals[:, 1]
 
-            mask = (t >= minTime[1]) & (t <= minTime[2])
+            mask = (t >= (minTime[1] * 1000)) & (t <= (minTime[2] * 1000))
             t = t[mask]
             y = y[mask]
 
