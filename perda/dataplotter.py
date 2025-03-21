@@ -100,10 +100,10 @@ class dataplotter:
         short_names = ["pcm.wheelSpeeds.frontLeft", "pcm.wheelSpeeds.frontRight", 
                        "pcm.wheelSpeeds.backLeft", "pcm.wheelSpeeds.backRight"]
 
-        minTime = (float('inf'), -1, -1, -1) # duration, startTime, endTime, endSpeed
         didNotReach60 = 0
     
         for i in range(numWheels):
+            minTime = (float('inf'), -1, -1, -1) # duration, startTime, endTime, endSpeed
             vals = self.__csvparser.get_np_array(short_names[i])
 
             if vals.shape[1] < 2:  # Ensure vals has at least 2 columns (time, speed)
