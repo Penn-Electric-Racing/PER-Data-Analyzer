@@ -23,8 +23,8 @@ class analyzer:
         if self.__file_read:
             raise AttributeError("Call .reset() before reading new csv")
         self.__csvparser.read_csv(path, input_align_name)
-        self.__dataplotter.get_csvparser(self.__csvparser)
-        self.__operator.get_csvparser(self.__csvparser)
+        self.__dataplotter.set_csvparser(self.__csvparser)
+        self.__operator.set_csvparser(self.__csvparser)
         self.__file_read = True
 
     def set_plot(self, start_time = 0, end_time = -1, same_graph = True, unit = "s"):
@@ -97,3 +97,8 @@ class analyzer:
             print(f"Average: {average}")
             print(f"Integral: {integral}")
             print("\n")
+    
+    def calculate0to60(self, numWheels = 1):
+        if numWheels < 1 or numWheels > 4:
+            raise AttributeError("One to four wheels. Default is 1")
+        self.__dataplotter.plot0to60(numWheels)

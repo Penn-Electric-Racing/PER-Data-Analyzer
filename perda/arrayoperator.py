@@ -12,7 +12,7 @@ class arrayoperator:
         self.__csvparser = csvparser()
         self.__file_read = False
 
-    def get_csvparser(self, cp: csvparser):
+    def set_csvparser(self, cp: csvparser):
         self.__csvparser = cp
         self.__file_read = True
     

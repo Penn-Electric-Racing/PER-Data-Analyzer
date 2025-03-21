@@ -22,7 +22,7 @@ class dataplotter:
         self.__plot_end_time = -1
         self.__plot_unit = "s"
 
-    def get_csvparser(self, cp: csvparser):
+    def set_csvparser(self, cp: csvparser):
         self.__csvparser = cp
         self.__file_read = True
 
@@ -94,3 +94,51 @@ class dataplotter:
         if self.__plot_same_graph:
             plt.show()
             print("\n\n")
+
+    def plot0to60(self, numWheels):
+        self.set_plot()
+        short_names = ["pcm.wheelSpeeds.frontLeft", "pcm.wheelSpeeds.frontRight", "pcm.wheelSpeeds.backLeft", "pcm.wheelSpeeds.backRight"]
+
+        minTime = (float('inf'), -1, -1, -1) # duration, startTime, endTime, endSpeed
+        startTime = -1
+        endTime = -1
+
+        for i in range(numWheels):
+            vals = self.__csvparser.get_np_array(short_names[i])
+
+            lastTime = -1
+            lastSpeed = -1
+
+            for t, y, _ in vals:
+                # wheel speed sensor is NaN if 0
+                if np.isnan(y):
+                    startTime = t
+                elif y >= 60 and lastSpeed < 60:
+                    endTime = lastTime + (60 - lastSpeed) * (t - lastTime) / (y - lastSpeed)
+
+                    duration = endTime - startTime
+
+                if duration < minTime[0]:
+                    minTime = (duration, startTime, t, y)
+
+                lastTime = t
+                lastSpeed = y
+
+            if minTime[1] == -1:
+                print("DID NOT REACH 60 MPH")
+                return
+
+            t = vals[:, 0]
+            y = vals[:, 1]
+
+            mask = (t >= minTime[1]) & (t <= minTime[2])
+            t = t[mask]
+            y = y[mask]
+
+            plt.plot(t, y, label = short_names[i])
+            plt.legend()
+    
+        plt.axhline(y=60, color='red')
+        plt.xlabel("Timestamp (s)")
+        plt.title("0-60 MPH in " + str(minTime[0]) + "s")
+        plt.show()
