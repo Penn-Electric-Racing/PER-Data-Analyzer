@@ -1,4 +1,4 @@
-from csvparser import csvparser
+from .csvparser import csvparser
 from .dataplotter import dataplotter
 from .arrayoperator import arrayoperator
 
