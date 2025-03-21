@@ -145,14 +145,15 @@ class dataplotter:
             t = t[mask]/1e3
             y = y[mask]
 
+            plt.figure(figsize=(8, 5))
             plt.plot(t, y, label = short_names[i])
-            
-        if (didNotReach60 == numWheels):
-            print(f"No wheels reached 60mph")
-        else:
             plt.axhline(y=60, color='red', linestyle="--",)
             plt.xlabel("Timestamp (s)")
             plt.ylabel("Speed (MPH)")
             plt.title("0-60 MPH in " + str(minTime[0]) + "s")
             plt.legend()
             plt.show()
+            
+        if (didNotReach60 == numWheels):
+            print(f"No wheels reached 60mph")
+            
