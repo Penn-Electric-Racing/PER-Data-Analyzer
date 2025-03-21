@@ -109,7 +109,7 @@ class dataplotter:
             lastTime = -1
             lastSpeed = -1
 
-            for t, y, _ in vals:
+            for t, y, _, _, _ in vals:
                 # wheel speed sensor is NaN if 0
                 if np.isnan(y):
                     startTime = t
