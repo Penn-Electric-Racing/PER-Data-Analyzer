@@ -33,8 +33,8 @@ class arrayoperator:
         else:
             raise AttributeError("Invalid Input For Integral")
 
-        max_start = int(start_time)
-        min_end = int(end_time)
+        max_start = float(start_time)
+        min_end = float(end_time)
         if min_end == -1:
             min_end = self.__csvparser.get_data_end_time()
         if unit == "s":
