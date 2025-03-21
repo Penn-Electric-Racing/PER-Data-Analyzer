@@ -101,6 +101,7 @@ class dataplotter:
                        "pcm.wheelSpeeds.backLeft", "pcm.wheelSpeeds.backRight"]
 
         minTime = (float('inf'), -1, -1, -1) # duration, startTime, endTime, endSpeed
+        didNotReach60 = 0
     
         for i in range(numWheels):
             vals = self.__csvparser.get_np_array(short_names[i])
@@ -111,10 +112,11 @@ class dataplotter:
 
             lastTime, lastSpeed, startTime, endTime = -1, -1, -1, -1
 
+            reached60 = False
             for row in vals:
                 t, y = row[:2] 
                 # wheel speed sensor is NaN if 0
-                if np.isnan(y):
+                if np.isnan(y) or y <= 0:
                     startTime = t
                 elif y >= 60 and lastSpeed < 60:
                     endTime = lastTime + (60 - lastSpeed) * (t - lastTime) / (y - lastSpeed)
@@ -123,13 +125,17 @@ class dataplotter:
 
                     if duration < minTime[0]:
                         minTime = (duration, startTime, t, y)
+                    
+                    reached60 = True
+                    break
 
                 lastTime = t
                 lastSpeed = y
 
-            if minTime[1] == -1:
-                print("DID NOT REACH 60 MPH")
-                return
+            if not reached60:
+                print(f"{short_names[i]} Did not reach 60")
+                didNotReach60 += 1
+                continue
 
             t = vals[:, 0]
             y = vals[:, 1]
@@ -140,10 +146,12 @@ class dataplotter:
 
             plt.plot(t, y, label = short_names[i])
             
-    
-        plt.axhline(y=60, color='red', linestyle="--",)
-        plt.xlabel("Timestamp (s)")
-        plt.ylabel("Speed (MPH)")
-        plt.title("0-60 MPH in " + str(minTime[0]) + "s")
-        plt.legend()
-        plt.show()
+        if (didNotReach60 == numWheels):
+            print(f"No wheels reached 60mph")
+        else:
+            plt.axhline(y=60, color='red', linestyle="--",)
+            plt.xlabel("Timestamp (s)")
+            plt.ylabel("Speed (MPH)")
+            plt.title("0-60 MPH in " + str(minTime[0]) + "s")
+            plt.legend()
+            plt.show()
