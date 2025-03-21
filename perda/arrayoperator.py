@@ -38,8 +38,6 @@ class arrayoperator:
         if min_end == -1:
             min_end = self.__csvparser.get_data_end_time()
         if unit == "s":
-            print(max_start)
-            print(min_end)
             max_start = max_start * 1e3
             if min_end != -1:
                 min_end = min_end * 1e3
