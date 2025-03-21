@@ -118,7 +118,7 @@ class dataplotter:
                 t /= 1000
                 # wheel speed sensor is NaN if 0
                 if np.isnan(y) or y <= 0:
-                    startTime = t/1000
+                    startTime = t
                 elif y >= 60 and lastSpeed < 60:
                     endTime = lastTime + (60 - lastSpeed) * (t - lastTime) / (y - lastSpeed)
 
