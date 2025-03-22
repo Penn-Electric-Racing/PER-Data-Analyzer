@@ -109,7 +109,7 @@ class dataplotter:
                     ax.tick_params(axis="y", labelcolor="b")
                     ax.set_title(short_name)
                     ax.legend(loc="upper left")
-                    print("graph for var")
+                    print(f"graph for {var}")
                     plt.show()
                     print("\n\n")
             
@@ -125,7 +125,7 @@ class dataplotter:
                     title = " and ".join(valid_names)
                     plt.title(f"Dual Graph for {title}" if len(valid_names) == 2 else f"Single Y-Axis Graph for {title}")
                     fig.tight_layout()
-                    print("graph for {title}")
+                    print(f"graph for {title}")
                     plt.show()
                     print("\n\n")
 
