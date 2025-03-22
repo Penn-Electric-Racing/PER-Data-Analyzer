@@ -51,8 +51,8 @@ logfile = folder_path + "/10_08/01_01_00 12_18_59 AM.csv"
 
 #Configuration to access library
 #Input your github username and authentication token
-username = "odzjeffreyjr"
-authenticationToken = "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"
+username = ""
+authenticationToken = ""
 !pip uninstall -y perda
 !pip install --upgrade git+https://{username}:{authenticationToken}@github.com/Penn-Electric-Racing/PER-Data-Analyzer.git
 # You may need to restart session if updates are done on library in real time. Run this cell then restart session
