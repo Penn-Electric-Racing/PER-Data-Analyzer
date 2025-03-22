@@ -108,11 +108,6 @@ class dataplotter:
                     ax.legend(loc="upper left")
                     plt.show()
                     print("\n\n")
-
-                if not self.__plot_same_graph:
-                    plt.suptitle(short_name)
-                    plt.show()
-                    print("\n\n")
             
             if self.__plot_same_graph:
                 valid_names = []
@@ -126,9 +121,6 @@ class dataplotter:
                     title = " and ".join(valid_names)
                     plt.title(f"Dual Graph for {title}" if len(valid_names) == 2 else f"Single Y-Axis Graph for {title}")
                     fig.tight_layout()
-                    ax1.legend(loc="upper left")
-                    if ax2:
-                        ax2.legend(loc="upper right")
                     plt.show()
                     print("\n\n")
 
