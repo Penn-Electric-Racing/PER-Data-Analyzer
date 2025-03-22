@@ -73,6 +73,9 @@ class dataplotter:
                     last_time_stamp = vals[-1,0]
                 
                 filtered_vals = vals[(vals[:, 0] >= first_time_stamp) & (vals[:, 0] <= last_time_stamp )]
+                if filtered_vals.size == 0:
+                    print(f"Warning: No data available for {short_name} in the given time range.")
+                    continue
 
                 if self.__plot_unit == "s":
                     t = filtered_vals[::, 0]/1e3
@@ -106,6 +109,7 @@ class dataplotter:
                     ax.tick_params(axis="y", labelcolor="b")
                     ax.set_title(short_name)
                     ax.legend(loc="upper left")
+                    print("graph for var")
                     plt.show()
                     print("\n\n")
             
@@ -121,6 +125,7 @@ class dataplotter:
                     title = " and ".join(valid_names)
                     plt.title(f"Dual Graph for {title}" if len(valid_names) == 2 else f"Single Y-Axis Graph for {title}")
                     fig.tight_layout()
+                    print("graph for {title}")
                     plt.show()
                     print("\n\n")
 
