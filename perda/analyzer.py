@@ -27,34 +27,39 @@ class analyzer:
         self.__operator.set_csvparser(self.__csvparser)
         self.__file_read = True
 
-    def set_plot(self, start_time = 0, end_time = -1, same_graph = True, unit = "s"):
-        self.__dataplotter.set_plot(start_time, end_time, same_graph, unit)
-
-    def plot(self, variables: list):
-        self.__dataplotter.plot(variables)
+    def plot(self, variables: list, start_time = 0, end_time = -1, same_graph = True, time_unit = "s"):
+        self.__dataplotter.set_plot(start_time, end_time, same_graph, time_unit)
+        self.__dataplotter.plot_norm(variables)
+    
+    def plot_dual(self, variables: list, start_time = 0, end_time = -1, same_graph = True, time_unit = "s"):
+        self.__dataplotter.set_plot(start_time, end_time, same_graph, time_unit)
+        self.__dataplotter.plot_dual(variables)
 
     def get_nparray(self, short_name: str):
         return self.__csvparser.get_np_array(short_name)
     
-    def get_filtered_nparray(self, arr, start_time = 0, end_time = -1, unit = "s"):
-        return self.__operator.get_filtered_nparr(arr, start_time, end_time, unit)
-
-    def get_compute_arrays(self, op_list: list[str], match_type: str = "connect", start_time = 0, end_time = -1, unit = "s"):
-        return self.__operator.get_compute_arrays(op_list, match_type, start_time, end_time, unit)
+    def get_filtered_nparray(self, arr, start_time = 0, end_time = -1, time_unit = "s"):
+        return self.__operator.get_filtered_nparr(arr, start_time, end_time, time_unit)
     
-    def get_integral(self, arr, start_time = 0, end_time = -1, unit = "s"):
-        filtered_arr = self.__operator.get_filtered_nparr(arr, start_time, end_time, unit)
+    def align_array(self, align_list: list, match_type: str = "connect", start_time = 0, end_time = -1, time_unit = "s"):
+        return self.__operator.align_arrays(align_list, match_type, start_time, end_time, time_unit)
+
+    def get_compute_arrays(self, op_list: list[str], match_type: str = "connect", start_time = 0, end_time = -1, time_unit = "s"):
+        return self.__operator.get_compute_arrays(op_list, match_type, start_time, end_time, time_unit)
+    
+    def get_integral(self, arr, start_time = 0, end_time = -1, time_unit = "s"):
+        filtered_arr = self.__operator.get_filtered_nparr(arr, start_time, end_time, time_unit)
         integral, _ = self.__operator.get_integral_avg(filtered_arr)
-        if unit == "s":
+        if time_unit == "s":
             integral /= 1e3
         return integral
     
-    def get_average(self, arr, start_time = 0, end_time = -1, unit = "s"):
-        filtered_arr = self.__operator.get_filtered_nparr(arr, start_time, end_time, unit)
+    def get_average(self, arr, start_time = 0, end_time = -1, time_unit = "s"):
+        filtered_arr = self.__operator.get_filtered_nparr(arr, start_time, end_time, time_unit)
         _, average = self.__operator.get_integral_avg(filtered_arr)
         return average
     
-    def analyze_data(self, arr_list: list, start_time = 0, end_time = -1, unit = "s"):
+    def analyze_data(self, arr_list: list, start_time = 0, end_time = -1, time_unit = "s"):
         arr_num = 0
         for arr in arr_list:
             if type(arr) is str:
@@ -64,7 +69,7 @@ class analyzer:
                 var_name = f"Input Data {arr_num}"
                 canid = -1
 
-            filtered_arr = self.__operator.get_filtered_nparr(arr, start_time, end_time, unit)
+            filtered_arr = self.__operator.get_filtered_nparr(arr, start_time, end_time, time_unit)
             num_data = len(filtered_arr)
             data_start_time = filtered_arr[0,0]
             data_end_time = filtered_arr[-1,0]
@@ -73,7 +78,7 @@ class analyzer:
             max_value, max_timestamp, min_value, min_timestamp = self.__operator.get_max_min(filtered_arr)
             decimals = 0
 
-            if unit == "s":
+            if time_unit == "s":
                 max_timestamp /= 1e3
                 min_timestamp /= 1e3
                 data_start_time /= 1e3
@@ -86,14 +91,14 @@ class analyzer:
             if canid != -1:
                 print(f"Can ID: {canid}")
             print(f"Data amount: {num_data}")
-            start_time = format(data_start_time, f",.{decimals}f")
-            end_time = format(data_end_time, f",.{decimals}f")
+            display_start_time = format(data_start_time, f",.{decimals}f")
+            display_end_time = format(data_end_time, f",.{decimals}f")
             duration = format(duration, f",.{decimals}f")
             max_time = format(max_timestamp,f",.{decimals}f")
             min_time = format(min_timestamp,f",.{decimals}f")
-            print(f"Start: {start_time}{unit} | End: {end_time}{unit} | Duration: {duration}{unit}")
-            print(f"Max Value: {max_value} ({max_time}{unit})")
-            print(f"Min Value: {min_value} ({min_time}{unit})")
+            print(f"Start: {display_start_time}{time_unit} | End: {display_end_time}{time_unit} | Duration: {duration}{time_unit}")
+            print(f"Max Value: {max_value} ({max_time}{time_unit})")
+            print(f"Min Value: {min_value} ({min_time}{time_unit})")
             print(f"Average: {average}")
             print(f"Integral: {integral}")
             print("\n")

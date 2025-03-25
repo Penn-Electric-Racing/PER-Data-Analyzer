@@ -3,4 +3,5 @@ __pycache__/
 *.pyc
 *.pyo
 perda.egg-info/
-csv files/
+Tests/csv files/
+build/

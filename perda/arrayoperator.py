@@ -76,7 +76,51 @@ class arrayoperator:
         max_timestamp = timestamps[max_index]
 
         return max_value, max_timestamp, min_value, min_timestamp
+    
+    def align_arrays(self, arr_list: list, match_type: str = "connect", start_time = 0, end_time = -1, unit = "s"):
+        if not self.__file_read:
+            raise AttributeError("No csv read. Call .get_csvparser() before plotting.")
+        var_arrs = []
+        max_start = start_time
+        min_end = end_time
+        if min_end == -1:
+            min_end = self.__csvparser.get_data_end_time()
+        if unit == "s":
+            max_start = max_start * 1e3
+            if min_end != -1:
+                min_end = min_end * 1e3
+        max_start = max(max_start, 0)
+        min_end = min(min_end, self.__csvparser.get_data_end_time())
+
+        for arr in arr_list:
+            if type(arr) is str:
+                var_np = self.__csvparser.get_np_array(arr)
+                if var_np is None:
+                    raise AttributeError("Abroated: Missing Information: Cannot Find Input Name")
+            elif isinstance(arr, np.ndarray):
+                var_np = arr
+            else:
+                raise TypeError("Abroated: Invalid Input Type")
+            max_start = max(var_np[0,0], max_start)
+            min_end = min(var_np[-1,0], min_end)
+            var_arrs.append(var_np)
+
+        filtered_arrs = []
+        for np_arr in var_arrs:
+            filtered_np = np_arr[(np_arr[:, 0] >= max_start) & (np_arr[:, 0] <= min_end)]
+            filtered_arrs.append(filtered_np)
+
+        arr_num = len(filtered_arrs)
+        sorted_arr, sorted_hvimp = helper.align_nparr(filtered_arrs)
+        filled_data = []
+        for i in range(arr_num):
+            # Stack the timestamp column with the current value column
+            arr = np.column_stack((sorted_arr[:, 0], sorted_arr[:, i+1]))
+            filled_arr = helper.fill_missing_values(arr, match_type)
+            combined_filled = np.hstack((filled_arr, sorted_hvimp))
+            filled_data.append(combined_filled)
         
+        return filled_data
 
     def get_compute_arrays(self, op_list: list[str], match_type: str = "connect", start_time = 0, end_time = -1, unit = "s"):
         if not self.__file_read:

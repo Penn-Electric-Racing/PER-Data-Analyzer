@@ -16,7 +16,7 @@ def align_nparr(np_list: list[np.ndarray]):
             sorted_hv_imp.append([])
             curr_idx += 1
             final_sorted_arr[curr_idx][0] = this_tsp
-            sorted_hv_imp[curr_idx] = [this_tsp, arr[2], arr[3]]
+            sorted_hv_imp[curr_idx] = [arr[2], arr[3]]
         final_sorted_arr[curr_idx][arr_input_num+1] = arr[1]
         last_tsp = this_tsp
     return np.array(final_sorted_arr), np.array(sorted_hv_imp)
@@ -90,7 +90,7 @@ def fill_missing_values(arr, math_type="connect"):
                 elif next_i < m:
                     filled[i, 1] = filled[next_i, 1]
 
-            elif math_type == "extend_back":
+            elif math_type == "extend_backward":
                 # Use the next valid value.
                 if next_i < m:
                     filled[i, 1] = filled[next_i, 1]
@@ -100,7 +100,7 @@ def fill_missing_values(arr, math_type="connect"):
 
             else:
                 if math_type != "connect":
-                    print("Invalid math_type. Please input 'connect', 'extend_forward', or 'extend_back'. Default to 'connect'")
+                    print("Invalid math_type. Please input 'connect', 'extend_forward', or 'extend_backward'. Default to 'connect'")
                 # Both neighbors found: interpolate.
                 if prev_i >= 0 and next_i < m:
                     t_prev, v_prev = filled[prev_i, 0], filled[prev_i, 1]
