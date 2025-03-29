@@ -7,6 +7,7 @@ class csvparser:
     def __init__(self):
         self.__value_map = {}
         self.__ID_map = {}
+        self.__already_filtered = {}
         self.__high_voltage_changes = []
         self.__data_start_time = None
         self.__data_end_time = None
@@ -15,6 +16,7 @@ class csvparser:
     def reset(self):
         self.__value_map = {}
         self.__ID_map = {}
+        self.__already_filtered = {}
         self.__high_voltage_changes = []
         self.__data_start_time = None
         self.__data_end_time = None
@@ -26,6 +28,7 @@ class csvparser:
         # Reset but do not print
         self.__value_map = {}
         self.__ID_map = {}
+        self.__already_filtered = {}
         self.__high_voltage_changes = []
         self.__data_start_time = None
         self.__data_end_time = None
@@ -145,12 +148,10 @@ class csvparser:
         self.__data_end_time = raw_time
         self.__file_read = True
         print("Csv parsing complete.")
-        self.filter_data_drop(self.__value_map)
-        print("Starting outlier filtering.")
-
         if bad_data != 0:
             print(f"Number of bad data: {bad_data}")
     
+    # might need in the future
     def filter_data_replace(self, value_map: dict):
         window_size = 5 
         for key in value_map:
@@ -179,46 +180,68 @@ class csvparser:
 
             value_map[key] = np.column_stack((time_col, cleaned_values, data[:, 2:])).tolist()
 
-    def filter_data_drop(self, value_map: dict):
-        with tqdm(desc="Filtering data by ID", unit=" IDs", initial = 1) as pbar:
-            for key in list(value_map):
-                data = np.array(value_map[key])
-                N = data.shape[0]
-                if N < 5:
-                    continue  
+    def filter_data_drop(self, key: str):
+        if self.__already_filtered.get(key, False):
+            return self.__value_map[key]
+        with tqdm(desc=f"Cleaning outliers for {key}. ", unit=" windows", initial = 1) as pbar:
+            data = np.array(self.__value_map[key])
+            N = data.shape[0]
+            if N < 5:
+                return self.__value_map[key]
 
-                window_size = max(5, int(np.sqrt(N)))
-                if window_size % 2 == 0:
-                    window_size += 1 
+            window_size = max(5, int(np.sqrt(N)))
+            if window_size % 2 == 0:
+                window_size += 1 
 
-                values_col = data[:, 1]
+            values_col = data[:, 1]
 
-                valid_indices = []
-                firstCol = True
+            valid_indices = []
+            firstCol = True
 
-                for i in range(N - window_size + 1):
-                    window = values_col[i:i + window_size]
-                    Q1 = np.percentile(window, 25)
-                    Q3 = np.percentile(window, 75)
-                    IQR = Q3 - Q1
+            for i in range(N - window_size + 1):
+                window = values_col[i:i + window_size]
+                Q1 = np.percentile(window, 25)
+                Q3 = np.percentile(window, 75)
+                IQR = Q3 - Q1
 
-                    lower_bound = Q1 - 1.5 * IQR
-                    upper_bound = Q3 + 1.5 * IQR
-                    if (firstCol):
-                        for idx in range(window_size // 2):
-                            if lower_bound <= values_col[idx] <= upper_bound:
-                                valid_indices.append(idx)
-                        firstCol = False
-                    mid_idx = i + (window_size // 2)
-                    if lower_bound <= values_col[mid_idx] <= upper_bound:
-                        valid_indices.append(mid_idx)
-
-                # Convert valid indices into a filtered dataset
-                filtered_data = data[valid_indices]
-
-                # Store the cleaned data back in value_map as a list of lists
-                value_map[key] = filtered_data.tolist()
+                lower_bound = Q1 - 1.5 * IQR
+                upper_bound = Q3 + 1.5 * IQR
+                if (firstCol):
+                    for idx in range(window_size // 2):
+                        if lower_bound <= values_col[idx] <= upper_bound:
+                            valid_indices.append(idx)
+                    firstCol = False
+                mid_idx = i + (window_size // 2)
+                if lower_bound <= values_col[mid_idx] <= upper_bound:
+                    valid_indices.append(mid_idx)
+                if (i == N - window_size):
+                    for idx in range(i + (window_size // 2), N):
+                        if lower_bound <= values_col[idx] <= upper_bound:
+                            valid_indices.append(idx)
                 pbar.update(1)
+
+            # Convert valid indices into a filtered dataset
+            filtered_data = data[valid_indices]
+
+            # Store the cleaned data back in value_map as a list of lists
+            self.__value_map[key] = filtered_data.tolist()
+            self.__already_filtered[key] = True
+        return self.__value_map[key]
+    
+    def filter_all_data(self):
+        if not self.__file_read:
+            raise AttributeError("Empty parser, read csv before calling.")
+        print("Warning: This is an expensive and time consuming operation. Do you wish to continue?")
+        while True:
+            inp = input("Y/N: ")
+            if inp == "Y" or inp == "y":
+                break
+            elif inp == "N" or inp == "n":
+                return
+            else:
+                print("Invalid input.")
+        for eachKey in self.__value_map:
+            self.filter_data_drop(eachKey)
 
 
     def get_np_array(self, short_name: str):
@@ -232,11 +255,12 @@ class csvparser:
 
         if full_name is None:
             raise AttributeError("Error: could not find data for " + short_name)
-        return np.array(self.__value_map[full_name])
+        return np.array(self.filter_data_drop(full_name))
     
     def get_value_map(self):
         if not self.__file_read:
             raise AttributeError("Empty parser, read csv before calling.")
+        print("Not all data in the value map might have outliers filtered.")
         return self.__value_map
     
     def get_ID_map(self):

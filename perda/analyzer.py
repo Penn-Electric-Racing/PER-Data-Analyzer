@@ -41,6 +41,9 @@ class analyzer:
     def get_filtered_nparray(self, arr, start_time = 0, end_time = -1, time_unit = "s"):
         return self.__operator.get_filtered_nparr(arr, start_time, end_time, time_unit)
     
+    def filter_all_data(self):
+        return self.__csvparser.filter_all_data()
+
     def align_array(self, align_list: list, match_type: str = "connect", start_time = 0, end_time = -1, time_unit = "s"):
         return self.__operator.align_arrays(align_list, match_type, start_time, end_time, time_unit)
 
