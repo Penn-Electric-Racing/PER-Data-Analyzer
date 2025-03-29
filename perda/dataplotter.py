@@ -36,9 +36,14 @@ class dataplotter:
         else:
             self.__plot_unit = unit
 
-    def plot_norm(self, variables: list):
+    def plot_norm(self, variables: list, h_lines: list = [], v_lines: list = []):
         if not self.__file_read:
             raise AttributeError("No csv read. Call .get_csvparser() before plotting.")
+        for h in h_lines:
+            plt.axhline(y=h, color='black', linestyle='--', zorder=1)
+        for v in v_lines:
+            plt.axvline(x=v, color='black', linestyle='--', zorder=1)
+        
         for var in variables:
             if type(var) is list:
                 self.plot(var, True)
@@ -90,12 +95,17 @@ class dataplotter:
                 plt.suptitle(short_name)
                 plt.show()
                 print("\n\n")
+                for h in h_lines:
+                    plt.axhline(y=h, color='black', linestyle='--')
+                
+                for v in v_lines:
+                    plt.axvline(x=v, color='black', linestyle='--')
         
         if self.__plot_same_graph:
             plt.show()
             print("\n\n")
-
-    def plot_dual(self, variables: list):
+        
+    def plot_dual(self, variables: list, h_lines: list = [], v_lines: list = []):
         if not self.__file_read:
             raise AttributeError("No csv read. Call .get_csvparser() before plotting.")
         num_vars = len(variables)
@@ -104,6 +114,13 @@ class dataplotter:
         for group in grouped_vars:
             fig, ax1 = plt.subplots()
             ax2 = None
+
+            for h in h_lines:
+                plt.axhline(y=h, color='black', linestyle='--', zorder=1)
+            
+            for v in v_lines:
+                plt.axvline(x=v, color='black', linestyle='--', zorder=1)
+    
             for i, var in enumerate(group):
                 if type(var) is list:
                     self.plot(var)
