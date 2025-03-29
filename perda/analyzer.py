@@ -27,13 +27,13 @@ class analyzer:
         self.__operator.set_csvparser(self.__csvparser)
         self.__file_read = True
 
-    def plot(self, variables: list, start_time = 0, end_time = -1, same_graph = True, time_unit = "s"):
+    def plot(self, variables: list, start_time = 0, end_time = -1, same_graph = True, time_unit = "s", h_lines: list = [], v_lines: list = []):
         self.__dataplotter.set_plot(start_time, end_time, same_graph, time_unit)
-        self.__dataplotter.plot_norm(variables)
+        self.__dataplotter.plot_norm(variables, h_lines, v_lines)
     
-    def plot_dual(self, variables: list, start_time = 0, end_time = -1, same_graph = True, time_unit = "s"):
+    def plot_dual(self, variables: list, start_time = 0, end_time = -1, same_graph = True, time_unit = "s", h_lines: list = [], v_lines: list = []):
         self.__dataplotter.set_plot(start_time, end_time, same_graph, time_unit)
-        self.__dataplotter.plot_dual(variables)
+        self.__dataplotter.plot_dual(variables, h_lines, v_lines)
 
     def get_nparray(self, short_name: str):
         return self.__csvparser.get_np_array(short_name)
