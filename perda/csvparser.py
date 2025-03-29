@@ -145,9 +145,82 @@ class csvparser:
         self.__data_end_time = raw_time
         self.__file_read = True
         print("Csv parsing complete.")
+        self.filter_data_drop(self.__value_map)
+        print("Starting outlier filtering.")
+
         if bad_data != 0:
             print(f"Number of bad data: {bad_data}")
     
+    def filter_data_replace(self, value_map: dict):
+        window_size = 5 
+        for key in value_map:
+            data = np.array(value_map[key])
+            if data.shape[0] < window_size:
+                continue  
+
+            time_col = data[:, 0]
+            values_col = data[:, 1]
+            cleaned_values = values_col.copy()
+
+            for i in range(len(values_col) - window_size + 1):
+                window = values_col[i:i + window_size]
+                Q1 = np.percentile(window, 25)
+                Q3 = np.percentile(window, 75)
+                IQR = Q3 - Q1
+
+                lower_bound = Q1 - 1.5 * IQR
+                upper_bound = Q3 + 1.5 * IQR
+
+                mid_idx = i + window_size // 2
+                if values_col[mid_idx] < lower_bound or values_col[mid_idx] > upper_bound:
+                    median_value = np.median(window)
+                    if lower_bound <= median_value <= upper_bound:
+                        cleaned_values[mid_idx] = median_value
+
+            value_map[key] = np.column_stack((time_col, cleaned_values, data[:, 2:])).tolist()
+
+    def filter_data_drop(self, value_map: dict):
+        with tqdm(desc="Filtering data by ID", unit=" IDs", initial = 1) as pbar:
+            for key in list(value_map):
+                data = np.array(value_map[key])
+                N = data.shape[0]
+                if N < 5:
+                    continue  
+
+                window_size = max(5, int(np.sqrt(N)))
+                if window_size % 2 == 0:
+                    window_size += 1 
+
+                values_col = data[:, 1]
+
+                valid_indices = []
+                firstCol = True
+
+                for i in range(N - window_size + 1):
+                    window = values_col[i:i + window_size]
+                    Q1 = np.percentile(window, 25)
+                    Q3 = np.percentile(window, 75)
+                    IQR = Q3 - Q1
+
+                    lower_bound = Q1 - 1.5 * IQR
+                    upper_bound = Q3 + 1.5 * IQR
+                    if (firstCol):
+                        for idx in range(window_size // 2):
+                            if lower_bound <= values_col[idx] <= upper_bound:
+                                valid_indices.append(idx)
+                        firstCol = False
+                    mid_idx = i + (window_size // 2)
+                    if lower_bound <= values_col[mid_idx] <= upper_bound:
+                        valid_indices.append(mid_idx)
+
+                # Convert valid indices into a filtered dataset
+                filtered_data = data[valid_indices]
+
+                # Store the cleaned data back in value_map as a list of lists
+                value_map[key] = filtered_data.tolist()
+                pbar.update(1)
+
+
     def get_np_array(self, short_name: str):
         if not self.__file_read:
             raise AttributeError("Empty parser, read csv before calling.")
