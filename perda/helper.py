@@ -1,5 +1,8 @@
 import numpy as np
 
+def name_matches(short_name, full_name):
+    return f'({short_name})' in full_name
+
 def align_nparr(np_list: list[np.ndarray]):
     num_arr = len(np_list)
     sorted_arr = merge_and_sort_with_source(np_list)
@@ -120,5 +123,151 @@ def fill_missing_values(arr, math_type="connect"):
                 
     return filled
 
-def name_matches(short_name, full_name):
-    return f'({short_name})' in full_name
+def sample_missing_values(empty_tsp, match_np, math_type="connect"):
+    length = len(match_np)
+
+    prev_tsp = match_np[0][0]
+    prev_val = match_np[0][1]
+    prev_hv = match_np[0][2]
+    prev_imp = match_np[0][3]
+
+    next_tsp = match_np[1][0]
+    next_val = match_np[1][1]
+    next_hv = match_np[1][2]
+    next_imp = match_np[1][3]
+
+    curr_tsp_index = 1
+
+    sample_data = []
+
+    for tsp in empty_tsp:
+        this_val = None
+        this_hv = None
+        this_imp = None
+        while (next_tsp < tsp):
+            prev_tsp = next_tsp
+            prev_val = next_val
+            prev_hv = next_hv
+            prev_imp = next_imp
+            curr_tsp_index += 1
+            
+            if (curr_tsp_index == length):
+                raise IndexError("Index Out Of Bounds")
+
+            next_tsp = match_np[curr_tsp_index][0]
+            next_val = match_np[curr_tsp_index][1]
+            next_hv = match_np[curr_tsp_index][2]
+            next_imp = match_np[curr_tsp_index][3]
+        
+        if math_type == "extend_forward":
+            this_val = next_val
+            this_hv = next_hv
+            this_imp = next_imp
+
+        elif math_type == "extend_backward":
+            this_val = prev_val
+            this_hv = prev_hv
+            this_imp = prev_imp
+
+        else:
+            if math_type != "connect":
+                print("Invalid math_type. Please input 'connect', 'extend_forward', or 'extend_backward'. Default to 'connect'")
+            # Both neighbors found: interpolate.
+
+            this_hv = prev_hv
+            this_imp = prev_imp
+
+            if prev_tsp != next_tsp:
+                this_val = prev_val + (next_val - prev_val) * (tsp - prev_tsp) / (next_tsp - prev_tsp)
+            else:
+                this_val = prev_val
+        sample_data.append([tsp, this_val, this_hv, this_imp])
+
+    return np.array(sample_data)
+
+def sample_data(nparr, fs, start_time = -1, end_time = -1, time_unit = "s", match_type = "connect"):
+    data_start_time = nparr[0][0]
+    data_end_time = nparr[-1][0]
+    if time_unit == "s":
+        if start_time != -1:
+            start_time *= 1e3
+        else:
+            start_time = data_start_time
+        if end_time != -1:
+            end_time *= 1e3
+        else:
+            end_time = data_end_time
+    if start_time > data_end_time or end_time < data_start_time:
+        raise AttributeError("Time Range Incorrect")
+    
+    interval = 1000 / fs  # 1000 ms per second divided by samples per second
+
+    # Generate the array of timestamps
+    timestamps = np.arange(start_time, end_time, interval)
+    sampled_data = sample_missing_values(timestamps, nparr, match_type)
+
+    return sampled_data
+
+def compute_fft(x, fs: int, center_frequencies=True):
+    """
+    Compute the DFT of x.
+
+    Args:
+        x: Signal of length N.
+        fs: Sampling frequency.
+        center_frequencies: If true then returns frequencies on [-f/2,f/2]. If false then returns frequencies between [0,f].
+    Returns:
+        X: DFT of x.
+        f: Frequencies
+    """
+    N = len(x)
+    X = np.fft.fft(x, norm="ortho")
+    f = np.fft.fftfreq(N, 1/fs)
+    if center_frequencies:
+        X = np.fft.fftshift(X)
+        f = np.fft.fftshift(f)
+    return X, f
+
+def compute_ifft(X, fs: int, center_frequencies=True):
+    """
+    Compute the iDFT of X.
+
+    Args:
+        X: Spectrum  of length N.
+        fs: Sampling frequency.
+        center_frequencies: If true then X is defined over the frequency range [-f/2,f/2]. If false then [0,f].
+    Returns:
+        x: iDFT of X and it should be real.
+        t: real time instants in the range [0, T]
+    """
+    N = len(X)
+    if center_frequencies:
+      X = np.fft.ifftshift(X)
+    x = np.fft.ifft(X, norm="ortho")
+    t = np.arange(N)/fs
+    return x.real, t
+
+def bandlimitter(X, f, bl, bu):
+    """
+    Generate a band-limited signal by nulling the frequency components within the range [bl, bu].
+    If bu is set to -1, the function nulls all frequency components above bl.
+
+    Args:
+        X: Spectrum (1D numpy array)
+        f: Frequency range corresponding to the spectrum X (1D numpy array)
+        bl: Lower bound of the frequency range to eliminate
+        bu: Upper bound of the frequency range to eliminate; if bu = -1, eliminates all frequencies above bl
+
+    Returns:
+        X_BL: Spectrum of the band-limited signal
+    """
+    # Create a mask to null frequencies within the range [bl, bu]
+    if bu == -1:
+        mask = np.abs(f) <= bl
+    else:
+        mask = (np.abs(f) < bl) | (np.abs(f) > bu)
+
+    # Apply the mask to the spectrum
+    X_BL = X * mask
+
+    return X_BL

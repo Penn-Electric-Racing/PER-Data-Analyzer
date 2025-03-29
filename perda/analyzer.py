@@ -47,6 +47,11 @@ class analyzer:
     def get_compute_arrays(self, op_list: list[str], match_type: str = "connect", start_time = 0, end_time = -1, time_unit = "s"):
         return self.__operator.get_compute_arrays(op_list, match_type, start_time, end_time, time_unit)
     
+    def get_band_filter(self, band_list: list, sample_frequency = -1, filtered_lower_band = -1, filtered_upper_band = -1,
+                        match_type: str = "connect", start_time = 0, end_time = -1, time_unit = "s"):
+        return self.__operator.get_band_filter(band_list, sample_frequency, filtered_lower_band, filtered_upper_band, match_type, start_time, end_time, time_unit)
+
+    
     def get_integral(self, arr, start_time = 0, end_time = -1, time_unit = "s"):
         filtered_arr = self.__operator.get_filtered_nparr(arr, start_time, end_time, time_unit)
         integral, _ = self.__operator.get_integral_avg(filtered_arr)
