@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "Penn Electric Racing Data Analyzer"
 authors = [
     {name = "laytcai", email = "1715782167@qq.com"},
-    {name = "odzjeffreyjr"},
+    {name = "odzjeffreyjr", email = "odzjeffreyjr@gmail.com"},
     {name = "Penn Electric Racing Software"}
 ]
 readme = "README.md"
@@ -21,7 +21,7 @@ classifiers = [
     "Operating System :: OS Independent"
 ]
 
-[tool.setuptools]
+[tool.setuptools.packages.find]
 packages = ["perda"]
 
 [build-system]
