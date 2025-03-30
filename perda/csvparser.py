@@ -183,6 +183,7 @@ class csvparser:
     def filter_data_drop(self, key: str):
         if self.__already_filtered.get(key, False):
             return self.__value_map[key]
+        outlier_count = 0
         with tqdm(desc=f"Cleaning outliers for {key}. ", unit=" windows", initial = 1) as pbar:
             data = np.array(self.__value_map[key])
             N = data.shape[0]
@@ -210,6 +211,8 @@ class csvparser:
                     for idx in range(window_size // 2):
                         if lower_bound <= values_col[idx] <= upper_bound:
                             valid_indices.append(idx)
+                        else:
+                            outlier_count += 1
                     firstCol = False
                 mid_idx = i + (window_size // 2)
                 if lower_bound <= values_col[mid_idx] <= upper_bound:
@@ -218,6 +221,8 @@ class csvparser:
                     for idx in range(i + (window_size // 2), N):
                         if lower_bound <= values_col[idx] <= upper_bound:
                             valid_indices.append(idx)
+                        else:
+                            outlier_count += 1
                 pbar.update(1)
 
             # Convert valid indices into a filtered dataset
@@ -226,6 +231,7 @@ class csvparser:
             # Store the cleaned data back in value_map as a list of lists
             self.__value_map[key] = filtered_data.tolist()
             self.__already_filtered[key] = True
+        print(f"{outlier_count} outliers found for {key}.")
         return self.__value_map[key]
     
     def filter_all_data(self):
