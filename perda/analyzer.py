@@ -27,13 +27,13 @@ class analyzer:
         self.__operator.set_csvparser(self.__csvparser)
         self.__file_read = True
 
-    def plot(self, variables: list, start_time = 0, end_time = -1, same_graph = True, time_unit = "s"):
+    def plot(self, variables: list, start_time = 0, end_time = -1, same_graph = True, time_unit = "s", h_lines: list = [], v_lines: list = []):
         self.__dataplotter.set_plot(start_time, end_time, same_graph, time_unit)
-        self.__dataplotter.plot_norm(variables)
+        self.__dataplotter.plot_norm(variables, h_lines, v_lines)
     
-    def plot_dual(self, variables: list, start_time = 0, end_time = -1, same_graph = True, time_unit = "s"):
+    def plot_dual(self, variables: list, start_time = 0, end_time = -1, same_graph = True, time_unit = "s", h_lines: list = [], v_lines: list = []):
         self.__dataplotter.set_plot(start_time, end_time, same_graph, time_unit)
-        self.__dataplotter.plot_dual(variables)
+        self.__dataplotter.plot_dual(variables, h_lines, v_lines)
 
     def get_nparray(self, short_name: str):
         return self.__csvparser.get_np_array(short_name)
@@ -41,6 +41,9 @@ class analyzer:
     def get_filtered_nparray(self, arr, start_time = 0, end_time = -1, time_unit = "s"):
         return self.__operator.get_filtered_nparr(arr, start_time, end_time, time_unit)
     
+    def filter_all_data(self):
+        return self.__csvparser.filter_all_data()
+
     def align_array(self, align_list: list, match_type: str = "connect", start_time = 0, end_time = -1, time_unit = "s"):
         return self.__operator.align_arrays(align_list, match_type, start_time, end_time, time_unit)
 

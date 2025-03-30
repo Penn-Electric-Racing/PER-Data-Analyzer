@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "Penn Electric Racing Data Analyzer"
 authors = [
     {name = "laytcai", email = "1715782167@qq.com"},
-    {name = "odzjeffreyjr"},
+    {name = "odzjeffreyjr", email = "odzjeffreyjr@gmail.com"},
     {name = "Penn Electric Racing Software"}
 ]
 readme = "README.md"
