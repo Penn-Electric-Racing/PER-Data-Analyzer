@@ -184,3 +184,30 @@ class arrayoperator:
             final_arr.append([this_timestamp, calculated_val, this_hv, this_imp])
         
         return np.array(final_arr)
+    
+    def get_band_filter(self, band_list: list, sample_frequency = -1, filtered_lower_band = -1, filtered_upper_band = -1,
+                        match_type: str = "connect", start_time = 0, end_time = -1, time_unit = "s"):
+        band_filtered_arr = []
+        for band_arr in band_list:
+            filtered_band_arr = self.get_filtered_nparr(band_arr, start_time, end_time, time_unit)
+            if sample_frequency == -1:
+                length = len(filtered_band_arr)
+                time_difference = (filtered_band_arr[-1][0] - filtered_band_arr[0][0])/1e3
+                fs = int(np.round(length/time_difference))
+            else:
+                fs = int(sample_frequency)
+            
+            if filtered_lower_band == -1:
+                bl = int(fs/3)
+            else:
+                bl = filtered_lower_band
+
+            sampled_filtered_arr = helper.sample_data(filtered_band_arr, fs, start_time, end_time, time_unit, match_type)
+            val = sampled_filtered_arr[:, 1]
+            X, f = helper.compute_fft(val, fs)
+            XF = helper.bandlimitter(X, f, bl, filtered_upper_band)
+            val_filtered, _ = helper.compute_ifft(XF, fs)
+            sampled_filtered_arr[:,1] = val_filtered
+            band_filtered_arr.append(sampled_filtered_arr)
+
+        return band_filtered_arr
