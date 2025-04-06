@@ -20,8 +20,9 @@ class analyzer:
         print("Reset Analyzer")
 
     def read_csv(self, path: str, input_align_name = "default"):
-        if self.__file_read:
-            raise AttributeError("Call .reset() before reading new csv")
+        # if self.__file_read:
+        #     raise AttributeError("Call .reset() before reading new csv")
+        self.reset()
         self.__csvparser.read_csv(path, input_align_name)
         self.__dataplotter.set_csvparser(self.__csvparser)
         self.__operator.set_csvparser(self.__csvparser)
