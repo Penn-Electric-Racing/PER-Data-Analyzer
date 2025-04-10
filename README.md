@@ -9,3 +9,7 @@ Custom python library for car data analysis.
 - Statistical analysis (integrals, averages, min/max values)
 - Acceleration analysis (0-60 mph calculations)
 - Time-unit conversion (seconds/milliseconds)
+
+## Installation
+### Colab
+- Run `pip install git+https://github.com/Penn-Electric-Racing/PER-Data-Analyzer.git@main`
