@@ -47,7 +47,7 @@ class analyzer:
     def plot(self, variables: list, start_time = 0, end_time = -1, same_graph = True, time_unit = "s", h_lines: list = [], v_lines: list = []):
         """Plot data variables on a graph.
 
-        Use plot_norm when you just want regular line plots, either all together or separately, such that they use the same y-axis scales.
+        Use plot when you want to visualize one or more variables over time on the same or separate graphs.
        
         Args:
             variables (list): List of variable names or arrays to plot
@@ -55,21 +55,27 @@ class analyzer:
             end_time (int, optional): End time for the plot. -1 for end of data. Defaults to -1.
             same_graph (bool, optional): Whether to plot all variables on same graph. Defaults to True.
             time_unit (str, optional): Time unit ("s" or "ms"). Defaults to "s".
+            h_lines (list, optional): List of y-values to draw horizontal lines at. Defaults to empty list.
+            v_lines (list, optional): List of x-values to draw vertical lines at. Defaults to empty list.
         """
         self.__dataplotter.set_plot(start_time, end_time, same_graph, time_unit)
         self.__dataplotter.plot_norm(variables, h_lines, v_lines)
     
     def plot_dual(self, variables: list, start_time = 0, end_time = -1, same_graph = True, time_unit = "s", h_lines: list = [], v_lines: list = []):
-        """Plot data variables on dual y-axis graphs.
+        """Plot data variables with dual y-axes.
 
-        Use plot_dual when you want variables paired up and plotted together but with different y-axis scales for easier comparison.
-       
+        Use plot_dual when you want to visualize pairs of variables over time with separate y-axes.
+        Each pair of variables will be plotted on its own graph with the first variable using the left y-axis
+        and the second variable using the right y-axis.
+
         Args:
-            variables (list): List of variable names or arrays to plot
+            variables (list): List of variable names or arrays to plot in pairs
             start_time (int, optional): Start time for the plot. Defaults to 0.
             end_time (int, optional): End time for the plot. -1 for end of data. Defaults to -1.
-            same_graph (bool, optional): Whether to plot all variables on same graph. Defaults to True.
+            same_graph (bool, optional): Whether to plot all pairs on same graph. Defaults to True.
             time_unit (str, optional): Time unit ("s" or "ms"). Defaults to "s".
+            h_lines (list, optional): List of y-values to draw horizontal lines at. Defaults to empty list.
+            v_lines (list, optional): List of x-values to draw vertical lines at. Defaults to empty list.
         """
         self.__dataplotter.set_plot(start_time, end_time, same_graph, time_unit)
         self.__dataplotter.plot_dual(variables, h_lines, v_lines)
