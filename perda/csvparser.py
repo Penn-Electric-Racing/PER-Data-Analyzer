@@ -250,7 +250,7 @@ class csvparser:
             self.filter_data_drop(eachKey)
 
 
-    def get_np_array(self, short_name: str):
+    def get_np_array(self, short_name: str, filter = False):
         if not self.__file_read:
             raise AttributeError("Empty parser, read csv before calling.")
         full_name = None
@@ -261,7 +261,9 @@ class csvparser:
 
         if full_name is None:
             raise AttributeError("Error: could not find data for " + short_name)
-        return np.array(self.filter_data_drop(full_name))
+        if filter:
+            return np.array(self.filter_data_drop(full_name))
+        return np.array(self.__value_map[full_name])
     
     def get_value_map(self):
         if not self.__file_read:

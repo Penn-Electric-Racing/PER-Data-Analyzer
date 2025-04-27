@@ -11,5 +11,4 @@ Custom python library for car data analysis.
 - Time-unit conversion (seconds/milliseconds)
 
 ## Installation
-### Colab
 - Run `pip install git+https://github.com/Penn-Electric-Racing/PER-Data-Analyzer.git@main`

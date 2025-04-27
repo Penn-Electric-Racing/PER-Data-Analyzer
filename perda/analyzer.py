@@ -36,8 +36,8 @@ class analyzer:
         self.__dataplotter.set_plot(start_time, end_time, same_graph, time_unit)
         self.__dataplotter.plot_dual(variables, h_lines, v_lines)
 
-    def get_nparray(self, short_name: str):
-        return self.__csvparser.get_np_array(short_name)
+    def get_nparray(self, short_name: str, filter = False):
+        return self.__csvparser.get_np_array(short_name, filter)
     
     def get_filtered_nparray(self, arr, start_time = 0, end_time = -1, time_unit = "s"):
         return self.__operator.get_filtered_nparr(arr, start_time, end_time, time_unit)

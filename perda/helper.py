@@ -1,7 +1,7 @@
 import numpy as np
 
 def name_matches(short_name, full_name):
-    return f'({short_name})' in full_name
+    return f'({short_name})' in full_name or f'{short_name}' in full_name
 
 def align_nparr(np_list: list[np.ndarray]):
     num_arr = len(np_list)
