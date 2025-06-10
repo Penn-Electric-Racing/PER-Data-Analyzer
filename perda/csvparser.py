@@ -43,7 +43,7 @@ class csvparser:
 
         bad_data = 0
 
-        if input_align_name == "default":
+        if input_align_name == "max_freq":
 
             count_dic = {}
 
@@ -94,7 +94,7 @@ class csvparser:
                     if (bad_data >= 100):
                         raise Exception("Bad data exceeds 100, aborted.")
                     if (line.startswith("Value")):
-                        if input_align_name == "default":
+                        if input_align_name == "max_freq":
                             continue
                         canID_name_value = line[6:].strip().split(": ")
                         try:
@@ -107,7 +107,7 @@ class csvparser:
                             bad_data += 1
                             continue
                     else:
-                        if align_id is None:
+                        if align_name != "default" and align_id is None:
                             print("Cannot Find Align Variable Name.")
                             return None
                         data = line.strip().split(",")
@@ -137,7 +137,10 @@ class csvparser:
                             if name not in self.__value_map:
                                 self.__value_map[name] = []
                             
-                            self.__value_map[name].append([time_stamp, val, high_voltage, any_implausibility, raw_time])
+                            if align_name == "default":
+                                self.__value_map[name].append([raw_time, val, high_voltage, any_implausibility])   
+                            else:
+                                self.__value_map[name].append([time_stamp, val, high_voltage, any_implausibility])
 
                         except Exception as e:
                             print(f"Error parsing ID | Line number {line_num} | Line: {line} | Error: {e}")
