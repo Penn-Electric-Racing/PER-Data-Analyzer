@@ -1,7 +1,13 @@
+# Ignore venv
+*venv/
+
 # Ignore compiled Python files
+build/
+dist/
 __pycache__/
+perda.egg-info/
 *.pyc
 *.pyo
-perda.egg-info/
-Tests/csv files/
-build/
+
+# Data
+notebooks/csv_files/
