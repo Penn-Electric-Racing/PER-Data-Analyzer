@@ -43,6 +43,14 @@ class analyzer:
         self.__dataplotter.set_csvparser(self.__csvparser)
         self.__operator.set_csvparser(self.__csvparser)
         self.__file_read = True
+    
+    def print_input_can_variables(self):
+        input_variables = self.__csvparser.get_input_can_variables()
+        col1_width = max(len(id) for id, _ in input_variables)
+        print(f"{'CAN Variables':<{col1_width}}  Info")
+        print("-" * (col1_width + 7))  # optional separator
+        for id, discript in input_variables:
+            print(f"{id:<{col1_width}}  {discript}")
 
     def plot(self, variables: list, start_time = 0, end_time = -1, same_graph = True, time_unit = "s", h_lines: list = [], v_lines: list = []):
         """Plot data variables on a graph.

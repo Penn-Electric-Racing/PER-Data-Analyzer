@@ -268,6 +268,33 @@ class csvparser:
             return np.array(self.filter_data_drop(full_name))
         return np.array(self.__value_map[full_name])
     
+    def get_input_can_variables(self):
+        """
+        Return a NumPy array of tuples:
+            (outside_text, inside_text)
+        • If a value looks like 'foo (bar)', it becomes ('foo', 'bar')
+        • Otherwise it becomes ('foo', '')
+        The array is lexicographically sorted by the two fields.
+        """
+        pairs = []
+
+        for raw in self.__ID_map.values():
+            s = raw.strip()
+            left = s.rfind('(')
+            # well-formed "( … )" at the end?
+            if left != -1 and s.endswith(')'):
+                outside = s[:left].rstrip()
+                inside  = s[left + 1 : -1].strip()   # drop '(' and ')'
+                if inside:               # both parts exist
+                    pairs.append((inside, outside))
+                    continue
+            # fallback: single column
+            pairs.append((s, ''))
+
+        # sort by outside first, then inside
+        sorted_pairs = np.array(sorted(pairs, key=lambda t: (t[0], t[1])), dtype=object)
+        return sorted_pairs
+    
     def get_value_map(self):
         if not self.__file_read:
             raise AttributeError("Empty parser, read csv before calling.")
