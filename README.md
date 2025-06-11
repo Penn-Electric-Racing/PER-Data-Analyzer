@@ -12,3 +12,6 @@ Custom python library for car data analysis.
 
 ## Installation
 - Run `pip install git+https://github.com/Penn-Electric-Racing/PER-Data-Analyzer.git@main`
+
+## Code Demo
+- See [tutorial.ipynb](tutorial/tutorial.ipynb)
