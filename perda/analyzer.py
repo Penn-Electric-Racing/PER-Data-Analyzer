@@ -52,7 +52,7 @@ class analyzer:
         for id, discript in input_variables:
             print(f"{id:<{col1_width}}  {discript}")
 
-    def plot(self, variables: list, start_time = 0, end_time = -1, same_graph = True, time_unit = "s", h_lines: list = [], v_lines: list = []):
+    def plot(self, variables: list, start_time = 0, end_time = -1, same_graph = True, label = True, time_unit = "s", h_lines: list = [], v_lines: list = []):
         """Plot data variables on a graph.
 
         Use plot when you want to visualize one or more variables over time on the same or separate graphs.
@@ -67,7 +67,7 @@ class analyzer:
             v_lines (list, optional): List of x-values to draw vertical lines at. Defaults to empty list.
         """
         self.__dataplotter.set_plot(start_time, end_time, same_graph, time_unit)
-        self.__dataplotter.plot_norm(variables, h_lines, v_lines)
+        self.__dataplotter.plot_norm(variables, label, h_lines, v_lines)
     
     def plot_dual(self, variables: list, start_time = 0, end_time = -1, same_graph = True, time_unit = "s", h_lines: list = [], v_lines: list = []):
         """Plot data variables with dual y-axes.

@@ -36,7 +36,7 @@ class dataplotter:
         else:
             self.__plot_unit = unit
 
-    def plot_norm(self, variables: list, h_lines: list = [], v_lines: list = []):
+    def plot_norm(self, variables: list, labels: bool = True, h_lines: list = [], v_lines: list = []):
         if not self.__file_read:
             raise AttributeError("No csv read. Call .get_csvparser() before plotting.")
         for h in h_lines:
@@ -89,7 +89,8 @@ class dataplotter:
 
             y = filtered_vals[::, 1]
             plt.plot(t, y, label=short_name)
-            plt.legend()
+            if labels:
+                plt.legend()
 
             if not self.__plot_same_graph:
                 plt.suptitle(short_name)
