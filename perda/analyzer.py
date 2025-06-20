@@ -88,10 +88,10 @@ class analyzer:
         self.__dataplotter.set_plot(start_time, end_time, same_graph, time_unit)
         self.__dataplotter.plot_dual(variables, h_lines, v_lines)
     
-    def plot_join(self, left_variables: list, right_variables: list, start_time = 0, end_time = -1, left_title = "", right_title = "", middle_title = "", labels = True, same_graph = True, time_unit = "s", h_lines: list = [], v_lines: list = []):
+    def plot_join(self, left_variables: list, right_variables: list, start_time = 0, end_time = -1, left_title = "", right_title = "", middle_title = "", labels = True, same_graph = True, time_unit = "s", left_spacing = -1, right_spacing = -1, h_lines: list = [], v_lines: list = []):
 
         self.__dataplotter.set_plot(start_time, end_time, same_graph, time_unit)
-        self.__dataplotter.plot_dual_group(left_variables, right_variables, left_title= left_title, right_title= right_title, middle_title= middle_title, labels= labels, h_lines= h_lines, v_lines= v_lines)
+        self.__dataplotter.plot_dual_group(left_variables, right_variables, left_title= left_title, right_title= right_title, middle_title= middle_title, labels= labels, left_spacing= left_spacing, right_spacing= right_spacing, h_lines= h_lines, v_lines= v_lines)
 
     def get_nparray(self, short_name: str, filter = False):
         return self.__csvparser.get_np_array(short_name, filter)

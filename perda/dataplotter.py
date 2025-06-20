@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.ticker import MultipleLocator
 
 from .csvparser import csvparser
 
@@ -212,7 +213,7 @@ class dataplotter:
                     plt.show()
                     print("\n\n")
        
-    def plot_dual_group(self, l_v: list, r_v: list, left_title: str = "Left", right_title: str = "Right", middle_title: str = "title", labels = False, h_lines: list = [], v_lines: list = []):
+    def plot_dual_group(self, l_v: list, r_v: list, left_title: str = "Left", right_title: str = "Right", middle_title: str = "title", labels = False, left_spacing = -1, right_spacing = -1, h_lines: list = [], v_lines: list = []):
         if not self.__file_read:
             raise AttributeError("No csv read. Call .get_csvparser() before plotting.")
         left_len = len(l_v)
@@ -277,12 +278,16 @@ class dataplotter:
                 ax1.plot(t, y, label=short_name, color = colors[index % len(colors)])
                 ax1.set_ylabel(left_title)
                 ax1.tick_params(axis='y')
+                if left_spacing != -1:
+                    ax1.yaxis.set_major_locator(MultipleLocator(left_spacing))
             else:
                 if ax2 is None:
                     ax2 = ax1.twinx()
                 ax2.plot(t, y, label=short_name, color = colors[index % len(colors)]) #, linestyle="--"
                 ax2.set_ylabel(right_title)
                 ax2.tick_params(axis='y')
+                if right_spacing != -1:
+                    ax2.yaxis.set_major_locator(MultipleLocator(right_spacing))
         plt.xlabel(xlabel)
         plt.title(f"Join Graph for {middle_title}")
         if labels:
