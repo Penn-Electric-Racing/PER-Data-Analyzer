@@ -141,12 +141,15 @@ class arrayoperator:
         is_var = True
         for ops in op_list:
             if is_var:
-                var_np = self.__csvparser.get_np_array(ops)
-                if var_np is None:
-                    raise AttributeError("Abroated: Missing Information: Cannot Find Input Name")
-                max_start = max(var_np[0,0], max_start)
-                min_end = min(var_np[-1,0], min_end)
-                var_arrs.append(var_np)
+                if type(ops) is str:
+                    var_np = self.__csvparser.get_np_array(ops)
+                    if var_np is None:
+                        raise AttributeError("Abroated: Missing Information: Cannot Find Input Name")
+                    max_start = max(var_np[0,0], max_start)
+                    min_end = min(var_np[-1,0], min_end)
+                    var_arrs.append(var_np)
+                elif isinstance(ops, np.ndarray):
+                    var_arrs.append(ops)
             else:
                 if ops != "+" and ops != "-" and ops != "*" and ops != "/":
                     raise AttributeError("Abroated: Invalid Operations Format")
