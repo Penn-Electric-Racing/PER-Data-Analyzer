@@ -36,7 +36,7 @@ class dataplotter:
         else:
             self.__plot_unit = unit
 
-    def plot_norm(self, variables: list, labels: bool = True, h_lines: list = [], v_lines: list = []):
+    def plot_norm(self, variables: list, labels: bool = True, label_list: list[str] = [], h_lines: list = [], v_lines: list = []):
         if not self.__file_read:
             raise AttributeError("No csv read. Call .get_csvparser() before plotting.")
         for h in h_lines:
@@ -44,7 +44,7 @@ class dataplotter:
         for v in v_lines:
             plt.axvline(x=v, color='black', linestyle='--', zorder=1)
         
-        for var in variables:
+        for index, var in enumerate(variables):
             if type(var) is list:
                 self.plot(var, True)
                 continue
@@ -88,7 +88,13 @@ class dataplotter:
                     plt.axvline(x=hvT, color=color)
 
             y = filtered_vals[::, 1]
-            plt.plot(t, y, label=short_name)
+            this_label = ""
+            if index >= len(label_list):
+                this_label = short_name
+            else:
+                this_label = label_list[index]
+
+            plt.plot(t, y, label=this_label)
             if labels:
                 plt.legend()
 
