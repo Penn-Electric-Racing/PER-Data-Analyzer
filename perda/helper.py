@@ -1,7 +1,9 @@
 import numpy as np
 
+
 def name_matches(short_name, full_name):
-    return f'({short_name})' in full_name or f'{short_name}' in full_name
+    return f"({short_name})" in full_name or f"{short_name}" in full_name
+
 
 def align_nparr(np_list: list[np.ndarray]):
     num_arr = len(np_list)
@@ -15,26 +17,27 @@ def align_nparr(np_list: list[np.ndarray]):
         this_tsp = arr[0]
         arr_input_num = int(arr[-1])
         if this_tsp != last_tsp:
-            final_sorted_arr.append([None] * (num_arr+1))
+            final_sorted_arr.append([None] * (num_arr + 1))
             sorted_hv_imp.append([])
             curr_idx += 1
             final_sorted_arr[curr_idx][0] = this_tsp
             sorted_hv_imp[curr_idx] = [arr[2], arr[3]]
-        final_sorted_arr[curr_idx][arr_input_num+1] = arr[1]
+        final_sorted_arr[curr_idx][arr_input_num + 1] = arr[1]
         last_tsp = this_tsp
     return np.array(final_sorted_arr), np.array(sorted_hv_imp)
+
 
 def merge_and_sort_with_source(arrays: list[np.ndarray]):
     """
     Merge a list of NumPy arrays (each with a timestamp in the first column) into one array.
     An extra column is added to mark the source (input order) of each row. The merged array is
     then sorted first by the timestamp and, for rows with identical timestamps, by the input sequence.
-    
+
     :param arrays: List of NumPy arrays, each assumed to have a timestamp in column 0.
     :return: A single merged and sorted NumPy array with an extra column indicating the source.
     """
     new_arrays = []
-    
+
     # Add an extra column to each array that indicates the input order (source index)
     for source_index, arr in enumerate(arrays):
         # Create a column with the source index repeated for each row in the array
@@ -42,22 +45,23 @@ def merge_and_sort_with_source(arrays: list[np.ndarray]):
         # Append the source column to the right of the original array
         new_arr = np.hstack((arr, source_col))
         new_arrays.append(new_arr)
-    
+
     # Merge all arrays vertically
     merged_array = np.vstack(new_arrays)
-    
+
     # Sort the merged array using lexsort.
     # np.lexsort takes a tuple of keys, where the last key is the primary key.
     # Here, we want to sort primarily by the timestamp (column 0) and then by source index (last column).
     sorted_indices = np.lexsort((merged_array[:, -1], merged_array[:, 0]))
     sorted_array = merged_array[sorted_indices]
-    
+
     return sorted_array
+
 
 def fill_missing_values(arr, math_type="connect"):
     """
     Fills missing values in a 2D array (each row is [timestamp, val]) where some val entries may be None.
-    
+
     Parameters:
     arr (np.ndarray): 2D array with shape (m, 2), where arr[i,0] is the timestamp and arr[i,1] is the value.
                         The array's dtype should be object if it contains None.
@@ -65,14 +69,14 @@ def fill_missing_values(arr, math_type="connect"):
                     "connect" - linear interpolation between nearest valid neighbors.
                     "extend_forward" - use the last valid value.
                     "extend_back" - use the next valid value.
-                    
+
     Returns:
     np.ndarray: A new array with missing values filled.
     """
     # Make a copy so we don't modify the original array.
     filled = arr.copy()
     m = len(filled)
-    
+
     # Loop over each row in the array.
     for i in range(m):
         if filled[i, 1] is None:
@@ -103,7 +107,9 @@ def fill_missing_values(arr, math_type="connect"):
 
             else:
                 if math_type != "connect":
-                    print("Invalid math_type. Please input 'connect', 'extend_forward', or 'extend_backward'. Default to 'connect'")
+                    print(
+                        "Invalid math_type. Please input 'connect', 'extend_forward', or 'extend_backward'. Default to 'connect'"
+                    )
                 # Both neighbors found: interpolate.
                 if prev_i >= 0 and next_i < m:
                     t_prev, v_prev = filled[prev_i, 0], filled[prev_i, 1]
@@ -111,7 +117,9 @@ def fill_missing_values(arr, math_type="connect"):
                     t_current = filled[i, 0]
                     # Avoid division by zero.
                     if t_next != t_prev:
-                        interpolated_val = v_prev + (v_next - v_prev) * (t_current - t_prev) / (t_next - t_prev)
+                        interpolated_val = v_prev + (v_next - v_prev) * (
+                            t_current - t_prev
+                        ) / (t_next - t_prev)
                         filled[i, 1] = interpolated_val
                     else:
                         filled[i, 1] = v_prev
@@ -120,8 +128,9 @@ def fill_missing_values(arr, math_type="connect"):
                     filled[i, 1] = filled[prev_i, 1]
                 elif next_i < m:
                     filled[i, 1] = filled[next_i, 1]
-                
+
     return filled
+
 
 def sample_missing_values(empty_tsp, match_np, math_type="connect"):
     length = len(match_np)
@@ -144,21 +153,21 @@ def sample_missing_values(empty_tsp, match_np, math_type="connect"):
         this_val = None
         this_hv = None
         this_imp = None
-        while (next_tsp < tsp):
+        while next_tsp < tsp:
             prev_tsp = next_tsp
             prev_val = next_val
             prev_hv = next_hv
             prev_imp = next_imp
             curr_tsp_index += 1
-            
-            if (curr_tsp_index == length):
+
+            if curr_tsp_index == length:
                 raise IndexError("Index Out Of Bounds")
 
             next_tsp = match_np[curr_tsp_index][0]
             next_val = match_np[curr_tsp_index][1]
             next_hv = match_np[curr_tsp_index][2]
             next_imp = match_np[curr_tsp_index][3]
-        
+
         if math_type == "extend_forward":
             this_val = next_val
             this_hv = next_hv
@@ -171,21 +180,28 @@ def sample_missing_values(empty_tsp, match_np, math_type="connect"):
 
         else:
             if math_type != "connect":
-                print("Invalid math_type. Please input 'connect', 'extend_forward', or 'extend_backward'. Default to 'connect'")
+                print(
+                    "Invalid math_type. Please input 'connect', 'extend_forward', or 'extend_backward'. Default to 'connect'"
+                )
             # Both neighbors found: interpolate.
 
             this_hv = prev_hv
             this_imp = prev_imp
 
             if prev_tsp != next_tsp:
-                this_val = prev_val + (next_val - prev_val) * (tsp - prev_tsp) / (next_tsp - prev_tsp)
+                this_val = prev_val + (next_val - prev_val) * (tsp - prev_tsp) / (
+                    next_tsp - prev_tsp
+                )
             else:
                 this_val = prev_val
         sample_data.append([tsp, this_val, this_hv, this_imp])
 
     return np.array(sample_data)
 
-def sample_data(nparr, fs, start_time = -1, end_time = -1, time_unit = "s", match_type = "connect"):
+
+def sample_data(
+    nparr, fs, start_time=-1, end_time=-1, time_unit="s", match_type="connect"
+):
     data_start_time = nparr[0][0]
     data_end_time = nparr[-1][0]
     if time_unit == "s":
@@ -199,7 +215,7 @@ def sample_data(nparr, fs, start_time = -1, end_time = -1, time_unit = "s", matc
             end_time = data_end_time
     if start_time > data_end_time or end_time < data_start_time:
         raise AttributeError("Time Range Incorrect")
-    
+
     interval = 1000 / fs  # 1000 ms per second divided by samples per second
 
     # Generate the array of timestamps
@@ -207,6 +223,7 @@ def sample_data(nparr, fs, start_time = -1, end_time = -1, time_unit = "s", matc
     sampled_data = sample_missing_values(timestamps, nparr, match_type)
 
     return sampled_data
+
 
 def compute_fft(x, fs: int, center_frequencies=True):
     """
@@ -222,11 +239,12 @@ def compute_fft(x, fs: int, center_frequencies=True):
     """
     N = len(x)
     X = np.fft.fft(x, norm="ortho")
-    f = np.fft.fftfreq(N, 1/fs)
+    f = np.fft.fftfreq(N, 1 / fs)
     if center_frequencies:
         X = np.fft.fftshift(X)
         f = np.fft.fftshift(f)
     return X, f
+
 
 def compute_ifft(X, fs: int, center_frequencies=True):
     """
@@ -242,10 +260,11 @@ def compute_ifft(X, fs: int, center_frequencies=True):
     """
     N = len(X)
     if center_frequencies:
-      X = np.fft.ifftshift(X)
+        X = np.fft.ifftshift(X)
     x = np.fft.ifft(X, norm="ortho")
-    t = np.arange(N)/fs
+    t = np.arange(N) / fs
     return x.real, t
+
 
 def bandlimitter(X, f, bl, bu):
     """

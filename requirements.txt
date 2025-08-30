@@ -1,4 +1,16 @@
+# Notebook
 ipykernel
+
+# Data Processing
 matplotlib
 numpy
+
+# Progress Bar
 tqdm
+
+# Formatting
+pre-commit
+black
+black[jupyter]
+isort
+mypy
