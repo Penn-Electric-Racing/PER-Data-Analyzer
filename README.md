@@ -7,11 +7,10 @@ Custom python library for car data analysis.
 - Multi-variable plotting with dual-axis support
 - Array operations (filtering, alignment, mathematical operations)
 - Statistical analysis (integrals, averages, min/max values)
-- Acceleration analysis (0-60 mph calculations)
 - Time-unit conversion (seconds/milliseconds)
 
 ## Installation
 - Run `pip install git+https://github.com/Penn-Electric-Racing/PER-Data-Analyzer.git@main`
 
 ## Code Demo
-- See [tutorial.ipynb](tutorial/tutorial.ipynb)
+- See [Tutorial.ipynb](notebooks/Tutorial.ipynb)
