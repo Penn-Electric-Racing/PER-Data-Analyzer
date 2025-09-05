@@ -8,3 +8,6 @@ __pycache__/
 perda.egg-info/
 *.pyc
 *.pyo
+
+# Ignore test
+notebooks/tests/

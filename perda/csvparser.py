@@ -5,6 +5,7 @@ from . import helper
 
 
 class csvparser:
+    # shit code:
     def __init__(self):
         self.__value_map = {}
         self.__ID_map = {}
