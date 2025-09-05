@@ -1,0 +1,101 @@
+import matplotlib.pyplot as plt
+import numpy as np
+from matplotlib.ticker import MultipleLocator
+
+from .datainstance import DataInstance
+from .newparser import newparser
+
+
+def plot(
+    parser: newparser,
+    left_input,
+    right_input=None,
+    start_time=0,
+    end_time=-1,
+    unit="ms",
+    label=True,
+    left_spacing=-1,
+    right_spacing=-1,
+    left_title="",
+    right_title="",
+    top_title="",
+):
+    """
+    Plot data from the parser.
+    left_input: name of variable to plot on left y-axis (has to have sth)
+    right_input: name of variable to plot on right y-axis (optional)
+    start_time: start time in ms (default 0)
+    end_time: end time in ms (default -1, means till end)
+    label: whether to show label (default True)
+    left_spacing: spacing for left y-axis ticks (default -1, means auto)
+    right_spacing: spacing for right y-axis ticks (default -1, means auto)
+    """
+    left_di = []
+    right_di = []
+    dual_axis = right_input is not None
+
+    # Get left DataInstance list and filter time
+    if not isinstance(left_input, list):
+        di = parser.get_data(left_input)
+        ftr_di = di.get_range(start_time, end_time)
+        left_di = [ftr_di]
+    else:
+        for left in left_input:
+            di = parser.get_data(left)
+            ftr_di = di.get_range(start_time, end_time)
+            left_di.append(ftr_di)
+
+    # Get right DataInstance list if there is any and filter time
+    if dual_axis:
+        if not isinstance(right_input, list):
+            di = parser.get_data(right_input)
+            ftr_di = di.get_range(start_time, end_time)
+            right_di = [ftr_di]
+        else:
+            for right in right_input:
+                di = parser.get_data(right)
+                ftr_di = di.get_range(start_time, end_time)
+                right_di.append(ftr_di)
+
+    fig, ax1 = plt.subplots()
+    ax2 = None
+    colors = plt.rcParams["axes.prop_cycle"].by_key()["color"]
+    coloridx = 1
+
+    ax1.set_ylabel(left_title)
+    ax1.tick_params(axis="y")
+    for ldi in left_di:
+        ts = ldi.timestamp_np
+        val = ldi.value_np
+        if unit == "s":
+            ts = ts.astype(np.float64) / 1e3
+        lb = ldi.label
+        ax1.plot(ts, val, label=lb, color=colors[coloridx % len(colors)])
+        coloridx += 1
+        if left_spacing != -1:
+            ax1.yaxis.set_major_locator(MultipleLocator(left_spacing))
+
+    if dual_axis:
+        ax2 = ax1.twinx()
+        ax2.set_ylabel(right_title)
+        ax2.tick_params(axis="y")
+        for rdi in right_di:
+            ts = rdi.timestamp_np
+            val = rdi.value_np
+            if unit == "s":
+                ts = ts.astype(np.float64) / 1e3
+            lb = rdi.label
+            ax2.plot(ts, val, label=lb, color=colors[coloridx % len(colors)])
+            coloridx += 1
+            if right_spacing != -1:
+                ax2.yaxis.set_major_locator(MultipleLocator(right_spacing))
+
+    xlabel = "Timestamp (ms)" if unit == "ms" else "Timestamp (s)"
+    plt.xlabel(xlabel)
+    plt.title(f"{top_title}")
+    if label:
+        ax1.legend()
+        if dual_axis:
+            ax2.legend()
+    fig.tight_layout()
+    plt.show()

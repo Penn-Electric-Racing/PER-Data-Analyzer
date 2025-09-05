@@ -4,6 +4,7 @@ ipykernel
 # Data Processing
 matplotlib
 numpy
+dataclass
 
 # Progress Bar
 tqdm
