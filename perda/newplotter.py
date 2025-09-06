@@ -19,6 +19,7 @@ def plot(
     left_title="",
     right_title="",
     top_title="",
+    figsize=(8, 5),
 ):
     """
     Plot data from the parser.
@@ -29,6 +30,7 @@ def plot(
     label: whether to show label (default True)
     left_spacing: spacing for left y-axis ticks (default -1, means auto)
     right_spacing: spacing for right y-axis ticks (default -1, means auto)
+    figsize: tuple of width and height in inches (default (10, 6))
     """
     left_di = []
     right_di = []
@@ -57,7 +59,7 @@ def plot(
                 ftr_di = di.get_range(start_time, end_time)
                 right_di.append(ftr_di)
 
-    fig, ax1 = plt.subplots()
+    fig, ax1 = plt.subplots(figsize=figsize)
     ax2 = None
     colors = plt.rcParams["axes.prop_cycle"].by_key()["color"]
     coloridx = 1
@@ -93,9 +95,17 @@ def plot(
     xlabel = "Timestamp (ms)" if unit == "ms" else "Timestamp (s)"
     plt.xlabel(xlabel)
     plt.title(f"{top_title}")
+
+    # Calculate proper spacing for legends based on figure size
     if label:
-        ax1.legend()
+        # Add padding to make room for legends
+        fig.tight_layout(pad=2.0)
         if dual_axis:
-            ax2.legend()
-    fig.tight_layout()
+            ax1.legend(loc="lower left", bbox_to_anchor=(0, 1))
+            ax2.legend(loc="lower right", bbox_to_anchor=(1, 1), markerfirst=False)
+        else:
+            ax1.legend(loc="best")
+    else:
+        fig.tight_layout()
+
     plt.show()

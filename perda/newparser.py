@@ -83,6 +83,12 @@ class newparser:
             values = data_array[:, 1]
             self.__tv_map[name] = DataInstance(timestamps, values, label=name)
 
+        # temp data check, in idmap not in tvmap
+        for id in self.__ID_map:
+            name = self.__ID_map[id]
+            if name not in self.__tv_map:
+                print(f"Warning: ID {id} with name '{name}' has no data.")
+
         # Record end time as last timestamp
         self.__data_end_time = timestamp
         if bad_data != 0:

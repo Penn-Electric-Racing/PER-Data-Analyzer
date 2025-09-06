@@ -48,6 +48,7 @@ class newanalyzer:
         left_title="",
         right_title="",
         top_title="",
+        figsize=(8, 5),
     ):
         """
         todo
@@ -68,6 +69,7 @@ class newanalyzer:
             left_title=left_title,
             right_title=right_title,
             top_title=top_title,
+            figsize=figsize,
         )
 
     # def align_array(
