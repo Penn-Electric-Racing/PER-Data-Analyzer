@@ -8,6 +8,7 @@ class newparser:
     def __init__(self):
         self.__tv_map = {}
         self.__ID_map = {}
+        self.__name_map = {}
         self.__data_start_time = None
         self.__data_end_time = None
         self.__file_read = False
@@ -22,6 +23,7 @@ class newparser:
         if self.__file_read:
             self.__tv_map = {}
             self.__ID_map = {}
+            self.__name_map = {}
             self.__data_start_time = None
             self.__data_end_time = None
             print("Resetting previous data.")
@@ -48,6 +50,10 @@ class newparser:
                         canID = int(canid_name[1])
                         name = canid_name[0]
                         # Store everything in map
+                        if canID in self.__ID_map:
+                            print(
+                                f"Warning: Duplicate CAN ID {canID} at line {line_num}. Overwriting previous name."
+                            )
                         self.__ID_map[canID] = name
                     except Exception as e:
                         print(f"Error parsing line {line_num}: {e}")
@@ -58,7 +64,6 @@ class newparser:
                     data = line.strip().split(",")
                     try:
                         id = int(data[1])
-                        name = self.__ID_map[id]
                         timestamp = int(data[0])
                         val = float(data[2])
 
@@ -66,10 +71,10 @@ class newparser:
                         if self.__data_start_time is None:
                             self.__data_start_time = timestamp
 
-                        if name not in self.__tv_map:
-                            # self.__tv_map[name] = DataInstance()
-                            self.__tv_map[name] = []
-                        self.__tv_map[name].append([timestamp, val])
+                        if id not in self.__tv_map:
+                            # Use can ID as key since there is somehow duplicate names sometimes :(
+                            self.__tv_map[id] = []
+                        self.__tv_map[id].append([timestamp, val])
 
                     except Exception as e:
                         print(f"Error parsing line {line_num}: {e}")
@@ -77,17 +82,21 @@ class newparser:
                         continue
 
         # Convert lists to DataInstance
-        for name in tqdm(self.__tv_map, desc="Creating DataInstances"):
-            data_array = np.array(self.__tv_map[name])
-            timestamps = data_array[:, 0]
-            values = data_array[:, 1]
-            self.__tv_map[name] = DataInstance(timestamps, values, label=name)
-
-        # temp data check, in idmap not in tvmap
-        for id in self.__ID_map:
-            name = self.__ID_map[id]
-            if name not in self.__tv_map:
-                print(f"Warning: ID {id} with name '{name}' has no data.")
+        for canid in tqdm(self.__ID_map, desc="Creating DataInstances"):
+            name = self.__ID_map[canid]
+            self.__name_map[name] = canid
+            if canid not in self.__tv_map:
+                self.__tv_map[canid] = DataInstance(
+                    np.array([]), np.array([]), label=name, canid=canid
+                )
+            else:
+                data_array = self.__tv_map[canid]
+                data_array = np.array(data_array)
+                timestamps = data_array[:, 0]
+                values = data_array[:, 1]
+                self.__tv_map[canid] = DataInstance(
+                    timestamps, values, label=name, canid=canid
+                )
 
         # Record end time as last timestamp
         self.__data_end_time = timestamp
@@ -100,31 +109,32 @@ class newparser:
         """
         Get DataInstance by canid or name.
         Raises AttributeError if no csv read or cannot find input.
-        If input is already DataInstance, return it directly.
+        If input is DataInstance, return itself (used for plotting).
         Very very very very useful function :)) core of perda prob
         """
+        # Dummy return for plotting function for convenience
         if isinstance(input_canid_name, DataInstance):
             return input_canid_name
         if not self.__file_read:
             raise AttributeError("No csv read. Call .read_csv() before getting data.")
         # If input is canid
         if isinstance(input_canid_name, int):
-            if input_canid_name not in self.__ID_map:
+            if input_canid_name not in self.__tv_map:
                 raise AttributeError("Aborted: Cannot Find Input ID")
-            name = self.__ID_map[input_canid_name]
+            canid = input_canid_name
         # If input is can name
         elif isinstance(input_canid_name, str):
-            name = None
-            for var_name in self.__tv_map.keys():
-                if newparser.name_matches(input_canid_name, var_name):
-                    name = var_name
+            canid = None
+            for long_name in self.__name_map:
+                if newparser.name_matches(input_canid_name, long_name):
+                    canid = self.__name_map[long_name]
                     break
-            if name is None:
+            if canid is None:
                 raise AttributeError("Aborted: Cannot Find Input Name")
         else:
-            raise ValueError("Input must be a string, int, or DataInstance.")
+            raise ValueError("Input must be a string, int.")
         # Return DataInstance
-        return self.__tv_map[name]
+        return self.__tv_map[canid]
 
     def name_matches(short_name, full_name):
         return f"({short_name})" in full_name or f"{short_name}" in full_name

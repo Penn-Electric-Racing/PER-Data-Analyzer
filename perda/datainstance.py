@@ -3,6 +3,8 @@ from dataclasses import dataclass, field
 import numpy as np
 from numpy.typing import NDArray
 
+from .datahelper import *
+
 
 @dataclass(slots=True)
 class DataInstance:
@@ -10,6 +12,7 @@ class DataInstance:
     timestamp_np: NDArray = field(default_factory=lambda: np.empty(0, dtype=np.int64))
     value_np: NDArray = field(default_factory=lambda: np.empty(0, dtype=np.float64))
     label: str = ""
+    canid: int = -1
 
     # desired canonical dtypes
     TS_DTYPE = np.int64
@@ -43,9 +46,12 @@ class DataInstance:
     def set_label(self, label: str):
         self.label = label
 
+    def set_canid(self, canid: int):
+        self.canid = canid
+
     # ---------- getters ----------
 
-    def get_range(self, start_time: int = 0, end_time: int = -1) -> "DataInstance":
+    def get_range(self, start_time: int = 0, end_time: int = -1):
         """
         Get a new DataInstance with data in [start_time, end_time).
         If end_time == -1, means till end.
@@ -54,43 +60,118 @@ class DataInstance:
             mask = self.timestamp_np >= start_time
         else:
             mask = (self.timestamp_np >= start_time) & (self.timestamp_np < end_time)
-        return DataInstance(self.timestamp_np[mask], self.value_np[mask], self.label)
+        return DataInstance(
+            self.timestamp_np[mask], self.value_np[mask], self.label, self.canid
+        )
+
+    def get_min(self):
+        """Get min timestamp and value."""
+        if len(self.timestamp_np) == 0:
+            return None, None
+        return int(self.timestamp_np.min()), float(self.value_np.min())
+
+    def get_max(self):
+        """Get max timestamp and value."""
+        if len(self.timestamp_np) == 0:
+            return None, None
+        return int(self.timestamp_np.max()), float(self.value_np.max())
+
+    def get_integral(self, time_unit: str = "ms"):
+        """Get integral of the value over time using trapezoidal rule."""
+        if len(self.timestamp_np) < 2:
+            return 0.0
+        ts = self.timestamp_np.astype(np.float64)
+        # Convert timestamps from ms to s for integration
+        if time_unit == "s":
+            ts /= 1e3
+        integral = np.trapz(self.value_np, ts)
+        return float(integral)
+
+    def get_average(self):
+        """Get average using integral over time."""
+        if len(self.timestamp_np) < 2:
+            return 0.0
+        total_time = self.timestamp_np[-1] - self.timestamp_np[0]
+        if total_time == 0:
+            return 0.0
+        integral = self.get_integral()
+        average = integral / total_time
+        return float(average)
 
     # ---------- info ----------
-    def __len__(self) -> int:
+    def __len__(self):
         return self.timestamp_np.shape[0]
 
     # ---------- numeric protocol ----------
     def __add__(self, other):
-        from .datahelper import add
-
-        return add(self, other)
+        if isinstance(other, DataInstance):
+            ts, val = combine(
+                self.timestamp_np,
+                self.value_np,
+                other.timestamp_np,
+                other.value_np,
+                np.add,
+            )
+            return DataInstance(ts, val)
+        if np.isscalar(other):
+            return DataInstance(self.timestamp_np, np.add(self.value_np, other))
+        raise TypeError("add expects (DataInstance, DataInstance|scalar) in any order")
 
     def __sub__(self, other):
-        from .datahelper import sub
-
-        return sub(self, other)
+        if isinstance(other, DataInstance):
+            ts, val = combine(
+                self.timestamp_np,
+                self.value_np,
+                other.timestamp_np,
+                other.value_np,
+                np.subtract,
+            )
+            return DataInstance(ts, val)
+        if np.isscalar(other):
+            return DataInstance(self.timestamp_np, np.subtract(self.value_np, other))
+        raise TypeError("sub expects (DataInstance, DataInstance|scalar)")
 
     def __mul__(self, other):
-        from .datahelper import mul
-
-        return mul(self, other)
+        if isinstance(other, DataInstance):
+            ts, val = combine(
+                self.timestamp_np,
+                self.value_np,
+                other.timestamp_np,
+                other.value_np,
+                np.multiply,
+            )
+            return DataInstance(ts, val)
+        if np.isscalar(other):
+            return DataInstance(self.timestamp_np, np.multiply(self.value_np, other))
+        raise TypeError("mul expects (DataInstance, DataInstance|scalar)")
 
     def __truediv__(self, other):
-        from .datahelper import truediv
-
-        return truediv(self, other)
+        if isinstance(other, DataInstance):
+            ts, val = combine(
+                self.timestamp_np,
+                self.value_np,
+                other.timestamp_np,
+                other.value_np,
+                np.true_divide,
+            )
+            return DataInstance(ts, val)
+        if np.isscalar(other):
+            return DataInstance(self.timestamp_np, np.true_divide(self.value_np, other))
+        raise TypeError("div expects (DataInstance, DataInstance|scalar)")
 
     def __pow__(self, other):
-        from .datahelper import pow
+        if isinstance(other, DataInstance):
+            ts, val = combine(
+                self.timestamp_np,
+                self.value_np,
+                other.timestamp_np,
+                other.value_np,
+                np.power,
+            )
+            return DataInstance(ts, val)
+        if np.isscalar(other):
+            return DataInstance(self.timestamp_np, np.power(self.value_np, other))
+        raise TypeError("pow_ expects (DataInstance, DataInstance|scalar)")
 
-        return pow(self, other)
-
-    # scalars on the right (e.g., d1 / 2, d1 ** 2)
-
-    # # unary
-    # def __neg__(self):
-    #     return self
-
-    # def __pos__(self):
-    #     return self
+    def __neg__(self):
+        return DataInstance(self.timestamp_np, np.negative(self.value_np))

@@ -59,11 +59,14 @@ def plot(
                 ftr_di = di.get_range(start_time, end_time)
                 right_di.append(ftr_di)
 
+    # Setup plot and figsize
     fig, ax1 = plt.subplots(figsize=figsize)
     ax2 = None
+    # Setup colors
     colors = plt.rcParams["axes.prop_cycle"].by_key()["color"]
     coloridx = 1
 
+    # Plot left axis
     ax1.set_ylabel(left_title)
     ax1.tick_params(axis="y")
     for ldi in left_di:
@@ -77,6 +80,7 @@ def plot(
         if left_spacing != -1:
             ax1.yaxis.set_major_locator(MultipleLocator(left_spacing))
 
+    # Plot right axis if any
     if dual_axis:
         ax2 = ax1.twinx()
         ax2.set_ylabel(right_title)
@@ -92,6 +96,7 @@ def plot(
             if right_spacing != -1:
                 ax2.yaxis.set_major_locator(MultipleLocator(right_spacing))
 
+    # Set x label and title
     xlabel = "Timestamp (ms)" if unit == "ms" else "Timestamp (s)"
     plt.xlabel(xlabel)
     plt.title(f"{top_title}")

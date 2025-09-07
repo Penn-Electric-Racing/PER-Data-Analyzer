@@ -3,24 +3,24 @@ from typing import Callable, Tuple
 
 import numpy as np
 
-from .datainstance import DataInstance
 
-# def _new(T: NDArray[np.integer], V: NDArray[np.number]) -> DataInstance:
-#     return DataInstance(T, np.asarray(V))
-
-
-# --- alignment policies ---
-
-
-def align_union_interp(a: DataInstance, b: DataInstance, *, drop_nan=True, fill=-1):
+def align_union_interp(
+    a_ts: np.ndarray,
+    a_val: np.ndarray,
+    b_ts: np.ndarray,
+    b_val: np.ndarray,
+    *,
+    drop_nan=True,
+    fill=-1,
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Union of timestamps; linearly interpolate each to that grid.
     If drop_nan=True, rows with NaN in either series are dropped.
     Otherwise NaNs are filled with `fill`.
     """
-    timestamp_match = np.union1d(a.timestamp_np, b.timestamp_np)
-    a_fill = np.interp(timestamp_match, a.timestamp_np, a.value_np)
-    b_fill = np.interp(timestamp_match, b.timestamp_np, b.value_np)
+    timestamp_match = np.union1d(a_ts, b_ts)
+    a_fill = np.interp(timestamp_match, a_ts, a_val)
+    b_fill = np.interp(timestamp_match, b_ts, b_val)
     if drop_nan:
         keep_idx = ~np.isnan(a_fill) & ~np.isnan(b_fill)
         timestamp_match, a_fill, b_fill = (
@@ -71,16 +71,22 @@ def _step_fill(
 
 
 def align_union_prev(
-    a, b, *, drop_nan: bool = True, fill: float = -1
+    a_ts: np.ndarray,
+    a_val: np.ndarray,
+    b_ts: np.ndarray,
+    b_val: np.ndarray,
+    *,
+    drop_nan=True,
+    fill=-1,
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Union of timestamps; fill each series with the **previous** sample
     (last value where timestamp <= t). Outside each series' range -> NaN
     unless drop_nan=False, in which case NaNs are replaced by `fill`.
     """
-    timestamp_match = np.union1d(a.timestamp_np, b.timestamp_np)
-    a_fill = _step_fill(timestamp_match, a.timestamp_np, a.value_np, how="prev")
-    b_fill = _step_fill(timestamp_match, b.timestamp_np, b.value_np, how="prev")
+    timestamp_match = np.union1d(a_ts, b_ts)
+    a_fill = _step_fill(timestamp_match, a_ts, a_val, how="prev")
+    b_fill = _step_fill(timestamp_match, b_ts, b_val, how="prev")
 
     if drop_nan:
         keep_idx = ~np.isnan(a_fill) & ~np.isnan(b_fill)
@@ -97,16 +103,22 @@ def align_union_prev(
 
 
 def align_union_next(
-    a, b, *, drop_nan: bool = True, fill: float = -1
+    a_ts: np.ndarray,
+    a_val: np.ndarray,
+    b_ts: np.ndarray,
+    b_val: np.ndarray,
+    *,
+    drop_nan=True,
+    fill=-1,
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Union of timestamps; fill each series with the **next** sample
     (first value where timestamp >= t). Outside each series' range -> NaN
     unless drop_nan=False, in which case NaNs are replaced by `fill`.
     """
-    timestamp_match = np.union1d(a.timestamp_np, b.timestamp_np)
-    a_fill = _step_fill(timestamp_match, a.timestamp_np, a.value_np, how="next")
-    b_fill = _step_fill(timestamp_match, b.timestamp_np, b.value_np, how="next")
+    timestamp_match = np.union1d(a_ts, b_ts)
+    a_fill = _step_fill(timestamp_match, a_ts, a_val, how="next")
+    b_fill = _step_fill(timestamp_match, b_ts, b_val, how="next")
 
     if drop_nan:
         keep_idx = ~np.isnan(a_fill) & ~np.isnan(b_fill)
@@ -123,70 +135,13 @@ def align_union_next(
 
 
 # --- generic combiner for binary ops ---
-def _combine(
-    a: DataInstance, b: DataInstance, ufunc: Callable, align=align_union_interp
-) -> DataInstance:
-    T, av, bv = align(a, b)
-    return DataInstance(T, ufunc(av, bv))
-    # return _new(T, ufunc(av, bv))
-
-
-# --- public API ---
-def add(x, y, align=align_union_interp):
-    if isinstance(x, DataInstance) and isinstance(y, DataInstance):
-        return _combine(x, y, np.add, align)
-    if isinstance(x, DataInstance) and np.isscalar(y):
-        return DataInstance(x.timestamp_np, np.add(x.value_np, y))
-        # return _new(x.timestamp_np, np.add(x.value_np, y))
-    if np.isscalar(x) and isinstance(y, DataInstance):
-        return DataInstance(y.timestamp_np, np.add(x, y.value_np))
-        # return _new(y.timestamp_np, np.add(x, y.value_np))
-    raise TypeError("add expects (DataInstance, DataInstance|scalar) in any order")
-
-
-def sub(x, y, align=align_union_interp):
-    if isinstance(x, DataInstance) and isinstance(y, DataInstance):
-        return _combine(x, y, np.subtract, align)
-    if isinstance(x, DataInstance) and np.isscalar(y):
-        return DataInstance(x.timestamp_np, np.subtract(x.value_np, y))
-        # return _new(x.timestamp_np, np.subtract(x.value_np, y))
-    if np.isscalar(x) and isinstance(y, DataInstance):
-        return DataInstance(y.timestamp_np, np.subtract(x, y.value_np))
-        # return _new(y.timestamp_np, np.subtract(x, y.value_np))
-    raise TypeError("sub expects (DataInstance, DataInstance|scalar)")
-
-
-def mul(x, y, align=align_union_interp):
-    if isinstance(x, DataInstance) and isinstance(y, DataInstance):
-        return _combine(x, y, np.multiply, align)
-    if isinstance(x, DataInstance) and np.isscalar(y):
-        return DataInstance(x.timestamp_np, np.multiply(x.value_np, y))
-        # return _new(x.timestamp_np, np.multiply(x.value_np, y))
-    if np.isscalar(x) and isinstance(y, DataInstance):
-        return DataInstance(y.timestamp_np, np.multiply(x, y.value_np))
-        # return _new(y.timestamp_np, np.multiply(x, y.value_np))
-    raise TypeError("mul expects (DataInstance, DataInstance|scalar)")
-
-
-def truediv(x, y, align=align_union_interp):
-    if isinstance(x, DataInstance) and isinstance(y, DataInstance):
-        return _combine(x, y, np.true_divide, align)  # true_divide to avoid zero
-    if isinstance(x, DataInstance) and np.isscalar(y):
-        return DataInstance(x.timestamp_np, np.true_divide(x.value_np, y))
-        # return _new(x.timestamp_np, np.true_divide(x.value_np, y))
-    if np.isscalar(x) and isinstance(y, DataInstance):
-        return DataInstance(y.timestamp_np, np.true_divide(x, y.value_np))
-        # return _new(y.timestamp_np, np.true_divide(x, y.value_np))
-    raise TypeError("div expects (DataInstance, DataInstance|scalar)")
-
-
-def pow_(x, y, align=align_union_interp):
-    if isinstance(x, DataInstance) and isinstance(y, DataInstance):
-        return _combine(x, y, np.power, align)
-    if isinstance(x, DataInstance) and np.isscalar(y):
-        return DataInstance(x.timestamp_np, np.power(x.value_np, y))
-        # return _new(x.timestamp_np, np.power(x.value_np, y))
-    if np.isscalar(x) and isinstance(y, DataInstance):
-        return DataInstance(y.timestamp_np, np.power(x, y.value_np))
-        # return _new(y.timestamp_np, np.power(x, y.value_np))
-    raise TypeError("pow_ expects (DataInstance, DataInstance|scalar)")
+def combine(
+    a_ts: np.ndarray,
+    a_val: np.ndarray,
+    b_ts: np.ndarray,
+    b_val: np.ndarray,
+    ufunc: Callable,
+    align=align_union_interp,
+) -> Tuple[np.ndarray, np.ndarray]:
+    T, av, bv = align(a_ts, a_val, b_ts, b_val)
+    return T, ufunc(av, bv)
