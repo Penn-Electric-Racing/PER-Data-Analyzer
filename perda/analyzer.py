@@ -1,13 +1,13 @@
-from .newparser import newparser
-from .newplotter import plot
+from .csvparser import csvparser
+from .dataplotter import plot
 
 
-class newanalyzer:
+class analyzer:
     def __init__(self):
         """
         todo
         """
-        self.__parser = newparser()
+        self.__parser = csvparser()
         self.__file_read = False
         print("Analyzer Created")
 
@@ -16,7 +16,7 @@ class newanalyzer:
         todo
         """
         if self.__file_read:
-            self.__parser = newparser()
+            self.__parser = csvparser()
             print("Resetting previous data.")
         self.__file_read = True
         self.__parser.read_csv(path, bad_data_limit)
@@ -38,7 +38,7 @@ class newanalyzer:
         """
         Function to show all possible variables in the data.
         """
-        self.__parser.print_variables()
+        self.__parser.print_variables(sort_by=sort_by)
 
     def plot(
         self,

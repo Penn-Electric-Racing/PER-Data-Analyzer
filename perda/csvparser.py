@@ -4,7 +4,7 @@ from tqdm import tqdm
 from .datainstance import DataInstance
 
 
-class newparser:
+class csvparser:
     def __init__(self):
         self.__tv_map = {}
         self.__ID_map = {}
@@ -129,7 +129,7 @@ class newparser:
         elif isinstance(input_canid_name, str):
             canid = None
             for long_name in self.__name_map:
-                if newparser.name_matches(input_canid_name, long_name):
+                if csvparser.name_matches(input_canid_name, long_name):
                     canid = self.__name_map[long_name]
                     break
             if canid is None:

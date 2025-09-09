@@ -1,12 +1,7 @@
-# from .analyzer import analyzer
-from .newanalyzer import newanalyzer
+from .analyzer import analyzer
 
-__all__ = ["create, create_new"]
-
-
-# def create():
-#     return analyzer()
+__all__ = ["create"]
 
 
-def create_new():
-    return newanalyzer()
+def create():
+    return analyzer()

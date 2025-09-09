@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 import numpy as np
 from numpy.typing import NDArray
 
-from .datahelper import *
+from .helper import *
 
 
 @dataclass(slots=True)
