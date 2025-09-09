@@ -9,6 +9,7 @@ class newparser:
         self.__tv_map = {}
         self.__ID_map = {}
         self.__name_map = {}
+        self.__total_data_points = 0
         self.__data_start_time = None
         self.__data_end_time = None
         self.__file_read = False
@@ -24,6 +25,7 @@ class newparser:
             self.__tv_map = {}
             self.__ID_map = {}
             self.__name_map = {}
+            self.__total_data_points = 0
             self.__data_start_time = None
             self.__data_end_time = None
             print("Resetting previous data.")
@@ -75,6 +77,7 @@ class newparser:
                             # Use can ID as key since there is somehow duplicate names sometimes :(
                             self.__tv_map[id] = []
                         self.__tv_map[id].append([timestamp, val])
+                        self.__total_data_points += 1
 
                     except Exception as e:
                         print(f"Error parsing line {line_num}: {e}")
@@ -138,3 +141,84 @@ class newparser:
 
     def name_matches(short_name, full_name):
         return f"({short_name})" in full_name or f"{short_name}" in full_name
+
+    def print_info(self, input_canid_name=None, time_unit: str = "s"):
+        """
+        If input_canid_name is None, print parser info.
+        If input_canid_name is DataInstance, print its info.
+        If input_canid_name is canid or name, print its DataInstance info.
+        """
+        if input_canid_name is None:
+            if not self.__file_read:
+                raise AttributeError(
+                    "No csv read. Call .read_csv() before printing info."
+                )
+            print("Parser Info:")
+            start_time = self.__data_start_time
+            end_time = self.__data_end_time
+            if time_unit == "s":
+                start_time = float(start_time) / 1e3
+                end_time = float(end_time) / 1e3
+            print(f"  Time range: {start_time} to {end_time} ({time_unit})")
+            print(f"  Total CAN IDs:   {len(self.__tv_map)}")
+            print(f"  Total CAN Names: {len(self.__name_map)}")
+            print(f"  Total Data Points: {self.__total_data_points}")
+        else:
+            if isinstance(input_canid_name, DataInstance):
+                input_canid_name.print_info(time_unit=time_unit)
+            else:
+                di = self.get_data(input_canid_name)
+                di.print_info(time_unit=time_unit)
+
+    def print_variables(self, sort_by="name"):
+        """
+        Print all available CAN IDs and names.
+        """
+        if not self.__file_read:
+            raise AttributeError(
+                "No csv read. Call .read_csv() before printing variables."
+            )
+        # Parse variable names into (inside, outside) pairs for sorting
+        variable_pairs = []
+        for canid in self.__ID_map:
+            full_name = self.__ID_map[canid]
+            s = full_name.strip()
+            left = s.rfind("(")
+            # well-formed "( … )" at the end?
+            if left != -1 and s.endswith(")"):
+                description = s[:left].rstrip()
+                short_can_name = s[left + 1 : -1].strip()  # drop '(' and ')'
+                if short_can_name:  # both parts exist
+                    variable_pairs.append((canid, short_can_name, description))
+                    continue
+            # fallback: single column
+            variable_pairs.append((canid, s, ""))
+        # Sort by name or ID
+        if sort_by == "name":
+            # sort by outside first, then inside, then canid
+            sorted_pairs = np.array(
+                sorted(variable_pairs, key=lambda t: (t[1], t[2], t[0])), dtype=object
+            )
+        else:
+            # sort by canid only
+            sorted_pairs = np.array(
+                sorted(variable_pairs, key=lambda t: t[0]), dtype=object
+            )
+
+        # Print in Three columns
+        col1_width = max(len(str(id)) for id, _, _ in sorted_pairs)
+        col2_width = max(len(name) for _, name, _ in sorted_pairs)
+        if sort_by == "name":
+            print(f"{'CAN Name':<{col2_width}}  {'CAN ID':<{col1_width}}  Description")
+            print("-" * (col1_width + col2_width + 15))
+            for canid, short_name, description in sorted_pairs:
+                print(
+                    f"{short_name:<{col2_width}}  {canid:<{col1_width}}  {description}"
+                )
+        else:
+            print(f"{'CAN ID':<{col1_width}}  {'CAN Name':<{col2_width}}  Description")
+            print("-" * (col1_width + col2_width + 15))
+            for canid, short_name, description in sorted_pairs:
+                print(
+                    f"{canid:<{col1_width}}  {short_name:<{col2_width}}  {description}"
+                )

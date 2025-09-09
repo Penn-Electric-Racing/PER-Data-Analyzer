@@ -102,6 +102,37 @@ class DataInstance:
     def __len__(self):
         return self.timestamp_np.shape[0]
 
+    def print_info(self, time_unit: str = "s"):
+        print(f"DataInstance for | {self.label} | canid={self.canid}")
+        if len(self) > 0:
+            min_ts, min_val = self.get_min()
+            max_ts, max_val = self.get_max()
+            first_ts = self.timestamp_np[0]
+            last_ts = self.timestamp_np[-1]
+            if time_unit == "s":
+                first_ts = float(first_ts) / 1e3
+                last_ts = float(last_ts) / 1e3
+                min_ts = float(min_ts) / 1e3
+                max_ts = float(max_ts) / 1e3
+            avg_val = self.get_average()
+            integral = self.get_integral(time_unit=time_unit)
+            # Set width for alignment
+            w = 10
+            print(f"  Data points:  {len(self):>{w}}")
+            print(
+                f"  Time range:   {first_ts:>{w}.4f} to {last_ts:>{w}.4f} ({time_unit})"
+            )
+            print(
+                f"  Min value:    {min_val:>{w}.4f} at {min_ts:>{w}.4f} ({time_unit})"
+            )
+            print(
+                f"  Max value:    {max_val:>{w}.4f} at {max_ts:>{w}.4f} ({time_unit})"
+            )
+            print(f"  Integral:     {integral:>{w}.4f}")
+            print(f"  Average value:{avg_val:>{w}.4f}")
+        else:
+            print("  Empty DataInstance.")
+
     # ---------- numeric protocol ----------
     def __add__(self, other):
         if isinstance(other, DataInstance):
