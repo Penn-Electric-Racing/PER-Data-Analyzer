@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
-from matplotlib.ticker import MultipleLocator
 import numpy as np
+from matplotlib.ticker import MultipleLocator
 
 from .csvparser import csvparser
 
@@ -38,7 +38,14 @@ class dataplotter:
         else:
             self.__plot_unit = unit
 
-    def plot_norm(self, variables: list, labels: bool = True, label_list: list[str] = [], h_lines: list = [], v_lines: list = []):
+    def plot_norm(
+        self,
+        variables: list,
+        labels: bool = True,
+        label_list: list[str] = [],
+        h_lines: list = [],
+        v_lines: list = [],
+    ):
         if not self.__file_read:
             raise AttributeError("No csv read. Call .get_csvparser() before plotting.")
         for h in h_lines:
@@ -223,8 +230,20 @@ class dataplotter:
                     print(f"graph for {title}")
                     plt.show()
                     print("\n\n")
-       
-    def plot_dual_group(self, l_v: list, r_v: list, left_title: str = "Left", right_title: str = "Right", middle_title: str = "title", labels = False, left_spacing = -1, right_spacing = -1, h_lines: list = [], v_lines: list = []):
+
+    def plot_dual_group(
+        self,
+        l_v: list,
+        r_v: list,
+        left_title: str = "Left",
+        right_title: str = "Right",
+        middle_title: str = "title",
+        labels=False,
+        left_spacing=-1,
+        right_spacing=-1,
+        h_lines: list = [],
+        v_lines: list = [],
+    ):
         if not self.__file_read:
             raise AttributeError("No csv read. Call .get_csvparser() before plotting.")
         left_len = len(l_v)
@@ -232,15 +251,25 @@ class dataplotter:
         xlabel = "Timestamp (s)" if self.__plot_unit == "s" else "Timestamp (ms)"
         fig, ax1 = plt.subplots()
         ax2 = None
-        colors = ['blue', 'red', 'green', 'orange', 'purple', 'brown', 'pink', 'gray', 'olive', 'cyan']
+        colors = [
+            "blue",
+            "red",
+            "green",
+            "orange",
+            "purple",
+            "brown",
+            "pink",
+            "gray",
+            "olive",
+            "cyan",
+        ]
         color_index = 0
 
-
         for h in h_lines:
-            plt.axhline(y=h, color='black', linestyle='--', zorder=1)
-        
+            plt.axhline(y=h, color="black", linestyle="--", zorder=1)
+
         for v in v_lines:
-            plt.axvline(x=v, color='black', linestyle='--', zorder=1)
+            plt.axvline(x=v, color="black", linestyle="--", zorder=1)
 
         for index, var in enumerate(both_l):
             if type(var) is str:
@@ -262,51 +291,57 @@ class dataplotter:
             if self.__plot_unit == "s":
                 last_time_stamp *= 1e3
                 first_time_stamp *= 1e3
-            
+
             if self.__plot_end_time == -1:
-                last_time_stamp = vals[-1,0]
-            
-            filtered_vals = vals[(vals[:, 0] >= first_time_stamp) & (vals[:, 0] <= last_time_stamp )]
+                last_time_stamp = vals[-1, 0]
+
+            filtered_vals = vals[
+                (vals[:, 0] >= first_time_stamp) & (vals[:, 0] <= last_time_stamp)
+            ]
             if filtered_vals.size == 0:
-                print(f"Warning: No data available for {short_name} in the given time range.")
+                print(
+                    f"Warning: No data available for {short_name} in the given time range."
+                )
                 continue
 
             if self.__plot_unit == "s":
-                t = filtered_vals[::, 0]/1e3
+                t = filtered_vals[::, 0] / 1e3
             else:
                 t = filtered_vals[::, 0]
 
             for hvT, hvOn in self.__csvparser.get_HV_changes():
                 color = "red" if hvOn else "green"
-                if (hvT >= first_time_stamp and hvT <= last_time_stamp):
+                if hvT >= first_time_stamp and hvT <= last_time_stamp:
                     if self.__plot_unit == "s":
-                        hvT = hvT/1e3
+                        hvT = hvT / 1e3
                     plt.axvline(x=hvT, color=color)
 
             y = filtered_vals[::, 1]
 
             if index < left_len:
-                ax1.plot(t, y, label=short_name, color = colors[index % len(colors)])
+                ax1.plot(t, y, label=short_name, color=colors[index % len(colors)])
                 ax1.set_ylabel(left_title)
-                ax1.tick_params(axis='y')
+                ax1.tick_params(axis="y")
                 if left_spacing != -1:
                     ax1.yaxis.set_major_locator(MultipleLocator(left_spacing))
             else:
                 if ax2 is None:
                     ax2 = ax1.twinx()
-                ax2.plot(t, y, label=short_name, color = colors[index % len(colors)]) #, linestyle="--"
+                ax2.plot(
+                    t, y, label=short_name, color=colors[index % len(colors)]
+                )  # , linestyle="--"
                 ax2.set_ylabel(right_title)
-                ax2.tick_params(axis='y')
+                ax2.tick_params(axis="y")
                 if right_spacing != -1:
                     ax2.yaxis.set_major_locator(MultipleLocator(right_spacing))
         plt.xlabel(xlabel)
         plt.title(f"Join Graph for {middle_title}")
         if labels:
-            ax1.legend(loc='upper left')
-            ax2.legend(loc='upper right')
+            ax1.legend(loc="upper left")
+            ax2.legend(loc="upper right")
         fig.tight_layout()
         plt.show()
-    
+
     def plot0to60(self, numWheels):
         self.set_plot()
         short_names = [
