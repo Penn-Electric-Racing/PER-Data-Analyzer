@@ -56,7 +56,7 @@ class DataInstance:
         Get a new DataInstance with data in [start_time, end_time).
         If end_time == -1, means till end.
         """
-        if end_time == -1:
+        if end_time < 0:
             mask = self.timestamp_np >= start_time
         else:
             mask = (self.timestamp_np >= start_time) & (self.timestamp_np < end_time)

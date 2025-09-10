@@ -170,9 +170,12 @@ class csvparser:
                 di = self.get_data(input_canid_name)
                 di.print_info(time_unit=time_unit)
 
-    def print_variables(self, sort_by="name"):
+    def print_variables(
+        self, search: str = None, strict_search: bool = False, sort_by="name"
+    ):
         """
         Print all available CAN IDs and names.
+        If search is given, only print ones containing the search string.
         """
         if not self.__file_read:
             raise AttributeError(
@@ -180,8 +183,18 @@ class csvparser:
             )
         # Parse variable names into (inside, outside) pairs for sorting
         variable_pairs = []
+        if search is not None:
+            search_list = search.lower().split(" ")
         for canid in self.__ID_map:
             full_name = self.__ID_map[canid]
+            # Strict search: all terms must be present
+            if strict_search and search is not None:
+                if not all(term in full_name.lower() for term in search_list):
+                    continue
+            # Non-strict search: any term present is enough
+            if not strict_search and search is not None:
+                if not any(term in full_name.lower() for term in search_list):
+                    continue
             s = full_name.strip()
             left = s.rfind("(")
             # well-formed "( … )" at the end?
@@ -189,6 +202,7 @@ class csvparser:
                 description = s[:left].rstrip()
                 short_can_name = s[left + 1 : -1].strip()  # drop '(' and ')'
                 if short_can_name:  # both parts exist
+                    # pass search filter, append
                     variable_pairs.append((canid, short_can_name, description))
                     continue
             # fallback: single column
@@ -204,7 +218,22 @@ class csvparser:
             sorted_pairs = np.array(
                 sorted(variable_pairs, key=lambda t: t[0]), dtype=object
             )
+        # First print total count, indicating search methods and outputs
+        if search is None:
+            print(f"Total CAN Variables: {len(sorted_pairs)}")
+        elif strict_search:
+            print(
+                f"Total CAN Variables matching ALL terms '{search}': {len(sorted_pairs)}"
+            )
+        else:
+            print(
+                f"Total CAN Variables matching ANY terms '{search}': {len(sorted_pairs)}"
+            )
 
+        # if sorted_pairs is empty, print no matching found
+        if len(sorted_pairs) == 0:
+            print("No matching CAN variables found.")
+            return
         # Print in Three columns
         col1_width = max(len(str(id)) for id, _, _ in sorted_pairs)
         col2_width = max(len(name) for _, name, _ in sorted_pairs)
@@ -222,3 +251,5 @@ class csvparser:
                 print(
                     f"{canid:<{col1_width}}  {short_name:<{col2_width}}  {description}"
                 )
+        # end with line
+        print("-" * (col1_width + col2_width + 15))

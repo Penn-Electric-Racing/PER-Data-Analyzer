@@ -12,7 +12,7 @@ def plot(
     right_input=None,
     start_time=0,
     end_time=-1,
-    unit="ms",
+    unit="s",
     label=True,
     left_spacing=-1,
     right_spacing=-1,
@@ -35,6 +35,11 @@ def plot(
     left_di = []
     right_di = []
     dual_axis = right_input is not None
+
+    # Adjust start_time and end_time if unit is in seconds
+    if unit == "s":
+        start_time *= 1e3
+        end_time *= 1e3
 
     # Get left DataInstance list and filter time
     if not isinstance(left_input, list):
@@ -91,15 +96,12 @@ def plot(
             if unit == "s":
                 ts = ts.astype(np.float64) / 1e3
             lb = rdi.label
-            ax2.plot(ts, val, label=lb, color=colors[coloridx % len(colors)])
+            ax2.plot(
+                ts, val, linestyle="-.", label=lb, color=colors[coloridx % len(colors)]
+            )
             coloridx += 1
             if right_spacing != -1:
                 ax2.yaxis.set_major_locator(MultipleLocator(right_spacing))
-
-    # Set x label and title
-    xlabel = "Timestamp (ms)" if unit == "ms" else "Timestamp (s)"
-    plt.xlabel(xlabel)
-    plt.title(f"{top_title}")
 
     # Calculate proper spacing for legends based on figure size
     if label:
@@ -113,4 +115,8 @@ def plot(
     else:
         fig.tight_layout()
 
+    # Set x label and title
+    xlabel = "Timestamp (ms)" if unit == "ms" else "Timestamp (s)"
+    plt.xlabel(xlabel)
+    plt.title(f"{top_title}")
     plt.show()
