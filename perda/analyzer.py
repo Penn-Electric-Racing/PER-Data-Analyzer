@@ -1,32 +1,29 @@
-from .csv_parser import CSVParser
+from typing import Union, List, Optional, Tuple
+from .csv_parser import CSVParser, SingleRunData
 from .data_instance import DataInstance
 from .data_plotter import plot
+from . import data_helpers
 
 
 class Analyzer:
     def __init__(self):
         """
         Initialize a new analyzer instance.
-        Creates new csvparser and initialize.
         """
-        self.__parser = CSVParser()
-        self.__file_read = False
+        self.data: SingleRunData = None
         print("Analyzer Created")
 
     def read_csv(self, path: str, bad_data_limit: int = 100) -> None:
         """
-        Read and parse a CSV file, information stored inside csvparser.
+        Read and parse a CSV file, storing the result in self.data.
 
         path: The file path to the CSV file.
         bad_data_limit: Number of allowed bad data rows before raising error.
-
-        Reset csvparser if already have data.
         """
-        if self.__file_read:
-            self.__parser = CSVParser()
+        if self.data is not None:
             print("Resetting previous data.")
-        self.__file_read = True
-        self.__parser.read_csv(path, bad_data_limit)
+        parser = CSVParser()
+        self.data = parser(path, bad_data_limit)
 
     def get_data(self, variable: str) -> "DataInstance":
         """
@@ -36,51 +33,26 @@ class Analyzer:
 
         variable: name or canid of the variable to get.
         """
-        return self.__parser.get_data(variable)
+        if self.data is None:
+            raise AttributeError("No csv read. Call .read_csv() before getting data.")
+        return self.data[variable]
 
-    def print_info(self, input=None, time_unit: str = "s") -> None:
-        """
-        Print information about the data, a specific variable, or a CAN ID.
 
-        input (Union[None, str, int], optional): What to get info about:
-            - None: Print overall dataset information
-            - str: Print information about a specific variable name
-            - int: Print information about a specific CAN ID
-            Defaults to None.
-        time_unit (str, optional): Unit for time values ("ms" or "s").
-            Defaults to "s".
-        """
-        self.__parser.print_info(input, time_unit=time_unit)
-
-    def print_variables(
-        self, search: str = None, strict_search: bool = False, sort_by: str = "name"
-    ) -> None:
-        """
-        Print a list of all available variables in the dataset.
-
-        sort_by (str, optional): How to sort the variables list:
-            - "name": Sort alphabetically by variable name
-            - "canid": Sort by CAN ID
-            Defaults to "name".
-        """
-        self.__parser.print_variables(
-            search, strict_search=strict_search, sort_by=sort_by
-        )
 
     def plot(
         self,
-        left_input,
-        right_input=None,
-        start_time=0,
-        end_time=-1,
-        time_unit="s",
-        label=True,
-        left_spacing=-1,
-        right_spacing=-1,
-        left_title="",
-        right_title="",
-        top_title="",
-        figsize=(8, 5),
+        left_input: Union[str, int, DataInstance, List[Union[str, int, DataInstance]]],
+        right_input: Optional[Union[str, int, DataInstance, List[Union[str, int, DataInstance]]]] = None,
+        start_time: Union[int, float] = 0,
+        end_time: Union[int, float] = -1,
+        time_unit: str = "s",
+        label: bool = True,
+        left_spacing: Union[int, float] = -1,
+        right_spacing: Union[int, float] = -1,
+        left_title: str = "",
+        right_title: str = "",
+        top_title: str = "",
+        figsize: Tuple[Union[int, float], Union[int, float]] = (8, 5),
     ) -> None:
         """
         Main plot function, has all functionalities
@@ -110,8 +82,10 @@ class Analyzer:
             When using time_unit="s", start_time and end_time are interpreted as seconds
             and converted to milliseconds internally.
         """
+        if self.data is None:
+            raise AttributeError("No csv read. Call .read_csv() before plotting.")
         plot(
-            self.__parser,
+            self.data,
             left_input,
             right_input=right_input,
             start_time=start_time,

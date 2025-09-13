@@ -2,12 +2,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.ticker import MultipleLocator
 
-from .csv_parser import CSVParser
+from .csv_parser import SingleRunData
 from .data_instance import DataInstance
 
 
 def plot(
-    parser: CSVParser,
+    data: SingleRunData,
     left_input,
     right_input=None,
     start_time=0,
@@ -22,7 +22,7 @@ def plot(
     figsize=(8, 5),
 ):
     """
-    Plot data from the parser.
+    Plot data from the ParsedData model.
     left_input: name of variable to plot on left y-axis (has to have sth)
     right_input: name of variable to plot on right y-axis (optional)
     start_time: start time in ms (default 0)
@@ -43,24 +43,24 @@ def plot(
 
     # Get left DataInstance list and filter time
     if not isinstance(left_input, list):
-        di = parser.get_data(left_input)
+        di = data[left_input]
         ftr_di = di.get_range(start_time, end_time)
         left_di = [ftr_di]
     else:
         for left in left_input:
-            di = parser.get_data(left)
+            di = data[left]
             ftr_di = di.get_range(start_time, end_time)
             left_di.append(ftr_di)
 
     # Get right DataInstance list if there is any and filter time
     if dual_axis:
         if not isinstance(right_input, list):
-            di = parser.get_data(right_input)
+            di = data[right_input]
             ftr_di = di.get_range(start_time, end_time)
             right_di = [ftr_di]
         else:
             for right in right_input:
-                di = parser.get_data(right)
+                di = data[right]
                 ftr_di = di.get_range(start_time, end_time)
                 right_di.append(ftr_di)
 
