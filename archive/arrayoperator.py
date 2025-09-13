@@ -168,8 +168,8 @@ class arrayoperator:
                         raise AttributeError(
                             "Aborted: Missing Information: Cannot Find Input Name"
                         )
-                    max_start = max(var_np[0,0], max_start)
-                    min_end = min(var_np[-1,0], min_end)
+                    max_start = max(var_np[0, 0], max_start)
+                    min_end = min(var_np[-1, 0], min_end)
                     var_arrs.append(var_np)
                 elif isinstance(ops, np.ndarray):
                     var_arrs.append(ops)

@@ -1,368 +1,255 @@
 import numpy as np
 from tqdm import tqdm
 
-from . import helper
+from .datainstance import DataInstance
 
 
 class csvparser:
     def __init__(self):
-        self.__value_map = {}
+        self.__tv_map = {}
         self.__ID_map = {}
-        self.__already_filtered = {}
-        self.__high_voltage_changes = []
+        self.__name_map = {}
+        self.__total_data_points = 0
         self.__data_start_time = None
         self.__data_end_time = None
         self.__file_read = False
 
-    def reset(self):
-        self.__value_map = {}
-        self.__ID_map = {}
-        self.__already_filtered = {}
-        self.__high_voltage_changes = []
-        self.__data_start_time = None
-        self.__data_end_time = None
-        self.__file_read = False
-
-    def read_csv(self, path: str, input_align_name="default"):
+    def read_csv(self, file_path, bad_data_limit=100):
+        """
+        Main function to parse csv file from path
+        file_path: path of file we want to parse
+        bad_data_limit: number of bad data before stopping (-1 for no limit)
+        """
+        # Reset previous data
         if self.__file_read:
-            raise AttributeError("Call .reset() before reading new csv")
-        # Reset but do not print
-        self.__value_map = {}
-        self.__ID_map = {}
-        self.__already_filtered = {}
-        self.__high_voltage_changes = []
-        self.__data_start_time = None
-        self.__data_end_time = None
+            self.__tv_map = {}
+            self.__ID_map = {}
+            self.__name_map = {}
+            self.__total_data_points = 0
+            self.__data_start_time = None
+            self.__data_end_time = None
+            print("Resetting previous data.")
+        self.__file_read = True
 
-        time_stamp = -1
-        start_time_read = False
-        high_voltage = False
-        any_implausibility = False
-
-        align_id = None
-        align_name = input_align_name
-
+        # Initialize bad data count
         bad_data = 0
 
-        if input_align_name == "max_freq":
-
-            count_dic = {}
-
-            with open(path, "r") as pre_log:
-                header = next(pre_log)
-                line_num = 2
-                with tqdm(
-                    desc="Finding Highest Freq Value", unit="lines", initial=1
-                ) as pbar:
-                    for pre_line in pre_log:
-                        if bad_data >= 100:
-                            raise Exception("Bad data exceeds 100, aborted.")
-                        if pre_line.startswith("Value"):
-                            canID_name_value = pre_line[6:].strip().split(": ")
-                            try:
-                                this_id = int(canID_name_value[1])
-                                self.__ID_map[this_id] = canID_name_value[0]
-                            except Exception as e:
-                                print(
-                                    f"Error parsing ID | Line number {line_num} | Line: {line} | Error: {e}"
-                                )
-                                bad_data += 1
-                                continue
-                        else:
-                            data = pre_line.strip().split(",")
-                            try:
-                                id = int(data[1])
-
-                                if id not in count_dic:
-                                    count_dic[id] = 0
-
-                                count_dic[id] += 1
-
-                            except Exception as e:
-                                print(
-                                    f"Error parsing ID | Line number {line_num} | Line: {line} | Error: {e}"
-                                )
-                                bad_data += 1
-                                continue
-                        line_num += 1
-                        pbar.update(1)
-            align_id = max(count_dic, key=count_dic.get)
-            num_data = count_dic[align_id]
-            max_name = self.__ID_map[align_id]
-            align_name = max_name
-            print(
-                f"Timestamp aligned to {max_name} | canID: {align_id} | Number of data: {num_data}\n"
-            )
-
-        with open(path, "r") as log:
+        with open(file_path, "r") as log:
+            # Skip and print first line (header)
             header = next(log)
-            print(f"Reading file: {header}")
-            line_num = 2
-            with tqdm(desc="Processing CSV", unit="lines", initial=1) as pbar:
-                for line in log:
-                    if bad_data >= 100:
-                        raise Exception("Bad data exceeds 100, aborted.")
-                    if line.startswith("Value"):
-                        if input_align_name == "max_freq":
-                            continue
-                        canID_name_value = line[6:].strip().split(": ")
-                        try:
-                            this_id = int(canID_name_value[1])
-                            self.__ID_map[this_id] = canID_name_value[0]
-                            if helper.name_matches(align_name, canID_name_value[0]):
-                                align_id = this_id
-                        except Exception as e:
+            print(f"Header: {header}")
+            # Start at second line for displaying error line
+            line_num = 1
+            for line in tqdm(log, desc="Reading CSV", unit=" lines", initial=1):
+                line_num += 1
+                # Stop read if too many bad lines
+                if bad_data_limit > 0 and bad_data >= bad_data_limit:
+                    raise Exception("Too many bad data lines encountered.")
+                # Read canid and name before data
+                if line.startswith("Value "):
+                    canid_name = line[6:].strip().split(": ")
+                    try:
+                        canID = int(canid_name[1])
+                        name = canid_name[0]
+                        # Store everything in map
+                        if canID in self.__ID_map:
                             print(
-                                f"Error parsing ID | Line number {line_num} | Line: {line} | Error: {e}"
+                                f"Warning: Duplicate CAN ID {canID} at line {line_num}. Overwriting previous name."
                             )
-                            bad_data += 1
-                            continue
-                    else:
-                        if align_name != "default" and align_id is None:
-                            print("Cannot Find Align Variable Name.")
-                            return None
-                        data = line.strip().split(",")
-                        try:
-                            id = int(data[1])
-                            name = self.__ID_map[id]
-                            val = float(data[2])
-                            raw_time = int(data[0])
+                        self.__ID_map[canID] = name
+                    except Exception as e:
+                        print(f"Error parsing line {line_num}: {e}")
+                        bad_data += 1
+                        continue
+                # Read data lines
+                else:
+                    data = line.strip().split(",")
+                    try:
+                        id = int(data[1])
+                        timestamp = int(data[0])
+                        val = float(data[2])
 
-                            if not start_time_read:
-                                self.__data_start_time = raw_time
-                                time_stamp = self.__data_start_time
-                                start_time_read = True
-                            elif (
-                                helper.name_matches(align_name, name) or id == align_id
-                            ):
-                                # time_stamp = val / 1e3
-                                time_stamp = raw_time
-                            elif helper.name_matches("ams.airsState", name):
-                                if high_voltage and val == 0:
-                                    high_voltage = False
-                                    self.__high_voltage_changes.append(
-                                        (time_stamp, high_voltage)
-                                    )
-                                elif not high_voltage and val == 4:
-                                    high_voltage = True
-                                    self.__high_voltage_changes.append(
-                                        (time_stamp, high_voltage)
-                                    )
-                            elif helper.name_matches(
-                                "pcm.pedals.implausibility.anyImplausibility", name
-                            ):
-                                any_implausibility = val
+                        # Record start time
+                        if self.__data_start_time is None:
+                            self.__data_start_time = timestamp
 
-                            if name not in self.__value_map:
-                                self.__value_map[name] = []
+                        if id not in self.__tv_map:
+                            # Use can ID as key since there is somehow duplicate names sometimes :(
+                            self.__tv_map[id] = []
+                        self.__tv_map[id].append([timestamp, val])
+                        self.__total_data_points += 1
 
-                            if align_name == "default":
-                                self.__value_map[name].append(
-                                    [raw_time, val, high_voltage, any_implausibility]
-                                )
-                            else:
-                                self.__value_map[name].append(
-                                    [time_stamp, val, high_voltage, any_implausibility]
-                                )
+                    except Exception as e:
+                        print(f"Error parsing line {line_num}: {e}")
+                        bad_data += 1
+                        continue
 
-                        except Exception as e:
-                            print(
-                                f"Error parsing ID | Line number {line_num} | Line: {line} | Error: {e}"
-                            )
-                            bad_data += 1
-                            continue
-                    line_num += 1
-                    pbar.update(1)
-        self.__data_end_time = raw_time
-        self.__file_read = True
-        print("Csv parsing complete.")
-        if bad_data != 0:
-            print(f"Number of bad data: {bad_data}")
-
-    # might need in the future
-    def filter_data_replace(self, value_map: dict):
-        window_size = 5
-        for key in value_map:
-            data = np.array(value_map[key])
-            if data.shape[0] < window_size:
-                continue
-
-            time_col = data[:, 0]
-            values_col = data[:, 1]
-            cleaned_values = values_col.copy()
-
-            for i in range(len(values_col) - window_size + 1):
-                window = values_col[i : i + window_size]
-                Q1 = np.percentile(window, 25)
-                Q3 = np.percentile(window, 75)
-                IQR = Q3 - Q1
-
-                lower_bound = Q1 - 1.5 * IQR
-                upper_bound = Q3 + 1.5 * IQR
-
-                mid_idx = i + window_size // 2
-                if (
-                    values_col[mid_idx] < lower_bound
-                    or values_col[mid_idx] > upper_bound
-                ):
-                    median_value = np.median(window)
-                    if lower_bound <= median_value <= upper_bound:
-                        cleaned_values[mid_idx] = median_value
-
-            value_map[key] = np.column_stack(
-                (time_col, cleaned_values, data[:, 2:])
-            ).tolist()
-
-    def filter_data_drop(self, key: str):
-        if self.__already_filtered.get(key, False):
-            return self.__value_map[key]
-        outlier_count = 0
-        with tqdm(
-            desc=f"Cleaning outliers for {key}. ", unit=" windows", initial=1
-        ) as pbar:
-            data = np.array(self.__value_map[key])
-            N = data.shape[0]
-            if N < 5:
-                return self.__value_map[key]
-
-            window_size = max(5, int(np.sqrt(N)))
-            if window_size % 2 == 0:
-                window_size += 1
-
-            values_col = data[:, 1]
-
-            valid_indices = []
-            firstCol = True
-
-            for i in range(N - window_size + 1):
-                window = values_col[i : i + window_size]
-                Q1 = np.percentile(window, 25)
-                Q3 = np.percentile(window, 75)
-                IQR = Q3 - Q1
-
-                lower_bound = Q1 - 1.5 * IQR
-                upper_bound = Q3 + 1.5 * IQR
-                if firstCol:
-                    for idx in range(window_size // 2):
-                        if lower_bound <= values_col[idx] <= upper_bound:
-                            valid_indices.append(idx)
-                        else:
-                            outlier_count += 1
-                    firstCol = False
-                mid_idx = i + (window_size // 2)
-                if lower_bound <= values_col[mid_idx] <= upper_bound:
-                    valid_indices.append(mid_idx)
-                if i == N - window_size:
-                    for idx in range(i + (window_size // 2), N):
-                        if lower_bound <= values_col[idx] <= upper_bound:
-                            valid_indices.append(idx)
-                        else:
-                            outlier_count += 1
-                pbar.update(1)
-
-            # Convert valid indices into a filtered dataset
-            filtered_data = data[valid_indices]
-
-            # Store the cleaned data back in value_map as a list of lists
-            self.__value_map[key] = filtered_data.tolist()
-            self.__already_filtered[key] = True
-        print(f"{outlier_count} outliers found for {key}.")
-        return self.__value_map[key]
-
-    def filter_all_data(self):
-        if not self.__file_read:
-            raise AttributeError("Empty parser, read csv before calling.")
-        print(
-            "Warning: This is an expensive and time consuming operation. Do you wish to continue?"
-        )
-        while True:
-            inp = input("Y/N: ")
-            if inp == "Y" or inp == "y":
-                break
-            elif inp == "N" or inp == "n":
-                return
+        # Convert lists to DataInstance
+        for canid in tqdm(self.__ID_map, desc="Creating DataInstances"):
+            name = self.__ID_map[canid]
+            self.__name_map[name] = canid
+            if canid not in self.__tv_map:
+                self.__tv_map[canid] = DataInstance(
+                    np.array([]), np.array([]), label=name, canid=canid
+                )
             else:
-                print("Invalid input.")
-        for eachKey in self.__value_map:
-            self.filter_data_drop(eachKey)
+                data_array = self.__tv_map[canid]
+                data_array = np.array(data_array)
+                timestamps = data_array[:, 0]
+                values = data_array[:, 1]
+                self.__tv_map[canid] = DataInstance(
+                    timestamps, values, label=name, canid=canid
+                )
 
-    def get_np_array(self, short_name: str, filter=False):
+        # Record end time as last timestamp
+        self.__data_end_time = timestamp
+        if bad_data != 0:
+            print(f"Csv parsing complete with: {bad_data} bad lines.")
+        else:
+            print("Csv parsing complete.")
+
+    def get_data(self, input_canid_name):
+        """
+        Get DataInstance by canid or name.
+        Raises AttributeError if no csv read or cannot find input.
+        If input is DataInstance, return itself (used for plotting).
+        Very very very very useful function :)) core of perda prob
+        """
+        # Dummy return for plotting function for convenience
+        if isinstance(input_canid_name, DataInstance):
+            return input_canid_name
         if not self.__file_read:
-            raise AttributeError("Empty parser, read csv before calling.")
-        full_name = None
-        for var_name in self.__value_map.keys():
-            if helper.name_matches(short_name, var_name):
-                full_name = var_name
-                break
+            raise AttributeError("No csv read. Call .read_csv() before getting data.")
+        # If input is canid
+        if isinstance(input_canid_name, int):
+            if input_canid_name not in self.__tv_map:
+                raise AttributeError("Aborted: Cannot Find Input ID")
+            canid = input_canid_name
+        # If input is can name
+        elif isinstance(input_canid_name, str):
+            canid = None
+            for long_name in self.__name_map:
+                if csvparser.name_matches(input_canid_name, long_name):
+                    canid = self.__name_map[long_name]
+                    break
+            if canid is None:
+                raise AttributeError("Aborted: Cannot Find Input Name")
+        else:
+            raise ValueError("Input must be a string, int.")
+        # Return DataInstance
+        return self.__tv_map[canid]
 
-        if full_name is None:
-            raise AttributeError("Error: could not find data for " + short_name)
-        if filter:
-            return np.array(self.filter_data_drop(full_name))
-        return np.array(self.__value_map[full_name])
+    def name_matches(short_name, full_name):
+        return f"({short_name})" in full_name or f"{short_name}" in full_name
 
-    def get_input_can_variables(self):
+    def print_info(self, input_canid_name=None, time_unit: str = "s"):
         """
-        Return a NumPy array of tuples:
-            (outside_text, inside_text)
-        • If a value looks like 'foo (bar)', it becomes ('foo', 'bar')
-        • Otherwise it becomes ('foo', '')
-        The array is lexicographically sorted by the two fields.
+        If input_canid_name is None, print parser info.
+        If input_canid_name is DataInstance, print its info.
+        If input_canid_name is canid or name, print its DataInstance info.
         """
-        pairs = []
+        if input_canid_name is None:
+            if not self.__file_read:
+                raise AttributeError(
+                    "No csv read. Call .read_csv() before printing info."
+                )
+            print("Parser Info:")
+            start_time = self.__data_start_time
+            end_time = self.__data_end_time
+            if time_unit == "s":
+                start_time = float(start_time) / 1e3
+                end_time = float(end_time) / 1e3
+            print(f"  Time range: {start_time} to {end_time} ({time_unit})")
+            print(f"  Total CAN IDs:   {len(self.__tv_map)}")
+            print(f"  Total CAN Names: {len(self.__name_map)}")
+            print(f"  Total Data Points: {self.__total_data_points}")
+        else:
+            if isinstance(input_canid_name, DataInstance):
+                input_canid_name.print_info(time_unit=time_unit)
+            else:
+                di = self.get_data(input_canid_name)
+                di.print_info(time_unit=time_unit)
 
-        for raw in self.__ID_map.values():
-            s = raw.strip()
+    def print_variables(
+        self, search: str = None, strict_search: bool = False, sort_by="name"
+    ):
+        """
+        Print all available CAN IDs and names.
+        If search is given, only print ones containing the search string.
+        """
+        if not self.__file_read:
+            raise AttributeError(
+                "No csv read. Call .read_csv() before printing variables."
+            )
+        # Parse variable names into (inside, outside) pairs for sorting
+        variable_pairs = []
+        if search is not None:
+            search_list = search.lower().split(" ")
+        for canid in self.__ID_map:
+            full_name = self.__ID_map[canid]
+            # Strict search: all terms must be present
+            if strict_search and search is not None:
+                if not all(term in full_name.lower() for term in search_list):
+                    continue
+            # Non-strict search: any term present is enough
+            if not strict_search and search is not None:
+                if not any(term in full_name.lower() for term in search_list):
+                    continue
+            s = full_name.strip()
             left = s.rfind("(")
             # well-formed "( … )" at the end?
             if left != -1 and s.endswith(")"):
-                outside = s[:left].rstrip()
-                inside = s[left + 1 : -1].strip()  # drop '(' and ')'
-                if inside:  # both parts exist
-                    pairs.append((inside, outside))
+                description = s[:left].rstrip()
+                short_can_name = s[left + 1 : -1].strip()  # drop '(' and ')'
+                if short_can_name:  # both parts exist
+                    # pass search filter, append
+                    variable_pairs.append((canid, short_can_name, description))
                     continue
             # fallback: single column
-            pairs.append((s, ""))
+            variable_pairs.append((canid, s, ""))
+        # Sort by name or ID
+        if sort_by == "name":
+            # sort by outside first, then inside, then canid
+            sorted_pairs = np.array(
+                sorted(variable_pairs, key=lambda t: (t[1], t[2], t[0])), dtype=object
+            )
+        else:
+            # sort by canid only
+            sorted_pairs = np.array(
+                sorted(variable_pairs, key=lambda t: t[0]), dtype=object
+            )
+        # First print total count, indicating search methods and outputs
+        if search is None:
+            print(f"Total CAN Variables: {len(sorted_pairs)}")
+        elif strict_search:
+            print(
+                f"Total CAN Variables matching ALL terms '{search}': {len(sorted_pairs)}"
+            )
+        else:
+            print(
+                f"Total CAN Variables matching ANY terms '{search}': {len(sorted_pairs)}"
+            )
 
-        # sort by outside first, then inside
-        sorted_pairs = np.array(sorted(pairs, key=lambda t: (t[0], t[1])), dtype=object)
-        return sorted_pairs
-
-    def get_value_map(self):
-        if not self.__file_read:
-            raise AttributeError("Empty parser, read csv before calling.")
-        print("Not all data in the value map might have outliers filtered.")
-        return self.__value_map
-
-    def get_ID_map(self):
-        if not self.__file_read:
-            raise AttributeError("Empty parser, read csv before calling.")
-        return self.__ID_map
-
-    def get_can_id(self, name: str):
-        if not self.__file_read:
-            raise AttributeError("Empty parser, read csv before calling.")
-        canID = next(
-            (k for k, v in self.__ID_map.items() if helper.name_matches(name, v)), None
-        )
-        if canID is None:
-            raise AttributeError("No Can ID Found")
-        return canID
-
-    def get_HV_changes(self):
-        if not self.__file_read:
-            raise AttributeError("Empty parser, read csv before calling.")
-        return self.__high_voltage_changes
-
-    def get_data_start_time(self):
-        if not self.__file_read:
-            raise AttributeError("Empty parser, read csv before calling.")
-        return self.__data_start_time
-
-    def get_data_end_time(self):
-        if not self.__file_read:
-            raise AttributeError("Empty parser, read csv before calling.")
-        return self.__data_end_time
-
-    def is_empty(self):
-        return not self.__file_read
+        # if sorted_pairs is empty, print no matching found
+        if len(sorted_pairs) == 0:
+            print("No matching CAN variables found.")
+            return
+        # Print in Three columns
+        col1_width = max(len(str(id)) for id, _, _ in sorted_pairs)
+        col2_width = max(len(name) for _, name, _ in sorted_pairs)
+        if sort_by == "name":
+            print(f"{'CAN Name':<{col2_width}}  {'CAN ID':<{col1_width}}  Description")
+            print("-" * (col1_width + col2_width + 15))
+            for canid, short_name, description in sorted_pairs:
+                print(
+                    f"{short_name:<{col2_width}}  {canid:<{col1_width}}  {description}"
+                )
+        else:
+            print(f"{'CAN ID':<{col1_width}}  {'CAN Name':<{col2_width}}  Description")
+            print("-" * (col1_width + col2_width + 15))
+            for canid, short_name, description in sorted_pairs:
+                print(
+                    f"{canid:<{col1_width}}  {short_name:<{col2_width}}  {description}"
+                )
+        # end with line
+        print("-" * (col1_width + col2_width + 15))
