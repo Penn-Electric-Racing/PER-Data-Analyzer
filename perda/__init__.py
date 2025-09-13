@@ -1,11 +1,7 @@
-from .analyzer import analyzer
-from .datainstance import DataInstance
+from .analyzer import Analyzer
+from .data_instance import DataInstance
 
 __all__ = [
-    "create",
-    "DataInstance",  # Make DataInstance available for direct import
+    "Analyzer",
+    "DataInstance"
 ]
-
-
-def create():
-    return analyzer()

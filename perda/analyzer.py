@@ -1,15 +1,15 @@
-from .csvparser import csvparser
-from .datainstance import DataInstance
-from .dataplotter import plot
+from .csv_parser import CSVParser
+from .data_instance import DataInstance
+from .data_plotter import plot
 
 
-class analyzer:
+class Analyzer:
     def __init__(self):
         """
         Initialize a new analyzer instance.
         Creates new csvparser and initialize.
         """
-        self.__parser = csvparser()
+        self.__parser = CSVParser()
         self.__file_read = False
         print("Analyzer Created")
 
@@ -23,7 +23,7 @@ class analyzer:
         Reset csvparser if already have data.
         """
         if self.__file_read:
-            self.__parser = csvparser()
+            self.__parser = CSVParser()
             print("Resetting previous data.")
         self.__file_read = True
         self.__parser.read_csv(path, bad_data_limit)

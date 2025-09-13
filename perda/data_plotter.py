@@ -2,12 +2,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.ticker import MultipleLocator
 
-from .csvparser import csvparser
-from .datainstance import DataInstance
+from .csv_parser import CSVParser
+from .data_instance import DataInstance
 
 
 def plot(
-    parser: csvparser,
+    parser: CSVParser,
     left_input,
     right_input=None,
     start_time=0,

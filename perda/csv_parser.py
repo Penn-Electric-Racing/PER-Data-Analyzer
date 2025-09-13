@@ -1,10 +1,10 @@
 import numpy as np
 from tqdm import tqdm
 
-from .datainstance import DataInstance
+from .data_instance import DataInstance
 
 
-class csvparser:
+class CSVParser:
     def __init__(self):
         self.__tv_map = {}
         self.__ID_map = {}
@@ -129,7 +129,7 @@ class csvparser:
         elif isinstance(input_canid_name, str):
             canid = None
             for long_name in self.__name_map:
-                if csvparser.name_matches(input_canid_name, long_name):
+                if CSVParser.name_matches(input_canid_name, long_name):
                     canid = self.__name_map[long_name]
                     break
             if canid is None:
