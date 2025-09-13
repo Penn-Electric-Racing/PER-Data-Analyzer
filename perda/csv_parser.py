@@ -1,7 +1,8 @@
+from typing import Any, Dict, Optional, Union
+
 import numpy as np
-from tqdm import tqdm
 from pydantic import BaseModel
-from typing import Dict, Optional, Union, Any
+from tqdm import tqdm
 
 from .data_instance import DataInstance
 
@@ -22,7 +23,9 @@ class SingleRunData(BaseModel):
     class Config:
         arbitrary_types_allowed = True
 
-    def __getitem__(self, input_canid_name: Union[str, int, DataInstance]) -> DataInstance:
+    def __getitem__(
+        self, input_canid_name: Union[str, int, DataInstance]
+    ) -> DataInstance:
         """Dictionary-like access to DataInstance by CAN ID or variable name."""
         # Dummy return for plotting function for convenience
         if isinstance(input_canid_name, DataInstance):
@@ -45,7 +48,7 @@ class SingleRunData(BaseModel):
                 raise KeyError(f"Cannot find CAN name: {input_canid_name}")
         else:
             raise ValueError("Input must be a string, int, or DataInstance.")
-        
+
         # Return DataInstance
         return self.tv_map[canid]
 
@@ -134,7 +137,10 @@ class CSVParser:
             name_map[name] = canid
             if canid not in tv_map:
                 tv_map[canid] = DataInstance(
-                    np.array([]), np.array([]), label=name, canid=canid
+                    timestamp_np=np.array([]),
+                    value_np=np.array([]),
+                    label=name,
+                    canid=canid,
                 )
             else:
                 data_array = tv_map[canid]
@@ -142,7 +148,10 @@ class CSVParser:
                 timestamps = data_array[:, 0]
                 values = data_array[:, 1]
                 tv_map[canid] = DataInstance(
-                    timestamps, values, label=name, canid=canid
+                    timestamp_np=timestamps,
+                    value_np=values,
+                    label=name,
+                    canid=canid,
                 )
 
         # Record end time as last timestamp
@@ -159,12 +168,9 @@ class CSVParser:
             name_map=name_map,
             total_data_points=total_data_points,
             data_start_time=data_start_time,
-            data_end_time=data_end_time
+            data_end_time=data_end_time,
         )
-
 
     @staticmethod
     def name_matches(short_name, full_name):
         return f"({short_name})" in full_name or f"{short_name}" in full_name
-
-

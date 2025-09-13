@@ -1,8 +1,8 @@
-from typing import Union, List, Optional, Tuple
+from typing import List, Optional, Tuple, Union
+
 from .csv_parser import CSVParser, SingleRunData
 from .data_instance import DataInstance
 from .data_plotter import plot
-from . import data_helpers
 
 
 class Analyzer:
@@ -37,12 +37,12 @@ class Analyzer:
             raise AttributeError("No csv read. Call .read_csv() before getting data.")
         return self.data[variable]
 
-
-
     def plot(
         self,
         left_input: Union[str, int, DataInstance, List[Union[str, int, DataInstance]]],
-        right_input: Optional[Union[str, int, DataInstance, List[Union[str, int, DataInstance]]]] = None,
+        right_input: Optional[
+            Union[str, int, DataInstance, List[Union[str, int, DataInstance]]]
+        ] = None,
         start_time: Union[int, float] = 0,
         end_time: Union[int, float] = -1,
         time_unit: str = "s",
