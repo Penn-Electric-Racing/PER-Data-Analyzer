@@ -1,70 +1,13 @@
-from typing import Any, Dict, Optional, Union
-
 import numpy as np
-from pydantic import BaseModel
 from tqdm import tqdm
 
-from .data_instance import DataInstance
-
-
-class SingleRunData(BaseModel):
-    """Pydantic model to store parsed CSV data with dictionary-like lookup."""
-
-    # Core data storage
-    tv_map: Dict[int, DataInstance] = {}  # canid -> DataInstance
-    id_map: Dict[int, str] = {}  # canid -> name
-    name_map: Dict[str, int] = {}  # name -> canid
-
-    # Metadata
-    total_data_points: int = 0
-    data_start_time: Optional[int] = None
-    data_end_time: Optional[int] = None
-
-    class Config:
-        arbitrary_types_allowed = True
-
-    def __getitem__(
-        self, input_canid_name: Union[str, int, DataInstance]
-    ) -> DataInstance:
-        """Dictionary-like access to DataInstance by CAN ID or variable name."""
-        # Dummy return for plotting function for convenience
-        if isinstance(input_canid_name, DataInstance):
-            return input_canid_name
-
-        # If input is a CAN ID
-        if isinstance(input_canid_name, int):
-            if input_canid_name not in self.tv_map:
-                raise KeyError(f"Cannot find CAN ID: {input_canid_name}")
-            canid = input_canid_name
-
-        # If input is CAN variable name
-        elif isinstance(input_canid_name, str):
-            canid = None
-            for long_name in self.name_map:
-                if CSVParser.name_matches(input_canid_name, long_name):
-                    canid = self.name_map[long_name]
-                    break
-            if canid is None:
-                raise KeyError(f"Cannot find CAN name: {input_canid_name}")
-        else:
-            raise ValueError("Input must be a string, int, or DataInstance.")
-
-        # Return DataInstance
-        return self.tv_map[canid]
-
-    def __contains__(self, input_canid_name: Union[str, int]) -> bool:
-        """Check if CAN ID or variable name exists in the data."""
-        try:
-            self[input_canid_name]
-            return True
-        except (KeyError, AttributeError):
-            return False
+from .models import DataInstance, SingleRunData
 
 
 class CSVParser:
     """Callable CSV parser that returns SingleRunData model."""
 
-    def __call__(self, file_path: str, bad_data_limit: int = 100) -> "SingleRunData":
+    def __call__(self, file_path: str, bad_data_limit: int = 100) -> SingleRunData:
         """
         Parse CSV file and return SingleRunData model.
         file_path: path of file we want to parse
@@ -75,8 +18,8 @@ class CSVParser:
         id_map = {}
         name_map = {}
         total_data_points = 0
-        data_start_time = None
-        data_end_time = None
+        data_start_time = 0
+        data_end_time = 0
 
         # Initialize bad data count
         bad_data = 0
@@ -117,7 +60,7 @@ class CSVParser:
                         val = float(data[2])
 
                         # Record start time
-                        if data_start_time is None:
+                        if data_start_time == 0:
                             data_start_time = timestamp
 
                         if id not in tv_map:
@@ -170,7 +113,3 @@ class CSVParser:
             data_start_time=data_start_time,
             data_end_time=data_end_time,
         )
-
-    @staticmethod
-    def name_matches(short_name, full_name):
-        return f"({short_name})" in full_name or f"{short_name}" in full_name

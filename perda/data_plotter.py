@@ -3,7 +3,8 @@ import numpy as np
 from matplotlib.ticker import MultipleLocator
 
 from .csv_parser import SingleRunData
-from .data_instance import DataInstance
+from .models import DataInstance
+from .utils import get_data_slice_by_timestamp
 
 
 def plot(
@@ -44,24 +45,24 @@ def plot(
     # Get left DataInstance list and filter time
     if not isinstance(left_input, list):
         di = data[left_input]
-        ftr_di = di.get_range(start_time, end_time)
+        ftr_di = get_data_slice_by_timestamp(di, start_time, end_time)
         left_di = [ftr_di]
     else:
         for left in left_input:
             di = data[left]
-            ftr_di = di.get_range(start_time, end_time)
+            ftr_di = get_data_slice_by_timestamp(di, start_time, end_time)
             left_di.append(ftr_di)
 
     # Get right DataInstance list if there is any and filter time
     if dual_axis:
         if not isinstance(right_input, list):
             di = data[right_input]
-            ftr_di = di.get_range(start_time, end_time)
+            ftr_di = get_data_slice_by_timestamp(di, start_time, end_time)
             right_di = [ftr_di]
         else:
             for right in right_input:
                 di = data[right]
-                ftr_di = di.get_range(start_time, end_time)
+                ftr_di = get_data_slice_by_timestamp(di, start_time, end_time)
                 right_di.append(ftr_di)
 
     # Setup plot and figsize

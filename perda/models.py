@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Dict, Union
 
 import numpy as np
 from numpy.typing import NDArray
@@ -9,6 +9,7 @@ from .helper import *
 
 class DataInstance(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
+
     timestamp_np: NDArray
     value_np: NDArray
     label: str
@@ -39,22 +40,6 @@ class DataInstance(BaseModel):
             raise ValueError("timestamp_np and value_np must have the same length.")
 
     # ---------- getters ----------
-
-    def get_range(self, start_time: int = 0, end_time: int = -1):
-        """
-        Get a new DataInstance with data in [start_time, end_time).
-        If end_time == -1, means till end.
-        """
-        if end_time < 0:
-            mask = self.timestamp_np >= start_time
-        else:
-            mask = (self.timestamp_np >= start_time) & (self.timestamp_np < end_time)
-        return DataInstance(
-            timestamp_np=self.timestamp_np[mask],
-            value_np=self.value_np[mask],
-            label=self.label,
-            canid=self.canid,
-        )
 
     def get_integral(self, time_unit: str = "ms"):
         """Get integral of the value over time using trapezoidal rule."""
@@ -195,3 +180,56 @@ class DataInstance(BaseModel):
             label=self.label,
             canid=self.canid,
         )
+
+
+class SingleRunData(BaseModel):
+    """Pydantic model to store parsed CSV data with dictionary-like lookup."""
+
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
+    # Core data storage
+    tv_map: Dict[int, DataInstance] = {}  # canid -> DataInstance
+    id_map: Dict[int, str] = {}  # canid -> name
+    name_map: Dict[str, int] = {}  # name -> canid
+
+    # Metadata
+    total_data_points: int
+    data_start_time: int
+    data_end_time: int
+
+    def __getitem__(
+        self, input_canid_name: Union[str, int, DataInstance]
+    ) -> DataInstance:
+        """Dictionary-like access to DataInstance by CAN ID or variable name."""
+        # Dummy return for plotting function for convenience
+        if isinstance(input_canid_name, DataInstance):
+            return input_canid_name
+
+        # If input is a CAN ID
+        if isinstance(input_canid_name, int):
+            if input_canid_name not in self.tv_map:
+                raise KeyError(f"Cannot find CAN ID: {input_canid_name}")
+            canid = input_canid_name
+
+        # If input is CAN variable name
+        elif isinstance(input_canid_name, str):
+            canid = None
+            for long_name in self.name_map:
+                if name_matches(input_canid_name, long_name):
+                    canid = self.name_map[long_name]
+                    break
+            if canid is None:
+                raise KeyError(f"Cannot find CAN name: {input_canid_name}")
+        else:
+            raise ValueError("Input must be a string, int, or DataInstance.")
+
+        # Return DataInstance
+        return self.tv_map[canid]
+
+    def __contains__(self, input_canid_name: Union[str, int]) -> bool:
+        """Check if CAN ID or variable name exists in the data."""
+        try:
+            self[input_canid_name]
+            return True
+        except (KeyError, AttributeError):
+            return False

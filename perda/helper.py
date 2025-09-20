@@ -145,3 +145,7 @@ def combine(
 ) -> Tuple[np.ndarray, np.ndarray]:
     T, av, bv = align(a_ts, a_val, b_ts, b_val)
     return T, ufunc(av, bv)
+
+
+def name_matches(short_name, full_name):
+    return f"({short_name})" in full_name or f"{short_name}" in full_name

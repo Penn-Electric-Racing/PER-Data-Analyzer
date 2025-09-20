@@ -1,7 +1,7 @@
 import numpy as np
 
 from .csv_parser import SingleRunData
-from .data_instance import DataInstance
+from .models import DataInstance
 
 
 def pretty_print_data_instance_info(data_instance: DataInstance, time_unit: str = "s"):

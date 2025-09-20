@@ -1,8 +1,8 @@
 from typing import List, Optional, Tuple, Union
 
 from .csv_parser import CSVParser, SingleRunData
-from .data_instance import DataInstance
 from .data_plotter import plot
+from .models import DataInstance
 
 
 class Analyzer:
