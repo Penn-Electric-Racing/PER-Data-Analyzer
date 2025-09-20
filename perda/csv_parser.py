@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 import numpy as np
 from tqdm import tqdm
 
@@ -14,10 +16,7 @@ class CSVParser:
         bad_data_limit: number of bad data before stopping (-1 for no limit)
         """
         # Initialize data containers
-        temp_tv_map: dict[int, list] = (
-            {}
-        )  # Temporary storage for lists of [timestamp, value]
-        tv_map: dict[int, DataInstance] = {}  # Final storage for DataInstance objects
+        tv_map: dict[int, DataInstance] = {}
         id_map: dict[int, str] = {}
         name_map: dict[str, int] = {}
         total_data_points = 0
@@ -26,6 +25,11 @@ class CSVParser:
 
         # Initialize bad data count
         bad_data = 0
+
+        # Initialize temporary data structure with separate lists for timestamps and values
+        temp_list_tv_map: defaultdict[int, tuple[list, list]] = defaultdict(
+            lambda: ([], [])
+        )
 
         with open(file_path, "r") as log:
             # Skip and print first line (header)
@@ -38,7 +42,7 @@ class CSVParser:
                 # Stop read if too many bad lines
                 if bad_data_limit > 0 and bad_data >= bad_data_limit:
                     raise Exception("Too many bad data lines encountered.")
-                # Read canid and name before data
+                # Read CAN ID and name before data
                 if line.startswith("Value "):
                     canid_name = line[6:].strip().split(": ")
                     try:
@@ -66,10 +70,9 @@ class CSVParser:
                         if data_start_time == 0:
                             data_start_time = timestamp
 
-                        if id not in temp_tv_map:
-                            # Use can ID as key since there is somehow duplicate names sometimes :(
-                            temp_tv_map[id] = []
-                        temp_tv_map[id].append([timestamp, val])
+                        # Use can ID as key since there is somehow duplicate names sometimes :(
+                        temp_list_tv_map[id][0].append(timestamp)
+                        temp_list_tv_map[id][1].append(val)
                         total_data_points += 1
 
                     except Exception as e:
@@ -81,24 +84,13 @@ class CSVParser:
         for canid in tqdm(id_map, desc="Creating DataInstances"):
             name = id_map[canid]
             name_map[name] = canid
-            if canid not in temp_tv_map:
-                tv_map[canid] = DataInstance(
-                    timestamp_np=np.array([]),
-                    value_np=np.array([]),
-                    label=name,
-                    canid=canid,
-                )
-            else:
-                data_array = temp_tv_map[canid]
-                data_array = np.array(data_array)
-                timestamps = data_array[:, 0]
-                values = data_array[:, 1]
-                tv_map[canid] = DataInstance(
-                    timestamp_np=timestamps,
-                    value_np=values,
-                    label=name,
-                    canid=canid,
-                )
+            timestamps_list, values_list = temp_list_tv_map[canid]
+            tv_map[canid] = DataInstance(
+                timestamp_np=np.array(timestamps_list),
+                value_np=np.array(values_list),
+                label=name,
+                canid=canid,
+            )
 
         # Record end time as last timestamp
         data_end_time = timestamp
