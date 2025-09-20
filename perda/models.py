@@ -198,6 +198,7 @@ class SingleRunData(BaseModel):
             raise ValueError("Input must be a string, int, or DataInstance.")
 
         # Return DataInstance
+        assert canid is not None  # This should never be None due to the checks above
         return self.tv_map[canid]
 
     def __contains__(self, input_canid_name: Union[str, int]) -> bool:

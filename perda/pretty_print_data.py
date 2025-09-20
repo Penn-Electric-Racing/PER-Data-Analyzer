@@ -18,15 +18,15 @@ def pretty_print_data_instance_info(data_instance: DataInstance, time_unit: str 
         max_val = float(data_instance.value_np.max())
         min_val_idx = int(data_instance.value_np.argmin())
         max_val_idx = int(data_instance.value_np.argmax())
-        min_ts = int(data_instance.timestamp_np[min_val_idx])
-        max_ts = int(data_instance.timestamp_np[max_val_idx])
-        first_ts = data_instance.timestamp_np[0]
-        last_ts = data_instance.timestamp_np[-1]
+        min_ts = float(data_instance.timestamp_np[min_val_idx])
+        max_ts = float(data_instance.timestamp_np[max_val_idx])
+        first_ts = float(data_instance.timestamp_np[0])
+        last_ts = float(data_instance.timestamp_np[-1])
         if time_unit == "s":
-            first_ts = float(first_ts) / 1e3
-            last_ts = float(last_ts) / 1e3
-            min_ts = float(min_ts) / 1e3
-            max_ts = float(max_ts) / 1e3
+            first_ts = first_ts / 1e3
+            last_ts = last_ts / 1e3
+            min_ts = min_ts / 1e3
+            max_ts = max_ts / 1e3
         avg_val = average_over_time_range(data_instance)
         integral = integrate_over_time_range(data_instance, time_unit=time_unit)
         # Set width for alignment
@@ -53,11 +53,11 @@ def pretty_print_single_run_info(
         Defaults to "s".
     """
     print("Parser Info:")
-    start_time = data.data_start_time
-    end_time = data.data_end_time
+    start_time = float(data.data_start_time)
+    end_time = float(data.data_end_time)
     if time_unit == "s":
-        start_time = float(start_time) / 1e3
-        end_time = float(end_time) / 1e3
+        start_time = start_time / 1e3
+        end_time = end_time / 1e3
     print(f"  Time range: {start_time} to {end_time} ({time_unit})")
     print(f"  Total CAN IDs:   {len(data.tv_map)}")
     print(f"  Total CAN Names: {len(data.name_map)}")
@@ -66,7 +66,7 @@ def pretty_print_single_run_info(
 
 def pretty_print_single_run_variables(
     data: SingleRunData,
-    search: str = None,
+    search: str | None = None,
     strict_search: bool = False,
     sort_by: str = "name",
 ):

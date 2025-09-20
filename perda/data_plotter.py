@@ -36,6 +36,7 @@ def plot(
     left_di = []
     right_di = []
     dual_axis = right_input is not None
+    ax2 = None  # Initialize ax2 for type checking
 
     # Adjust start_time and end_time if unit is in seconds
     if unit == "s":
@@ -110,7 +111,8 @@ def plot(
         fig.tight_layout(pad=2.0)
         if dual_axis:
             ax1.legend(loc="lower left", bbox_to_anchor=(0, 1))
-            ax2.legend(loc="lower right", bbox_to_anchor=(1, 1), markerfirst=False)
+            if ax2 is not None:
+                ax2.legend(loc="lower right", bbox_to_anchor=(1, 1), markerfirst=False)
         else:
             ax1.legend(loc="best")
     else:

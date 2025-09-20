@@ -14,9 +14,12 @@ class CSVParser:
         bad_data_limit: number of bad data before stopping (-1 for no limit)
         """
         # Initialize data containers
-        tv_map = {}
-        id_map = {}
-        name_map = {}
+        temp_tv_map: dict[int, list] = (
+            {}
+        )  # Temporary storage for lists of [timestamp, value]
+        tv_map: dict[int, DataInstance] = {}  # Final storage for DataInstance objects
+        id_map: dict[int, str] = {}
+        name_map: dict[str, int] = {}
         total_data_points = 0
         data_start_time = 0
         data_end_time = 0
@@ -63,10 +66,10 @@ class CSVParser:
                         if data_start_time == 0:
                             data_start_time = timestamp
 
-                        if id not in tv_map:
+                        if id not in temp_tv_map:
                             # Use can ID as key since there is somehow duplicate names sometimes :(
-                            tv_map[id] = []
-                        tv_map[id].append([timestamp, val])
+                            temp_tv_map[id] = []
+                        temp_tv_map[id].append([timestamp, val])
                         total_data_points += 1
 
                     except Exception as e:
@@ -78,7 +81,7 @@ class CSVParser:
         for canid in tqdm(id_map, desc="Creating DataInstances"):
             name = id_map[canid]
             name_map[name] = canid
-            if canid not in tv_map:
+            if canid not in temp_tv_map:
                 tv_map[canid] = DataInstance(
                     timestamp_np=np.array([]),
                     value_np=np.array([]),
@@ -86,7 +89,7 @@ class CSVParser:
                     canid=canid,
                 )
             else:
-                data_array = tv_map[canid]
+                data_array = temp_tv_map[canid]
                 data_array = np.array(data_array)
                 timestamps = data_array[:, 0]
                 values = data_array[:, 1]
