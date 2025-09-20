@@ -39,35 +39,9 @@ class DataInstance(BaseModel):
         if self.timestamp_np.shape[0] != self.value_np.shape[0]:
             raise ValueError("timestamp_np and value_np must have the same length.")
 
-    # ---------- getters ----------
-
-    def get_integral(self, time_unit: str = "ms"):
-        """Get integral of the value over time using trapezoidal rule."""
-        if len(self.timestamp_np) < 2:
-            return 0.0
-        ts = self.timestamp_np.astype(np.float64)
-        # Convert timestamps from ms to s for integration
-        if time_unit == "s":
-            ts /= 1e3
-        integral = np.trapz(self.value_np, ts)
-        return float(integral)
-
-    def get_average(self):
-        """Get average using integral over time."""
-        if len(self.timestamp_np) < 2:
-            return 0.0
-        total_time = self.timestamp_np[-1] - self.timestamp_np[0]
-        if total_time == 0:
-            return 0.0
-        integral = self.get_integral()
-        average = integral / total_time
-        return float(average)
-
-    # ---------- info ----------
     def __len__(self):
         return self.timestamp_np.shape[0]
 
-    # ---------- numeric protocol ----------
     def __add__(self, other):
         if isinstance(other, DataInstance):
             ts, val = combine(

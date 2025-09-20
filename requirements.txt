@@ -5,6 +5,7 @@ ipykernel
 matplotlib
 numpy
 pydantic
+scipy
 
 # Progress Bar
 tqdm

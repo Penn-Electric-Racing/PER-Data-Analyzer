@@ -2,6 +2,7 @@ import numpy as np
 
 from .csv_parser import SingleRunData
 from .models import DataInstance
+from .utils import average_over_time_range, integrate_over_time_range
 
 
 def pretty_print_data_instance_info(data_instance: DataInstance, time_unit: str = "s"):
@@ -26,8 +27,8 @@ def pretty_print_data_instance_info(data_instance: DataInstance, time_unit: str 
             last_ts = float(last_ts) / 1e3
             min_ts = float(min_ts) / 1e3
             max_ts = float(max_ts) / 1e3
-        avg_val = data_instance.get_average()
-        integral = data_instance.get_integral(time_unit=time_unit)
+        avg_val = average_over_time_range(data_instance)
+        integral = integrate_over_time_range(data_instance, time_unit=time_unit)
         # Set width for alignment
         w = 10
         print(f"  Data points:  {len(data_instance):>{w}}")
