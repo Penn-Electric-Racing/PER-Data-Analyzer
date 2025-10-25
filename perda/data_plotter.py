@@ -77,6 +77,8 @@ def plot(
     ax1.set_ylabel(left_title)
     ax1.tick_params(axis="y")
     for ldi in left_di:
+        if len(ldi) == 0:
+            print(f"Warning: No data points in time range for {ldi.label}")
         ts = ldi.timestamp_np
         val = ldi.value_np
         if unit == "s":
@@ -93,6 +95,8 @@ def plot(
         ax2.set_ylabel(right_title)
         ax2.tick_params(axis="y")
         for rdi in right_di:
+            if len(rdi) == 0:
+                print(f"Warning: No data points in time range for {rdi.label}")
             ts = rdi.timestamp_np
             val = rdi.value_np
             if unit == "s":
