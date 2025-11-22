@@ -252,36 +252,71 @@ Keep responses professional and brief."""
                     while response.candidates[0].content.parts[0].function_call:
                         function_call = response.candidates[0].content.parts[0].function_call
                         tool_name = function_call.name
-                        tool_args = dict(function_call.args)
-                        
+
+                        # Convert protobuf args to native Python types
+                        def convert_proto_to_native(obj):
+                            """Convert protobuf objects to native Python types."""
+                            if isinstance(obj, (str, int, float, bool, type(None))):
+                                return obj
+                            elif isinstance(obj, dict):
+                                return {str(k): convert_proto_to_native(v) for k, v in obj.items()}
+                            elif hasattr(obj, 'items'):  # dict-like
+                                return {str(k): convert_proto_to_native(v) for k, v in obj.items()}
+                            elif hasattr(obj, '__iter__') and not isinstance(obj, (str, bytes)):
+                                return [convert_proto_to_native(item) for item in obj]
+                            else:
+                                return str(obj)
+
+                        tool_args = convert_proto_to_native(dict(function_call.args))
+
                         print(f"\n[Calling tool: {tool_name}]")
-                        
+
                         # Call the MCP tool
                         result = await session.call_tool(tool_name, tool_args)
-                        
-                        # Extract text content
+
+                        # Extract content - handle both text and images
                         result_text = ""
+                        inline_data_parts = []
+
                         for content in result.content:
                             if hasattr(content, 'text'):
+                                # TextContent
                                 result_text += content.text
-                        
-                        # Send result back to Gemini
-                        response = chat.send_message(
-                            genai.protos.Content(
-                                parts=[
+                            elif hasattr(content, 'data') and hasattr(content, 'mimeType'):
+                                # ImageContent
+                                import base64
+                                inline_data_parts.append(
                                     genai.protos.Part(
-                                        function_response=genai.protos.FunctionResponse(
-                                            name=tool_name,
-                                            response={"result": result_text}
+                                        inline_data=genai.protos.Blob(
+                                            mime_type=content.mimeType,
+                                            data=base64.b64decode(content.data)
                                         )
                                     )
-                                ]
+                                )
+                                result_text += f"\n[Generated graph image]\n"
+
+                        # Send result back to Gemini (with images if any)
+                        parts = [
+                            genai.protos.Part(
+                                function_response=genai.protos.FunctionResponse(
+                                    name=tool_name,
+                                    response={"result": result_text}
+                                )
                             )
+                        ]
+                        parts.extend(inline_data_parts)
+
+                        response = chat.send_message(
+                            genai.protos.Content(parts=parts)
                         )
-                    
-                    # Display Gemini's response
-                    formatted_response = format_can_response(response.text)
-                    print(f"\nGemini: {formatted_response}")
+
+                    # Display Gemini's response (check if it has text)
+                    if response.candidates[0].content.parts[0].function_call:
+                        # Still has a function call, something went wrong
+                        print("\n⚠️ Unexpected: Gemini returned another function call")
+                    else:
+                        formatted_response = format_can_response(response.text)
+                        print(f"\nGemini: {formatted_response}")
                     print()
                 
                 except KeyboardInterrupt:

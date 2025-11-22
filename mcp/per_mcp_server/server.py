@@ -11,7 +11,7 @@ from typing import Any
 from dotenv import load_dotenv
 
 from mcp.server import Server
-from mcp.types import Resource, Tool, TextContent, ImageContent, EmbeddedResource
+from mcp.types import Resource, Tool, TextContent, ImageContent, EmbeddedResource, Content
 from mcp.server.stdio import stdio_server
 
 from .utils import CANSearch
@@ -112,7 +112,7 @@ async def list_tools() -> list[Tool]:
 
 
 @app.call_tool()
-async def call_tool(name: str, arguments: Any) -> list[TextContent]:
+async def call_tool(name: str, arguments: Any) -> list[Content]:
     """Handle tool calls."""
     handler = tool_handlers.get(name)
 
