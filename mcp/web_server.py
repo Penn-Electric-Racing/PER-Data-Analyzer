@@ -9,6 +9,7 @@ import os
 import asyncio
 import json
 import logging
+import threading
 from pathlib import Path
 from datetime import datetime
 from flask import Flask, request, render_template, session, redirect, url_for, jsonify
@@ -35,6 +36,11 @@ logger = logging.getLogger(__name__)
 
 # Global cache for CAN variable definitions from XML
 _can_defines_cache = None
+
+# Global dictionary to store chat objects per session
+# Key: session ID, Value: {'chat': chat_object, 'model': model_object}
+_chat_sessions = {}
+_chat_lock = threading.Lock()  # For thread-safe access
 
 
 def load_can_defines():
@@ -169,6 +175,22 @@ def upload_file():
     return redirect(url_for('index'))
 
 
+@app.route('/clear', methods=['POST'])
+def clear_chat():
+    """Clear chat history and start fresh."""
+    session['messages'] = [{'type': 'assistant', 'text': 'Chat history cleared! How can I help you?'}]
+
+    # Clear the chat object for this session
+    if 'session_id' in session:
+        session_id = session['session_id']
+        with _chat_lock:
+            if session_id in _chat_sessions:
+                del _chat_sessions[session_id]
+                logger.info(f"Cleared chat session: {session_id[:8]}...")
+
+    return redirect(url_for('index'))
+
+
 @app.route('/chat', methods=['POST'])
 def chat():
     """Handle chat messages - communicate with MCP server."""
@@ -188,9 +210,16 @@ def chat():
     messages.append({'type': 'user', 'text': message})
     session['messages'] = messages
 
+    # Get or create a unique session ID for this user
+    if 'session_id' not in session:
+        import uuid
+        session['session_id'] = str(uuid.uuid4())
+
+    session_id = session['session_id']
+
     # Run async MCP communication
     try:
-        response = asyncio.run(send_to_mcp(message, session.get('active_csv_path')))
+        response = asyncio.run(send_to_mcp(message, session.get('active_csv_path'), session_id))
         # Save to session
         messages = session.get('messages', [])
         messages.append(response)
@@ -207,10 +236,15 @@ def chat():
         return jsonify(error_response)
 
 
-async def send_to_mcp(user_message: str, active_csv_path: str = None):
+async def send_to_mcp(user_message: str, active_csv_path: str = None, session_id: str = None):
     """
     Send message to MCP server and get response.
     Uses Gemini to interpret user intent and call appropriate tools.
+
+    Args:
+        user_message: The user's message
+        active_csv_path: Path to active CSV file
+        session_id: Unique session ID to maintain chat history
     """
     # MCP server parameters
     server_params = StdioServerParameters(
@@ -268,31 +302,52 @@ Note: Not all variables may be present in the current CSV log file.
 Use search_can_variables to see what's actually available in this specific dataset.
 Use get_can_variable_info for detailed statistics about a variable."""
 
-                model = genai.GenerativeModel(
-                    'gemini-2.5-flash',
-                    tools=[
-                        genai.protos.Tool(
-                            function_declarations=[
-                                genai.protos.FunctionDeclaration(
-                                    name=tool.name,
-                                    description=tool.description,
-                                    parameters=genai.protos.Schema(
-                                        type=genai.protos.Type.OBJECT,
-                                        properties={
-                                            k: _convert_schema_to_proto(v)
-                                            for k, v in tool.inputSchema.get('properties', {}).items()
-                                        },
-                                        required=tool.inputSchema.get('required', [])
-                                    )
-                                )
-                                for tool in available_tools.values()
-                            ]
-                        )
-                    ],
-                    system_instruction=system_instruction
-                )
+                # Get or create chat object for this session
+                chat = None
+                model = None
 
-                chat = model.start_chat()
+                if session_id:
+                    with _chat_lock:
+                        if session_id in _chat_sessions:
+                            # Reuse existing chat object
+                            chat = _chat_sessions[session_id]['chat']
+                            model = _chat_sessions[session_id]['model']
+                            logger.info(f"Reusing chat session: {session_id[:8]}...")
+
+                if chat is None:
+                    # Create new chat session
+                    model = genai.GenerativeModel(
+                        'gemini-2.5-flash',
+                        tools=[
+                            genai.protos.Tool(
+                                function_declarations=[
+                                    genai.protos.FunctionDeclaration(
+                                        name=tool.name,
+                                        description=tool.description,
+                                        parameters=genai.protos.Schema(
+                                            type=genai.protos.Type.OBJECT,
+                                            properties={
+                                                k: _convert_schema_to_proto(v)
+                                                for k, v in tool.inputSchema.get('properties', {}).items()
+                                            },
+                                            required=tool.inputSchema.get('required', [])
+                                        )
+                                    )
+                                    for tool in available_tools.values()
+                                ]
+                            )
+                        ],
+                        system_instruction=system_instruction
+                    )
+
+                    chat = model.start_chat()
+
+                    # Store in global dictionary
+                    if session_id:
+                        with _chat_lock:
+                            _chat_sessions[session_id] = {'chat': chat, 'model': model}
+                        logger.info(f"Created new chat session: {session_id[:8]}...")
+
                 gemini_response = chat.send_message(user_message)
 
                 # Handle function calls

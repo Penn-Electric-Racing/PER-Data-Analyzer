@@ -87,6 +87,24 @@ header h1 {
     transform: translateY(-2px);
 }
 
+.clear-btn {
+    background: rgba(220, 20, 60, 0.1);
+    color: white;
+    border: 2px solid rgba(220, 20, 60, 0.3);
+    padding: 10px 24px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.clear-btn:hover {
+    background: rgba(220, 20, 60, 0.2);
+    border-color: #DC143C;
+    transform: translateY(-2px);
+}
+
 .file-name {
     color: white;
     font-size: 14px;
