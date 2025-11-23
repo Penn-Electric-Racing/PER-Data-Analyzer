@@ -210,7 +210,7 @@ Use get_can_variable_info for detailed statistics about a variable."""
 
                 # Build final response text from all non-function-call parts
                 assistant_text = _extract_text_from_response(gemini_response)
-                if not assistant_text:
+                if not assistant_text and not result_images:
                     return {
                         'type': 'error',
                         'text': 'Assistant did not return a textual response.'
