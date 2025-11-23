@@ -162,6 +162,10 @@ Use get_can_variable_info for detailed statistics about a variable."""
                         with _chat_lock:
                             _chat_sessions[session_id] = {'chat': chat, 'model': model}
                         logger.info(f"Created new chat session: {session_id[:8]}...")
+                        
+                        # Log warning if using a different model
+                        if model_name != 'gemini-2.5-flash':
+                            logger.warning(f"Using model '{model_name}' instead of 'gemini-2.5-flash' (likely for quota management)")
 
                 gemini_response = chat.send_message(user_message)
 
@@ -271,6 +275,12 @@ Use get_can_variable_info for detailed statistics about a variable."""
                 if result_images:
                     response_dict['images'] = result_images
                     response_dict['image'] = result_images[0]  # Back-compat for single image handling
+
+                # Add warning if using a different model
+                model_name = os.getenv('GEMINI_MODEL', 'gemini-2.5-flash')
+                if model_name != 'gemini-2.5-flash':
+                    warning = f"ℹ️ Note: Using {model_name} for quota management.\n\n"
+                    response_dict['text'] = warning + response_dict['text']
 
                 return response_dict
 
