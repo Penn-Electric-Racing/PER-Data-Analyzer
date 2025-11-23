@@ -168,7 +168,24 @@ Use get_can_variable_info for detailed statistics about a variable."""
                 result_images = []  # Preserve all generated images in order
                 while True:
                     function_calls = _get_function_calls(gemini_response)
+                    
+                    # Check for empty response with STOP reason - retry once
                     if not function_calls:
+                        # Check if there's text content
+                        text_content = _extract_text_from_response(gemini_response)
+                        if not text_content:
+                            # Check finish reason
+                            candidates = getattr(gemini_response, 'candidates', [])
+                            if candidates:
+                                finish_reason = candidates[0].finish_reason
+                                # Check for STOP (1)
+                                if finish_reason == 1 or str(finish_reason) == 'STOP':
+                                    logger.warning("Empty response with STOP. Retrying once...")
+                                    # Send retry message
+                                    gemini_response = chat.send_message("You returned an empty response. Please answer the user's request.")
+                                    # Continue loop to check if retry produced function calls or text
+                                    continue
+                        # No function calls and either has text or not a STOP reason - exit loop
                         break
 
                     function_responses = []
@@ -210,10 +227,39 @@ Use get_can_variable_info for detailed statistics about a variable."""
 
                 # Build final response text from all non-function-call parts
                 assistant_text = _extract_text_from_response(gemini_response)
+
                 if not assistant_text and not result_images:
+                    # Log detailed info about why response is still empty
+                    candidates = getattr(gemini_response, 'candidates', [])
+                    if candidates:
+                        finish_reason = candidates[0].finish_reason
+                        logger.warning(f"Gemini response empty after processing. Finish reason: {finish_reason}")
+                        logger.warning(f"Full candidate: {candidates[0]}")
+
+                        # Handle specific finish reasons (using integer values for robustness)
+                        # 3=SAFETY, 4=RECITATION, etc.
+                        if hasattr(finish_reason, 'name'):
+                             reason_name = finish_reason.name
+                        else:
+                             reason_name = str(finish_reason)
+
+                        if reason_name == 'SAFETY' or finish_reason == 3:
+                            return {
+                                'type': 'error',
+                                'text': 'I cannot answer that due to safety filters. Please try rephrasing.'
+                            }
+                        elif reason_name == 'RECITATION' or finish_reason == 4:
+                            return {
+                                'type': 'error',
+                                'text': 'I cannot answer that due to recitation checks. Please try rephrasing.'
+                            }
+                    else:
+                        logger.warning("Gemini response contained no candidates.")
+                        logger.warning(f"Full response: {gemini_response}")
+
                     return {
                         'type': 'error',
-                        'text': 'Assistant did not return a textual response.'
+                        'text': 'Assistant did not return a textual response. Please check server logs for details.'
                     }
 
                 response_dict = {
