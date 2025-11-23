@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CHUKKA - Car Hardware Unified Kinematics & Knowledge Analyzer</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
+
 <body>
     <div class="container">
         <header>
@@ -31,31 +33,31 @@
             </div>
         </header>
 
+        {% if show_model_warning %}
+        <div class="model-warning">
+            ℹ️ Note: Currently using <strong>{{ model_name }}</strong> for quota management.
+        </div>
+        {% endif %}
+
         <div class="chat-container">
             <div id="messages" class="messages">
                 {% for msg in messages %}
                 <div class="message {{ msg.type }}">
                     <div class="message-content">{{ msg.text }}</div>
                     {% if msg.images %}
-                        {% for image in msg.images %}
-                        <img src="data:image/png;base64,{{ image }}" class="message-image" alt="Graph">
-                        {% endfor %}
+                    {% for image in msg.images %}
+                    <img src="data:image/png;base64,{{ image }}" class="message-image" alt="Graph">
+                    {% endfor %}
                     {% elif msg.image %}
-                        <img src="data:image/png;base64,{{ msg.image }}" class="message-image" alt="Graph">
+                    <img src="data:image/png;base64,{{ msg.image }}" class="message-image" alt="Graph">
                     {% endif %}
                 </div>
                 {% endfor %}
             </div>
             <div class="input-container">
                 <form action="/chat" method="post" id="chatForm">
-                    <input
-                        type="text"
-                        name="message"
-                        id="messageInput"
-                        placeholder="Ask a question about the CAN data..."
-                        autocomplete="off"
-                        required
-                    >
+                    <input type="text" name="message" id="messageInput"
+                        placeholder="Ask a question about the CAN data..." autocomplete="off" required>
                     <button type="submit" class="send-btn">Send</button>
                 </form>
             </div>
@@ -64,4 +66,5 @@
 
     <script src="{{ url_for('static', filename='js/chat.js') }}"></script>
 </body>
+
 </html>

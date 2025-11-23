@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, session, request, redirect, url_fo
 from werkzeug.utils import secure_filename
 from datetime import datetime
 import logging
+import os
 
 from ..services.chat_service import ensure_session_id, get_history_snapshot, append_history_message, reset_history
 from ..services.file_service import allowed_file
@@ -25,10 +26,16 @@ def index():
         session['active_file'] = None
 
     history = get_history_snapshot(session_id)
+    
+    # Check if using a different model
+    model_name = os.getenv('GEMINI_MODEL', 'gemini-2.5-flash')
+    show_model_warning = model_name != 'gemini-2.5-flash'
 
     return render_template('index.html',
                          messages=history,
-                         active_file=session['active_file'])
+                         active_file=session['active_file'],
+                         model_name=model_name,
+                         show_model_warning=show_model_warning)
 
 @main_bp.route('/upload', methods=['POST'])
 def upload_file():
