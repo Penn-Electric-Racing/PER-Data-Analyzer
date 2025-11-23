@@ -152,8 +152,9 @@ def upload_file():
 
     file.save(str(filepath))
 
-    # Set as active CSV in session
-    session['active_csv_path'] = str(filepath)
+    # Set as active CSV in session (relative path from mcp directory)
+    relative_path = f"uploads/{filename}"
+    session['active_csv_path'] = relative_path
     session['active_file'] = original_name
 
     logger.info(f"Uploaded and activated CSV: {filepath}")
