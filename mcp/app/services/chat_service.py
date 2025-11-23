@@ -130,8 +130,9 @@ Use get_can_variable_info for detailed statistics about a variable."""
 
                 if chat is None:
                     # Create new chat session
+                    model_name = os.getenv('GEMINI_MODEL', 'gemini-2.5-flash')
                     model = genai.GenerativeModel(
-                        'gemini-2.5-flash',
+                        model_name,
                         tools=[
                             genai.protos.Tool(
                                 function_declarations=[
@@ -275,6 +276,15 @@ Use get_can_variable_info for detailed statistics about a variable."""
 
     except Exception as e:
         logger.error(f"MCP communication error: {e}", exc_info=True)
+        
+        # Check for quota exhaustion error
+        error_str = str(e)
+        if 'ResourceExhausted' in str(type(e)) or '429' in error_str or 'quota' in error_str.lower():
+            return {
+                'type': 'error',
+                'text': '⚠️ API quota exceeded. The Gemini API daily limit has been reached. Please try again later or upgrade your API plan.'
+            }
+        
         return {
             'type': 'error',
             'text': f'Error: {str(e)}'
