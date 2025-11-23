@@ -13,6 +13,10 @@ main_bp = Blueprint('main', __name__)
 @main_bp.route('/')
 def index():
     """Serve the main chat interface."""
+    # Check authentication
+    if not session.get('authenticated'):
+        return redirect(url_for('auth.login'))
+    
     session_id = ensure_session_id(session)
 
     if 'active_csv_path' not in session:
@@ -29,6 +33,10 @@ def index():
 @main_bp.route('/upload', methods=['POST'])
 def upload_file():
     """Handle CSV file upload."""
+    # Check authentication
+    if not session.get('authenticated'):
+        return redirect(url_for('auth.login'))
+    
     session_id = ensure_session_id(session)
 
     if 'file' not in request.files:
@@ -70,6 +78,10 @@ def upload_file():
 @main_bp.route('/clear', methods=['POST'])
 def clear_chat():
     """Clear chat history and start fresh."""
+    # Check authentication
+    if not session.get('authenticated'):
+        return redirect(url_for('auth.login'))
+    
     session_id = ensure_session_id(session)
     reset_history(session_id, {'type': 'assistant', 'text': 'Chat history cleared! How can I help you?'})
 

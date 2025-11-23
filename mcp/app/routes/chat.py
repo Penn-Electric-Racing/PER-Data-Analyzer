@@ -11,6 +11,10 @@ chat_bp = Blueprint('chat', __name__)
 @chat_bp.route('/chat', methods=['POST'])
 def chat():
     """Handle chat messages - communicate with MCP server."""
+    # Check authentication
+    if not session.get('authenticated'):
+        return jsonify({'type': 'error', 'text': 'Not authenticated'}), 401
+    
     data = request.get_json()
     message = data.get('message', '') if data else ''
 
