@@ -10,6 +10,7 @@ import asyncio
 import json
 import logging
 import threading
+import uuid
 from pathlib import Path
 from datetime import datetime
 from flask import Flask, request, render_template, session, redirect, url_for, jsonify
@@ -40,7 +41,14 @@ _can_defines_cache = None
 # Global dictionary to store chat objects per session
 # Key: session ID, Value: {'chat': chat_object, 'model': model_object}
 _chat_sessions = {}
+_chat_history = {}
 _chat_lock = threading.Lock()  # For thread-safe access
+
+
+WELCOME_MESSAGE = {
+    'type': 'assistant',
+    'text': 'Welcome to CHUKKA - Car Hardware Unified Kinematics & Knowledge Analyzer! Upload a CSV file to get started, or ask questions about the default dataset.'
+}
 
 
 def load_can_defines():
@@ -112,42 +120,64 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
 
 
+def _ensure_session_id():
+    if 'session_id' not in session:
+        session['session_id'] = str(uuid.uuid4())
+    return session['session_id']
+
+
+def _get_history_snapshot(session_id):
+    with _chat_lock:
+        history = _chat_history.setdefault(session_id, [WELCOME_MESSAGE.copy()])
+        return [dict(msg) for msg in history]
+
+
+def _append_history_message(session_id, message):
+    with _chat_lock:
+        history = _chat_history.setdefault(session_id, [WELCOME_MESSAGE.copy()])
+        history.append(message)
+
+
+def _reset_history(session_id, initial_message=None):
+    base_message = initial_message or WELCOME_MESSAGE.copy()
+    with _chat_lock:
+        _chat_history[session_id] = [base_message]
+
+
 @app.route('/')
 def index():
     """Serve the main chat interface."""
-    if 'messages' not in session:
-        session['messages'] = [{'type': 'assistant', 'text': 'Welcome to CHUKKA - Car Hardware Unified Kinematics & Knowledge Analyzer! Upload a CSV file to get started, or ask questions about the default dataset.'}]
+    session_id = _ensure_session_id()
+
     if 'active_csv_path' not in session:
         session['active_csv_path'] = None
     if 'active_file' not in session:
         session['active_file'] = None
 
+    history = _get_history_snapshot(session_id)
+
     return render_template('index.html',
-                         messages=session['messages'],
+                         messages=history,
                          active_file=session['active_file'])
 
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
     """Handle CSV file upload."""
+    session_id = _ensure_session_id()
+
     if 'file' not in request.files:
-        messages = session.get('messages', [])
-        messages.append({'type': 'error', 'text': 'No file provided'})
-        session['messages'] = messages
+        _append_history_message(session_id, {'type': 'error', 'text': 'No file provided'})
         return redirect(url_for('index'))
 
     file = request.files['file']
 
     if file.filename == '':
-        messages = session.get('messages', [])
-        messages.append({'type': 'error', 'text': 'No file selected'})
-        session['messages'] = messages
+        _append_history_message(session_id, {'type': 'error', 'text': 'No file selected'})
         return redirect(url_for('index'))
 
     if not allowed_file(file.filename):
-        messages = session.get('messages', [])
-        messages.append({'type': 'error', 'text': 'Only CSV files are allowed'})
-        session['messages'] = messages
+        _append_history_message(session_id, {'type': 'error', 'text': 'Only CSV files are allowed'})
         return redirect(url_for('index'))
 
     # Save file with timestamp to avoid conflicts
@@ -165,12 +195,10 @@ def upload_file():
 
     logger.info(f"Uploaded and activated CSV: {filepath}")
 
-    messages = session.get('messages', [])
-    messages.append({
+    _append_history_message(session_id, {
         'type': 'assistant',
         'text': f'Successfully uploaded {original_name}. You can now analyze this data!'
     })
-    session['messages'] = messages
 
     return redirect(url_for('index'))
 
@@ -178,15 +206,14 @@ def upload_file():
 @app.route('/clear', methods=['POST'])
 def clear_chat():
     """Clear chat history and start fresh."""
-    session['messages'] = [{'type': 'assistant', 'text': 'Chat history cleared! How can I help you?'}]
+    session_id = _ensure_session_id()
+    _reset_history(session_id, {'type': 'assistant', 'text': 'Chat history cleared! How can I help you?'})
 
     # Clear the chat object for this session
-    if 'session_id' in session:
-        session_id = session['session_id']
-        with _chat_lock:
-            if session_id in _chat_sessions:
-                del _chat_sessions[session_id]
-                logger.info(f"Cleared chat session: {session_id[:8]}...")
+    with _chat_lock:
+        if session_id in _chat_sessions:
+            del _chat_sessions[session_id]
+            logger.info(f"Cleared chat session: {session_id[:8]}...")
 
     return redirect(url_for('index'))
 
@@ -199,40 +226,24 @@ def chat():
 
     if not message:
         error_response = {'type': 'error', 'text': 'No message provided'}
-        # Save to session
-        messages = session.get('messages', [])
-        messages.append(error_response)
-        session['messages'] = messages
+        session_id = _ensure_session_id()
+        _append_history_message(session_id, error_response)
         return jsonify(error_response)
 
-    # Add user message to session
-    messages = session.get('messages', [])
-    messages.append({'type': 'user', 'text': message})
-    session['messages'] = messages
-
-    # Get or create a unique session ID for this user
-    if 'session_id' not in session:
-        import uuid
-        session['session_id'] = str(uuid.uuid4())
-
-    session_id = session['session_id']
+    # Get or create a unique session ID for this user and store message server-side
+    session_id = _ensure_session_id()
+    _append_history_message(session_id, {'type': 'user', 'text': message})
 
     # Run async MCP communication
     try:
         response = asyncio.run(send_to_mcp(message, session.get('active_csv_path'), session_id))
-        # Save to session
-        messages = session.get('messages', [])
-        messages.append(response)
-        session['messages'] = messages
+        _append_history_message(session_id, response)
         # Return just the response (not the user message)
         return jsonify(response)
     except Exception as e:
         logger.error(f"Error communicating with MCP: {e}", exc_info=True)
         error_response = {'type': 'error', 'text': f'Error: {str(e)}'}
-        # Save to session
-        messages = session.get('messages', [])
-        messages.append(error_response)
-        session['messages'] = messages
+        _append_history_message(session_id, error_response)
         return jsonify(error_response)
 
 
@@ -351,10 +362,12 @@ Use get_can_variable_info for detailed statistics about a variable."""
                 gemini_response = chat.send_message(user_message)
 
                 # Handle function calls
-                responses = []
-                result_image = None  # Initialize before loop
-                while gemini_response.candidates[0].content.parts[0].function_call:
-                    function_call = gemini_response.candidates[0].content.parts[0].function_call
+                result_images = []  # Preserve all generated images in order
+                while True:
+                    function_call = _get_next_function_call(gemini_response)
+                    if not function_call:
+                        break
+
                     tool_name = function_call.name
                     tool_args = _convert_proto_to_native(dict(function_call.args))
 
@@ -365,12 +378,15 @@ Use get_can_variable_info for detailed statistics about a variable."""
 
                     # Extract content (text and images)
                     result_text = ""
-                    result_image = None
+                    result_image_data = []
                     for content in result.content:
                         if hasattr(content, 'text'):
                             result_text += content.text
                         elif content.type == 'image':
-                            result_image = content.data
+                            result_image_data.append(content.data)
+
+                    if result_image_data:
+                        result_images.extend(result_image_data)
 
                     # Send result back to Gemini
                     gemini_response = chat.send_message(
@@ -386,21 +402,24 @@ Use get_can_variable_info for detailed statistics about a variable."""
                         )
                     )
 
-                # Get final response
-                if not gemini_response.candidates[0].content.parts[0].function_call:
-                    response_dict = {
-                        'type': 'assistant',
-                        'text': gemini_response.text
-                    }
-                    # Add image if present
-                    if result_image:
-                        response_dict['image'] = result_image
-                    return response_dict
-                else:
+                # Build final response text from all non-function-call parts
+                assistant_text = _extract_text_from_response(gemini_response)
+                if not assistant_text:
                     return {
                         'type': 'error',
-                        'text': 'Unexpected response from assistant'
+                        'text': 'Assistant did not return a textual response.'
                     }
+
+                response_dict = {
+                    'type': 'assistant',
+                    'text': assistant_text
+                }
+
+                if result_images:
+                    response_dict['images'] = result_images
+                    response_dict['image'] = result_images[0]  # Back-compat for single image handling
+
+                return response_dict
 
     except Exception as e:
         logger.error(f"MCP communication error: {e}", exc_info=True)
@@ -457,6 +476,50 @@ def _convert_proto_to_native(obj):
         return [_convert_proto_to_native(item) for item in obj]
     else:
         return str(obj)
+
+
+def _get_next_function_call(response):
+    """Return the next function call part from a Gemini response, if any."""
+    candidates = getattr(response, 'candidates', [])
+    if not candidates:
+        return None
+
+    content = getattr(candidates[0], 'content', None)
+    if not content:
+        return None
+
+    for part in getattr(content, 'parts', []) or []:
+        function_call = getattr(part, 'function_call', None)
+        if function_call:
+            return function_call
+
+    return None
+
+
+def _extract_text_from_response(response) -> str:
+    """Safely extract concatenated text parts from a Gemini response."""
+    candidates = getattr(response, 'candidates', [])
+    if not candidates:
+        return ""
+
+    content = getattr(candidates[0], 'content', None)
+    if not content:
+        return ""
+
+    texts = []
+    for part in getattr(content, 'parts', []) or []:
+        text_value = getattr(part, 'text', None)
+        if text_value:
+            texts.append(text_value)
+
+    if texts:
+        return "\n".join(texts).strip()
+
+    # Fallback to Gemini's text helper if no part.text entries exist
+    try:
+        return response.text
+    except ValueError:
+        return ""
 
 
 if __name__ == '__main__':

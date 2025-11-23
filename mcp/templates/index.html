@@ -36,8 +36,12 @@
                 {% for msg in messages %}
                 <div class="message {{ msg.type }}">
                     <div class="message-content">{{ msg.text }}</div>
-                    {% if msg.image %}
-                    <img src="data:image/png;base64,{{ msg.image }}" class="message-image" alt="Graph">
+                    {% if msg.images %}
+                        {% for image in msg.images %}
+                        <img src="data:image/png;base64,{{ image }}" class="message-image" alt="Graph">
+                        {% endfor %}
+                    {% elif msg.image %}
+                        <img src="data:image/png;base64,{{ msg.image }}" class="message-image" alt="Graph">
                     {% endif %}
                 </div>
                 {% endfor %}
@@ -117,7 +121,7 @@
                 if (result.type === 'error') {
                     addMessage('error', result.text);
                 } else {
-                    addMessage('assistant', result.text, result.image);
+                    addMessage('assistant', result.text, result.images || result.image);
                 }
             } catch (error) {
                 removeLoading(loadingId);
@@ -135,13 +139,17 @@
 
             messageDiv.appendChild(contentDiv);
 
-            if (imageData) {
+            const images = Array.isArray(imageData)
+                ? imageData.filter(Boolean)
+                : imageData ? [imageData] : [];
+
+            images.forEach((imgData) => {
                 const img = document.createElement('img');
                 img.className = 'message-image';
-                img.src = `data:image/png;base64,${imageData}`;
+                img.src = `data:image/png;base64,${imgData}`;
                 img.alt = 'Graph';
                 messageDiv.appendChild(img);
-            }
+            });
 
             messagesContainer.appendChild(messageDiv);
             scrollToBottom();

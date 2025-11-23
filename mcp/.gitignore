@@ -46,3 +46,4 @@ temp/
 
 # Environment variables
 .env
+uploads/
