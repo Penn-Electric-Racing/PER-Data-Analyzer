@@ -8,8 +8,8 @@ from mcp.types import TextContent, Content
 
 from perda.csv_parser import CSVParser
 
-# CSV path (relative to MCP server's cwd which is mcp/)
-CSV_PATH = "temp/16thMay13-52.csv"
+# CSV path from environment variable (relative to MCP server's cwd which is mcp/)
+CSV_PATH = os.getenv("ACTIVE_CSV_PATH", "temp/16thMay13-52.csv")
 
 TOOL_DEFINITIONS = {
     "get_dataset_info": {

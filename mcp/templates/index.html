@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CHUKKA - Car Hardware Unified Kinematics & Knowledge Analyzer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <img src="{{ url_for('static', filename='chukka.png') }}" alt="CHUKKA" class="header-icon">
+                <div>
+                    <h1><span class="acronym">CHUKKA</span></h1>
+                    <p class="subtitle">Car Hardware Unified Kinematics & Knowledge Analyzer</p>
+                </div>
+                <img src="{{ url_for('static', filename='chukka.png') }}" alt="CHUKKA" class="header-icon">
+            </div>
+            <div class="file-upload-section">
+                <form action="/upload" method="post" enctype="multipart/form-data" id="uploadForm">
+                    <input type="file" name="file" id="fileInput" accept=".csv" style="display: none;">
+                    <button type="button" id="uploadBtn" class="upload-btn">Upload CSV</button>
+                </form>
+                <span id="fileName" class="file-name">
+                    {% if active_file %}{{ active_file }}{% endif %}
+                </span>
+            </div>
+        </header>
+
+        <div class="chat-container">
+            <div id="messages" class="messages">
+                {% for msg in messages %}
+                <div class="message {{ msg.type }}">
+                    <div class="message-content">{{ msg.text }}</div>
+                    {% if msg.image %}
+                    <img src="data:image/png;base64,{{ msg.image }}" class="message-image" alt="Graph">
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            <div class="input-container">
+                <form action="/chat" method="post" id="chatForm">
+                    <input
+                        type="text"
+                        name="message"
+                        id="messageInput"
+                        placeholder="Ask a question about the CAN data..."
+                        autocomplete="off"
+                        required
+                    >
+                    <button type="submit" class="send-btn">Send</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const uploadBtn = document.getElementById('uploadBtn');
+        const fileInput = document.getElementById('fileInput');
+        const uploadForm = document.getElementById('uploadForm');
+        const chatForm = document.getElementById('chatForm');
+        const messageInput = document.getElementById('messageInput');
+        const messagesContainer = document.getElementById('messages');
+
+        uploadBtn.addEventListener('click', () => fileInput.click());
+
+        fileInput.addEventListener('change', async () => {
+            const formData = new FormData(uploadForm);
+            await fetch('/upload', {
+                method: 'POST',
+                body: formData
+            });
+            location.reload();
+        });
+
+        chatForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const message = messageInput.value.trim();
+            if (!message) return;
+
+            // Immediately show user message
+            addMessage('user', message);
+            messageInput.value = '';
+
+            // Show loading indicator
+            const loadingId = addLoading();
+
+            try {
+                // Send message to backend
+                const response = await fetch('/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ message })
+                });
+
+                const result = await response.json();
+
+                // Remove loading
+                removeLoading(loadingId);
+
+                // Show assistant response
+                if (result.type === 'error') {
+                    addMessage('error', result.text);
+                } else {
+                    addMessage('assistant', result.text, result.image);
+                }
+            } catch (error) {
+                removeLoading(loadingId);
+                addMessage('error', `Error: ${error.message}`);
+            }
+        });
+
+        function addMessage(type, text, imageData = null) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+            contentDiv.textContent = text;
+
+            messageDiv.appendChild(contentDiv);
+
+            if (imageData) {
+                const img = document.createElement('img');
+                img.className = 'message-image';
+                img.src = `data:image/png;base64,${imageData}`;
+                img.alt = 'Graph';
+                messageDiv.appendChild(img);
+            }
+
+            messagesContainer.appendChild(messageDiv);
+            scrollToBottom();
+        }
+
+        function addLoading() {
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = 'message assistant';
+            loadingDiv.id = `loading-${Date.now()}`;
+
+            const loadingContent = document.createElement('div');
+            loadingContent.className = 'loading';
+            loadingContent.innerHTML = '<span></span><span></span><span></span>';
+
+            loadingDiv.appendChild(loadingContent);
+            messagesContainer.appendChild(loadingDiv);
+            scrollToBottom();
+
+            return loadingDiv.id;
+        }
+
+        function removeLoading(loadingId) {
+            const loadingDiv = document.getElementById(loadingId);
+            if (loadingDiv) {
+                loadingDiv.remove();
+            }
+        }
+
+        function scrollToBottom() {
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        // Auto-scroll to bottom on page load
+        scrollToBottom();
+    </script>
+</body>
+</html>

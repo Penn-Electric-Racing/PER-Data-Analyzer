@@ -1,6 +1,7 @@
 import os
 import sys
-from io import StringIO
+import base64
+from io import StringIO, BytesIO
 from datetime import datetime
 from contextlib import redirect_stdout, redirect_stderr
 
@@ -88,8 +89,8 @@ def handle_build_graph_vs_time(arguments: dict) -> list[Content]:
     if not variables:
         return [TextContent(type="text", text="No variables provided")]
 
-    # For now, use the example CSV file (relative to MCP server's cwd which is mcp/)
-    csv_path = "temp/16thMay13-52.csv"
+    # Get CSV path from environment variable
+    csv_path = os.getenv("ACTIVE_CSV_PATH", "temp/16thMay13-52.csv")
 
     if not os.path.exists(csv_path):
         return [TextContent(type="text", text=f"CSV file not found: {csv_path}")]
@@ -156,26 +157,25 @@ def handle_build_graph_vs_time(arguments: dict) -> list[Content]:
     ax.grid(True, alpha=0.3)
     fig.tight_layout()
 
-    # Generate filename with timestamp
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    var_names_str = "_".join(var_name.replace(".", "_") for var_name in variables[:3])  # Use first 3 vars
-    if len(variables) > 3:
-        var_names_str += "_and_more"
-    filename = f"graph_{var_names_str}_{timestamp}.png"
-    filepath = os.path.join(GRAPH_OUTPUT_DIR, filename)
-
-    # Ensure output directory exists
-    os.makedirs(GRAPH_OUTPUT_DIR, exist_ok=True)
-
-    # Save plot to file
-    plt.savefig(filepath, format='png', dpi=150, bbox_inches='tight')
+    # Save plot to BytesIO buffer and encode as base64
+    buffer = BytesIO()
+    plt.savefig(buffer, format='png', dpi=150, bbox_inches='tight')
+    buffer.seek(0)
+    image_base64 = base64.b64encode(buffer.read()).decode('utf-8')
     plt.close(fig)
 
-    # Return success message with file path
-    return [TextContent(
-        type="text",
-        text=f"Graph saved successfully to: {filepath}\nPlotted {plotted_count} variable(s)"
-    )]
+    # Return image content with base64 data
+    return [
+        TextContent(
+            type="text",
+            text=f"Plotted {plotted_count} variable(s): {', '.join(plotted_labels)}"
+        ),
+        ImageContent(
+            type="image",
+            data=image_base64,
+            mimeType="image/png"
+        )
+    ]
 
 
 def handle_build_dual_axis_graph(arguments: dict) -> list[Content]:
@@ -190,7 +190,7 @@ def handle_build_dual_axis_graph(arguments: dict) -> list[Content]:
     if not left_variables:
         return [TextContent(type="text", text="No left variables provided")]
 
-    csv_path = "temp/16thMay13-52.csv"
+    csv_path = os.getenv("ACTIVE_CSV_PATH", "temp/16thMay13-52.csv")
 
     if not os.path.exists(csv_path):
         return [TextContent(type="text", text=f"CSV file not found: {csv_path}")]
@@ -293,24 +293,23 @@ def handle_build_dual_axis_graph(arguments: dict) -> list[Content]:
         title = f"{all_labels[0]} vs {all_labels[1]} and {len(all_labels) - 2} more"
     plt.title(title)
 
-    # Generate filename
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    left_str = "_".join(v.replace(".", "_") for v in left_variables[:2])
-    if len(left_variables) > 2:
-        left_str += "_more"
-    filename = f"dual_axis_{left_str}_{timestamp}.png"
-    filepath = os.path.join(GRAPH_OUTPUT_DIR, filename)
-
-    # Ensure output directory exists
-    os.makedirs(GRAPH_OUTPUT_DIR, exist_ok=True)
-
-    # Save plot
-    plt.savefig(filepath, format='png', dpi=150, bbox_inches='tight')
+    # Save plot to BytesIO buffer and encode as base64
+    buffer = BytesIO()
+    plt.savefig(buffer, format='png', dpi=150, bbox_inches='tight')
+    buffer.seek(0)
+    image_base64 = base64.b64encode(buffer.read()).decode('utf-8')
     plt.close(fig)
 
-    # Return success message
+    # Return image content with base64 data
     total_plotted = left_plotted + right_plotted
-    return [TextContent(
-        type="text",
-        text=f"Dual-axis graph saved to: {filepath}\nPlotted {left_plotted} left + {right_plotted} right = {total_plotted} total variable(s)"
-    )]
+    return [
+        TextContent(
+            type="text",
+            text=f"Dual-axis graph: {left_plotted} left + {right_plotted} right = {total_plotted} total variable(s)"
+        ),
+        ImageContent(
+            type="image",
+            data=image_base64,
+            mimeType="image/png"
+        )
+    ]

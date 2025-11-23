@@ -32,28 +32,29 @@ TOOL_DEFINITIONS = {
 }
 
 
-def get_tool_handlers(can_search_instance) -> dict[str, Callable]:
+def get_tool_handlers() -> dict[str, Callable]:
     """
-    Get tool handlers with can_search bound.
-
-    Args:
-        can_search_instance: CANSearch instance to use for handlers
+    Get all tool handlers.
 
     Returns:
         Dictionary mapping tool names to handler functions
     """
     return {
-        "search_can_variables": lambda args: can_search.handle_search_can_variables(can_search_instance, args),
-        "get_can_variable": lambda args: can_query.handle_get_can_variable(can_search_instance, args),
-        "list_device_variables": lambda args: can_query.handle_list_device_variables(can_search_instance, args),
-        "list_can_devices": lambda args: can_query.handle_list_can_devices(can_search_instance, args),
-        "build_graph_vs_time": lambda args: build_graph.handle_build_graph_vs_time(args),
-        "build_dual_axis_graph": lambda args: build_graph.handle_build_dual_axis_graph(args),
-        "get_variable_statistics": lambda args: variable_stats.handle_get_variable_statistics(args),
-        "get_dataset_info": lambda args: dataset_info.handle_get_dataset_info(args),
-        "get_variable_time_slice": lambda args: time_slice.handle_get_variable_time_slice(args),
-        "integrate_variable_over_time": lambda args: integrate.handle_integrate_variable_over_time(args),
-        "average_variable_over_time": lambda args: average.handle_average_variable_over_time(args),
+        # CAN search handlers (now use perda directly)
+        "search_can_variables": can_search.handle_search_can_variables,
+        "list_all_can_variables": can_search.handle_list_all_can_variables,
+        # CAN query handlers (now use perda directly)
+        "get_can_variable_info": can_query.handle_get_can_variable_info,
+        "get_dataset_overview": can_query.handle_get_dataset_overview,
+        # Graph handlers
+        "build_graph_vs_time": build_graph.handle_build_graph_vs_time,
+        "build_dual_axis_graph": build_graph.handle_build_dual_axis_graph,
+        # Analysis handlers
+        "get_variable_statistics": variable_stats.handle_get_variable_statistics,
+        "get_dataset_info": dataset_info.handle_get_dataset_info,
+        "get_variable_time_slice": time_slice.handle_get_variable_time_slice,
+        "integrate_variable_over_time": integrate.handle_integrate_variable_over_time,
+        "average_variable_over_time": average.handle_average_variable_over_time,
     }
 
 
