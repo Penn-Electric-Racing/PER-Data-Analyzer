@@ -24,6 +24,11 @@
                     <input type="file" name="file" id="fileInput" accept=".csv" style="display: none;">
                     <button type="button" id="uploadBtn" class="upload-btn">Upload CSV</button>
                 </form>
+                <span class="separator">or</span>
+                <select id="logSelector" class="log-selector">
+                    <option value="">Select log from S3...</option>
+                </select>
+                <button type="button" id="loadLogBtn" class="load-log-btn">Load from S3</button>
                 <form action="/clear" method="post" id="clearForm" style="display: inline;">
                     <button type="button" id="clearBtn" class="clear-btn">Clear Chat</button>
                 </form>

@@ -129,3 +129,93 @@ function scrollToBottom() {
 
 // Auto-scroll to bottom on page load
 scrollToBottom();
+
+// Log selector functionality
+const logSelector = document.getElementById('logSelector');
+const loadLogBtn = document.getElementById('loadLogBtn');
+
+// Fetch available logs from S3 on page load
+async function fetchLogs() {
+    try {
+        const response = await fetch('/api/logs');
+        if (!response.ok) {
+            console.error('Failed to fetch logs');
+            return;
+        }
+
+        const data = await response.json();
+        const logs = data.logs || [];
+
+        // Clear existing options (except the first placeholder)
+        logSelector.innerHTML = '<option value="">Select log from S3...</option>';
+
+        // Add log options
+        logs.forEach(log => {
+            const option = document.createElement('option');
+            option.value = log.name;
+
+            // Format the display text with name and date
+            const date = log.upload_time ? new Date(log.upload_time).toLocaleString() : 'Unknown date';
+            const size = log.size ? formatBytes(log.size) : '';
+            option.textContent = `${log.name} (${date}${size ? ', ' + size : ''})`;
+
+            logSelector.appendChild(option);
+        });
+
+        console.log(`Loaded ${logs.length} logs from S3`);
+    } catch (error) {
+        console.error('Error fetching logs:', error);
+    }
+}
+
+// Format bytes to human-readable size
+function formatBytes(bytes) {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+// Handle load log button click
+if (loadLogBtn) {
+    loadLogBtn.addEventListener('click', async () => {
+        const selectedLog = logSelector.value;
+
+        if (!selectedLog) {
+            alert('Please select a log file first');
+            return;
+        }
+
+        // Disable button during loading
+        loadLogBtn.disabled = true;
+        loadLogBtn.textContent = 'Loading...';
+
+        try {
+            const response = await fetch('/api/logs/select', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ filename: selectedLog })
+            });
+
+            if (response.ok) {
+                // Reload page to show the loaded file
+                location.reload();
+            } else {
+                const error = await response.json();
+                alert(`Failed to load log: ${error.error || 'Unknown error'}`);
+                loadLogBtn.disabled = false;
+                loadLogBtn.textContent = 'Load from S3';
+            }
+        } catch (error) {
+            console.error('Error loading log:', error);
+            alert('Failed to load log file');
+            loadLogBtn.disabled = false;
+            loadLogBtn.textContent = 'Load from S3';
+        }
+    });
+}
+
+// Fetch logs on page load
+fetchLogs();
+

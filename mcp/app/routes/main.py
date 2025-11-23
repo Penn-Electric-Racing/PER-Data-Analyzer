@@ -93,3 +93,62 @@ def clear_chat():
     reset_history(session_id, {'type': 'assistant', 'text': 'Chat history cleared! How can I help you?'})
 
     return redirect(url_for('main.index'))
+
+@main_bp.route('/api/logs', methods=['GET'])
+def list_logs():
+    """List all log files from S3 bucket."""
+    # Check authentication
+    if not session.get('authenticated'):
+        return {'error': 'Unauthorized'}, 401
+    
+    from ..services.s3_service import s3_service
+    
+    files, status_code = s3_service.list_log_files()
+    
+    if status_code == 200:
+        return {'logs': files}, 200
+    else:
+        return {'error': 'Failed to fetch logs from S3'}, status_code
+
+@main_bp.route('/api/logs/select', methods=['POST'])
+def select_log():
+    """Download and activate a log file from S3."""
+    # Check authentication
+    if not session.get('authenticated'):
+        return {'error': 'Unauthorized'}, 401
+    
+    session_id = ensure_session_id(session)
+    
+    data = request.get_json()
+    filename = data.get('filename')
+    
+    if not filename:
+        return {'error': 'Filename required'}, 400
+    
+    from ..services.s3_service import s3_service
+    
+    # Download file from S3 to uploads directory
+    upload_dir = current_app.config['UPLOAD_FOLDER']
+    local_path = s3_service.download_log_file(filename, upload_dir)
+    
+    if local_path is None:
+        append_history_message(session_id, {
+            'type': 'error',
+            'text': f'Failed to download {filename} from S3'
+        })
+        return {'error': 'Download failed'}, 500
+    
+    # Set as active CSV in session
+    relative_path = f"uploads/{local_path.name}"
+    session['active_csv_path'] = relative_path
+    session['active_file'] = filename
+    
+    logger.info(f"Downloaded and activated S3 log: {filename}")
+    
+    append_history_message(session_id, {
+        'type': 'assistant',
+        'text': f'Successfully loaded {filename} from S3. You can now analyze this data!'
+    })
+    
+    return {'success': True, 'filename': filename}, 200
+
