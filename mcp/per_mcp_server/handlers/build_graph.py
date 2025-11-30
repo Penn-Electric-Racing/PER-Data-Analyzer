@@ -1,5 +1,4 @@
 import os
-import sys
 import base64
 from io import StringIO, BytesIO
 from datetime import datetime
@@ -12,8 +11,7 @@ import numpy as np
 
 from mcp.types import TextContent, ImageContent, Content
 
-from perda.csv_parser import CSVParser
-from perda.utils import get_data_slice_by_timestamp
+from ..utils.data_fetcher import get_variable_data
 
 # Output directory for saved graphs (relative to MCP server's cwd which is mcp/)
 GRAPH_OUTPUT_DIR = "temp"
@@ -89,20 +87,6 @@ def handle_build_graph_vs_time(arguments: dict) -> list[Content]:
     if not variables:
         return [TextContent(type="text", text="No variables provided")]
 
-    # Get CSV path from environment variable
-    csv_path = os.getenv("ACTIVE_CSV_PATH", "temp/16thMay13-52.csv")
-
-    if not os.path.exists(csv_path):
-        return [TextContent(type="text", text=f"CSV file not found: {csv_path}")]
-
-    # Parse the CSV (suppress output to avoid polluting MCP stdout)
-    parser = CSVParser()
-    try:
-        with redirect_stdout(StringIO()), redirect_stderr(StringIO()):
-            data = parser(csv_path)
-    except Exception as e:
-        return [TextContent(type="text", text=f"Error parsing CSV: {e}")]
-
     # Create the plot
     fig, ax = plt.subplots(figsize=(10, 6))
     colors = plt.rcParams["axes.prop_cycle"].by_key()["color"]
@@ -111,25 +95,25 @@ def handle_build_graph_vs_time(arguments: dict) -> list[Content]:
     plotted_labels = []
     for i, var_name in enumerate(variables):
         try:
-            # Get data instance for this variable
-            di = data[var_name]
+            # Get data from either CSV or computed variables
+            di = get_variable_data(var_name, start_time, end_time)
 
-            # Apply time filtering
-            filtered_di = get_data_slice_by_timestamp(di, start_time, end_time)
-
-            if len(filtered_di) == 0:
+            if len(di) == 0:
                 continue
 
             # Convert timestamps to seconds for better readability
-            ts = filtered_di.timestamp_np.astype(np.float64) / 1e3
-            val = filtered_di.value_np
+            ts = di.timestamp_np.astype(np.float64) / 1e3
+            val = di.value_np
+
+            # Get label (works for both CSV and computed variables)
+            label = getattr(di, 'label', var_name)
 
             # Plot with label
-            ax.plot(ts, val, label=filtered_di.label, color=colors[i % len(colors)])
-            plotted_labels.append(filtered_di.label)
+            ax.plot(ts, val, label=label, color=colors[i % len(colors)])
+            plotted_labels.append(label)
             plotted_count += 1
 
-        except (KeyError, Exception):
+        except (KeyError, FileNotFoundError, Exception):
             continue
 
     if plotted_count == 0:
@@ -313,3 +297,10 @@ def handle_build_dual_axis_graph(arguments: dict) -> list[Content]:
             mimeType="image/png"
         )
     ]
+
+
+# Tool handlers mapping
+TOOL_HANDLERS = {
+    "build_graph_vs_time": handle_build_graph_vs_time,
+    "build_dual_axis_graph": handle_build_dual_axis_graph,
+}

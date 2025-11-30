@@ -115,3 +115,9 @@ def handle_average_variable_over_time(arguments: dict) -> list[Content]:
 
     except Exception as e:
         return [TextContent(type="text", text=f"Error calculating average: {e}")]
+
+
+# Tool handlers mapping
+TOOL_HANDLERS = {
+    "average_variable_over_time": handle_average_variable_over_time,
+}

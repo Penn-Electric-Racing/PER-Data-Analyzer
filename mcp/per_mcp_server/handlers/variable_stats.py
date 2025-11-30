@@ -134,3 +134,9 @@ def handle_get_variable_statistics(arguments: dict) -> list[Content]:
 
     except Exception as e:
         return [TextContent(type="text", text=f"Error calculating statistics: {e}")]
+
+
+# Tool handlers mapping
+TOOL_HANDLERS = {
+    "get_variable_statistics": handle_get_variable_statistics,
+}

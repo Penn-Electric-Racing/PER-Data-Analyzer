@@ -105,3 +105,10 @@ def handle_list_all_can_variables(arguments: dict) -> list[Content]:
         )
 
     return [TextContent(type="text", text=output.getvalue())]
+
+
+# Tool handlers mapping
+TOOL_HANDLERS = {
+    "search_can_variables": handle_search_can_variables,
+    "list_all_can_variables": handle_list_all_can_variables,
+}

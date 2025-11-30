@@ -91,3 +91,9 @@ def handle_get_dataset_info(arguments: dict) -> list[Content]:
 
     except Exception as e:
         return [TextContent(type="text", text=f"Error generating dataset info: {e}")]
+
+
+# Tool handlers mapping
+TOOL_HANDLERS = {
+    "get_dataset_info": handle_get_dataset_info,
+}

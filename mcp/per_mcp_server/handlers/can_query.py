@@ -109,3 +109,10 @@ def handle_get_dataset_overview(arguments: dict) -> list[Content]:
         pretty_print_single_run_info(data, time_unit=time_unit)
 
     return [TextContent(type="text", text=output.getvalue())]
+
+
+# Tool handlers mapping
+TOOL_HANDLERS = {
+    "get_can_variable_info": handle_get_can_variable_info,
+    "get_dataset_overview": handle_get_dataset_overview,
+}

@@ -114,3 +114,9 @@ def handle_integrate_variable_over_time(arguments: dict) -> list[Content]:
 
     except Exception as e:
         return [TextContent(type="text", text=f"Error calculating integral: {e}")]
+
+
+# Tool handlers mapping
+TOOL_HANDLERS = {
+    "integrate_variable_over_time": handle_integrate_variable_over_time,
+}
