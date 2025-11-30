@@ -54,8 +54,11 @@ def get_tool_handlers() -> dict[str, Callable]:
 
     Returns:
         Dictionary mapping tool names to handler functions
+
+    Note: This function is kept for backwards compatibility.
+    Prefer using TOOL_HANDLERS directly for better performance.
     """
     return TOOL_HANDLERS
 
 
-__all__ = ["TOOL_DEFINITIONS", "get_tool_handlers"]
+__all__ = ["TOOL_DEFINITIONS", "TOOL_HANDLERS", "get_tool_handlers"]

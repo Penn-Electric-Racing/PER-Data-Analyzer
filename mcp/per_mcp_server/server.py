@@ -14,7 +14,7 @@ from mcp.server import Server
 from mcp.types import Tool, Content
 from mcp.server.stdio import stdio_server
 
-from .handlers import TOOL_DEFINITIONS, get_tool_handlers
+from .handlers import TOOL_DEFINITIONS, TOOL_HANDLERS
 
 # Load environment variables
 load_dotenv()
@@ -26,9 +26,8 @@ logger = logging.getLogger(__name__)
 # Initialize MCP server
 app = Server("per-telemetry")
 
-# Initialize tool handlers (no longer need separate CAN search instance)
-tool_handlers = get_tool_handlers()
-logger.info(f"✓ MCP server ready with {len(tool_handlers)} tools")
+# Tool handlers are loaded at import time from handlers module
+logger.info(f"✓ MCP server ready with {len(TOOL_HANDLERS)} tools")
 
 
 @app.list_tools()
@@ -49,7 +48,7 @@ async def list_tools() -> list[Tool]:
 @app.call_tool()
 async def call_tool(name: str, arguments: Any) -> list[Content]:
     """Handle tool calls."""
-    handler = tool_handlers.get(name)
+    handler = TOOL_HANDLERS.get(name)
 
     if not handler:
         raise ValueError(f"Unknown tool: {name}")
