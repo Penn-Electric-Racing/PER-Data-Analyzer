@@ -78,7 +78,13 @@ function addMessage(type, text, imageData = null) {
 
     const contentDiv = document.createElement('div');
     contentDiv.className = 'message-content';
-    contentDiv.textContent = text;
+
+    // Parse markdown for assistant and error messages, keep user messages as plain text
+    if (type === 'assistant' || type === 'error') {
+        contentDiv.innerHTML = marked.parse(text);
+    } else {
+        contentDiv.textContent = text;
+    }
 
     messageDiv.appendChild(contentDiv);
 
