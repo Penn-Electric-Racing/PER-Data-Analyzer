@@ -25,10 +25,19 @@
                     <button type="button" id="uploadBtn" class="upload-btn">Upload CSV</button>
                 </form>
                 <span class="separator">or</span>
-                <select id="logSelector" class="log-selector">
-                    <option value="">Select log from S3...</option>
-                </select>
-                <button type="button" id="loadLogBtn" class="load-log-btn">Load from S3</button>
+                <div class="log-selection-group">
+                    <select id="logSelector" class="log-selector">
+                        <option value="">S3 logs...</option>
+                    </select>
+                    <button type="button" id="loadLogBtn" class="load-log-btn">Load from S3</button>
+                </div>
+                <span class="separator">or</span>
+                <div class="log-selection-group">
+                    <select id="localLogSelector" class="log-selector">
+                        <option value="">Local logs...</option>
+                    </select>
+                    <button type="button" id="loadLocalLogBtn" class="load-log-btn">Load Local</button>
+                </div>
                 <form action="/clear" method="post" id="clearForm" style="display: inline;">
                     <button type="button" id="clearBtn" class="clear-btn">Clear Chat</button>
                 </form>

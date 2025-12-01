@@ -116,39 +116,92 @@ def select_log():
     # Check authentication
     if not session.get('authenticated'):
         return {'error': 'Unauthorized'}, 401
-    
+
     session_id = ensure_session_id(session)
-    
+
     data = request.get_json()
     filename = data.get('filename')
-    
+
     if not filename:
         return {'error': 'Filename required'}, 400
-    
+
     from ..services.s3_service import s3_service
-    
+
     # Download file from S3 to uploads directory
     upload_dir = current_app.config['UPLOAD_FOLDER']
     local_path = s3_service.download_log_file(filename, upload_dir)
-    
+
     if local_path is None:
         append_history_message(session_id, {
             'type': 'error',
             'text': f'Failed to download {filename} from S3'
         })
         return {'error': 'Download failed'}, 500
-    
+
     # Set as active CSV in session
     relative_path = f"uploads/{local_path.name}"
     session['active_csv_path'] = relative_path
     session['active_file'] = filename
-    
+
     logger.info(f"Downloaded and activated S3 log: {filename}")
-    
+
     append_history_message(session_id, {
         'type': 'assistant',
         'text': f'Successfully loaded {filename} from S3. You can now analyze this data!'
     })
-    
+
     return {'success': True, 'filename': filename}, 200
+
+@main_bp.route('/api/local-logs', methods=['GET'])
+def list_local_logs():
+    """List all log files from local logs directory."""
+    # Check authentication
+    if not session.get('authenticated'):
+        return {'error': 'Unauthorized'}, 401
+
+    from ..services.local_logs_service import local_logs_service
+
+    logs = local_logs_service.list_local_logs()
+
+    return {'logs': logs}, 200
+
+@main_bp.route('/api/local-logs/select', methods=['POST'])
+def select_local_log():
+    """Activate a log file from local logs directory."""
+    # Check authentication
+    if not session.get('authenticated'):
+        return {'error': 'Unauthorized'}, 401
+
+    session_id = ensure_session_id(session)
+
+    data = request.get_json()
+    filepath = data.get('filepath')
+
+    if not filepath:
+        return {'error': 'Filepath required'}, 400
+
+    from ..services.local_logs_service import local_logs_service
+
+    # Validate that file exists
+    abs_path = local_logs_service.get_absolute_path(filepath)
+
+    if abs_path is None:
+        append_history_message(session_id, {
+            'type': 'error',
+            'text': f'Local log file not found or invalid: {filepath}'
+        })
+        return {'error': 'File not found'}, 404
+
+    # Set as active CSV in session (use the relative path)
+    session['active_csv_path'] = filepath
+    session['active_file'] = abs_path.name
+
+    logger.info(f"Activated local log: {filepath}")
+
+    append_history_message(session_id, {
+        'type': 'assistant',
+        'text': f'Successfully loaded {abs_path.name} from local storage. You can now analyze this data!'
+    })
+
+    return {'success': True, 'filename': abs_path.name}, 200
 

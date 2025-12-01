@@ -67,6 +67,13 @@ header h1 {
     justify-content: center;
     align-items: center;
     gap: 12px;
+    flex-wrap: wrap;
+}
+
+.log-selection-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .upload-btn {
@@ -136,6 +143,20 @@ header h1 {
 .log-selector option {
     background: #2a2a2a;
     color: white;
+}
+
+.log-selector optgroup {
+    background: #1a1a1a;
+    color: #DC143C;
+    font-weight: 600;
+    font-style: normal;
+}
+
+.log-selector optgroup option {
+    background: #2a2a2a;
+    color: white;
+    font-weight: normal;
+    padding-left: 20px;
 }
 
 .load-log-btn {

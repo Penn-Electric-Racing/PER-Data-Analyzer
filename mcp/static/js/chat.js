@@ -139,6 +139,8 @@ scrollToBottom();
 // Log selector functionality
 const logSelector = document.getElementById('logSelector');
 const loadLogBtn = document.getElementById('loadLogBtn');
+const localLogSelector = document.getElementById('localLogSelector');
+const loadLocalLogBtn = document.getElementById('loadLocalLogBtn');
 
 // Fetch available logs from S3 on page load
 async function fetchLogs() {
@@ -153,7 +155,7 @@ async function fetchLogs() {
         const logs = data.logs || [];
 
         // Clear existing options (except the first placeholder)
-        logSelector.innerHTML = '<option value="">Select log from S3...</option>';
+        logSelector.innerHTML = '<option value="">S3 logs...</option>';
 
         // Add log options
         logs.forEach(log => {
@@ -174,6 +176,47 @@ async function fetchLogs() {
     }
 }
 
+// Fetch available local logs on page load
+async function fetchLocalLogs() {
+    try {
+        const response = await fetch('/api/local-logs');
+        if (!response.ok) {
+            console.error('Failed to fetch local logs');
+            return;
+        }
+
+        const data = await response.json();
+        const logGroups = data.logs || [];
+
+        // Clear existing options (except the first placeholder)
+        localLogSelector.innerHTML = '<option value="">Local logs...</option>';
+
+        // Add log options grouped by folder
+        logGroups.forEach(group => {
+            const optgroup = document.createElement('optgroup');
+            optgroup.label = group.folder;
+
+            group.files.forEach(file => {
+                const option = document.createElement('option');
+                option.value = file.path;
+
+                // Format the display text with name, date, and size
+                const date = file.modified ? new Date(file.modified).toLocaleDateString() : '';
+                const size = file.size ? formatBytes(file.size) : '';
+                option.textContent = `${file.name}${date ? ' (' + date : ''}${size ? ', ' + size : ''}${date ? ')' : ''}`;
+
+                optgroup.appendChild(option);
+            });
+
+            localLogSelector.appendChild(optgroup);
+        });
+
+        console.log(`Loaded ${logGroups.length} log folders from local storage`);
+    } catch (error) {
+        console.error('Error fetching local logs:', error);
+    }
+}
+
 // Format bytes to human-readable size
 function formatBytes(bytes) {
     if (bytes < 1024) return `${bytes} B`;
@@ -181,7 +224,7 @@ function formatBytes(bytes) {
     return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-// Handle load log button click
+// Handle load log button click (S3)
 if (loadLogBtn) {
     loadLogBtn.addEventListener('click', async () => {
         const selectedLog = logSelector.value;
@@ -222,6 +265,48 @@ if (loadLogBtn) {
     });
 }
 
+// Handle load local log button click
+if (loadLocalLogBtn) {
+    loadLocalLogBtn.addEventListener('click', async () => {
+        const selectedLog = localLogSelector.value;
+
+        if (!selectedLog) {
+            alert('Please select a local log file first');
+            return;
+        }
+
+        // Disable button during loading
+        loadLocalLogBtn.disabled = true;
+        loadLocalLogBtn.textContent = 'Loading...';
+
+        try {
+            const response = await fetch('/api/local-logs/select', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ filepath: selectedLog })
+            });
+
+            if (response.ok) {
+                // Reload page to show the loaded file
+                location.reload();
+            } else {
+                const error = await response.json();
+                alert(`Failed to load local log: ${error.error || 'Unknown error'}`);
+                loadLocalLogBtn.disabled = false;
+                loadLocalLogBtn.textContent = 'Load Local';
+            }
+        } catch (error) {
+            console.error('Error loading local log:', error);
+            alert('Failed to load local log file');
+            loadLocalLogBtn.disabled = false;
+            loadLocalLogBtn.textContent = 'Load Local';
+        }
+    });
+}
+
 // Fetch logs on page load
 fetchLogs();
+fetchLocalLogs();
 
