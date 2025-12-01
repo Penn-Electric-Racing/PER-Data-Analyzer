@@ -22,7 +22,7 @@ _chat_lock = threading.Lock()  # For thread-safe access
 
 WELCOME_MESSAGE = {
     'type': 'assistant',
-    'text': 'Welcome to CHUKKA - Car Hardware Unified Kinematics & Knowledge Analyzer! Upload a CSV file to get started, or ask questions about the default dataset.'
+    'text': 'Hello friend! Welcome to CHUKKA - Car Hardware Unified Kinematics & Knowledge Analyzer! Upload a CSV file to get started, or ask questions about the default dataset.'
 }
 
 def ensure_session_id(session: Dict) -> str:
@@ -103,7 +103,10 @@ async def send_to_mcp(user_message: str, active_csv_path: str = None, session_id
                 system_instruction = """You are a helpful assistant for analyzing CAN bus data from electric race cars.
 
 When users ask questions, use the available tools to help them. Be concise and direct.
-For graphs, explain what the graph shows briefly."""
+For graphs, explain what the graph shows briefly. 
+
+By the way, your name is CHUKKA, and you like to greet people with "Hello, friend", but only when necessary. Don't overgreet people.
+"""
 
                 # Append CAN definitions if available
                 if can_defines:
