@@ -174,19 +174,6 @@ def handle_build_dual_axis_graph(arguments: dict) -> list[Content]:
     if not left_variables:
         return [TextContent(type="text", text="No left variables provided")]
 
-    csv_path = os.getenv("ACTIVE_CSV_PATH", "temp/16thMay13-52.csv")
-
-    if not os.path.exists(csv_path):
-        return [TextContent(type="text", text=f"CSV file not found: {csv_path}")]
-
-    # Parse the CSV (suppress output)
-    parser = CSVParser()
-    try:
-        with redirect_stdout(StringIO()), redirect_stderr(StringIO()):
-            data = parser(csv_path)
-    except Exception as e:
-        return [TextContent(type="text", text=f"Error parsing CSV: {e}")]
-
     # Create the plot with dual axes
     fig, ax1 = plt.subplots(figsize=(10, 6))
     colors = plt.rcParams["axes.prop_cycle"].by_key()["color"]
@@ -197,21 +184,24 @@ def handle_build_dual_axis_graph(arguments: dict) -> list[Content]:
     left_labels = []
     for var_name in left_variables:
         try:
-            di = data[var_name]
-            filtered_di = get_data_slice_by_timestamp(di, start_time, end_time)
+            # Get data from either CSV or computed variables
+            di = get_variable_data(var_name, start_time, end_time)
 
-            if len(filtered_di) == 0:
+            if len(di) == 0:
                 continue
 
-            ts = filtered_di.timestamp_np.astype(np.float64) / 1e3
-            val = filtered_di.value_np
+            ts = di.timestamp_np.astype(np.float64) / 1e3
+            val = di.value_np
 
-            ax1.plot(ts, val, label=filtered_di.label, color=colors[color_idx % len(colors)])
-            left_labels.append(filtered_di.label)
+            # Get label (works for both CSV and computed variables)
+            label = getattr(di, 'label', var_name)
+
+            ax1.plot(ts, val, label=label, color=colors[color_idx % len(colors)])
+            left_labels.append(label)
             left_plotted += 1
             color_idx += 1
 
-        except (KeyError, Exception):
+        except (KeyError, FileNotFoundError, Exception):
             continue
 
     if left_plotted == 0:
@@ -235,22 +225,25 @@ def handle_build_dual_axis_graph(arguments: dict) -> list[Content]:
 
         for var_name in right_variables:
             try:
-                di = data[var_name]
-                filtered_di = get_data_slice_by_timestamp(di, start_time, end_time)
+                # Get data from either CSV or computed variables
+                di = get_variable_data(var_name, start_time, end_time)
 
-                if len(filtered_di) == 0:
+                if len(di) == 0:
                     continue
 
-                ts = filtered_di.timestamp_np.astype(np.float64) / 1e3
-                val = filtered_di.value_np
+                ts = di.timestamp_np.astype(np.float64) / 1e3
+                val = di.value_np
 
-                ax2.plot(ts, val, label=filtered_di.label, linestyle='--',
+                # Get label (works for both CSV and computed variables)
+                label = getattr(di, 'label', var_name)
+
+                ax2.plot(ts, val, label=label, linestyle='--',
                         color=colors[color_idx % len(colors)])
-                right_labels.append(filtered_di.label)
+                right_labels.append(label)
                 right_plotted += 1
                 color_idx += 1
 
-            except (KeyError, Exception):
+            except (KeyError, FileNotFoundError, Exception):
                 continue
 
         if right_plotted > 0:
