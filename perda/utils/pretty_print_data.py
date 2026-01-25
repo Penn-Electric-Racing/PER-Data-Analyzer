@@ -2,17 +2,27 @@ from typing import Optional
 
 import numpy as np
 
-from ..csv_parser import SingleRunData
 from ..analyzer.models import DataInstance
+from ..csv_parser import SingleRunData
 from .utils import average_over_time_range, integrate_over_time_range
 
 
-def pretty_print_data_instance_info(data_instance: DataInstance, time_unit: str = "s"):
+def pretty_print_data_instance_info(
+    data_instance: DataInstance, time_unit: str = "s"
+) -> None:
     """
     Print information about a DataInstance.
 
-    data_instance (DataInstance): The DataInstance to print info about
-    time_unit (str, optional): Unit for time values ("ms" or "s"). Defaults to "s".
+    Parameters
+    ----------
+    data_instance : DataInstance
+        The DataInstance to print info about
+    time_unit : str, optional
+        Unit for time values: "ms" or "s". Default is "s"
+
+    Returns
+    -------
+    None
     """
     print(f"DataInstance for | {data_instance.label} | canid={data_instance.canid}")
     if len(data_instance) > 0:
@@ -46,13 +56,20 @@ def pretty_print_data_instance_info(data_instance: DataInstance, time_unit: str 
 def pretty_print_single_run_info(
     data: SingleRunData,
     time_unit: str = "s",
-):
+) -> None:
     """
     Print overall information about the SingleRunData.
 
-    data (SingleRunData): Data structure containing CSV file data
-    time_unit (str, optional): Unit for time values ("ms" or "s").
-        Defaults to "s".
+    Parameters
+    ----------
+    data : SingleRunData
+        Data structure containing CSV file data
+    time_unit : str, optional
+        Unit for time values: "ms" or "s". Default is "s"
+
+    Returns
+    -------
+    None
     """
     print("Parser Info:")
     start_time = float(data.data_start_time)
@@ -68,21 +85,31 @@ def pretty_print_single_run_info(
 
 def pretty_print_single_run_variables(
     data: SingleRunData,
-    search: str | None = None,
+    search: Optional[str] = None,
     strict_search: bool = False,
     sort_by: str = "name",
-):
+) -> None:
     """
     Print a list of all available variables in the dataset.
 
-    data (SingleRunData): Data structure containing CSV file data
-    search (str, optional): Search term to filter variables
-    strict_search (bool, optional): If True, all search terms must be present.
-        If False, any search term present is enough. Defaults to False.
-    sort_by (str, optional): How to sort the variables list:
+    Parameters
+    ----------
+    data : SingleRunData
+        Data structure containing CSV file data
+    search : Optional[str], optional
+        Search term to filter variables. Multiple terms separated by spaces. Default is None
+    strict_search : bool, optional
+        If True, all search terms must be present.
+        If False, any search term present is enough. Default is False
+    sort_by : str, optional
+        How to sort the variables list:
         - "name": Sort alphabetically by variable name
         - "canid": Sort by CAN ID
-        Defaults to "name".
+        Default is "name"
+
+    Returns
+    -------
+    None
     """
     # Parse variable names into (inside, outside) pairs for sorting
     variable_pairs = []

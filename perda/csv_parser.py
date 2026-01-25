@@ -7,13 +7,32 @@ from .analyzer.models import DataInstance, SingleRunData
 
 
 class CSVParser:
-    """Callable CSV parser that returns SingleRunData model."""
+    """
+    Callable CSV parser that returns SingleRunData model.
+
+    Parses CAN bus data from CSV files into structured SingleRunData objects.
+    """
 
     def __call__(self, file_path: str, bad_data_limit: int = 100) -> SingleRunData:
         """
         Parse CSV file and return SingleRunData model.
-        file_path: path of file we want to parse
-        bad_data_limit: number of bad data before stopping (-1 for no limit)
+
+        Parameters
+        ----------
+        file_path : str
+            Path to the CSV file to parse
+        bad_data_limit : int, optional
+            Maximum number of bad data lines before stopping. -1 for no limit. Default is 100
+
+        Returns
+        -------
+        SingleRunData
+            Parsed data structure containing all CAN variables
+
+        Raises
+        ------
+        Exception
+            If too many bad data lines are encountered
         """
         # Initialize data containers
         tv_map: dict[int, DataInstance] = {}

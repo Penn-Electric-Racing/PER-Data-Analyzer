@@ -4,36 +4,63 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.ticker import MultipleLocator
 
-from ..csv_parser import SingleRunData
 from ..analyzer.models import DataInstance
+from ..csv_parser import SingleRunData
 from ..utils.utils import get_data_slice_by_timestamp
 
 
 def plot(
     data: SingleRunData,
-    left_input,
-    right_input=None,
-    start_time=0,
-    end_time=-1,
-    unit="s",
-    label=True,
-    left_spacing=-1,
-    right_spacing=-1,
-    left_title="",
-    right_title="",
-    top_title="",
-    figsize=(8, 5),
-):
+    left_input: Union[str, int, DataInstance, List[Union[str, int, DataInstance]]],
+    right_input: Optional[
+        Union[str, int, DataInstance, List[Union[str, int, DataInstance]]]
+    ] = None,
+    start_time: Union[int, float] = 0,
+    end_time: Union[int, float] = -1,
+    unit: str = "s",
+    label: bool = True,
+    left_spacing: Union[int, float] = -1,
+    right_spacing: Union[int, float] = -1,
+    left_title: str = "",
+    right_title: str = "",
+    top_title: str = "",
+    figsize: Tuple[Union[int, float], Union[int, float]] = (8, 5),
+) -> None:
     """
-    Plot data from the ParsedData model.
-    left_input: name of variable to plot on left y-axis (has to have sth)
-    right_input: name of variable to plot on right y-axis (optional)
-    start_time: start time in ms (default 0)
-    end_time: end time in ms (default -1, means till end)
-    label: whether to show label (default True)
-    left_spacing: spacing for left y-axis ticks (default -1, means auto)
-    right_spacing: spacing for right y-axis ticks (default -1, means auto)
-    figsize: tuple of width and height in inches (default (10, 6))
+    Plot data from the SingleRunData model.
+
+    Parameters
+    ----------
+    data : SingleRunData
+        Parsed data containing CAN variables
+    left_input : Union[str, int, DataInstance, List[Union[str, int, DataInstance]]]
+        Variable(s) to plot on left y-axis. Can be name, CAN ID, or DataInstance
+    right_input : Optional[Union[str, int, DataInstance, List[Union[str, int, DataInstance]]]], optional
+        Variable(s) to plot on right y-axis. Can be name, CAN ID, or DataInstance. Default is None
+    start_time : Union[int, float], optional
+        Start time for plotting. Default is 0
+    end_time : Union[int, float], optional
+        End time for plotting. -1 means until end. Default is -1
+    unit : str, optional
+        Time unit: "ms" or "s". Default is "s"
+    label : bool, optional
+        Whether to show legends. Default is True
+    left_spacing : Union[int, float], optional
+        Spacing for left y-axis ticks. -1 means auto. Default is -1
+    right_spacing : Union[int, float], optional
+        Spacing for right y-axis ticks. -1 means auto. Default is -1
+    left_title : str, optional
+        Label for left y-axis. Default is ""
+    right_title : str, optional
+        Label for right y-axis. Default is ""
+    top_title : str, optional
+        Title for the entire plot. Default is ""
+    figsize : Tuple[Union[int, float], Union[int, float]], optional
+        Figure size in inches (width, height). Default is (8, 5)
+
+    Returns
+    -------
+    None
     """
     left_di = []
     right_di = []

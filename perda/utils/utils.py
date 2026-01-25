@@ -12,16 +12,29 @@ def integrate_over_time_range(
     end_time: int = -1,
     time_unit: str = "ms",
 ) -> float:
-    """Get integral of the value over time using interpolation and exact bounds integration.
+    """
+    Get integral of the value over time using interpolation and exact bounds integration.
 
+    Parameters
+    ----------
+    data_instance : DataInstance
+        DataInstance to integrate
+    start_time : int, optional
+        Start time for integration. Default is 0
+    end_time : int, optional
+        End time for integration. -1 means end of data. Default is -1
+    time_unit : str, optional
+        Time unit for integration: "ms" or "s". Default is "ms"
+
+    Returns
+    -------
+    float
+        Integral of the value over the time range
+
+    Notes
+    -----
     Uses scipy.interpolate.interp1d to create a continuous function from discrete data,
     then scipy.integrate.quad for precise integration over exact time bounds.
-
-    Args:
-        data_instance: DataInstance to integrate
-        start_time: Start time for integration (default 0)
-        end_time: End time for integration (default -1 means end of data)
-        time_unit: Time unit for integration ("ms" or "s")
     """
     if len(data_instance.timestamp_np) < 2:
         return 0.0
@@ -72,16 +85,29 @@ def average_over_time_range(
     end_time: int = -1,
     time_unit: str = "ms",
 ) -> float:
-    """Get average value over time using integral divided by time range.
+    """
+    Get average value over time using integral divided by time range.
 
+    Parameters
+    ----------
+    data_instance : DataInstance
+        DataInstance to average
+    start_time : int, optional
+        Start time for averaging. Default is 0
+    end_time : int, optional
+        End time for averaging. -1 means end of data. Default is -1
+    time_unit : str, optional
+        Time unit for averaging: "ms" or "s". Default is "ms"
+
+    Returns
+    -------
+    float
+        Time-weighted average value over the time range
+
+    Notes
+    -----
     Uses scipy.interpolate.interp1d to create a continuous function from discrete data,
     then scipy.integrate.quad for precise integration over exact time bounds.
-
-    Args:
-        data_instance: DataInstance to average
-        start_time: Start time for averaging (default 0)
-        end_time: End time for averaging (default -1 means end of data)
-        time_unit: Time unit for averaging ("ms" or "s")
     """
     if len(data_instance.timestamp_np) < 2:
         return 0.0
@@ -111,10 +137,23 @@ def average_over_time_range(
 
 def get_data_slice_by_timestamp(
     original_instance: DataInstance, start_time: int = 0, end_time: int = -1
-):
+) -> DataInstance:
     """
     Get a new DataInstance with data in [start_time, end_time).
-    If end_time == -1, means till end.
+
+    Parameters
+    ----------
+    original_instance : DataInstance
+        Original DataInstance to slice
+    start_time : int, optional
+        Start time (inclusive). Default is 0
+    end_time : int, optional
+        End time (exclusive). -1 means till end. Default is -1
+
+    Returns
+    -------
+    DataInstance
+        New DataInstance containing only data within the specified time range
     """
     if end_time < 0:
         mask = original_instance.timestamp_np >= start_time

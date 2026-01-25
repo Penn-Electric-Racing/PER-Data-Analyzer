@@ -18,6 +18,24 @@ class DataInstance(BaseModel):
     @field_validator("timestamp_np")
     @classmethod
     def validate_timestamp(cls, v: Any) -> NDArray:
+        """
+        Validate timestamp array for DataInstance.
+
+        Parameters
+        ----------
+        v : Any
+            Input value to validate and convert to timestamp array
+
+        Returns
+        -------
+        NDArray
+            Validated 1D array of int64 timestamps
+
+        Raises
+        ------
+        ValueError
+            If array is not 1-dimensional, contains decreasing values, or has negative values
+        """
         v = np.asarray(v, dtype=np.int64)
         if v.ndim != 1:
             raise ValueError("timestamp_np must be 1-dimensional array.")
@@ -30,19 +48,80 @@ class DataInstance(BaseModel):
     @field_validator("value_np")
     @classmethod
     def validate_value(cls, v: Any) -> NDArray:
+        """
+        Validate value array for DataInstance.
+
+        Parameters
+        ----------
+        v : Any
+            Input value to validate and convert to value array
+
+        Returns
+        -------
+        NDArray
+            Validated 1D array of float64 values
+
+        Raises
+        ------
+        ValueError
+            If array is not 1-dimensional
+        """
         v = np.asarray(v, dtype=np.float64)
         if v.ndim != 1:
             raise ValueError("value_np must be 1-dimensional array.")
         return v
 
     def model_post_init(self, __context: Any) -> None:
+        """
+        Post-initialization validation for DataInstance.
+
+        Parameters
+        ----------
+        __context : Any
+            Pydantic context (unused)
+
+        Returns
+        -------
+        None
+
+        Raises
+        ------
+        ValueError
+            If timestamp and value arrays have different lengths
+        """
         if self.timestamp_np.shape[0] != self.value_np.shape[0]:
             raise ValueError("timestamp_np and value_np must have the same length.")
 
-    def __len__(self):
+    def __len__(self) -> int:
+        """
+        Get number of data points in this DataInstance.
+
+        Returns
+        -------
+        int
+            Number of timestamp-value pairs
+        """
         return self.timestamp_np.shape[0]
 
-    def __add__(self, other):
+    def __add__(self, other: Union["DataInstance", int, float]) -> "DataInstance":
+        """
+        Add two DataInstances or add a scalar to a DataInstance.
+
+        Parameters
+        ----------
+        other : Union[DataInstance, int, float]
+            DataInstance or scalar value to add
+
+        Returns
+        -------
+        DataInstance
+            New DataInstance with added values
+
+        Raises
+        ------
+        TypeError
+            If other is not a DataInstance or scalar
+        """
         if isinstance(other, DataInstance):
             ts, val = combine(
                 self.timestamp_np,
@@ -63,7 +142,25 @@ class DataInstance(BaseModel):
             )
         raise TypeError("add expects (DataInstance, DataInstance|scalar) in any order")
 
-    def __sub__(self, other):
+    def __sub__(self, other: Union["DataInstance", int, float]) -> "DataInstance":
+        """
+        Subtract a DataInstance or scalar from this DataInstance.
+
+        Parameters
+        ----------
+        other : Union[DataInstance, int, float]
+            DataInstance or scalar value to subtract
+
+        Returns
+        -------
+        DataInstance
+            New DataInstance with subtracted values
+
+        Raises
+        ------
+        TypeError
+            If other is not a DataInstance or scalar
+        """
         if isinstance(other, DataInstance):
             ts, val = combine(
                 self.timestamp_np,
@@ -84,7 +181,25 @@ class DataInstance(BaseModel):
             )
         raise TypeError("sub expects (DataInstance, DataInstance|scalar)")
 
-    def __mul__(self, other):
+    def __mul__(self, other: Union["DataInstance", int, float]) -> "DataInstance":
+        """
+        Multiply two DataInstances or multiply a DataInstance by a scalar.
+
+        Parameters
+        ----------
+        other : Union[DataInstance, int, float]
+            DataInstance or scalar value to multiply
+
+        Returns
+        -------
+        DataInstance
+            New DataInstance with multiplied values
+
+        Raises
+        ------
+        TypeError
+            If other is not a DataInstance or scalar
+        """
         if isinstance(other, DataInstance):
             ts, val = combine(
                 self.timestamp_np,
@@ -105,7 +220,25 @@ class DataInstance(BaseModel):
             )
         raise TypeError("mul expects (DataInstance, DataInstance|scalar)")
 
-    def __truediv__(self, other):
+    def __truediv__(self, other: Union["DataInstance", int, float]) -> "DataInstance":
+        """
+        Divide this DataInstance by another DataInstance or scalar.
+
+        Parameters
+        ----------
+        other : Union[DataInstance, int, float]
+            DataInstance or scalar value to divide by
+
+        Returns
+        -------
+        DataInstance
+            New DataInstance with divided values
+
+        Raises
+        ------
+        TypeError
+            If other is not a DataInstance or scalar
+        """
         if isinstance(other, DataInstance):
             ts, val = combine(
                 self.timestamp_np,
@@ -126,7 +259,25 @@ class DataInstance(BaseModel):
             )
         raise TypeError("div expects (DataInstance, DataInstance|scalar)")
 
-    def __pow__(self, other):
+    def __pow__(self, other: Union["DataInstance", int, float]) -> "DataInstance":
+        """
+        Raise this DataInstance to the power of another DataInstance or scalar.
+
+        Parameters
+        ----------
+        other : Union[DataInstance, int, float]
+            DataInstance or scalar exponent
+
+        Returns
+        -------
+        DataInstance
+            New DataInstance with values raised to the power
+
+        Raises
+        ------
+        TypeError
+            If other is not a DataInstance or scalar
+        """
         if isinstance(other, DataInstance):
             ts, val = combine(
                 self.timestamp_np,
@@ -147,7 +298,15 @@ class DataInstance(BaseModel):
             )
         raise TypeError("pow_ expects (DataInstance, DataInstance|scalar)")
 
-    def __neg__(self):
+    def __neg__(self) -> "DataInstance":
+        """
+        Negate all values in this DataInstance.
+
+        Returns
+        -------
+        DataInstance
+            New DataInstance with negated values
+        """
         return DataInstance(
             timestamp_np=self.timestamp_np,
             value_np=np.negative(self.value_np),
@@ -157,7 +316,24 @@ class DataInstance(BaseModel):
 
 
 class SingleRunData(BaseModel):
-    """Pydantic model to store parsed CSV data with dictionary-like lookup."""
+    """
+    Pydantic model to store parsed CSV data with dictionary-like lookup.
+
+    Attributes
+    ----------
+    tv_map : Dict[int, DataInstance]
+        Mapping from CAN ID to DataInstance
+    id_map : Dict[int, str]
+        Mapping from CAN ID to variable name
+    name_map : Dict[str, int]
+        Mapping from variable name to CAN ID
+    total_data_points : int
+        Total number of data points across all variables
+    data_start_time : int
+        Start timestamp in milliseconds
+    data_end_time : int
+        End timestamp in milliseconds
+    """
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
@@ -174,7 +350,26 @@ class SingleRunData(BaseModel):
     def __getitem__(
         self, input_canid_name: Union[str, int, DataInstance]
     ) -> DataInstance:
-        """Dictionary-like access to DataInstance by CAN ID or variable name."""
+        """
+        Dictionary-like access to DataInstance by CAN ID or variable name.
+
+        Parameters
+        ----------
+        input_canid_name : Union[str, int, DataInstance]
+            CAN ID (int), variable name (str), or DataInstance to retrieve
+
+        Returns
+        -------
+        DataInstance
+            DataInstance corresponding to the input
+
+        Raises
+        ------
+        KeyError
+            If CAN ID or variable name cannot be found
+        ValueError
+            If input type is invalid
+        """
         # Dummy return for plotting function for convenience
         if isinstance(input_canid_name, DataInstance):
             return input_canid_name
@@ -202,7 +397,19 @@ class SingleRunData(BaseModel):
         return self.tv_map[canid]
 
     def __contains__(self, input_canid_name: Union[str, int]) -> bool:
-        """Check if CAN ID or variable name exists in the data."""
+        """
+        Check if CAN ID or variable name exists in the data.
+
+        Parameters
+        ----------
+        input_canid_name : Union[str, int]
+            CAN ID or variable name to check
+
+        Returns
+        -------
+        bool
+            True if the CAN ID or variable name exists in the data
+        """
         try:
             self[input_canid_name]
             return True
