@@ -1,37 +1,24 @@
 from typing import List, Optional, Tuple, Union
 
-from .csv_parser import CSVParser, SingleRunData
-from .data_plotter import plot
+from ..csv_parser import CSVParser, SingleRunData
+from ..plotting.data_plotter import plot
 from .models import DataInstance
 
 
 class Analyzer:
-    def __init__(self):
+    def __init__(self, data: SingleRunData):
         """
         Initialize a new analyzer instance.
         """
-        self.data: SingleRunData = None
-        print("Analyzer Created")
+        self.data: SingleRunData
 
-    def read_csv(self, path: str, bad_data_limit: int = 100) -> None:
+    def get_data(self, variable: str) -> DataInstance:
         """
-        Read and parse a CSV file, storing the result in self.data.
-
-        path: The file path to the CSV file.
-        bad_data_limit: Number of allowed bad data rows before raising error.
-        """
-        if self.data is not None:
-            print("Resetting previous data.")
-        parser = CSVParser()
-        self.data = parser(path, bad_data_limit)
-
-    def get_data(self, variable: str) -> "DataInstance":
-        """
-        Get DataInstance by canid or name.
+        Get DataInstance by CAN ID or name.
         Raises AttributeError if no csv read or cannot find input.
         Very very very very useful function :)) core of perda prob
 
-        variable: name or canid of the variable to get.
+        variable: name or CAN ID of the variable to get.
         """
         if self.data is None:
             raise AttributeError("No csv read. Call .read_csv() before getting data.")
@@ -55,8 +42,10 @@ class Analyzer:
         figsize: Tuple[Union[int, float], Union[int, float]] = (8, 5),
     ) -> None:
         """
-        Main plot function, has all functionalities
+        Display up to two variables from the parsed data on a plot.
 
+        Parameters:
+        -------------
         left_input (Union[str, List[str], DataInstance, List[DataInstance]]):
             Variable(s) to plot on the left y-axis. Can be variable name(s) or DataInstance(s).
         right_input (Union[str, List[str], DataInstance, List[DataInstance]], optional):

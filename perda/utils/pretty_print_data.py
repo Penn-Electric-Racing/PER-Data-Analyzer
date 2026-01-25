@@ -1,7 +1,9 @@
+from typing import Optional
+
 import numpy as np
 
-from .csv_parser import SingleRunData
-from .models import DataInstance
+from ..csv_parser import SingleRunData
+from ..analyzer.models import DataInstance
 from .utils import average_over_time_range, integrate_over_time_range
 
 

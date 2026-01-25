@@ -3,7 +3,7 @@ from collections import defaultdict
 import numpy as np
 from tqdm import tqdm
 
-from .models import DataInstance, SingleRunData
+from .analyzer.models import DataInstance, SingleRunData
 
 
 class CSVParser:

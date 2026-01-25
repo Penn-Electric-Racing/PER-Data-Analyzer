@@ -3,7 +3,7 @@ from numpy.typing import NDArray
 from scipy.integrate import quad
 from scipy.interpolate import interp1d
 
-from .models import DataInstance
+from ..analyzer.models import DataInstance
 
 
 def integrate_over_time_range(

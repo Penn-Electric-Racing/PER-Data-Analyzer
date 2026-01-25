@@ -4,7 +4,7 @@ import numpy as np
 from numpy.typing import NDArray
 from pydantic import BaseModel, ConfigDict, field_validator
 
-from .helper import *
+from .joins import *
 
 
 class DataInstance(BaseModel):
