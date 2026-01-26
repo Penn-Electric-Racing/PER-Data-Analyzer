@@ -1,9 +1,10 @@
 # Notebook
 ipykernel
+nbformat
 
 # Data Processing
-matplotlib
 numpy
+plotly
 pydantic
 scipy
 

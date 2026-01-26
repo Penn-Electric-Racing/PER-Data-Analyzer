@@ -2,7 +2,7 @@ from typing import Any, Dict, Union
 
 import numpy as np
 from numpy.typing import NDArray
-from pydantic import BaseModel, ConfigDict, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from .joins import *
 
@@ -74,20 +74,6 @@ class DataInstance(BaseModel):
     def model_post_init(self, __context: Any) -> None:
         """
         Post-initialization validation for DataInstance.
-
-        Parameters
-        ----------
-        __context : Any
-            Pydantic context (unused)
-
-        Returns
-        -------
-        None
-
-        Raises
-        ------
-        ValueError
-            If timestamp and value arrays have different lengths
         """
         if self.timestamp_np.shape[0] != self.value_np.shape[0]:
             raise ValueError("timestamp_np and value_np must have the same length.")
@@ -95,11 +81,6 @@ class DataInstance(BaseModel):
     def __len__(self) -> int:
         """
         Get number of data points in this DataInstance.
-
-        Returns
-        -------
-        int
-            Number of timestamp-value pairs
         """
         return self.timestamp_np.shape[0]
 
@@ -116,11 +97,6 @@ class DataInstance(BaseModel):
         -------
         DataInstance
             New DataInstance with added values
-
-        Raises
-        ------
-        TypeError
-            If other is not a DataInstance or scalar
         """
         if isinstance(other, DataInstance):
             ts, val = combine(
@@ -155,11 +131,6 @@ class DataInstance(BaseModel):
         -------
         DataInstance
             New DataInstance with subtracted values
-
-        Raises
-        ------
-        TypeError
-            If other is not a DataInstance or scalar
         """
         if isinstance(other, DataInstance):
             ts, val = combine(
@@ -194,11 +165,6 @@ class DataInstance(BaseModel):
         -------
         DataInstance
             New DataInstance with multiplied values
-
-        Raises
-        ------
-        TypeError
-            If other is not a DataInstance or scalar
         """
         if isinstance(other, DataInstance):
             ts, val = combine(
@@ -233,11 +199,6 @@ class DataInstance(BaseModel):
         -------
         DataInstance
             New DataInstance with divided values
-
-        Raises
-        ------
-        TypeError
-            If other is not a DataInstance or scalar
         """
         if isinstance(other, DataInstance):
             ts, val = combine(
@@ -272,11 +233,6 @@ class DataInstance(BaseModel):
         -------
         DataInstance
             New DataInstance with values raised to the power
-
-        Raises
-        ------
-        TypeError
-            If other is not a DataInstance or scalar
         """
         if isinstance(other, DataInstance):
             ts, val = combine(
@@ -316,36 +272,27 @@ class DataInstance(BaseModel):
 
 
 class SingleRunData(BaseModel):
-    """
-    Pydantic model to store parsed CSV data with dictionary-like lookup.
-
-    Attributes
-    ----------
-    tv_map : Dict[int, DataInstance]
-        Mapping from CAN ID to DataInstance
-    id_map : Dict[int, str]
-        Mapping from CAN ID to variable name
-    name_map : Dict[str, int]
-        Mapping from variable name to CAN ID
-    total_data_points : int
-        Total number of data points across all variables
-    data_start_time : int
-        Start timestamp in milliseconds
-    data_end_time : int
-        End timestamp in milliseconds
-    """
+    """Pydantic model to store parsed CSV data with dictionary-like lookup."""
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     # Core data storage
-    tv_map: Dict[int, DataInstance] = {}  # canid -> DataInstance
-    id_map: Dict[int, str] = {}  # canid -> name
-    name_map: Dict[str, int] = {}  # name -> canid
+    data_instance_map: Dict[int, DataInstance] = Field(
+        default_factory=dict, description="Mapping from CAN ID to DataInstance"
+    )
+    var_name_map: Dict[int, str] = Field(
+        default_factory=dict, description="Mapping from CAN ID to variable name"
+    )
+    can_id_map: Dict[str, int] = Field(
+        default_factory=dict, description="Mapping from variable name to CAN ID"
+    )
 
     # Metadata
-    total_data_points: int
-    data_start_time: int
-    data_end_time: int
+    total_data_points: int = Field(
+        description="Total number of data points across all variables"
+    )
+    data_start_time: int = Field(description="Start timestamp in milliseconds")
+    data_end_time: int = Field(description="End timestamp in milliseconds")
 
     def __getitem__(
         self, input_canid_name: Union[str, int, DataInstance]
@@ -362,13 +309,6 @@ class SingleRunData(BaseModel):
         -------
         DataInstance
             DataInstance corresponding to the input
-
-        Raises
-        ------
-        KeyError
-            If CAN ID or variable name cannot be found
-        ValueError
-            If input type is invalid
         """
         # Dummy return for plotting function for convenience
         if isinstance(input_canid_name, DataInstance):
@@ -376,16 +316,16 @@ class SingleRunData(BaseModel):
 
         # If input is a CAN ID
         if isinstance(input_canid_name, int):
-            if input_canid_name not in self.tv_map:
+            if input_canid_name not in self.data_instance_map:
                 raise KeyError(f"Cannot find CAN ID: {input_canid_name}")
             canid = input_canid_name
 
         # If input is CAN variable name
         elif isinstance(input_canid_name, str):
             canid = None
-            for long_name in self.name_map:
+            for long_name in self.can_id_map:
                 if name_matches(input_canid_name, long_name):
-                    canid = self.name_map[long_name]
+                    canid = self.can_id_map[long_name]
                     break
             if canid is None:
                 raise KeyError(f"Cannot find CAN name: {input_canid_name}")
@@ -394,7 +334,7 @@ class SingleRunData(BaseModel):
 
         # Return DataInstance
         assert canid is not None  # This should never be None due to the checks above
-        return self.tv_map[canid]
+        return self.data_instance_map[canid]
 
     def __contains__(self, input_canid_name: Union[str, int]) -> bool:
         """

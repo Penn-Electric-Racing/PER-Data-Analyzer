@@ -1,7 +1,10 @@
-from typing import List, Optional, Tuple, Union
+from typing import List, Union
 
-from ..plotting.data_plotter import plot
+from ..plotting import plot_dual_axis, plot_single_axis
+from ..plotting.plotting_constants import *
 from .models import DataInstance, SingleRunData
+
+from plotly import graph_objects as go
 
 
 class Analyzer:
@@ -16,103 +19,80 @@ class Analyzer:
         """
         self.data: SingleRunData = data
 
-    def get_data(self, variable: str) -> DataInstance:
-        """
-        Get DataInstance by CAN ID or name.
-
-        Parameters
-        ----------
-        variable : str
-            Name or CAN ID of the variable to get
-
-        Returns
-        -------
-        DataInstance
-            DataInstance object containing timestamp and value arrays
-        """
-        if self.data is None:
-            raise AttributeError("No csv read. Call .read_csv() before getting data.")
-        return self.data[variable]
-
     def plot(
         self,
-        left_input: Union[str, int, DataInstance, List[Union[str, int, DataInstance]]],
-        right_input: Optional[
-            Union[str, int, DataInstance, List[Union[str, int, DataInstance]]]
-        ] = None,
-        start_time: Union[int, float] = 0,
-        end_time: Union[int, float] = -1,
-        time_unit: str = "s",
-        label: bool = True,
-        left_spacing: Union[int, float] = -1,
-        right_spacing: Union[int, float] = -1,
-        left_title: str = "",
-        right_title: str = "",
-        top_title: str = "",
-        figsize: Tuple[Union[int, float], Union[int, float]] = (8, 5),
-    ) -> None:
+        var_1: Union[str, int, DataInstance, List[Union[str, int, DataInstance]]],
+        var_2: (
+            Union[str, int, DataInstance, List[Union[str, int, DataInstance]]] | None
+        ) = None,
+        title: str | None = None,
+        y_label_1: str | None = None,
+        y_label_2: str | None = None,
+        show_legend: bool = True,
+        font_config: FontConfig = DEFAULT_FONT_CONFIG,
+        layout_config: LayoutConfig = DEFAULT_LAYOUT_CONFIG,
+    ) -> go.Figure:
         """
-        Display up to two variables from the parsed data on a plot.
+        Display variables from the parsed data on an interactive Plotly plot.
 
         Parameters
         ----------
-        left_input : Union[str, int, DataInstance, List[Union[str, int, DataInstance]]]
+        var_1 : Union[str, int, DataInstance, List[Union[str, int, DataInstance]]]
             Variable(s) to plot on the left y-axis. Can be variable name(s), CAN ID(s), or DataInstance(s)
-        right_input : Optional[Union[str, int, DataInstance, List[Union[str, int, DataInstance]]]], optional
-            Variable(s) to plot on the right y-axis. Can be variable name(s), CAN ID(s), or DataInstance(s).
-            If None, only uses left y-axis. Default is None
-        start_time : Union[int, float], optional
-            Start time for plotting. Default is 0
-        end_time : Union[int, float], optional
-            End time for plotting. -1 means until the end. Default is -1
-        time_unit : str, optional
-            Unit for time axis, either "ms" or "s".
-            Affects both display and input interpretation. Default is "s"
-        label : bool, optional
+        var_2 : Union[str, int, DataInstance, List[Union[str, int, DataInstance]]] | None, optional
+            Optional variable(s) to plot on the right y-axis. Can be variable name(s), CAN ID(s), or DataInstance(s).
+        title : str | None, optional
+        y_label_1 : str | None, optional
+            Label for left y-axis (or only y-axis if no right input).
+        y_label_2 : str | None, optional
+            Label for right y-axis.
+        show_legend : bool, optional
             Whether to show plot legends. Default is True
-        left_spacing : Union[int, float], optional
-            Spacing between major ticks on left y-axis.
-            -1 means auto spacing. Default is -1
-        right_spacing : Union[int, float], optional
-            Spacing between major ticks on right y-axis.
-            -1 means auto spacing. Default is -1
-        left_title : str, optional
-            Label for left y-axis. Default is ""
-        right_title : str, optional
-            Label for right y-axis. Default is ""
-        top_title : str, optional
-            Title for the entire plot. Default is ""
-        figsize : Tuple[Union[int, float], Union[int, float]], optional
-            Figure size in inches (width, height). Default is (8, 5)
-
-        Returns
-        -------
-        None
-
-        Raises
-        ------
-        AttributeError
-            If no CSV has been read before calling this method
+        font_config : FontConfig, optional
+            Font configuration for plot elements. Default is DEFAULT_FONT_CONFIG
+        layout_config : LayoutConfig, optional
+            Layout configuration for plot dimensions. Default is DEFAULT_LAYOUT_CONFIG
 
         Notes
         -----
-        When using time_unit="s", start_time and end_time are interpreted as seconds
-        and converted to milliseconds internally.
+        This method uses Plotly for interactive plotting with zoom, pan, and hover capabilities.
+        Time filtering can be done interactively in the plot.
         """
-        if self.data is None:
-            raise AttributeError("No csv read. Call .read_csv() before plotting.")
-        plot(
-            self.data,
-            left_input,
-            right_input=right_input,
-            start_time=start_time,
-            end_time=end_time,
-            unit=time_unit,
-            label=label,
-            left_spacing=left_spacing,
-            right_spacing=right_spacing,
-            left_title=left_title,
-            right_title=right_title,
-            top_title=top_title,
-            figsize=figsize,
-        )
+        # Normalize left input to List[DataInstance]
+        var_1 = self._normalize_input(var_1)
+
+        if var_2 is not None:
+            # Normalize right input to List[DataInstance]
+            var_2 = self._normalize_input(var_2)
+
+            return plot_dual_axis(
+                left_data_instances=var_1,
+                right_data_instances=var_2,
+                title=title,
+                left_y_axis_title=y_label_1,
+                right_y_axis_title=y_label_2,
+                show_legend=show_legend,
+                font_config=font_config,
+                layout_config=layout_config,
+            )
+        else:
+            return plot_single_axis(
+                data_instances=var_1,
+                title=title,
+                y_axis_title=y_label_1,
+                show_legend=show_legend,
+                font_config=font_config,
+                layout_config=layout_config,
+            )
+
+    def _normalize_input(
+        self,
+        input_data: Union[str, int, DataInstance, List[Union[str, int, DataInstance]]],
+    ) -> List[DataInstance]:
+        """
+        Normalize various input types to a list of DataInstances.
+        """
+        if isinstance(input_data, list):
+            return [self.data[item] for item in input_data]
+        else:
+            return [self.data[input_data]]

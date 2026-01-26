@@ -1,19 +1,18 @@
 import numpy as np
 from numpy.typing import NDArray
-from scipy.integrate import quad
-from scipy.interpolate import interp1d
 
 from ..analyzer.models import DataInstance
+from .types import Timescale
 
 
 def integrate_over_time_range(
     data_instance: DataInstance,
     start_time: int = 0,
     end_time: int = -1,
-    time_unit: str = "ms",
+    time_unit: Timescale = Timescale.S,
 ) -> float:
     """
-    Get integral of the value over time using interpolation and exact bounds integration.
+    Get integral of the value over time using the trapezoidal rule.
 
     Parameters
     ----------
@@ -23,8 +22,8 @@ def integrate_over_time_range(
         Start time for integration. Default is 0
     end_time : int, optional
         End time for integration. -1 means end of data. Default is -1
-    time_unit : str, optional
-        Time unit for integration: "ms" or "s". Default is "ms"
+    time_unit : Timescale, optional
+        Time unit for integration: milliseconds or seconds. Default is seconds
 
     Returns
     -------
@@ -33,8 +32,7 @@ def integrate_over_time_range(
 
     Notes
     -----
-    Uses scipy.interpolate.interp1d to create a continuous function from discrete data,
-    then scipy.integrate.quad for precise integration over exact time bounds.
+    Uses numpy.trapz (trapezoidal rule) for numerical integration of discrete data.
     """
     if len(data_instance.timestamp_np) < 2:
         return 0.0
@@ -49,33 +47,20 @@ def integrate_over_time_range(
     if actual_start_time >= actual_end_time:
         return 0.0
 
-    # Create interpolation function
-    # Use linear interpolation with bounds handling
-    interp_func = interp1d(
-        ts,
-        values,
-        kind="linear",
-        bounds_error=False,
-        fill_value=(values[0], values[-1]),
-    )
+    # Filter data to the time range
+    mask = (ts >= actual_start_time) & (ts <= actual_end_time)
+    ts_filtered = ts[mask]
+    values_filtered = values[mask]
 
-    # Convert time bounds for integration
-    if time_unit == "s":
-        integration_start = actual_start_time / 1e3
-        integration_end = actual_end_time / 1e3
+    if len(ts_filtered) < 2:
+        return 0.0
 
-        # Create wrapper function that handles time unit conversion
-        def integrand(t_seconds):
-            t_ms = t_seconds * 1e3
-            return interp_func(t_ms)
+    # Convert time to desired unit
+    if time_unit == Timescale.S:
+        ts_filtered = ts_filtered / 1e3
 
-    else:
-        integration_start = actual_start_time
-        integration_end = actual_end_time
-        integrand = interp_func
-
-    # Integrate using scipy.integrate.quad
-    integral, _ = quad(integrand, integration_start, integration_end)
+    # Integrate using trapezoidal rule
+    integral = np.trapezoid(values_filtered, ts_filtered)
     return float(integral)
 
 
@@ -106,8 +91,7 @@ def average_over_time_range(
 
     Notes
     -----
-    Uses scipy.interpolate.interp1d to create a continuous function from discrete data,
-    then scipy.integrate.quad for precise integration over exact time bounds.
+    Uses numpy.trapz (trapezoidal rule) for numerical integration of discrete data.
     """
     if len(data_instance.timestamp_np) < 2:
         return 0.0

@@ -78,8 +78,8 @@ def pretty_print_single_run_info(
         start_time = start_time / 1e3
         end_time = end_time / 1e3
     print(f"  Time range: {start_time} to {end_time} ({time_unit})")
-    print(f"  Total CAN IDs:   {len(data.tv_map)}")
-    print(f"  Total CAN Names: {len(data.name_map)}")
+    print(f"  Total CAN IDs:   {len(data.data_instance_map)}")
+    print(f"  Total CAN Names: {len(data.can_id_map)}")
     print(f"  Total Data Points: {data.total_data_points}")
 
 
@@ -106,17 +106,13 @@ def pretty_print_single_run_variables(
         - "name": Sort alphabetically by variable name
         - "canid": Sort by CAN ID
         Default is "name"
-
-    Returns
-    -------
-    None
     """
     # Parse variable names into (inside, outside) pairs for sorting
     variable_pairs = []
     if search is not None:
         search_list = search.lower().split(" ")
-    for canid in data.id_map:
-        full_name = data.id_map[canid]
+    for canid in data.var_name_map:
+        full_name = data.var_name_map[canid]
         # Strict search: all terms must be present
         if strict_search and search is not None:
             if not all(term in full_name.lower() for term in search_list):
