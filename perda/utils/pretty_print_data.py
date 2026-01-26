@@ -1,7 +1,7 @@
 from typing import Optional
 
-from ..analyzer.models import DataInstance
-from ..csv_parser import SingleRunData
+from ..analyzer.data_instance import DataInstance
+from ..analyzer.single_run_data import SingleRunData
 from .integrate import average_over_time_range, integrate_over_time_range
 from .types import Timescale
 

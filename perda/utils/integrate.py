@@ -1,7 +1,7 @@
 import numpy as np
 from numpy.typing import NDArray
 
-from ..analyzer.models import DataInstance
+from ..analyzer.data_instance import DataInstance
 from .types import Timescale
 
 
