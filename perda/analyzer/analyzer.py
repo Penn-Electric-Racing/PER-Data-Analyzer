@@ -4,20 +4,26 @@ from plotly import graph_objects as go
 
 from ..plotting import plot_dual_axis, plot_single_axis
 from ..plotting.plotting_constants import *
-from .models import DataInstance, SingleRunData
+from .csv import parse_csv
+from .data_instance import DataInstance
+from .single_run_data import SingleRunData
 
 
 class Analyzer:
-    def __init__(self, data: SingleRunData) -> None:
+    def __init__(self, filepath: str, parsing_errors_limit: int = 100) -> None:
         """
         Initialize a new analyzer instance.
 
         Parameters
         ----------
-        data : SingleRunData
-            Parsed CSV data containing CAN bus variables
+        filepath : str
+            Path to the CSV file containing CAN bus variables
+        parsing_errors_limit : int, optional
+            Maximum number of parsing errors before stopping. Default is 100
         """
-        self.data: SingleRunData = data
+        self.data: SingleRunData = parse_csv(
+            filepath, parsing_errors_limit=parsing_errors_limit
+        )
 
     def plot(
         self,
@@ -38,9 +44,9 @@ class Analyzer:
         Parameters
         ----------
         var_1 : Union[str, int, DataInstance, List[Union[str, int, DataInstance]]]
-            Variable(s) to plot on the left y-axis. Can be variable name(s), CAN ID(s), or DataInstance(s)
+            Variable(s) to plot on the left y-axis. Can be variable name(s), variable ID(s), or DataInstance(s)
         var_2 : Union[str, int, DataInstance, List[Union[str, int, DataInstance]]] | None, optional
-            Optional variable(s) to plot on the right y-axis. Can be variable name(s), CAN ID(s), or DataInstance(s).
+            Optional variable(s) to plot on the right y-axis. Can be variable name(s), variable ID(s), or DataInstance(s).
         title : str | None, optional
         y_label_1 : str | None, optional
             Label for left y-axis (or only y-axis if no right input).
@@ -52,11 +58,6 @@ class Analyzer:
             Font configuration for plot elements. Default is DEFAULT_FONT_CONFIG
         layout_config : LayoutConfig, optional
             Layout configuration for plot dimensions. Default is DEFAULT_LAYOUT_CONFIG
-
-        Notes
-        -----
-        This method uses Plotly for interactive plotting with zoom, pan, and hover capabilities.
-        Time filtering can be done interactively in the plot.
         """
         # Normalize left input to List[DataInstance]
         var_1_norm = self._normalize_input(var_1)

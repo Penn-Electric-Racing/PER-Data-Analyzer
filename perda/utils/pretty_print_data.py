@@ -1,7 +1,7 @@
 from typing import Optional
 
-from ..analyzer.models import DataInstance
-from ..csv_parser import SingleRunData
+from ..analyzer.data_instance import DataInstance
+from ..analyzer.single_run_data import SingleRunData
 from .integrate import average_over_time_range, integrate_over_time_range
 from .types import Timescale
 
@@ -24,7 +24,7 @@ def pretty_print_data_instance_info(
     -------
     None
     """
-    print(f"DataInstance for | {data_instance.label} | canid={data_instance.canid}")
+    print(f"DataInstance for | {data_instance.label} | var_id={data_instance.var_id}")
     if len(data_instance) > 0:
         min_val = float(data_instance.value_np.min())
         max_val = float(data_instance.value_np.max())
@@ -78,8 +78,8 @@ def pretty_print_single_run_info(
         start_time = start_time / 1e3
         end_time = end_time / 1e3
     print(f"  Time range: {start_time} to {end_time} ({time_unit})")
-    print(f"  Total CAN IDs:   {len(data.data_instance_map)}")
-    print(f"  Total CAN Names: {len(data.can_id_map)}")
+    print(f"  Total Variable IDs:   {len(data.data_instance_map)}")
+    print(f"  Total Variable Names: {len(data.var_id_map)}")
     print(f"  Total Data Points: {data.total_data_points}")
 
 
@@ -104,15 +104,15 @@ def pretty_print_single_run_variables(
     sort_by : str, optional
         How to sort the variables list:
         - "name": Sort alphabetically by variable name
-        - "canid": Sort by CAN ID
+        - "var_id": Sort by variable ID
         Default is "name"
     """
     # Parse variable names into (inside, outside) pairs for sorting
     variable_pairs = []
     if search is not None:
         search_list = search.lower().split(" ")
-    for canid in data.var_name_map:
-        full_name = data.var_name_map[canid]
+    for var_id in data.var_name_map:
+        full_name = data.var_name_map[var_id]
         # Strict search: all terms must be present
         if strict_search and search is not None:
             if not all(term in full_name.lower() for term in search_list):
@@ -126,47 +126,51 @@ def pretty_print_single_run_variables(
         # well-formed "( … )" at the end?
         if left != -1 and s.endswith(")"):
             description = s[:left].rstrip()
-            short_can_name = s[left + 1 : -1].strip()  # drop '(' and ')'
-            if short_can_name:  # both parts exist
+            short_var_name = s[left + 1 : -1].strip()  # drop '(' and ')'
+            if short_var_name:  # both parts exist
                 # pass search filter, append
-                variable_pairs.append((canid, short_can_name, description))
+                variable_pairs.append((var_id, short_var_name, description))
                 continue
         # fallback: single column
-        variable_pairs.append((canid, s, ""))
+        variable_pairs.append((var_id, s, ""))
 
     # Sort by name or ID
     if sort_by == "name":
-        # sort by outside first, then inside, then canid
+        # sort by outside first, then inside, then var_id
         sorted_pairs = sorted(variable_pairs, key=lambda t: (t[1], t[2], t[0]))
     else:
-        # sort by canid only
+        # sort by var_id only
         sorted_pairs = sorted(variable_pairs, key=lambda t: t[0])
 
     # First print total count, indicating search methods and outputs
     if search is None:
-        print(f"Total CAN Variables: {len(sorted_pairs)}")
+        print(f"Total Variables: {len(sorted_pairs)}")
     elif strict_search:
-        print(f"Total CAN Variables matching ALL terms '{search}': {len(sorted_pairs)}")
+        print(f"Total Variables matching ALL terms '{search}': {len(sorted_pairs)}")
     else:
-        print(f"Total CAN Variables matching ANY terms '{search}': {len(sorted_pairs)}")
+        print(f"Total Variables matching ANY terms '{search}': {len(sorted_pairs)}")
 
     # if sorted_pairs is empty, print no matching found
     if len(sorted_pairs) == 0:
-        print("No matching CAN variables found.")
+        print("No matching variables found.")
         return
 
     # Print in Three columns
     col1_width = max(len(str(id)) for id, _, _ in sorted_pairs)
     col2_width = max(len(name) for _, name, _ in sorted_pairs)
     if sort_by == "name":
-        print(f"{'CAN Name':<{col2_width}}  {'CAN ID':<{col1_width}}  Description")
+        print(
+            f"{'Variable Name':<{col2_width}}  {'Variable ID':<{col1_width}}  Description"
+        )
         print("-" * (col1_width + col2_width + 15))
-        for canid, short_name, description in sorted_pairs:
-            print(f"{short_name:<{col2_width}}  {canid:<{col1_width}}  {description}")
+        for var_id, short_name, description in sorted_pairs:
+            print(f"{short_name:<{col2_width}}  {var_id:<{col1_width}}  {description}")
     else:
-        print(f"{'CAN ID':<{col1_width}}  {'CAN Name':<{col2_width}}  Description")
+        print(
+            f"{'Variable ID':<{col1_width}}  {'Variable Name':<{col2_width}}  Description"
+        )
         print("-" * (col1_width + col2_width + 15))
-        for canid, short_name, description in sorted_pairs:
-            print(f"{canid:<{col1_width}}  {short_name:<{col2_width}}  {description}")
+        for var_id, short_name, description in sorted_pairs:
+            print(f"{var_id:<{col1_width}}  {short_name:<{col2_width}}  {description}")
     # end with line
     print("-" * (col1_width + col2_width + 15))
