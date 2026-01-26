@@ -4,10 +4,8 @@
 # Ignore compiled Python files
 build/
 dist/
+.mypy_cache/
 __pycache__/
 perda.egg-info/
 *.pyc
 *.pyo
-
-# Ignore test
-notebooks/tests/

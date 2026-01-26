@@ -10,7 +10,7 @@ class CSVParser:
     """
     Callable CSV parser that returns SingleRunData model.
 
-    Parses CAN bus data from CSV files into structured SingleRunData objects.
+    Parses data from CSV files into structured SingleRunData objects.
     """
 
     def __call__(
@@ -29,14 +29,14 @@ class CSVParser:
         Returns
         -------
         SingleRunData
-            Parsed data structure containing all CAN variables
+            Parsed data structure containing all variables
 
         Raises
         ------
         Exception
             If too many parsing errors are encountered
         """
-        # Maps CAN ID to variable name
+        # Maps variable ID to variable name
         var_name_map: dict[int, str] = {}
         # Temporary data structure with separate lists for timestamps and values
         temp_time_value_list_map: defaultdict[int, tuple[list, list]] = defaultdict(
@@ -47,24 +47,24 @@ class CSVParser:
             # Skip and print first line (header)
             print(f"Header: {next(log)}")
 
-            # Block 1: CAN ID/Name pairs
-            pbar = tqdm(desc="Reading CAN ID mappings", unit=" lines", initial=2)
+            # Block 1: Variable ID/Name pairs
+            pbar = tqdm(desc="Reading variable ID mappings", unit=" lines", initial=2)
             line = next(log, None)
             while line is not None and line.startswith("Value "):
                 pbar.update(1)
-                canid_name = line[6:].strip().split(": ")
+                var_id_name = line[6:].strip().split(": ")
                 try:
-                    canID = int(canid_name[1])
-                    name = canid_name[0]
+                    var_id = int(var_id_name[1])
+                    name = var_id_name[0]
 
-                    # Store CAN ID to name mapping
-                    if canID in var_name_map:
+                    # Store variable ID to name mapping
+                    if var_id in var_name_map:
                         print(
-                            f"Warning: Duplicate CAN ID {canID} at line {pbar.n}. Overwriting previous name."
+                            f"Warning: Duplicate variable ID {var_id} at line {pbar.n}. Overwriting previous name."
                         )
-                    var_name_map[canID] = name
+                    var_name_map[var_id] = name
                 except Exception as e:
-                    print(f"Error parsing CAN ID/Name pair at line {pbar.n}: {e}")
+                    print(f"Error parsing variable ID/Name pair at line {pbar.n}: {e}")
 
                 line = next(log, None)
             pbar.close()
@@ -106,16 +106,16 @@ class CSVParser:
 
         # Format data as DataInstances
         data_instance_map: dict[int, DataInstance] = {}
-        can_id_map: dict[str, int] = {}
-        for can_id in tqdm(var_name_map, desc="Creating DataInstances"):
-            name = var_name_map[can_id]
-            can_id_map[name] = can_id
-            timestamps_list, values_list = temp_time_value_list_map[can_id]
-            data_instance_map[can_id] = DataInstance(
+        var_id_map: dict[str, int] = {}
+        for var_id in tqdm(var_name_map, desc="Creating DataInstances"):
+            name = var_name_map[var_id]
+            var_id_map[name] = var_id
+            timestamps_list, values_list = temp_time_value_list_map[var_id]
+            data_instance_map[var_id] = DataInstance(
                 timestamp_np=np.array(timestamps_list),
                 value_np=np.array(values_list),
                 label=name,
-                canid=can_id,
+                var_id=var_id,
             )
 
         # Create and return SingleRunData model
@@ -123,7 +123,7 @@ class CSVParser:
         return SingleRunData(
             data_instance_map=data_instance_map,
             var_name_map=var_name_map,
-            can_id_map=can_id_map,
+            var_id_map=var_id_map,
             total_data_points=total_data_points,
             data_start_time=data_start_time,
             data_end_time=data_end_time,

@@ -141,5 +141,5 @@ def get_data_slice_by_timestamp(
         timestamp_np=original_instance.timestamp_np[mask],
         value_np=original_instance.value_np[mask],
         label=original_instance.label,
-        canid=original_instance.canid,
+        var_id=original_instance.var_id,
     )

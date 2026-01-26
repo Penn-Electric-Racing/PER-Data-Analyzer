@@ -38,9 +38,9 @@ class Analyzer:
         Parameters
         ----------
         var_1 : Union[str, int, DataInstance, List[Union[str, int, DataInstance]]]
-            Variable(s) to plot on the left y-axis. Can be variable name(s), CAN ID(s), or DataInstance(s)
+            Variable(s) to plot on the left y-axis. Can be variable name(s), variable ID(s), or DataInstance(s)
         var_2 : Union[str, int, DataInstance, List[Union[str, int, DataInstance]]] | None, optional
-            Optional variable(s) to plot on the right y-axis. Can be variable name(s), CAN ID(s), or DataInstance(s).
+            Optional variable(s) to plot on the right y-axis. Can be variable name(s), variable ID(s), or DataInstance(s).
         title : str | None, optional
         y_label_1 : str | None, optional
             Label for left y-axis (or only y-axis if no right input).

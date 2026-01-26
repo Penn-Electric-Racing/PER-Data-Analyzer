@@ -13,7 +13,7 @@ class DataInstance(BaseModel):
     timestamp_np: NDArray
     value_np: NDArray
     label: str
-    canid: int
+    var_id: int
 
     @field_validator("timestamp_np")
     @classmethod
@@ -107,14 +107,14 @@ class DataInstance(BaseModel):
                 np.add,
             )
             return DataInstance(
-                timestamp_np=ts, value_np=val, label=self.label, canid=self.canid
+                timestamp_np=ts, value_np=val, label=self.label, var_id=self.var_id
             )
         if np.isscalar(other):
             return DataInstance(
                 timestamp_np=self.timestamp_np,
                 value_np=np.add(self.value_np, other),
                 label=self.label,
-                canid=self.canid,
+                var_id=self.var_id,
             )
         raise TypeError("add expects (DataInstance, DataInstance|scalar) in any order")
 
@@ -141,14 +141,14 @@ class DataInstance(BaseModel):
                 np.subtract,
             )
             return DataInstance(
-                timestamp_np=ts, value_np=val, label=self.label, canid=self.canid
+                timestamp_np=ts, value_np=val, label=self.label, var_id=self.var_id
             )
         if np.isscalar(other):
             return DataInstance(
                 timestamp_np=self.timestamp_np,
                 value_np=np.subtract(self.value_np, other),
                 label=self.label,
-                canid=self.canid,
+                var_id=self.var_id,
             )
         raise TypeError("sub expects (DataInstance, DataInstance|scalar)")
 
@@ -175,14 +175,14 @@ class DataInstance(BaseModel):
                 np.multiply,
             )
             return DataInstance(
-                timestamp_np=ts, value_np=val, label=self.label, canid=self.canid
+                timestamp_np=ts, value_np=val, label=self.label, var_id=self.var_id
             )
         if np.isscalar(other):
             return DataInstance(
                 timestamp_np=self.timestamp_np,
                 value_np=np.multiply(self.value_np, other),
                 label=self.label,
-                canid=self.canid,
+                var_id=self.var_id,
             )
         raise TypeError("mul expects (DataInstance, DataInstance|scalar)")
 
@@ -209,14 +209,14 @@ class DataInstance(BaseModel):
                 np.true_divide,
             )
             return DataInstance(
-                timestamp_np=ts, value_np=val, label=self.label, canid=self.canid
+                timestamp_np=ts, value_np=val, label=self.label, var_id=self.var_id
             )
         if np.isscalar(other):
             return DataInstance(
                 timestamp_np=self.timestamp_np,
                 value_np=np.true_divide(self.value_np, other),
                 label=self.label,
-                canid=self.canid,
+                var_id=self.var_id,
             )
         raise TypeError("div expects (DataInstance, DataInstance|scalar)")
 
@@ -243,14 +243,14 @@ class DataInstance(BaseModel):
                 np.power,
             )
             return DataInstance(
-                timestamp_np=ts, value_np=val, label=self.label, canid=self.canid
+                timestamp_np=ts, value_np=val, label=self.label, var_id=self.var_id
             )
         if np.isscalar(other):
             return DataInstance(
                 timestamp_np=self.timestamp_np,
                 value_np=np.power(self.value_np, other),
                 label=self.label,
-                canid=self.canid,
+                var_id=self.var_id,
             )
         raise TypeError("pow_ expects (DataInstance, DataInstance|scalar)")
 
@@ -267,7 +267,7 @@ class DataInstance(BaseModel):
             timestamp_np=self.timestamp_np,
             value_np=np.negative(self.value_np),
             label=self.label,
-            canid=self.canid,
+            var_id=self.var_id,
         )
 
 
@@ -278,13 +278,13 @@ class SingleRunData(BaseModel):
 
     # Core data storage
     data_instance_map: Dict[int, DataInstance] = Field(
-        default_factory=dict, description="Mapping from CAN ID to DataInstance"
+        default_factory=dict, description="Mapping from variable ID to DataInstance"
     )
     var_name_map: Dict[int, str] = Field(
-        default_factory=dict, description="Mapping from CAN ID to variable name"
+        default_factory=dict, description="Mapping from variable ID to variable name"
     )
-    can_id_map: Dict[str, int] = Field(
-        default_factory=dict, description="Mapping from variable name to CAN ID"
+    var_id_map: Dict[str, int] = Field(
+        default_factory=dict, description="Mapping from variable name to variable ID"
     )
 
     # Metadata
@@ -295,15 +295,15 @@ class SingleRunData(BaseModel):
     data_end_time: int = Field(description="End timestamp in milliseconds")
 
     def __getitem__(
-        self, input_canid_name: Union[str, int, DataInstance]
+        self, input_var_id_name: Union[str, int, DataInstance]
     ) -> DataInstance:
         """
-        Dictionary-like access to DataInstance by CAN ID or variable name.
+        Dictionary-like access to DataInstance by variable ID or variable name.
 
         Parameters
         ----------
-        input_canid_name : Union[str, int, DataInstance]
-            CAN ID (int), variable name (str), or DataInstance to retrieve
+        input_var_id_name : Union[str, int, DataInstance]
+            Variable ID (int), variable name (str), or DataInstance to retrieve
 
         Returns
         -------
@@ -311,47 +311,47 @@ class SingleRunData(BaseModel):
             DataInstance corresponding to the input
         """
         # Dummy return for plotting function for convenience
-        if isinstance(input_canid_name, DataInstance):
-            return input_canid_name
+        if isinstance(input_var_id_name, DataInstance):
+            return input_var_id_name
 
-        # If input is a CAN ID
-        if isinstance(input_canid_name, int):
-            if input_canid_name not in self.data_instance_map:
-                raise KeyError(f"Cannot find CAN ID: {input_canid_name}")
-            canid = input_canid_name
+        # If input is a variable ID
+        if isinstance(input_var_id_name, int):
+            if input_var_id_name not in self.data_instance_map:
+                raise KeyError(f"Cannot find variable ID: {input_var_id_name}")
+            var_id = input_var_id_name
 
-        # If input is CAN variable name
-        elif isinstance(input_canid_name, str):
-            canid = None
-            for long_name in self.can_id_map:
-                if name_matches(input_canid_name, long_name):
-                    canid = self.can_id_map[long_name]
+        # If input is variable name
+        elif isinstance(input_var_id_name, str):
+            var_id = None
+            for long_name in self.var_id_map:
+                if name_matches(input_var_id_name, long_name):
+                    var_id = self.var_id_map[long_name]
                     break
-            if canid is None:
-                raise KeyError(f"Cannot find CAN name: {input_canid_name}")
+            if var_id is None:
+                raise KeyError(f"Cannot find variable name: {input_var_id_name}")
         else:
             raise ValueError("Input must be a string, int, or DataInstance.")
 
         # Return DataInstance
-        assert canid is not None  # This should never be None due to the checks above
-        return self.data_instance_map[canid]
+        assert var_id is not None  # This should never be None due to the checks above
+        return self.data_instance_map[var_id]
 
-    def __contains__(self, input_canid_name: Union[str, int]) -> bool:
+    def __contains__(self, input_var_id_name: Union[str, int]) -> bool:
         """
-        Check if CAN ID or variable name exists in the data.
+        Check if variable ID or variable name exists in the data.
 
         Parameters
         ----------
-        input_canid_name : Union[str, int]
-            CAN ID or variable name to check
+        input_var_id_name : Union[str, int]
+            Variable ID or variable name to check
 
         Returns
         -------
         bool
-            True if the CAN ID or variable name exists in the data
+            True if the variable ID or variable name exists in the data
         """
         try:
-            self[input_canid_name]
+            self[input_var_id_name]
             return True
         except (KeyError, AttributeError):
             return False
