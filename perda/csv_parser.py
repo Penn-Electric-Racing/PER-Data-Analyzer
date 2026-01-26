@@ -49,8 +49,8 @@ class CSVParser:
 
             # Block 1: CAN ID/Name pairs
             pbar = tqdm(desc="Reading CAN ID mappings", unit=" lines", initial=2)
-            line = next(log)
-            while line.startswith("Value "):
+            line = next(log, None)
+            while line is not None and line.startswith("Value "):
                 pbar.update(1)
                 canid_name = line[6:].strip().split(": ")
                 try:
@@ -66,7 +66,7 @@ class CSVParser:
                 except Exception as e:
                     print(f"Error parsing CAN ID/Name pair at line {pbar.n}: {e}")
 
-                line = next(log)
+                line = next(log, None)
             pbar.close()
 
             # Block 2: Data lines

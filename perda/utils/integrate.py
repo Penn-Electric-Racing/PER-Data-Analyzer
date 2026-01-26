@@ -40,6 +40,10 @@ def integrate_over_time_range(
     ts = data_instance.timestamp_np.astype(np.float64)
     values = data_instance.value_np.astype(np.float64)
 
+    # Convert time to desired unit
+    if time_unit == Timescale.S:
+        ts = ts / 1e3
+
     # Set actual bounds
     actual_start_time = max(start_time, ts[0])
     actual_end_time = ts[-1] if end_time == -1 else min(end_time, ts[-1])
@@ -55,10 +59,6 @@ def integrate_over_time_range(
     if len(ts_filtered) < 2:
         return 0.0
 
-    # Convert time to desired unit
-    if time_unit == Timescale.S:
-        ts_filtered = ts_filtered / 1e3
-
     # Integrate using trapezoidal rule
     integral = np.trapezoid(values_filtered, ts_filtered)
     return float(integral)
@@ -68,7 +68,7 @@ def average_over_time_range(
     data_instance: DataInstance,
     start_time: int = 0,
     end_time: int = -1,
-    time_unit: str = "ms",
+    time_unit: Timescale = Timescale.MS,
 ) -> float:
     """
     Get average value over time using integral divided by time range.
@@ -81,8 +81,8 @@ def average_over_time_range(
         Start time for averaging. Default is 0
     end_time : int, optional
         End time for averaging. -1 means end of data. Default is -1
-    time_unit : str, optional
-        Time unit for averaging: "ms" or "s". Default is "ms"
+    time_unit : Timescale, optional
+        Time unit for averaging: "ms" or "s". Default is Timescale.MS
 
     Returns
     -------
@@ -93,30 +93,22 @@ def average_over_time_range(
     -----
     Uses numpy.trapz (trapezoidal rule) for numerical integration of discrete data.
     """
-    if len(data_instance.timestamp_np) < 2:
+    integral = integrate_over_time_range(data_instance, start_time, end_time, time_unit)
+
+    if integral == 0.0:
         return 0.0
 
     ts = data_instance.timestamp_np.astype(np.float64)
-
-    # Set actual bounds
     actual_start_time = max(start_time, ts[0])
     actual_end_time = ts[-1] if end_time == -1 else min(end_time, ts[-1])
 
-    if actual_start_time >= actual_end_time:
-        return 0.0
+    if time_unit == Timescale.S:
+        actual_start_time = actual_start_time / 1e3
+        actual_end_time = actual_end_time / 1e3
 
-    # Calculate time range
     time_range = actual_end_time - actual_start_time
-    if time_unit == "s":
-        time_range /= 1e3
 
-    if time_range == 0:
-        return 0.0
-
-    # Get integral over the time range
-    integral = integrate_over_time_range(data_instance, start_time, end_time, time_unit)
-    average = integral / time_range
-    return float(average)
+    return float(integral / time_range) if time_range > 0 else 0.0
 
 
 def get_data_slice_by_timestamp(

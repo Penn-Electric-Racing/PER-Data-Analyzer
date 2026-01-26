@@ -1,10 +1,10 @@
 from typing import List, Union
 
+from plotly import graph_objects as go
+
 from ..plotting import plot_dual_axis, plot_single_axis
 from ..plotting.plotting_constants import *
 from .models import DataInstance, SingleRunData
-
-from plotly import graph_objects as go
 
 
 class Analyzer:
@@ -59,15 +59,15 @@ class Analyzer:
         Time filtering can be done interactively in the plot.
         """
         # Normalize left input to List[DataInstance]
-        var_1 = self._normalize_input(var_1)
+        var_1_norm = self._normalize_input(var_1)
 
         if var_2 is not None:
             # Normalize right input to List[DataInstance]
-            var_2 = self._normalize_input(var_2)
+            var_2_norm = self._normalize_input(var_2)
 
             return plot_dual_axis(
-                left_data_instances=var_1,
-                right_data_instances=var_2,
+                left_data_instances=var_1_norm,
+                right_data_instances=var_2_norm,
                 title=title,
                 left_y_axis_title=y_label_1,
                 right_y_axis_title=y_label_2,
@@ -77,7 +77,7 @@ class Analyzer:
             )
         else:
             return plot_single_axis(
-                data_instances=var_1,
+                data_instances=var_1_norm,
                 title=title,
                 y_axis_title=y_label_1,
                 show_legend=show_legend,

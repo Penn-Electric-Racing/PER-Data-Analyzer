@@ -1,14 +1,14 @@
 from typing import Optional
 
-import numpy as np
-
 from ..analyzer.models import DataInstance
 from ..csv_parser import SingleRunData
-from .utils import average_over_time_range, integrate_over_time_range
+from .integrate import average_over_time_range, integrate_over_time_range
+from .types import Timescale
 
 
 def pretty_print_data_instance_info(
-    data_instance: DataInstance, time_unit: str = "s"
+    data_instance: DataInstance,
+    time_unit: Timescale = Timescale.S,
 ) -> None:
     """
     Print information about a DataInstance.
@@ -17,8 +17,8 @@ def pretty_print_data_instance_info(
     ----------
     data_instance : DataInstance
         The DataInstance to print info about
-    time_unit : str, optional
-        Unit for time values: "ms" or "s". Default is "s"
+    time_unit : Timescale, optional
+        Unit for time values: "ms" or "s". Default is seconds
 
     Returns
     -------
@@ -34,14 +34,14 @@ def pretty_print_data_instance_info(
         max_ts = float(data_instance.timestamp_np[max_val_idx])
         first_ts = float(data_instance.timestamp_np[0])
         last_ts = float(data_instance.timestamp_np[-1])
-        if time_unit == "s":
+        if time_unit == Timescale.S:
             first_ts = first_ts / 1e3
             last_ts = last_ts / 1e3
             min_ts = min_ts / 1e3
             max_ts = max_ts / 1e3
-        avg_val = average_over_time_range(data_instance)
+        avg_val = average_over_time_range(data_instance, time_unit=time_unit)
         integral = integrate_over_time_range(data_instance, time_unit=time_unit)
-        # Set width for alignment
+
         w = 10
         print(f"  Data points:  {len(data_instance):>{w}}")
         print(f"  Time range:   {first_ts:>{w}.4f} to {last_ts:>{w}.4f} ({time_unit})")
