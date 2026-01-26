@@ -1,9 +1,11 @@
 # Notebook
 ipykernel
+nbformat
+nbstripout
 
 # Data Processing
-matplotlib
 numpy
+plotly
 pydantic
 scipy
 

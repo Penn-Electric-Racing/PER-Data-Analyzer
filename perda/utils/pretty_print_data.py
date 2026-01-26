@@ -1,16 +1,28 @@
-import numpy as np
+from typing import Optional
 
-from .csv_parser import SingleRunData
-from .models import DataInstance
-from .utils import average_over_time_range, integrate_over_time_range
+from ..analyzer.models import DataInstance
+from ..csv_parser import SingleRunData
+from .integrate import average_over_time_range, integrate_over_time_range
+from .types import Timescale
 
 
-def pretty_print_data_instance_info(data_instance: DataInstance, time_unit: str = "s"):
+def pretty_print_data_instance_info(
+    data_instance: DataInstance,
+    time_unit: Timescale = Timescale.S,
+) -> None:
     """
     Print information about a DataInstance.
 
-    data_instance (DataInstance): The DataInstance to print info about
-    time_unit (str, optional): Unit for time values ("ms" or "s"). Defaults to "s".
+    Parameters
+    ----------
+    data_instance : DataInstance
+        The DataInstance to print info about
+    time_unit : Timescale, optional
+        Unit for time values: "ms" or "s". Default is seconds
+
+    Returns
+    -------
+    None
     """
     print(f"DataInstance for | {data_instance.label} | canid={data_instance.canid}")
     if len(data_instance) > 0:
@@ -22,14 +34,14 @@ def pretty_print_data_instance_info(data_instance: DataInstance, time_unit: str 
         max_ts = float(data_instance.timestamp_np[max_val_idx])
         first_ts = float(data_instance.timestamp_np[0])
         last_ts = float(data_instance.timestamp_np[-1])
-        if time_unit == "s":
+        if time_unit == Timescale.S:
             first_ts = first_ts / 1e3
             last_ts = last_ts / 1e3
             min_ts = min_ts / 1e3
             max_ts = max_ts / 1e3
-        avg_val = average_over_time_range(data_instance)
+        avg_val = average_over_time_range(data_instance, time_unit=time_unit)
         integral = integrate_over_time_range(data_instance, time_unit=time_unit)
-        # Set width for alignment
+
         w = 10
         print(f"  Data points:  {len(data_instance):>{w}}")
         print(f"  Time range:   {first_ts:>{w}.4f} to {last_ts:>{w}.4f} ({time_unit})")
@@ -44,13 +56,20 @@ def pretty_print_data_instance_info(data_instance: DataInstance, time_unit: str 
 def pretty_print_single_run_info(
     data: SingleRunData,
     time_unit: str = "s",
-):
+) -> None:
     """
     Print overall information about the SingleRunData.
 
-    data (SingleRunData): Data structure containing CSV file data
-    time_unit (str, optional): Unit for time values ("ms" or "s").
-        Defaults to "s".
+    Parameters
+    ----------
+    data : SingleRunData
+        Data structure containing CSV file data
+    time_unit : str, optional
+        Unit for time values: "ms" or "s". Default is "s"
+
+    Returns
+    -------
+    None
     """
     print("Parser Info:")
     start_time = float(data.data_start_time)
@@ -59,35 +78,41 @@ def pretty_print_single_run_info(
         start_time = start_time / 1e3
         end_time = end_time / 1e3
     print(f"  Time range: {start_time} to {end_time} ({time_unit})")
-    print(f"  Total CAN IDs:   {len(data.tv_map)}")
-    print(f"  Total CAN Names: {len(data.name_map)}")
+    print(f"  Total CAN IDs:   {len(data.data_instance_map)}")
+    print(f"  Total CAN Names: {len(data.can_id_map)}")
     print(f"  Total Data Points: {data.total_data_points}")
 
 
 def pretty_print_single_run_variables(
     data: SingleRunData,
-    search: str | None = None,
+    search: Optional[str] = None,
     strict_search: bool = False,
     sort_by: str = "name",
-):
+) -> None:
     """
     Print a list of all available variables in the dataset.
 
-    data (SingleRunData): Data structure containing CSV file data
-    search (str, optional): Search term to filter variables
-    strict_search (bool, optional): If True, all search terms must be present.
-        If False, any search term present is enough. Defaults to False.
-    sort_by (str, optional): How to sort the variables list:
+    Parameters
+    ----------
+    data : SingleRunData
+        Data structure containing CSV file data
+    search : Optional[str], optional
+        Search term to filter variables. Multiple terms separated by spaces. Default is None
+    strict_search : bool, optional
+        If True, all search terms must be present.
+        If False, any search term present is enough. Default is False
+    sort_by : str, optional
+        How to sort the variables list:
         - "name": Sort alphabetically by variable name
         - "canid": Sort by CAN ID
-        Defaults to "name".
+        Default is "name"
     """
     # Parse variable names into (inside, outside) pairs for sorting
     variable_pairs = []
     if search is not None:
         search_list = search.lower().split(" ")
-    for canid in data.id_map:
-        full_name = data.id_map[canid]
+    for canid in data.var_name_map:
+        full_name = data.var_name_map[canid]
         # Strict search: all terms must be present
         if strict_search and search is not None:
             if not all(term in full_name.lower() for term in search_list):
