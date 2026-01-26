@@ -1,6 +1,7 @@
 # Notebook
 ipykernel
 nbformat
+nbstripout
 
 # Data Processing
 numpy
