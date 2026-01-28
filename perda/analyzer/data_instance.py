@@ -3,7 +3,7 @@ from typing import Any, Callable, Tuple, Union
 
 import numpy as np
 from numpy.typing import NDArray
-from pydantic import BaseModel, ConfigDict, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from .joins import inner_join, left_join, outer_join
 
@@ -11,10 +11,13 @@ from .joins import inner_join, left_join, outer_join
 class DataInstance(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
-    timestamp_np: NDArray
-    value_np: NDArray
-    label: str
-    var_id: int
+    timestamp_np: NDArray = Field(description="Timestamps as a 1D NumPy array")
+    value_np: NDArray = Field(description="Values as a 1D NumPy array")
+    label: str | None = Field(
+        default=None, description="Human-readable label for this variable"
+    )
+    var_id: int | None = Field(default=None, description="Unique variable ID")
+    cpp_name: str | None = Field(default=None, description="C++ variable name")
 
     @field_validator("timestamp_np")
     @classmethod

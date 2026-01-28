@@ -24,7 +24,9 @@ def parse_csv(file_path: str, parsing_errors_limit: int = 100) -> SingleRunData:
         Parsed data structure containing all variables
     """
     # Maps variable ID to variable name
-    var_name_map: dict[int, str] = {}
+    id_to_cpp_name: dict[int, str] = {}
+    id_to_descript: dict[int, str] = {}
+
     # Temporary data structure with separate lists for timestamps and values
     temp_time_value_list_map: defaultdict[int, tuple[list, list]] = defaultdict(
         lambda: ([], [])
@@ -39,17 +41,25 @@ def parse_csv(file_path: str, parsing_errors_limit: int = 100) -> SingleRunData:
         line = next(log, None)
         while line is not None and line.startswith("Value "):
             pbar.update(1)
-            var_id_name = line[6:].strip().split(": ")
+
+            # Remove "Value " prefix, separate into variable name and ID
+            identifier = line[6:].strip().split(": ")
+
             try:
-                var_id = int(var_id_name[1])
-                name = var_id_name[0]
+                var_id = int(identifier[1])
+
+                name_list = identifier[0].split()
+                cpp_name = name_list[-1][1:-1]  # drop surrounding brackets
+                descript = " ".join(name_list[:-1])
 
                 # Store variable ID to name mapping
-                if var_id in var_name_map:
+                if var_id in id_to_cpp_name:
                     print(
                         f"Warning: Duplicate variable ID {var_id} at line {pbar.n}. Overwriting previous name."
                     )
-                var_name_map[var_id] = name
+                id_to_cpp_name[var_id] = cpp_name
+                id_to_descript[var_id] = descript
+
             except Exception as e:
                 print(f"Error parsing variable ID/Name pair at line {pbar.n}: {e}")
 
@@ -64,7 +74,7 @@ def parse_csv(file_path: str, parsing_errors_limit: int = 100) -> SingleRunData:
             pbar.update(1)
             data = line.strip().split(",")
             try:
-                id = int(data[1])
+                var_id = int(data[1])
                 timestamp = int(data[0])
                 val = float(data[2])
 
@@ -72,8 +82,8 @@ def parse_csv(file_path: str, parsing_errors_limit: int = 100) -> SingleRunData:
                     data_start_time = timestamp
 
                 # Append timestamp and value to temporary lists
-                temp_time_value_list_map[id][0].append(timestamp)
-                temp_time_value_list_map[id][1].append(val)
+                temp_time_value_list_map[var_id][0].append(timestamp)
+                temp_time_value_list_map[var_id][1].append(val)
 
             except Exception as e:
                 print(f"Error parsing data line {pbar.n}: {e}")
@@ -89,25 +99,28 @@ def parse_csv(file_path: str, parsing_errors_limit: int = 100) -> SingleRunData:
         pbar.close()
 
     # Format data as DataInstances
-    data_instance_map: dict[int, DataInstance] = {}
-    var_id_map: dict[str, int] = {}
-    for var_id in tqdm(var_name_map, desc="Creating DataInstances"):
-        name = var_name_map[var_id]
-        var_id_map[name] = var_id
+    id_to_instance: dict[int, DataInstance] = {}
+    cpp_name_to_id: dict[str, int] = {}
+    for var_id in tqdm(id_to_cpp_name, desc="Creating DataInstances"):
+        name = id_to_cpp_name[var_id]
+        descript = id_to_descript[var_id]
+        cpp_name_to_id[name] = var_id
         timestamps_list, values_list = temp_time_value_list_map[var_id]
-        data_instance_map[var_id] = DataInstance(
+        id_to_instance[var_id] = DataInstance(
             timestamp_np=np.array(timestamps_list),
             value_np=np.array(values_list),
-            label=name,
+            label=descript,
             var_id=var_id,
+            cpp_name=name,
         )
 
     # Create and return SingleRunData model
     print(f"CSV parsing complete with {parsing_errors} parsing errors.")
     return SingleRunData(
-        data_instance_map=data_instance_map,
-        var_name_map=var_name_map,
-        var_id_map=var_id_map,
+        id_to_instance=id_to_instance,
+        cpp_name_to_id=cpp_name_to_id,
+        id_to_cpp_name=id_to_cpp_name,
+        id_to_descript=id_to_descript,
         total_data_points=total_data_points,
         data_start_time=data_start_time,
         data_end_time=data_end_time,

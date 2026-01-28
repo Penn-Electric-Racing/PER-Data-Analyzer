@@ -1,10 +1,14 @@
+import io
+import sys
 from typing import List, Union
 
 from plotly import graph_objects as go
 
-from ..plotting import plot_dual_axis, plot_single_axis
+from ..plotting.data_instance_plotter import *
 from ..plotting.plotting_constants import *
-from .csv import parse_csv
+from ..utils.data_summary import single_run_summary
+from ..utils.search import search
+from .csv import *
 from .data_instance import DataInstance
 from .single_run_data import SingleRunData
 
@@ -24,6 +28,32 @@ class Analyzer:
         self.data: SingleRunData = parse_csv(
             filepath, parsing_errors_limit=parsing_errors_limit
         )
+
+    def __str__(self) -> str:
+        old_stdout = sys.stdout
+
+        buffer = io.StringIO()
+        sys.stdout = buffer
+
+        single_run_summary(self.data)
+
+        output = buffer.getvalue()
+        buffer.close()
+
+        sys.stdout = old_stdout
+
+        return output
+
+    def search(self, query: str) -> None:
+        """
+        Natural language search for available variables in the parsed data.
+
+        Parameters
+        ----------
+        query : str
+            Search query
+        """
+        search(self.data, query)
 
     def plot(
         self,

@@ -93,6 +93,9 @@ def average_over_time_range(
     -----
     Uses numpy.trapz (trapezoidal rule) for numerical integration of discrete data.
     """
+    if len(data_instance.timestamp_np) == 1:
+        return float(data_instance.value_np[0])
+
     integral = integrate_over_time_range(data_instance, start_time, end_time, time_unit)
 
     if integral == 0.0:

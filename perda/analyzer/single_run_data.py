@@ -14,14 +14,17 @@ class SingleRunData(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     # Core data storage
-    data_instance_map: Dict[int, DataInstance] = Field(
-        default_factory=dict, description="Mapping from variable ID to DataInstance"
+    id_to_instance: Dict[int, DataInstance] = Field(
+        description="Mapping from variable ID to DataInstance"
     )
-    var_name_map: Dict[int, str] = Field(
-        default_factory=dict, description="Mapping from variable ID to variable name"
+    cpp_name_to_id: Dict[str, int] = Field(
+        description="Mapping from variable name to variable ID"
     )
-    var_id_map: Dict[str, int] = Field(
-        default_factory=dict, description="Mapping from variable name to variable ID"
+    id_to_cpp_name: Dict[int, str] = Field(
+        description="Mapping from variable ID to variable name"
+    )
+    id_to_descript: Dict[int, str] = Field(
+        description="Mapping from variable ID to variable description"
     )
 
     # Metadata
@@ -53,25 +56,18 @@ class SingleRunData(BaseModel):
 
         # If input is a variable ID
         if isinstance(input_var_id_name, int):
-            if input_var_id_name not in self.data_instance_map:
+            if input_var_id_name not in self.id_to_instance:
                 raise KeyError(f"Cannot find variable ID: {input_var_id_name}")
-            var_id = input_var_id_name
+            return self.id_to_instance[input_var_id_name]
 
         # If input is variable name
         elif isinstance(input_var_id_name, str):
-            var_id = None
-            for long_name in self.var_id_map:
-                if name_matches(input_var_id_name, long_name):
-                    var_id = self.var_id_map[long_name]
-                    break
-            if var_id is None:
+            if input_var_id_name not in self.cpp_name_to_id:
                 raise KeyError(f"Cannot find variable name: {input_var_id_name}")
+            return self.id_to_instance[self.cpp_name_to_id[input_var_id_name]]
+
         else:
             raise ValueError("Input must be a string, int, or DataInstance.")
-
-        # Return DataInstance
-        assert var_id is not None  # This should never be None due to the checks above
-        return self.data_instance_map[var_id]
 
     def __contains__(self, input_var_id_name: Union[str, int]) -> bool:
         """
