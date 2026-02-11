@@ -1,5 +1,7 @@
 # Notebook
+anywidget
 ipykernel
+ipywidgets
 nbformat
 nbstripout
 
