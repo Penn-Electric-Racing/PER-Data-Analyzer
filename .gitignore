@@ -9,3 +9,6 @@ __pycache__/
 perda.egg-info/
 *.pyc
 *.pyo
+
+# Local ML model artifacts (downloaded on demand)
+models/stsb-cross-encoder/
