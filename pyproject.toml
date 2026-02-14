@@ -1,6 +1,6 @@
 [project]
 name = "perda"
-version = "0.2.0"
+version = "1.0.0"
 description = "Penn Electric Racing Data Analyzer"
 authors = [
     {name = "laytcai", email = "1715782167@qq.com"},
