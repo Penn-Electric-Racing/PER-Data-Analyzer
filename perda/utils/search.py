@@ -1,8 +1,12 @@
 import re
+from pathlib import Path
 
 from sentence_transformers.cross_encoder import CrossEncoder
 
 from ..analyzer.single_run_data import SingleRunData
+
+
+LOCAL_MODEL_DIR = Path(__file__).resolve().parents[2] / "models" / "stsb-cross-encoder"
 
 
 ABBREVIATIONS = {
@@ -39,7 +43,10 @@ def search(
     if not search:
         raise ValueError("Search query cannot be empty.")
 
-    model = CrossEncoder("cross-encoder/stsb-distilroberta-base")
+    if LOCAL_MODEL_DIR.exists():
+        model = CrossEncoder(str(LOCAL_MODEL_DIR))
+    else:
+        model = CrossEncoder("cross-encoder/stsb-distilroberta-base")
 
     semantic_query = _expand_query(search)
     query_terms = _extract_terms(search)
