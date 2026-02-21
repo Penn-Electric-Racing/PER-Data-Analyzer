@@ -11,4 +11,4 @@ perda.egg-info/
 *.pyo
 
 # Local ML model artifacts (downloaded on demand)
-models/stsb-cross-encoder/
+perda/models/stsb-cross-encoder/
