@@ -10,6 +10,7 @@ numpy
 plotly
 pydantic
 scipy
+sentence-transformers
 
 # Progress Bar
 tqdm

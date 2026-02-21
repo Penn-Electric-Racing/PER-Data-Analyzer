@@ -15,6 +15,9 @@ dynamic = ["dependencies"]
 where = ["."]
 include = ["perda*"]
 
+[tool.setuptools.package-data]
+perda = ["models/stsb-cross-encoder/*"]
+
 [tool.setuptools.dynamic]
 dependencies = {file = ["requirements.txt"]}
 

@@ -36,5 +36,15 @@ Not easy to modify and iterate on the source code, but useful for quick setup an
 `pip install git+https://github.com/Penn-Electric-Racing/PER-Data-Analyzer.git@main`
 
 
+## Search Model Setup
+
+The local cross-encoder model is installed automatically with `pip install` and packaged under:
+
+`perda/models/stsb-cross-encoder/`
+
+Natural-language search still falls back to loading from Hugging Face if local model files are unavailable.
+
+
 ## Code Demo
+
 See [Tutorial.ipynb](notebooks/Tutorial.ipynb)
