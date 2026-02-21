@@ -7,7 +7,21 @@ from ..analyzer.single_run_data import SingleRunData
 from ..constants import DELIMITER, title_block
 
 
-LOCAL_MODEL_DIR = Path(__file__).resolve().parents[2] / "models" / "stsb-cross-encoder"
+PACKAGED_MODEL_DIR = Path(__file__).resolve().parents[1] / "models" / "stsb-cross-encoder"
+REPO_MODEL_DIR = Path(__file__).resolve().parents[2] / "models" / "stsb-cross-encoder"
+
+
+def _resolve_local_model_dir() -> Path:
+    if PACKAGED_MODEL_DIR.exists():
+        return PACKAGED_MODEL_DIR
+
+    if REPO_MODEL_DIR.exists():
+        return REPO_MODEL_DIR
+
+    return PACKAGED_MODEL_DIR
+
+
+LOCAL_MODEL_DIR = _resolve_local_model_dir()
 
 
 ABBREVIATIONS = {

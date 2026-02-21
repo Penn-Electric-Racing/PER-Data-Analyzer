@@ -4,7 +4,7 @@ from sentence_transformers.cross_encoder import CrossEncoder
 
 
 MODEL_ID = "cross-encoder/stsb-distilroberta-base"
-TARGET_DIR = Path(__file__).resolve().parents[1] / "models" / "stsb-cross-encoder"
+TARGET_DIR = Path(__file__).resolve().parents[1] / "perda" / "models" / "stsb-cross-encoder"
 
 
 def main() -> None:
