@@ -139,7 +139,7 @@ def select_log():
         return {'error': 'Download failed'}, 500
 
     # Set as active CSV in session
-    relative_path = f"uploads/{local_path.name}"
+    relative_path = str(local_path.relative_to(upload_dir.parent))
     session['active_csv_path'] = relative_path
     session['active_file'] = filename
 
@@ -204,4 +204,3 @@ def select_local_log():
     })
 
     return {'success': True, 'filename': abs_path.name}, 200
-

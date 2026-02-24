@@ -4,6 +4,7 @@ import boto3
 from botocore.exceptions import ClientError
 from typing import List, Dict, Tuple, Optional
 from pathlib import Path
+from posixpath import normpath
 
 
 class S3Service:
@@ -85,22 +86,32 @@ class S3Service:
         """
         try:
             self._ensure_initialized()
-            
+
             # Ensure upload directory exists
             upload_dir.mkdir(parents=True, exist_ok=True)
-            
-            # Download to local file
-            local_path = upload_dir / filename
+
+            # Normalize and validate S3 key so it cannot escape upload_dir.
+            normalized_key = normpath(filename).lstrip("/")
+            if normalized_key in ("", ".") or normalized_key.startswith("../") or "/../" in normalized_key:
+                print(f"[ERROR] Invalid S3 key path: {filename}", flush=True)
+                return None
+
+            # Download to local file (preserve S3 key folder structure).
+            local_path = upload_dir / normalized_key
+            local_path.parent.mkdir(parents=True, exist_ok=True)
             self._client.download_file(self._bucket, filename, str(local_path))
-            
+
             print(f"[INFO] Downloaded {filename} from S3 to {local_path}", flush=True)
             return local_path
-            
+
         except ClientError as e:
             print(f"[ERROR] S3 download error for {filename}: {e}", flush=True)
             return None
         except ValueError as e:
             print(f"[ERROR] S3 configuration error: {e}", flush=True)
+            return None
+        except Exception as e:
+            print(f"[ERROR] Unexpected S3 download error for {filename}: {e}", flush=True)
             return None
 
 
