@@ -28,9 +28,9 @@ def parse_csv(file_path: str, parsing_errors_limit: int = 100) -> SingleRunData:
     id_to_descript: dict[int, str] = {}
 
     # Temporary data structure with separate lists for timestamps and values
-    temp_time_value_list_map: defaultdict[int, tuple[list, list]] = defaultdict(
-        lambda: ([], [])
-    )
+    temp_time_value_list_map: defaultdict[
+        int, tuple[list[int] | np.ndarray, list[float] | np.ndarray]
+    ] = defaultdict(lambda: ([], []))
 
     with open(file_path, "r") as log:
         # Skip and print first line (header)
@@ -98,6 +98,27 @@ def parse_csv(file_path: str, parsing_errors_limit: int = 100) -> SingleRunData:
 
         pbar.close()
 
+        # Block 3: Sort timestamps
+        pbar = tqdm(
+            temp_time_value_list_map.items(),
+            desc="Sorting timestamps",
+            unit=" vars",
+            total=len(temp_time_value_list_map),
+        )
+        for var_id, (timestamps_list, values_list) in pbar:
+            timestamps_np = np.asarray(timestamps_list, dtype=np.int64)
+            values_np = np.asarray(values_list, dtype=np.float64)
+
+            if timestamps_np.size >= 2:
+                # Use stable sort
+                order = np.argsort(timestamps_np, kind="stable")
+                timestamps_np = timestamps_np[order]
+                values_np = values_np[order]
+
+            # Now temp_time_value_list_map should all have ndarray
+            temp_time_value_list_map[var_id] = (timestamps_np, values_np)
+        pbar.close()
+
     # Format data as DataInstances
     id_to_instance: dict[int, DataInstance] = {}
     cpp_name_to_id: dict[str, int] = {}
@@ -107,8 +128,8 @@ def parse_csv(file_path: str, parsing_errors_limit: int = 100) -> SingleRunData:
         cpp_name_to_id[name] = var_id
         timestamps_list, values_list = temp_time_value_list_map[var_id]
         id_to_instance[var_id] = DataInstance(
-            timestamp_np=np.array(timestamps_list),
-            value_np=np.array(values_list),
+            timestamp_np=np.asarray(timestamps_list),
+            value_np=np.asarray(values_list),
             label=descript,
             var_id=var_id,
             cpp_name=name,
