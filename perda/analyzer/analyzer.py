@@ -8,6 +8,7 @@ from ..plotting.data_instance_plotter import *
 from ..plotting.plotting_constants import *
 from ..utils.data_summary import single_run_summary
 from ..utils.search import search
+from ..utils.diff import diff
 from .csv import *
 from .data_instance import DataInstance
 from .single_run_data import SingleRunData
@@ -115,6 +116,17 @@ class Analyzer:
                 font_config=font_config,
                 layout_config=layout_config,
             )
+
+    def diff(self, incoming_data: SingleRunData) -> None:
+        """
+        Compute the differences between the current data and incoming data.
+
+        Parameters
+        ----------
+        incoming_data : SingleRunData
+            The incoming data to compare against.
+        """
+        diff(self.data, incoming_data)
 
     def _normalize_input(
         self,
