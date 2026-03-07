@@ -117,7 +117,7 @@ class Analyzer:
                 layout_config=layout_config,
             )
 
-    def diff(self, incoming_data: SingleRunData) -> None:
+    def diff(self, incoming_data: SingleRunData, force_compare: bool = False) -> None:
         """
         Compute the differences between the current data and incoming data.
 
@@ -126,7 +126,7 @@ class Analyzer:
         incoming_data : SingleRunData
             The incoming data to compare against.
         """
-        diff(self.data, incoming_data)
+        diff(self.data, incoming_data, force_compare)
 
     def _normalize_input(
         self,
