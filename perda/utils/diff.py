@@ -348,9 +348,9 @@ def _get_diff_dis(
     else:
         point_counter = _accumulate_sparse(point_present_pairs)
 
-    base_extra_di = _counter_to_di(base_counter, "All Points Base Extra")
-    incom_extra_di = _counter_to_di(incom_counter, "All Points Incoming Extra")
-    diff_di = _counter_to_di(diff_counter, "All Points Value Diff")
-    all_diff_di = _counter_to_di(point_counter, "All Points Present")
+    base_extra_di = _counter_to_di(base_counter, "Base Extra Datapoints")
+    incom_extra_di = _counter_to_di(incom_counter, "Incoming Extra Datapoints")
+    diff_di = _counter_to_di(diff_counter, "Value Diff Datapoints")
+    all_diff_di = _counter_to_di(point_counter, "All Datapoints Present")
 
     return base_extra_di, incom_extra_di, diff_di, all_diff_di
