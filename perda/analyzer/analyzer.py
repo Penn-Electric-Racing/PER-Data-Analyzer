@@ -15,7 +15,7 @@ from .single_run_data import SingleRunData
 
 
 class Analyzer:
-    def __init__(self, filepath: str, parsing_errors_limit: int = 100) -> None:
+    def __init__(self, filepath: str, ts_offset: int = 0,parsing_errors_limit: int = 100) -> None:
         """
         Initialize a new analyzer instance.
 
@@ -23,11 +23,13 @@ class Analyzer:
         ----------
         filepath : str
             Path to the CSV file containing CAN bus variables
+        ts_offset : int, optional
+            Timestamp offset to apply to all data points. Default is 0
         parsing_errors_limit : int, optional
             Maximum number of parsing errors before stopping. Default is 100
         """
         self.data: SingleRunData = parse_csv(
-            filepath, parsing_errors_limit=parsing_errors_limit
+            filepath, ts_offset, parsing_errors_limit=parsing_errors_limit
         )
 
     def __str__(self) -> str:

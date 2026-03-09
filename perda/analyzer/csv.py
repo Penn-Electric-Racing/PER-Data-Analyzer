@@ -7,7 +7,7 @@ from .data_instance import DataInstance
 from .single_run_data import SingleRunData
 
 
-def parse_csv(file_path: str, parsing_errors_limit: int = 100) -> SingleRunData:
+def parse_csv(file_path: str, ts_offset: int = 0, parsing_errors_limit: int = 100) -> SingleRunData:
     """
     Parse CSV file and return SingleRunData model.
 
@@ -88,7 +88,7 @@ def parse_csv(file_path: str, parsing_errors_limit: int = 100) -> SingleRunData:
             data = line.strip().split(",")
             try:
                 var_id = int(data[1])
-                timestamp = int(data[0])
+                timestamp = int(data[0]) + ts_offset
                 val = float(data[2])
 
                 if not data_start_time:

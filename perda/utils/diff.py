@@ -10,7 +10,8 @@ from ..plotting.data_instance_plotter import plot_single_axis
 def diff(
     base_data: SingleRunData,
     incom_data: SingleRunData,
-    force_compare: bool = False
+    force_compare: bool = False,
+    timestamp_tolerance_ms: int = 1,
 ) -> None:
     base_cpp_name_to_id = base_data.cpp_name_to_id
     base_id_to_instance = base_data.id_to_instance
@@ -75,7 +76,11 @@ def diff(
         total=len(union_cpp_name_to_instances),
     )
     for cpp_name, (base_di, incom_di) in pbar:
-        base_extra_pair, incom_extra_pair, diff_pair = _get_diff_pairs(base_di, incom_di)
+        base_extra_pair, incom_extra_pair, diff_pair = _get_diff_pairs(
+            base_di,
+            incom_di,
+            timestamp_tolerance_ms=timestamp_tolerance_ms,
+        )
         base_extra_pairs.append(base_extra_pair)
         incom_extra_pairs.append(incom_extra_pair)
         diff_pairs.append(diff_pair)
@@ -139,110 +144,76 @@ def diff(
 def _get_diff_pairs(
     base_di: DataInstance,
     incom_di: DataInstance,
+    timestamp_tolerance_ms: int = 2,
+    diff_rtol: float = 1e-3,
+    diff_atol: float = 1e-3,
 ) -> tuple[
     tuple[np.ndarray, np.ndarray],
     tuple[np.ndarray, np.ndarray],
     tuple[np.ndarray, np.ndarray],
 ]:
-    if np.array_equal(base_di.timestamp_np, incom_di.timestamp_np) and np.array_equal(base_di.value_np, incom_di.value_np, equal_nan=True):
+    ts_a = base_di.timestamp_np.astype(np.int64, copy=False)
+    va = base_di.value_np.astype(np.float64, copy=False)
+    ts_b = incom_di.timestamp_np.astype(np.int64, copy=False)
+    vb = incom_di.value_np.astype(np.float64, copy=False)
+
+    # Fast exact match shortcut
+    if np.array_equal(ts_a, ts_b) and np.array_equal(va, vb, equal_nan=True):
         empty_ts = np.array([], dtype=np.int64)
         empty_cnt = np.array([], dtype=np.float64)
-        return (
-            (empty_ts, empty_cnt),
-            (empty_ts, empty_cnt),
-            (empty_ts, empty_cnt),
-        )
-    
-    base_unique_ts, base_first_idx, base_counts = np.unique(
-        base_di.timestamp_np, return_index=True, return_counts=True
-    )
-    incom_unique_ts, incom_first_idx, incom_counts = np.unique(
-        incom_di.timestamp_np, return_index=True, return_counts=True
-    )
+        return (empty_ts, empty_cnt), (empty_ts, empty_cnt), (empty_ts, empty_cnt)
 
-    base_extra_ts: list[int] = []
-    base_extra_cnt: list[float] = []
-    incom_extra_ts: list[int] = []
-    incom_extra_cnt: list[float] = []
-    diff_ts: list[int] = []
-    diff_cnt: list[float] = []
+    tol = max(int(timestamp_tolerance_ms), 0)
+
+    base_extra_counter: defaultdict[int, float] = defaultdict(float)
+    incom_extra_counter: defaultdict[int, float] = defaultdict(float)
+    diff_counter: defaultdict[int, float] = defaultdict(float)
+
+    def same_val(a: float, b: float) -> bool:
+        return bool(np.isclose(a, b, rtol=diff_rtol, atol=diff_atol, equal_nan=True))
 
     i = 0
     j = 0
-    while i < base_unique_ts.size and j < incom_unique_ts.size:
-        base_ts = int(base_unique_ts[i])
-        incom_ts = int(incom_unique_ts[j])
+    n = ts_a.size
+    m = ts_b.size
 
-        if base_ts < incom_ts:
-            base_extra_ts.append(base_ts)
-            base_extra_cnt.append(float(base_counts[i]))
+    while i < n and j < m:
+        ta = int(ts_a[i])
+        tb = int(ts_b[j])
+
+        # Too far apart: count as extras
+        if ta < tb - tol:
+            base_extra_counter[ta] += 1.0
             i += 1
             continue
-        if incom_ts < base_ts:
-            incom_extra_ts.append(incom_ts)
-            incom_extra_cnt.append(float(incom_counts[j]))
+        if tb < ta - tol:
+            incom_extra_counter[tb] += 1.0
             j += 1
             continue
 
-        # same timestamp
-        base_count = int(base_counts[i])
-        incom_count = int(incom_counts[j])
-        paired_count = min(base_count, incom_count)
-
-        if base_count > paired_count:
-            base_extra_ts.append(base_ts)
-            base_extra_cnt.append(float(base_count - paired_count))
-        if incom_count > paired_count:
-            incom_extra_ts.append(incom_ts)
-            incom_extra_cnt.append(float(incom_count - paired_count))
-
-        if paired_count > 0:
-            base_start = int(base_first_idx[i])
-            base_end = base_start + base_count
-            incom_start = int(incom_first_idx[j])
-            incom_end = incom_start + incom_count
-
-            base_values = np.sort(base_di.value_np[base_start:base_end].astype(np.float64, copy=False))
-            incom_values = np.sort(incom_di.value_np[incom_start:incom_end].astype(np.float64, copy=False))
-            same_mask = np.isclose(
-                base_values[:paired_count],
-                incom_values[:paired_count],
-                rtol=1e-6,
-                atol=1e-9,
-                equal_nan=True,
-            )
-            mismatch_count = int(np.count_nonzero(~same_mask))
-            if mismatch_count > 0:
-                diff_ts.append(base_ts)
-                diff_cnt.append(float(mismatch_count))
-
+        # Within tolerance: match points directly (monotonic two-pointer).
+        if not same_val(va[i], vb[j]):
+            diff_counter[ta] += 1.0
         i += 1
         j += 1
 
-    while i < base_unique_ts.size:
-        base_extra_ts.append(int(base_unique_ts[i]))
-        base_extra_cnt.append(float(base_counts[i]))
+    # Remaining tails are extras
+    while i < n:
+        base_extra_counter[int(ts_a[i])] += 1.0
         i += 1
-
-    while j < incom_unique_ts.size:
-        incom_extra_ts.append(int(incom_unique_ts[j]))
-        incom_extra_cnt.append(float(incom_counts[j]))
+    while j < m:
+        incom_extra_counter[int(ts_b[j])] += 1.0
         j += 1
 
-    return (
-        (
-            np.asarray(base_extra_ts, dtype=np.int64),
-            np.asarray(base_extra_cnt, dtype=np.float64),
-        ),
-        (
-            np.asarray(incom_extra_ts, dtype=np.int64),
-            np.asarray(incom_extra_cnt, dtype=np.float64),
-        ),
-        (
-            np.asarray(diff_ts, dtype=np.int64),
-            np.asarray(diff_cnt, dtype=np.float64),
-        ),
-    )
+    def to_pair(counter: dict[int, float]) -> tuple[np.ndarray, np.ndarray]:
+        if not counter:
+            return np.array([], dtype=np.int64), np.array([], dtype=np.float64)
+        ts = np.fromiter(counter.keys(), dtype=np.int64)
+        cnt = np.fromiter(counter.values(), dtype=np.float64)
+        order = np.argsort(ts, kind="stable")
+        return ts[order], cnt[order]
+
+    return to_pair(base_extra_counter), to_pair(incom_extra_counter), to_pair(diff_counter)
 
 def _get_diff_dis(
     base_extra_pairs: list[tuple[np.ndarray, np.ndarray]],
