@@ -119,7 +119,14 @@ class Analyzer:
                 layout_config=layout_config,
             )
 
-    def diff(self, incoming_data: SingleRunData, force_compare: bool = False) -> None:
+    def diff(
+        self,
+        incoming_data: SingleRunData,
+        force_compare: bool = False,
+        timestamp_tolerance_ms: int = 2,
+        diff_rtol: float = 1e-3,
+        diff_atol: float = 1e-3,
+    ) -> None:
         """
         Compute the differences between the current data and incoming data.
 
@@ -127,8 +134,23 @@ class Analyzer:
         ----------
         incoming_data : SingleRunData
             The incoming data to compare against.
+        force_compare : bool, optional
+            If True, compare matched variables even when C++ name sets differ.
+        timestamp_tolerance_ms : int, optional
+            Timestamp tolerance (ms) used to match points between streams.
+        diff_rtol : float, optional
+            Relative tolerance for value comparison (numpy.isclose).
+        diff_atol : float, optional
+            Absolute tolerance for value comparison (numpy.isclose).
         """
-        diff(self.data, incoming_data, force_compare)
+        diff(
+            self.data,
+            incoming_data,
+            force_compare=force_compare,
+            timestamp_tolerance_ms=timestamp_tolerance_ms,
+            diff_rtol=diff_rtol,
+            diff_atol=diff_atol,
+        )
 
     def _normalize_input(
         self,
