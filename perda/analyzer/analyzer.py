@@ -8,13 +8,14 @@ from ..plotting.data_instance_plotter import *
 from ..plotting.plotting_constants import *
 from ..utils.data_summary import single_run_summary
 from ..utils.search import search
+from ..utils.diff import diff
 from .csv import *
 from .data_instance import DataInstance
 from .single_run_data import SingleRunData
 
 
 class Analyzer:
-    def __init__(self, filepath: str, parsing_errors_limit: int = 100) -> None:
+    def __init__(self, filepath: str, ts_offset: int = 0,parsing_errors_limit: int = 100) -> None:
         """
         Initialize a new analyzer instance.
 
@@ -22,11 +23,13 @@ class Analyzer:
         ----------
         filepath : str
             Path to the CSV file containing CAN bus variables
+        ts_offset : int, optional
+            Timestamp offset to apply to all data points. Default is 0
         parsing_errors_limit : int, optional
             Maximum number of parsing errors before stopping. Default is 100
         """
         self.data: SingleRunData = parse_csv(
-            filepath, parsing_errors_limit=parsing_errors_limit
+            filepath, ts_offset, parsing_errors_limit=parsing_errors_limit
         )
 
     def __str__(self) -> str:
@@ -115,6 +118,39 @@ class Analyzer:
                 font_config=font_config,
                 layout_config=layout_config,
             )
+
+    def diff(
+        self,
+        incoming_data: SingleRunData,
+        force_compare: bool = False,
+        timestamp_tolerance_ms: int = 2,
+        diff_rtol: float = 1e-3,
+        diff_atol: float = 1e-3,
+    ) -> None:
+        """
+        Compute the differences between the current data and incoming data.
+
+        Parameters
+        ----------
+        incoming_data : SingleRunData
+            The incoming data to compare against.
+        force_compare : bool, optional
+            If True, compare matched variables even when C++ name sets differ.
+        timestamp_tolerance_ms : int, optional
+            Timestamp tolerance (ms) used to match points between streams.
+        diff_rtol : float, optional
+            Relative tolerance for value comparison (numpy.isclose).
+        diff_atol : float, optional
+            Absolute tolerance for value comparison (numpy.isclose).
+        """
+        diff(
+            self.data,
+            incoming_data,
+            force_compare=force_compare,
+            timestamp_tolerance_ms=timestamp_tolerance_ms,
+            diff_rtol=diff_rtol,
+            diff_atol=diff_atol,
+        )
 
     def _normalize_input(
         self,

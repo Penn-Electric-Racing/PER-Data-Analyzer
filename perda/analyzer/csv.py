@@ -7,7 +7,7 @@ from .data_instance import DataInstance
 from .single_run_data import SingleRunData
 
 
-def parse_csv(file_path: str, parsing_errors_limit: int = 100) -> SingleRunData:
+def parse_csv(file_path: str, ts_offset: int = 0, parsing_errors_limit: int = 100) -> SingleRunData:
     """
     Parse CSV file and return SingleRunData model.
 
@@ -47,10 +47,23 @@ def parse_csv(file_path: str, parsing_errors_limit: int = 100) -> SingleRunData:
 
             try:
                 var_id = int(identifier[1])
+                name_part = identifier[0]
 
-                name_list = identifier[0].split()
-                cpp_name = name_list[-1][1:-1]  # drop surrounding brackets
-                descript = " ".join(name_list[:-1])
+                # Check format: Value Desc (cpp.name): id | Value cpp.name: id
+                if "(" in name_part and ")" in name_part:
+                    open_idx = name_part.rfind("(")
+                    close_idx = name_part.rfind(")")
+                    if open_idx < close_idx:
+                        cpp_name = name_part[open_idx + 1 : close_idx].strip()
+                        descript = name_part[:open_idx].strip()
+                    else:
+                        cpp_name = name_part.strip()
+                        descript = ""
+                else:
+                    cpp_name = name_part.strip()
+                    descript = ""
+                if not cpp_name:
+                    raise ValueError(f"Empty cpp_name in mapping line: {line.strip()}")
 
                 # Store variable ID to name mapping
                 if var_id in id_to_cpp_name:
@@ -75,7 +88,7 @@ def parse_csv(file_path: str, parsing_errors_limit: int = 100) -> SingleRunData:
             data = line.strip().split(",")
             try:
                 var_id = int(data[1])
-                timestamp = int(data[0])
+                timestamp = int(data[0]) + ts_offset
                 val = float(data[2])
 
                 if not data_start_time:
