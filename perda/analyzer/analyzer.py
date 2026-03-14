@@ -9,13 +9,20 @@ from ..plotting.plotting_constants import *
 from ..utils.data_summary import single_run_summary
 from ..utils.search import search
 from ..utils.diff import diff
+from ..utils.types import Timescale
 from .csv import *
 from .data_instance import DataInstance
 from .single_run_data import SingleRunData
 
 
 class Analyzer:
-    def __init__(self, filepath: str, ts_offset: int = 0,parsing_errors_limit: int = 100) -> None:
+    def __init__(
+            self,
+            filepath: str,
+            ts_offset: int = 0,
+            parsing_errors_limit: int = 100,
+            raw_ts_unit: Timescale = Timescale.MS,
+        ) -> None:
         """
         Initialize a new analyzer instance.
 
@@ -27,9 +34,14 @@ class Analyzer:
             Timestamp offset to apply to all data points. Default is 0
         parsing_errors_limit : int, optional
             Maximum number of parsing errors before stopping. Default is 100
+        raw_ts_unit : Timescale, optional
+            Time unit for parsing timestamps. Default is Timescale.MS
         """
         self.data: SingleRunData = parse_csv(
-            filepath, ts_offset, parsing_errors_limit=parsing_errors_limit
+            filepath,
+            ts_offset,
+            parsing_errors_limit=parsing_errors_limit,
+            raw_ts_unit=raw_ts_unit,
         )
 
     def __str__(self) -> str:

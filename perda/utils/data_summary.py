@@ -36,10 +36,18 @@ def data_instance_summary(
         last_ts = float(data_instance.timestamp_np[-1])
 
         if time_unit == Timescale.S:
-            first_ts = first_ts / 1e3
-            last_ts = last_ts / 1e3
-            min_ts = min_ts / 1e3
-            max_ts = max_ts / 1e3
+            scale = 1e6
+        elif time_unit == Timescale.MS:
+            scale = 1e3
+        elif time_unit == Timescale.US:
+            scale = 1.0
+        else:
+            raise ValueError("time_unit must be Timescale.US, Timescale.MS, or Timescale.S")
+
+        first_ts = first_ts / scale
+        last_ts = last_ts / scale
+        min_ts = min_ts / scale
+        max_ts = max_ts / scale
 
         avg_val = average_over_time_range(data_instance, time_unit=time_unit)
 
@@ -69,6 +77,9 @@ def single_run_summary(
     start_time = float(data.data_start_time)
     end_time = float(data.data_end_time)
     if time_unit == Timescale.S:
+        start_time = start_time / 1e6
+        end_time = end_time / 1e6
+    elif time_unit == Timescale.MS:
         start_time = start_time / 1e3
         end_time = end_time / 1e3
 

@@ -46,8 +46,8 @@ def plot_single_axis(
             print(f"Warning: No data points in DataInstance for {di.label}")
             continue
 
-        # Convert timestamps from milliseconds to seconds
-        timestamps_s = di.timestamp_np.astype(float) / 1000.0
+        # Convert timestamps from microseconds to seconds
+        timestamps_s = di.timestamp_np.astype(float) / 1e6
 
         fig.add_trace(
             go.Scatter(
@@ -131,8 +131,8 @@ def plot_dual_axis(
             print(f"Warning: No data points in DataInstance for {di.label}")
             continue
 
-        # Convert timestamps from milliseconds to seconds
-        timestamps_s = di.timestamp_np.astype(float) / 1000.0
+        # Convert timestamps from microseconds to seconds
+        timestamps_s = di.timestamp_np.astype(float) / 1e6
 
         fig.add_trace(
             go.Scatter(
@@ -150,8 +150,8 @@ def plot_dual_axis(
             print(f"Warning: No data points in DataInstance for {di.label}")
             continue
 
-        # Convert timestamps from milliseconds to seconds
-        timestamps_s = di.timestamp_np.astype(float) / 1000.0
+        # Convert timestamps from microseconds to seconds
+        timestamps_s = di.timestamp_np.astype(float) / 1e6
 
         fig.add_trace(
             go.Scatter(

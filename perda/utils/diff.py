@@ -217,7 +217,7 @@ def _get_diff_pairs(
         empty_cnt = np.array([], dtype=np.float64)
         return (empty_ts, empty_cnt), (empty_ts, empty_cnt), (empty_ts, empty_cnt)
 
-    tol = max(int(timestamp_tolerance_ms), 0)
+    tol = max(int(timestamp_tolerance_ms * 1000), 0)
 
     base_extra_counter: defaultdict[int, float] = defaultdict(float)
     incom_extra_counter: defaultdict[int, float] = defaultdict(float)

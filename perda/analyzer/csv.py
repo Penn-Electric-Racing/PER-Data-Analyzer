@@ -5,9 +5,15 @@ from tqdm import tqdm
 
 from .data_instance import DataInstance
 from .single_run_data import SingleRunData
+from ..utils.types import Timescale
 
 
-def parse_csv(file_path: str, ts_offset: int = 0, parsing_errors_limit: int = 100) -> SingleRunData:
+def parse_csv(
+        file_path: str,
+        ts_offset: int = 0,
+        parsing_errors_limit: int = 100,
+        raw_ts_unit: Timescale = Timescale.MS
+) -> SingleRunData:
     """
     Parse CSV file and return SingleRunData model.
 
@@ -17,12 +23,21 @@ def parse_csv(file_path: str, ts_offset: int = 0, parsing_errors_limit: int = 10
         Path to the CSV file to parse
     parsing_errors_limit : int, optional
         Maximum number of parsing errors before stopping. -1 for no limit. Default is 100
+    raw_ts_unit : Timescale, optional
+        Time unit for parsing timestamps. Default is Timescale.MS
 
     Returns
     -------
     SingleRunData
         Parsed data structure containing all variables
     """
+
+    if raw_ts_unit not in (Timescale.US, Timescale.MS):
+        print(f"Invalid raw_ts_unit: {raw_ts_unit}. Defaulting to Timescale.MS.")
+        raw_ts_unit = Timescale.MS
+    else:
+        print(f"Parsing timestamps as: {raw_ts_unit}")
+
     # Maps variable ID to variable name
     id_to_cpp_name: dict[int, str] = {}
     id_to_descript: dict[int, str] = {}
@@ -88,8 +103,14 @@ def parse_csv(file_path: str, ts_offset: int = 0, parsing_errors_limit: int = 10
             data = line.strip().split(",")
             try:
                 var_id = int(data[1])
-                timestamp = int(data[0]) + ts_offset
                 val = float(data[2])
+
+                # store timestamp in terms of microseconds us
+                raw_timestamp = int(data[0]) + ts_offset
+                if raw_ts_unit == Timescale.MS:
+                    timestamp = raw_timestamp * 1000
+                elif raw_ts_unit == Timescale.US:
+                    timestamp = raw_timestamp
 
                 if not data_start_time:
                     data_start_time = timestamp

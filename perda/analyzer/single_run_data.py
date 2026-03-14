@@ -31,8 +31,8 @@ class SingleRunData(BaseModel):
     total_data_points: int = Field(
         description="Total number of data points across all variables"
     )
-    data_start_time: int = Field(description="Start timestamp in milliseconds")
-    data_end_time: int = Field(description="End timestamp in milliseconds")
+    data_start_time: int = Field(description="Start timestamp in microseconds")
+    data_end_time: int = Field(description="End timestamp in microseconds")
 
     def __getitem__(
         self, input_var_id_name: Union[str, int, DataInstance]

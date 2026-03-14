@@ -42,6 +42,8 @@ def integrate_over_time_range(
 
     # Convert time to desired unit
     if time_unit == Timescale.S:
+        ts = ts / 1e6
+    elif time_unit == Timescale.MS:
         ts = ts / 1e3
 
     # Set actual bounds
@@ -102,12 +104,16 @@ def average_over_time_range(
         return 0.0
 
     ts = data_instance.timestamp_np.astype(np.float64)
-    actual_start_time = max(start_time, ts[0])
-    actual_end_time = ts[-1] if end_time == -1 else min(end_time, ts[-1])
 
     if time_unit == Timescale.S:
-        actual_start_time = actual_start_time / 1e3
-        actual_end_time = actual_end_time / 1e3
+        ts = ts / 1e6
+    elif time_unit == Timescale.MS:
+        ts = ts / 1e3
+    elif time_unit != Timescale.US:
+        raise ValueError("time_unit must be Timescale.US, Timescale.MS, or Timescale.S")
+
+    actual_start_time = max(start_time, ts[0])
+    actual_end_time = ts[-1] if end_time == -1 else min(end_time, ts[-1])
 
     time_range = actual_end_time - actual_start_time
 
@@ -115,7 +121,10 @@ def average_over_time_range(
 
 
 def get_data_slice_by_timestamp(
-    original_instance: DataInstance, start_time: int = 0, end_time: int = -1
+    original_instance: DataInstance,
+    start_time: int = 0,
+    end_time: int = -1,
+    time_unit: Timescale = Timescale.MS
 ) -> DataInstance:
     """
     Get a new DataInstance with data in [start_time, end_time).
@@ -128,12 +137,21 @@ def get_data_slice_by_timestamp(
         Start time (inclusive). Default is 0
     end_time : int, optional
         End time (exclusive). -1 means till end. Default is -1
+    time_unit : Timescale, optional
+        Time unit for the start and end times. Default is Timescale.MS
 
     Returns
     -------
     DataInstance
         New DataInstance containing only data within the specified time range
     """
+    if time_unit == Timescale.S:
+        start_time = start_time * 1e6
+        end_time = -1 if end_time < 0 else end_time * 1e6
+    elif time_unit == Timescale.MS:
+        start_time = start_time * 1e3
+        end_time = -1 if end_time < 0 else end_time * 1e3
+
     if end_time < 0:
         mask = original_instance.timestamp_np >= start_time
     else:
