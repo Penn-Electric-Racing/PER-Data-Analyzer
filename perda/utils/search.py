@@ -1,4 +1,13 @@
+"""Semantic + keyword search.
+
+Each variable is represented by a search card: its C++ name +
+description. Results is combined from semantic cross-encoder score with
+keyword matching. Short queries rely more on keyword
+matching, while longer queries rely more on semantic ranking.
+"""
+
 import re
+from functools import lru_cache
 from pathlib import Path
 
 from sentence_transformers.cross_encoder import CrossEncoder
@@ -6,25 +15,32 @@ from sentence_transformers.cross_encoder import CrossEncoder
 from ..analyzer.single_run_data import SingleRunData
 from ..constants import DELIMITER, title_block
 
+# ---------------------------------------------------------------------------
+# Model resolution
+# ---------------------------------------------------------------------------
 
-PACKAGED_MODEL_DIR = Path(__file__).resolve().parents[1] / "models" / "stsb-cross-encoder"
-REPO_MODEL_DIR = Path(__file__).resolve().parents[2] / "models" / "stsb-cross-encoder"
-
-
-def _resolve_local_model_dir() -> Path:
-    if PACKAGED_MODEL_DIR.exists():
-        return PACKAGED_MODEL_DIR
-
-    if REPO_MODEL_DIR.exists():
-        return REPO_MODEL_DIR
-
-    return PACKAGED_MODEL_DIR
+_PACKAGED_MODEL_DIR = (
+    Path(__file__).resolve().parents[1] / "models" / "stsb-cross-encoder"
+)
+_REPO_MODEL_DIR = Path(__file__).resolve().parents[2] / "models" / "stsb-cross-encoder"
+_HF_MODEL_ID = "cross-encoder/stsb-distilroberta-base"
 
 
-LOCAL_MODEL_DIR = _resolve_local_model_dir()
+def _resolve_model_dir() -> Path:
+    """Return the first existing local model directory, or the packaged path."""
+    for candidate in (_PACKAGED_MODEL_DIR, _REPO_MODEL_DIR):
+        if candidate.exists():
+            return candidate
+    return _PACKAGED_MODEL_DIR
 
 
-ABBREVIATIONS = {
+_LOCAL_MODEL_DIR = _resolve_model_dir()
+
+# ---------------------------------------------------------------------------
+# Domain abbreviations
+# ---------------------------------------------------------------------------
+
+ABBREVIATIONS: dict[str, str] = {
     "pcm": "powertrain control module",
     "pdu": "power distribution unit",
     "ams": "accumulator management system",
@@ -39,147 +55,188 @@ ABBREVIATIONS = {
     "flt": "fault",
 }
 
+# ---------------------------------------------------------------------------
+# Public API
+# ---------------------------------------------------------------------------
 
-def search(
-    data: SingleRunData,
-    search: str,
-) -> None:
-    """
-    Natural language search for available variables in SingleRunData.
+
+def search(data: SingleRunData, query: str) -> None:
+    """Search telemetry variables and print the top matches.
 
     Parameters
     ----------
     data : SingleRunData
-        Data structure containing CSV file data
-    search : str
-        Query
+        Parsed CSV telemetry data.
+    query : str
+        Free-text search query (e.g. ``"bat wheel"``).
+
+    Raises
+    ------
+    ValueError
+        If the query is empty or has no alphanumeric terms.
     """
-    search = normalize_search_query(search)
-    if not search:
+    query = _normalize(query)
+    if not query:
         raise ValueError("Search query cannot be empty.")
 
-    if LOCAL_MODEL_DIR.exists():
-        model = CrossEncoder(str(LOCAL_MODEL_DIR))
-    else:
-        model = CrossEncoder("cross-encoder/stsb-distilroberta-base")
+    query_terms = _tokenize(query)
+    if not query_terms:
+        raise ValueError("Search query must contain letters or numbers.")
 
-    semantic_query = _expand_query(search)
-    query_terms = _extract_terms(search)
+    model = _load_model()
 
-    corpus = []
-    corpus_meta = []
+    semantic_query = _preprocess_query(query)
 
-    for var_id in data.id_to_cpp_name.keys():
+    corpus: list[str] = []
+    corpus_meta: list[tuple[int, str, str]] = []
+
+    for var_id, cpp_name in data.id_to_cpp_name.items():
         descript = data.id_to_descript[var_id]
-        cpp_name = data.id_to_cpp_name[var_id]
 
-        if search == normalize_search_query(cpp_name):
-
+        if query == _normalize(cpp_name):
             print("Exact match found!")
-            print_single_result(data, cpp_name, descript, score=1.0)
+            _print_result(var_id, cpp_name, descript, score=1.0)
             return
 
-        corpus.append(create_card(cpp_name, descript))
-        corpus_meta.append((cpp_name, descript))
+        corpus.append(_build_card(cpp_name, descript))
+        corpus_meta.append((var_id, cpp_name, descript))
 
-    ranks = model.rank(semantic_query, corpus)
+    if not corpus:
+        print("No variables available to search.")
+        return
 
-    semantic_scores = {int(rank["corpus_id"]): float(rank["score"]) for rank in ranks}
+    semantic_scores = {
+        int(r["corpus_id"]): float(r["score"])
+        for r in model.rank(semantic_query, corpus)
+    }
 
-    keyword_weight = _keyword_weight(query_terms)
-    combined_ranks = []
+    kw_weight = _keyword_weight(query_terms)
+    ranked = []
     for idx, card in enumerate(corpus):
-        cpp_name, descript = corpus_meta[idx]
-        semantic_score = semantic_scores.get(idx, 0.0)
-        keyword_score = _keyword_score(query_terms, cpp_name, descript, card)
-        combined_score = (
-            keyword_weight * keyword_score + (1.0 - keyword_weight) * semantic_score
-        )
-        combined_ranks.append((combined_score, idx))
+        _, cpp_name, descript = corpus_meta[idx]
+        sem = semantic_scores.get(idx, 0.0)
+        kw = _keyword_score(query_terms, cpp_name, descript, card)
+        ranked.append((kw_weight * kw + (1.0 - kw_weight) * sem, idx))
 
-    combined_ranks.sort(key=lambda x: x[0], reverse=True)
+    ranked.sort(key=lambda x: x[0], reverse=True)
 
     print(title_block("Search Results"))
-    print("Query: ", search)
-    for score, corpus_id in combined_ranks[:10]:
+    print("Query: ", query)
+    for score, idx in ranked[:10]:
         print(DELIMITER)
-        cpp_name, descript = corpus_meta[corpus_id]
-
-        print(f"Variable: {descript}")
-        print(f"ID: {var_id}")
-        print(f"C++ Name: {cpp_name}")
-        print(DELIMITER)
+        _print_result(*corpus_meta[idx], score=score)
 
 
-def _determine_query_hit(
-    search_list: list[str],
-    cpp_name: str,
-    descript: str,
-    score: float,
-) -> None:
-    var_id = data.cpp_name_to_id[cpp_name]
-
-    print(f"Score: {score:.2f}")
-    print(f"Variable ID: {var_id}")
-    print(f"C++ Name: {cpp_name}")
-    print(f"Description: {descript}")
+# ---------------------------------------------------------------------------
+# Text preprocessing
+# ---------------------------------------------------------------------------
 
 
-def create_card(cpp_name: str, descript: str) -> str:
+def _normalize(text: str) -> str:
+    """Lowercase and collapse whitespace."""
+    return " ".join(text.lower().strip().split())
+
+
+def _tokenize(text: str) -> list[str]:
+    """Extract lowercase alphanumeric tokens from *text*."""
+    return re.findall(r"[a-z0-9]+", _normalize(text))
+
+
+def _tokenize_identifier(identifier: str) -> list[str]:
+    """Split a telemetry identifier into searchable tokens.
+
+    Splits on separators and camelCase boundaries, then expands known
+    abbreviations.
     """
-    Create a card string for the search corpus.
-
-    Parameters
-    ----------
-    cpp_name : str
-        The C++ variable name
-    descript : str
-        The description of the variable
-
-    Returns
-    -------
-    str
-        A combined string of cpp_name and descript for the search corpus
-    """
-
-    tokens = []
-    for segment in re.split(r"[._]", cpp_name):
-        for token in advanced_split(segment):
-            lowered = token.lower()
+    tokens: list[str] = []
+    for segment in re.split(r"[._]", identifier):
+        if not segment:
+            continue
+        # Split camelCase: "requestedTorque" -> ["requested", "Torque"]
+        parts = re.sub(r"([a-z])([A-Z])", r"\1 \2", segment).split()
+        for part in parts:
+            lowered = part.lower()
             if lowered in ABBREVIATIONS:
-                lowered = ABBREVIATIONS[lowered] + " (" + token + ")"
-            tokens.append(lowered)
-
-    normalized_descript = normalize_search_query(descript)
-    expanded_context = " ".join(dict.fromkeys(tokens))
-    return f"{expanded_context} | {normalized_descript}"
+                tokens.append(f"{ABBREVIATIONS[lowered]} ({part})")
+            else:
+                tokens.append(lowered)
+    return tokens
 
 
-def _extract_terms(text: str) -> list[str]:
-    return re.findall(r"[a-z0-9]+", normalize_search_query(text))
-
-
-def _expand_query(query: str) -> str:
-    expanded_terms: list[str] = []
-    for term in _extract_terms(query):
-        expanded_terms.append(term)
+def _preprocess_query(query: str) -> str:
+    """Expand abbreviations and deduplicate tokens for semantic ranking."""
+    terms: list[str] = []
+    for term in _tokenize(query):
+        terms.append(term)
         if term in ABBREVIATIONS:
-            expanded_terms.extend(_extract_terms(ABBREVIATIONS[term]))
-    return " ".join(dict.fromkeys(expanded_terms))
+            terms.extend(_tokenize(ABBREVIATIONS[term]))
+    return " ".join(dict.fromkeys(terms))
+
+
+# ---------------------------------------------------------------------------
+# Card construction
+# ---------------------------------------------------------------------------
+
+
+def _build_card(cpp_name: str, descript: str) -> str:
+    """Build one search card from the variable name and description."""
+    id_tokens = _tokenize_identifier(cpp_name)
+    context = " ".join(dict.fromkeys(id_tokens))
+    return f"{context} | {_normalize(descript)}"
+
+
+# ---------------------------------------------------------------------------
+# Scoring
+# ---------------------------------------------------------------------------
 
 
 def _keyword_weight(query_terms: list[str]) -> float:
+    """Compute the blend weight between keyword and semantic scores.
+
+    Short queries get more keyword weight; longer queries lean semantic.
+    """
     if not query_terms:
         return 0.5
 
-    if len(query_terms) == 1 and len(query_terms[0]) <= 3:
-        return 0.8
-    if len(query_terms) == 1:
-        return 0.6
-    if len(query_terms) == 2:
-        return 0.45
+    n = len(query_terms)
+    avg_len = sum(len(t) for t in query_terms) / n
 
-    return 0.35
+    # Linear interpolation: 0.60 at n=1, 0.45 at n=2, 0.35 floor at n>=3
+    base = max(0.35, 0.60 - 0.15 * (n - 1))
+
+    # Abbreviation boost for short single-token queries
+    if n == 1:
+        ramp = max(0.0, min(1.0, 4.0 - avg_len))
+        base += 0.20 * ramp
+
+    return min(base, 1.0)
+
+
+def _term_match_strength(
+    term: str,
+    card_tokens: list[str],
+    card_text: str,
+) -> float:
+    """Return how strongly one query term matches a search card.
+
+    Exact token matches score highest, followed by prefix and substring matches.
+    """
+    best = 0.0
+
+    for token in card_tokens:
+        if token == term:
+            return 1.0
+
+        coverage = len(term) / max(len(token), 1)
+        if token.startswith(term):
+            best = max(best, 0.7 + 0.3 * coverage)
+        elif term in token:
+            best = max(best, 0.4 + 0.4 * coverage)
+
+    if best == 0.0 and term in card_text:
+        best = 0.4 + 0.2 * min(len(term) / 10.0, 1.0)
+
+    return min(best, 1.0)
 
 
 def _keyword_score(
@@ -188,35 +245,48 @@ def _keyword_score(
     descript: str,
     card: str,
 ) -> float:
+    """Aggregate keyword relevance for all query terms into ``[0, 1]``."""
     if not query_terms:
         return 0.0
 
-    searchable_text = normalize_search_query(f"{cpp_name} {descript} {card}")
-    searchable_tokens = _extract_terms(searchable_text)
+    card_text = _normalize(f"{cpp_name} {descript} {card}")
+    card_tokens = _tokenize(card_text)
 
-    raw_score = 0.0
-    matched_terms = 0
-    for term in query_terms:
-        if re.search(rf"\b{re.escape(term)}\b", searchable_text):
-            raw_score += 1.0
-            matched_terms += 1
-        elif any(token.startswith(term) for token in searchable_tokens):
-            raw_score += 0.7
-            matched_terms += 1
-        elif term in searchable_text:
-            raw_score += 0.4
-            matched_terms += 1
+    strengths = [_term_match_strength(t, card_tokens, card_text) for t in query_terms]
 
-    if matched_terms == len(query_terms):
-        raw_score += 0.5
+    raw = sum(strengths)
+    coverage = sum(1 for s in strengths if s > 0.0) / len(query_terms)
+    raw += 0.5 * coverage**2
 
-    max_possible = len(query_terms) + 0.5
-    return min(raw_score / max_possible, 1.0)
+    return min(raw / (len(query_terms) + 0.5), 1.0)
 
 
-def advanced_split(camel_case_string: str) -> list[str]:
-    """Splits a camelCase string into a list of words using regex."""
-    # Inserts a period between a lowercase letter and an uppercase letter
-    s1 = re.sub(r"([a-z])([A-Z])", r"\1.\2", camel_case_string)
-    # Splits the resulting string by period
-    return s1.split(".")
+# ---------------------------------------------------------------------------
+# Model loading
+# ---------------------------------------------------------------------------
+
+
+@lru_cache(maxsize=1)
+def _load_model() -> CrossEncoder:
+    """Load and cache the cross-encoder, preferring a local copy."""
+    if _LOCAL_MODEL_DIR.exists():
+        return CrossEncoder(str(_LOCAL_MODEL_DIR))
+    return CrossEncoder(_HF_MODEL_ID)
+
+
+# ---------------------------------------------------------------------------
+# Display
+# ---------------------------------------------------------------------------
+
+
+def _print_result(
+    var_id: int,
+    cpp_name: str,
+    descript: str,
+    score: float,
+) -> None:
+    """Print a single ranked result."""
+    print(f"Score: {score:.2f}")
+    print(f"Variable ID: {var_id}")
+    print(f"C++ Name: {cpp_name}")
+    print(f"Description: {descript}")
