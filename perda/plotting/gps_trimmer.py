@@ -10,20 +10,16 @@ from .plotting_constants import (
     LayoutConfig,
 )
 
-
-def plot_gps_trimmer(
+def get_fig_gps(
     lat: DataInstance,
     lon: DataInstance,
     title: str | None = None,
     layout_config: LayoutConfig = DEFAULT_LAYOUT_CONFIG,
     font_config: FontConfig = DEFAULT_FONT_CONFIG,
-) -> widgets.VBox:
+) -> go.Figure:
     """
-    Interactive GPS coordinate trimmer with a dual-handle range slider.
-
-    Displays a 2D scatter plot of GPS coordinates (longitude vs latitude) alongside
-    an ipywidgets IntRangeSlider that trims which points are shown. Designed for use
-    in Jupyter notebooks.
+    Create a Plotly Figure visualizing GPS coordinates (longitude vs latitude).
+    Used separately for generating images.
 
     Parameters
     ----------
@@ -37,8 +33,9 @@ def plot_gps_trimmer(
 
     Returns
     -------
-    ipywidgets.VBox
+    plotly.graph_objects.Figure
     """
+    # Check for alignment
     if len(lat) != len(lon):
         raise ValueError(
             f"lat and lon DataInstances have different lengths ({len(lat)} vs {len(lon)}). "
@@ -51,10 +48,8 @@ def plot_gps_trimmer(
             "Align them first using a join (e.g., inner_join_data_instances, left_join_data_instances)."
         )
 
-    n = len(lat)
-
     # Main GPS visualization
-    fig = go.FigureWidget()
+    fig = go.Figure()
     fig.add_trace(
         go.Scatter(
             x=lon.value_np,
@@ -84,6 +79,42 @@ def plot_gps_trimmer(
         yaxis=dict(tickfont=dict(size=font_config.small)),
     )
 
+    return fig
+
+def plot_gps_trimmer(
+    lat: DataInstance,
+    lon: DataInstance,
+    title: str | None = None,
+    layout_config: LayoutConfig = DEFAULT_LAYOUT_CONFIG,
+    font_config: FontConfig = DEFAULT_FONT_CONFIG,
+) -> widgets.VBox:
+    """
+    Interactive GPS coordinate trimmer with a dual-handle range slider.
+
+    Displays a 2D scatter plot of GPS coordinates (longitude vs latitude) alongside
+    an ipywidgets IntRangeSlider that trims which points are shown. Designed for use
+    in Jupyter notebooks.
+
+    Parameters
+    ----------
+    lat : DataInstance
+        Latitude values. Must have the same length and identical timestamps as `lon`.
+    lon : DataInstance
+        Longitude values. Must have the same length and identical timestamps as `lat`.
+    title : str | None, optional
+    layout_config : LayoutConfig, optional
+    font_config : FontConfig, optional
+
+    Returns
+    -------
+    ipywidgets.VBox
+    """
+
+    # Get fig and convert to FigureWidget
+    fig = get_fig_gps(lat, lon, title, layout_config, font_config)
+    fw = go.FigureWidget(fig)
+    n = len(lat)
+
     # Range Slider
     range_slider = widgets.IntRangeSlider(
         value=[0, n - 1],
@@ -110,14 +141,14 @@ def plot_gps_trimmer(
     # Callback
     def on_range_change(change: dict) -> None:
         lo, hi = change["new"]
-        with fig.batch_update():
-            fig.data[0].x = lon.value_np[lo : hi + 1]
-            fig.data[0].y = lat.value_np[lo : hi + 1]
+        with fw.batch_update():
+            fw.data[0].x = lon.value_np[lo : hi + 1]
+            fw.data[0].y = lat.value_np[lo : hi + 1]
         start_label.value = f"Start index: {lo} | timestamp: {lat.timestamp_np[lo]} ms"
         end_label.value = f"End index: {hi} | timestamp: {lat.timestamp_np[hi]} ms"
 
     range_slider.observe(on_range_change, names="value")
 
     return widgets.VBox(
-        [fig, range_slider, label_box],
+        [fw, range_slider, label_box],
     )
