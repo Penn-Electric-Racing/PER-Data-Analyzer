@@ -7,9 +7,9 @@ from plotly import graph_objects as go
 from ..plotting.data_instance_plotter import *
 from ..plotting.plotting_constants import *
 from ..utils.data_summary import single_run_summary
+from ..utils.diff import diff
 from ..utils.types import Timescale
 from ..utils.search import search
-from ..utils.diff import diff
 from .csv import *
 from .data_instance import DataInstance
 from .single_run_data import SingleRunData
@@ -137,11 +137,10 @@ class Analyzer:
     def diff(
         self,
         incoming_data: SingleRunData,
-        force_compare: bool = False,
         timestamp_tolerance_ms: int = 2,
         diff_rtol: float = 1e-3,
         diff_atol: float = 1e-3,
-    ) -> None:
+    ) -> go.Figure:
         """
         Compute the differences between the current data and incoming data.
 
@@ -149,8 +148,6 @@ class Analyzer:
         ----------
         incoming_data : SingleRunData
             The incoming data to compare against.
-        force_compare : bool, optional
-            If True, compare matched variables even when C++ name sets differ.
         timestamp_tolerance_ms : int, optional
             Timestamp tolerance used to match points between streams.
         diff_rtol : float, optional
@@ -158,10 +155,9 @@ class Analyzer:
         diff_atol : float, optional
             Absolute tolerance for value comparison (numpy.isclose).
         """
-        diff(
+        return diff(
             self.data,
             incoming_data,
-            force_compare=force_compare,
             timestamp_tolerance_ms=timestamp_tolerance_ms,
             diff_rtol=diff_rtol,
             diff_atol=diff_atol,
@@ -174,7 +170,12 @@ class Analyzer:
         """
         Normalize various input types to a list of DataInstances.
         """
-        if isinstance(input_data, list):
-            return [self.data[item] for item in input_data]
+        if isinstance(input_data, DataInstance):
+            return [input_data]
+        elif isinstance(input_data, list):
+            return [
+                item if isinstance(item, DataInstance) else self.data[item]
+                for item in input_data
+            ]
         else:
             return [self.data[input_data]]
