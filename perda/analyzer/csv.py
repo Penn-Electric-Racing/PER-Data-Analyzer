@@ -1,3 +1,4 @@
+import numpy as np
 import polars as pl
 from tqdm import tqdm
 
@@ -146,7 +147,7 @@ def parse_csv(
         name = id_to_cpp_name[var_id]
         descript = id_to_descript[var_id]
         cpp_name_to_id[name] = var_id
-        timestamps_np, values_np = var_arrays.get(var_id, ([], []))
+        timestamps_np, values_np = var_arrays.get(var_id, (np.array([], dtype=np.int64), np.array([], dtype=np.float64)))
         id_to_instance[var_id] = DataInstance(
             timestamp_np=timestamps_np,
             value_np=values_np,
