@@ -4,6 +4,7 @@ import plotly.graph_objects as go
 
 from ..analyzer.data_instance import DataInstance
 from ..analyzer.data_instance import left_join_data_instances
+from ..utils.types import Timescale
 from .plotting_constants import (
     DEFAULT_FONT_CONFIG,
     DEFAULT_LAYOUT_CONFIG,
@@ -17,6 +18,7 @@ def plot_gps_trimmer(
     title: str | None = None,
     layout_config: LayoutConfig = DEFAULT_LAYOUT_CONFIG,
     font_config: FontConfig = DEFAULT_FONT_CONFIG,
+    timestamp_unit: Timescale = Timescale.MS,
 ) -> widgets.VBox:
     """
     Interactive GPS coordinate trimmer with a dual-handle range slider.
@@ -34,6 +36,8 @@ def plot_gps_trimmer(
     title : str | None, optional
     layout_config : LayoutConfig, optional
     font_config : FontConfig, optional
+    timestamp_unit : Timescale, optional
+        Timestamp unit used for the slider timestamp labels.
 
     Returns
     -------
@@ -97,10 +101,10 @@ def plot_gps_trimmer(
 
     # Index labels
     start_label = widgets.Label(
-        value=f"Start index: 0 | timestamp: {lat.timestamp_np[0]} ms"
+        value=f"Start index: 0 | timestamp: {lat.timestamp_np[0]} {timestamp_unit.value}"
     )
     end_label = widgets.Label(
-        value=f"End index: {n - 1} | timestamp: {lat.timestamp_np[-1]} ms"
+        value=f"End index: {n - 1} | timestamp: {lat.timestamp_np[-1]} {timestamp_unit.value}"
     )
     label_box = widgets.HBox(
         [start_label, end_label],
@@ -113,8 +117,12 @@ def plot_gps_trimmer(
         with fig.batch_update():
             fig.data[0].x = lon.value_np[lo : hi + 1]
             fig.data[0].y = lat.value_np[lo : hi + 1]
-        start_label.value = f"Start index: {lo} | timestamp: {lat.timestamp_np[lo]} ms"
-        end_label.value = f"End index: {hi} | timestamp: {lat.timestamp_np[hi]} ms"
+        start_label.value = (
+            f"Start index: {lo} | timestamp: {lat.timestamp_np[lo]} {timestamp_unit.value}"
+        )
+        end_label.value = (
+            f"End index: {hi} | timestamp: {lat.timestamp_np[hi]} {timestamp_unit.value}"
+        )
 
     range_slider.observe(on_range_change, names="value")
 

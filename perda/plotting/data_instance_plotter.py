@@ -4,7 +4,20 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
 from ..analyzer.data_instance import DataInstance
+from ..utils.types import Timescale
 from .plotting_constants import *
+
+
+def _timestamps_to_seconds(
+    timestamp_np,
+    timestamp_unit: Timescale,
+):
+    timestamps = timestamp_np.astype(float)
+    if timestamp_unit == Timescale.US:
+        return timestamps / 1e6
+    if timestamp_unit == Timescale.MS:
+        return timestamps / 1e3
+    return timestamps
 
 
 def plot_single_axis(
@@ -14,6 +27,7 @@ def plot_single_axis(
     show_legend: bool = True,
     layout_config: LayoutConfig = DEFAULT_LAYOUT_CONFIG,
     font_config: FontConfig = DEFAULT_FONT_CONFIG,
+    timestamp_unit: Timescale = Timescale.MS,
 ) -> go.Figure:
     """
     Plot one or more DataInstances on a single y-axis using Plotly.
@@ -30,6 +44,8 @@ def plot_single_axis(
         Whether to show plot legends. Default is True
     layout_config : LayoutConfig, optional
     font_config : FontConfig, optional
+    timestamp_unit : Timescale, optional
+        Timestamp unit in the underlying data. Converted to seconds for x-axis display.
 
     Returns
     -------
@@ -46,8 +62,8 @@ def plot_single_axis(
             print(f"Warning: No data points in DataInstance for {di.label}")
             continue
 
-        # Convert timestamps from milliseconds to seconds
-        timestamps_s = di.timestamp_np.astype(float) / 1000.0
+        # Convert timestamps from the log unit to seconds for plotting.
+        timestamps_s = _timestamps_to_seconds(di.timestamp_np, timestamp_unit)
 
         fig.add_trace(
             go.Scatter(
@@ -91,6 +107,7 @@ def plot_dual_axis(
     show_legend: bool = True,
     font_config: FontConfig = DEFAULT_FONT_CONFIG,
     layout_config: LayoutConfig = DEFAULT_LAYOUT_CONFIG,
+    timestamp_unit: Timescale = Timescale.MS,
 ) -> go.Figure:
     """
     Plot DataInstances on dual y-axes using Plotly.
@@ -113,6 +130,8 @@ def plot_dual_axis(
         Font configuration for plot elements. Default is DEFAULT_FONT_CONFIG
     layout_config : LayoutConfig, optional
         Layout configuration for plot dimensions. Default is DEFAULT_LAYOUT_CONFIG
+    timestamp_unit : Timescale, optional
+        Timestamp unit in the underlying data. Converted to seconds for x-axis display.
 
     Returns
     -------
@@ -131,8 +150,8 @@ def plot_dual_axis(
             print(f"Warning: No data points in DataInstance for {di.label}")
             continue
 
-        # Convert timestamps from milliseconds to seconds
-        timestamps_s = di.timestamp_np.astype(float) / 1000.0
+        # Convert timestamps from the log unit to seconds for plotting.
+        timestamps_s = _timestamps_to_seconds(di.timestamp_np, timestamp_unit)
 
         fig.add_trace(
             go.Scatter(
@@ -150,8 +169,8 @@ def plot_dual_axis(
             print(f"Warning: No data points in DataInstance for {di.label}")
             continue
 
-        # Convert timestamps from milliseconds to seconds
-        timestamps_s = di.timestamp_np.astype(float) / 1000.0
+        # Convert timestamps from the log unit to seconds for plotting.
+        timestamps_s = _timestamps_to_seconds(di.timestamp_np, timestamp_unit)
 
         fig.add_trace(
             go.Scatter(
