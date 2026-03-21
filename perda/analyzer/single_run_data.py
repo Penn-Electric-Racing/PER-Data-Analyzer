@@ -6,6 +6,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from .data_instance import DataInstance
 from .joins import name_matches
+from ..utils.types import Timescale
 
 
 class SingleRunData(BaseModel):
@@ -31,8 +32,12 @@ class SingleRunData(BaseModel):
     total_data_points: int = Field(
         description="Total number of data points across all variables"
     )
-    data_start_time: int = Field(description="Start timestamp in milliseconds")
-    data_end_time: int = Field(description="End timestamp in milliseconds")
+    data_start_time: int = Field(description="Start timestamp in log timestamp unit")
+    data_end_time: int = Field(description="End timestamp in log timestamp unit")
+    timestamp_unit: Timescale = Field(
+        default=Timescale.MS,
+        description="Timestamp logging unit for this run (ms/us)",
+    )
 
     def __getitem__(
         self, input_var_id_name: Union[str, int, DataInstance]

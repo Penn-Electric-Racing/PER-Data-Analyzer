@@ -7,6 +7,7 @@ from plotly import graph_objects as go
 from ..plotting.data_instance_plotter import *
 from ..plotting.plotting_constants import *
 from ..utils.data_summary import single_run_summary
+from ..utils.types import Timescale
 from ..utils.search import search
 from ..utils.diff import diff
 from .csv import *
@@ -15,7 +16,13 @@ from .single_run_data import SingleRunData
 
 
 class Analyzer:
-    def __init__(self, filepath: str, ts_offset: int = 0,parsing_errors_limit: int = 100) -> None:
+    def __init__(
+        self,
+        filepath: str,
+        ts_offset: int = 0,
+        parsing_errors_limit: int = 100,
+        parse_unit: Timescale | str | None = None,
+    ) -> None:
         """
         Initialize a new analyzer instance.
 
@@ -27,9 +34,15 @@ class Analyzer:
             Timestamp offset to apply to all data points. Default is 0
         parsing_errors_limit : int, optional
             Maximum number of parsing errors before stopping. Default is 100
+        parse_unit : Timescale | str | None, optional
+            Logging timestamp unit for parsing. If None, auto-detect from header:
+            lines ending with "v2.0" use us, otherwise ms.
         """
         self.data: SingleRunData = parse_csv(
-            filepath, ts_offset, parsing_errors_limit=parsing_errors_limit
+            filepath,
+            ts_offset,
+            parsing_errors_limit=parsing_errors_limit,
+            parse_unit=parse_unit,
         )
 
     def __str__(self) -> str:
@@ -108,6 +121,7 @@ class Analyzer:
                 show_legend=show_legend,
                 font_config=font_config,
                 layout_config=layout_config,
+                timestamp_unit=self.data.timestamp_unit,
             )
         else:
             return plot_single_axis(
@@ -117,6 +131,7 @@ class Analyzer:
                 show_legend=show_legend,
                 font_config=font_config,
                 layout_config=layout_config,
+                timestamp_unit=self.data.timestamp_unit,
             )
 
     def diff(
@@ -137,7 +152,7 @@ class Analyzer:
         force_compare : bool, optional
             If True, compare matched variables even when C++ name sets differ.
         timestamp_tolerance_ms : int, optional
-            Timestamp tolerance (ms) used to match points between streams.
+            Timestamp tolerance used to match points between streams.
         diff_rtol : float, optional
             Relative tolerance for value comparison (numpy.isclose).
         diff_atol : float, optional

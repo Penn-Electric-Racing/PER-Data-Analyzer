@@ -5,9 +5,38 @@ from tqdm import tqdm
 
 from .data_instance import DataInstance
 from .single_run_data import SingleRunData
+from ..utils.types import Timescale
 
 
-def parse_csv(file_path: str, ts_offset: int = 0, parsing_errors_limit: int = 100) -> SingleRunData:
+def _resolve_parse_unit(
+    header_line: str,
+    parse_unit: Timescale | str | None,
+) -> Timescale:
+    if isinstance(parse_unit, str):
+        parse_unit = parse_unit.strip().lower()
+        if parse_unit not in (Timescale.MS.value, Timescale.US.value):
+            raise ValueError(
+                f"parse_unit must be 'ms' or 'us', got {parse_unit}"
+            )
+        parse_unit = Timescale(parse_unit)
+
+    if parse_unit is not None and parse_unit not in (Timescale.MS, Timescale.US):
+        raise ValueError(
+            f"parse_unit must be Timescale.MS or Timescale.US, got {parse_unit}"
+        )
+
+    if parse_unit is not None:
+        return parse_unit
+
+    return Timescale.US if header_line.rstrip().endswith("v2.0") else Timescale.MS
+
+
+def parse_csv(
+    file_path: str,
+    ts_offset: int = 0,
+    parsing_errors_limit: int = 100,
+    parse_unit: Timescale | str | None = None,
+) -> SingleRunData:
     """
     Parse CSV file and return SingleRunData model.
 
@@ -17,6 +46,8 @@ def parse_csv(file_path: str, ts_offset: int = 0, parsing_errors_limit: int = 10
         Path to the CSV file to parse
     parsing_errors_limit : int, optional
         Maximum number of parsing errors before stopping. -1 for no limit. Default is 100
+    parse_unit : Timescale | str | None, optional
+        Logging timestamp unit. If None, auto-detects using header suffix "v2.0" (us) or defaults to ms.
 
     Returns
     -------
@@ -33,8 +64,11 @@ def parse_csv(file_path: str, ts_offset: int = 0, parsing_errors_limit: int = 10
     ] = defaultdict(lambda: ([], []))
 
     with open(file_path, "r") as log:
-        # Skip and print first line (header)
-        print(f"Header: {next(log)}")
+        # Parse and print first line (header)
+        header_line = next(log, "")
+        parse_unit = _resolve_parse_unit(header_line, parse_unit)
+        print(f"Header: {header_line.rstrip()}")
+        print(f"Timestamp unit: {parse_unit.value}")
 
         # Block 1: Variable ID/Name pairs
         pbar = tqdm(desc="Reading variable ID mappings", unit=" lines", initial=2)
@@ -81,7 +115,8 @@ def parse_csv(file_path: str, ts_offset: int = 0, parsing_errors_limit: int = 10
 
         # Block 2: Data lines
         pbar = tqdm(desc="Reading data", unit=" lines", initial=0)
-        data_start_time = 0
+        data_start_time: int | None = None
+        data_end_time: int = 0
         parsing_errors = 0
         while line is not None:
             pbar.update(1)
@@ -91,8 +126,9 @@ def parse_csv(file_path: str, ts_offset: int = 0, parsing_errors_limit: int = 10
                 timestamp = int(data[0]) + ts_offset
                 val = float(data[2])
 
-                if not data_start_time:
+                if data_start_time is None:
                     data_start_time = timestamp
+                data_end_time = timestamp
 
                 # Append timestamp and value to temporary lists
                 temp_time_value_list_map[var_id][0].append(timestamp)
@@ -106,7 +142,8 @@ def parse_csv(file_path: str, ts_offset: int = 0, parsing_errors_limit: int = 10
                     raise Exception("Too many data parsing errors encountered.")
 
             line = next(log, None)
-        data_end_time = timestamp
+        if data_start_time is None:
+            data_start_time = 0
         total_data_points = pbar.n
 
         pbar.close()
@@ -158,4 +195,5 @@ def parse_csv(file_path: str, ts_offset: int = 0, parsing_errors_limit: int = 10
         total_data_points=total_data_points,
         data_start_time=data_start_time,
         data_end_time=data_end_time,
+        timestamp_unit=parse_unit,
     )

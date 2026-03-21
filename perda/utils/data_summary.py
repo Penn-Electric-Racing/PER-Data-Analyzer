@@ -4,9 +4,34 @@ from .integrate import average_over_time_range
 from .types import Timescale
 
 
+def _to_seconds(timestamp: float, source_time_unit: Timescale) -> float:
+    if source_time_unit == Timescale.US:
+        return timestamp / 1e6
+    if source_time_unit == Timescale.MS:
+        return timestamp / 1e3
+    return timestamp
+
+
+def _from_seconds(timestamp_s: float, target_time_unit: Timescale) -> float:
+    if target_time_unit == Timescale.US:
+        return timestamp_s * 1e6
+    if target_time_unit == Timescale.MS:
+        return timestamp_s * 1e3
+    return timestamp_s
+
+
+def _convert_time(
+    timestamp: float,
+    source_time_unit: Timescale,
+    target_time_unit: Timescale,
+) -> float:
+    return _from_seconds(_to_seconds(timestamp, source_time_unit), target_time_unit)
+
+
 def data_instance_summary(
     data_instance: DataInstance,
     time_unit: Timescale = Timescale.S,
+    source_time_unit: Timescale = Timescale.MS,
 ) -> None:
     """
     Print information about a DataInstance.
@@ -17,6 +42,8 @@ def data_instance_summary(
         The DataInstance to print info about
     time_unit : Timescale, optional
         Unit for time values. Default is seconds
+    source_time_unit : Timescale, optional
+        Timestamp unit used in `data_instance.timestamp_np`. Default is milliseconds.
     """
     print(
         f"{data_instance.label} | ID: {data_instance.var_id} | C++ Name: {data_instance.cpp_name}"
@@ -35,11 +62,10 @@ def data_instance_summary(
         first_ts = float(data_instance.timestamp_np[0])
         last_ts = float(data_instance.timestamp_np[-1])
 
-        if time_unit == Timescale.S:
-            first_ts = first_ts / 1e3
-            last_ts = last_ts / 1e3
-            min_ts = min_ts / 1e3
-            max_ts = max_ts / 1e3
+        first_ts = _convert_time(first_ts, source_time_unit, time_unit)
+        last_ts = _convert_time(last_ts, source_time_unit, time_unit)
+        min_ts = _convert_time(min_ts, source_time_unit, time_unit)
+        max_ts = _convert_time(max_ts, source_time_unit, time_unit)
 
         avg_val = average_over_time_range(data_instance, time_unit=time_unit)
 
@@ -68,11 +94,11 @@ def single_run_summary(
     """
     start_time = float(data.data_start_time)
     end_time = float(data.data_end_time)
-    if time_unit == Timescale.S:
-        start_time = start_time / 1e3
-        end_time = end_time / 1e3
+    start_time = _convert_time(start_time, data.timestamp_unit, time_unit)
+    end_time = _convert_time(end_time, data.timestamp_unit, time_unit)
 
     print("==== Data Summary ====")
+    print(f"Logging unit:       {data.timestamp_unit.value}")
     print(f"Time range:         {start_time} to {end_time} ({time_unit.value})")
     print(f"Total Variable:     {len(data.id_to_instance)}")
     print(f"Total Data Points:  {data.total_data_points}")
