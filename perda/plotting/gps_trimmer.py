@@ -2,8 +2,7 @@ import ipywidgets as widgets
 import numpy as np
 import plotly.graph_objects as go
 
-from ..analyzer.data_instance import DataInstance
-from ..analyzer.data_instance import left_join_data_instances
+from ..analyzer.data_instance import DataInstance, left_join_data_instances
 from ..utils.types import Timescale
 from .plotting_constants import (
     DEFAULT_FONT_CONFIG,
@@ -11,6 +10,7 @@ from .plotting_constants import (
     FontConfig,
     LayoutConfig,
 )
+
 
 def plot_gps_trimmer(
     lat: DataInstance,
@@ -117,12 +117,8 @@ def plot_gps_trimmer(
         with fig.batch_update():
             fig.data[0].x = lon.value_np[lo : hi + 1]
             fig.data[0].y = lat.value_np[lo : hi + 1]
-        start_label.value = (
-            f"Start index: {lo} | timestamp: {lat.timestamp_np[lo]} {timestamp_unit.value}"
-        )
-        end_label.value = (
-            f"End index: {hi} | timestamp: {lat.timestamp_np[hi]} {timestamp_unit.value}"
-        )
+        start_label.value = f"Start index: {lo} | timestamp: {lat.timestamp_np[lo]} {timestamp_unit.value}"
+        end_label.value = f"End index: {hi} | timestamp: {lat.timestamp_np[hi]} {timestamp_unit.value}"
 
     range_slider.observe(on_range_change, names="value")
 
@@ -130,11 +126,11 @@ def plot_gps_trimmer(
         [fig, range_slider, label_box],
     )
 
-def get_gps_figure(
+
+def create_representative_gps_image(
     lat_raw: DataInstance,
     lon_raw: DataInstance,
-
-    vel_raw: DataInstance = None,
+    vel_raw: DataInstance | None = None,
     vel_thresh: float = 0.5,
     title: str | None = None,
     layout_config: LayoutConfig = DEFAULT_LAYOUT_CONFIG,
@@ -149,7 +145,7 @@ def get_gps_figure(
         Raw latitude data instance, timestamp alignment base
     lon_raw : DataInstance
         Raw longitude data instance
-    vel_raw : DataInstance, optional
+    vel_raw : DataInstance | None, optional
         Raw velocity data instance
     vel_thresh : float, optional
         Velocity threshold for trimming, by default 0.5, same unit as velocity
@@ -197,7 +193,7 @@ def get_gps_figure(
     xspan = xmax - xmin
     yspan = ymax - ymin
     span = max(xspan, yspan) * 1.1
-    half = span/2
+    half = span / 2
 
     fig = go.Figure()
     fig.add_trace(
@@ -228,7 +224,7 @@ def get_gps_figure(
         xaxis_title=dict(text="Longitude", font=dict(size=font_config.medium)),
         yaxis_title=dict(text="Latitude", font=dict(size=font_config.medium)),
         showlegend=False,
-        width=int(layout_config.height), # make square
+        width=int(layout_config.height),  # make square
         height=int(layout_config.height),
         margin=layout_config.margin,
         plot_bgcolor=layout_config.plot_bgcolor,

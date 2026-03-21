@@ -8,8 +8,8 @@ from ..plotting.data_instance_plotter import *
 from ..plotting.plotting_constants import *
 from ..utils.data_summary import single_run_summary
 from ..utils.diff import diff
-from ..utils.types import Timescale
 from ..utils.search import search
+from ..utils.types import Timescale
 from .csv import *
 from .data_instance import DataInstance
 from .single_run_data import SingleRunData
