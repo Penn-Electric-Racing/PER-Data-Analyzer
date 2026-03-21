@@ -122,12 +122,12 @@ def plot_gps_trimmer(
         [fig, range_slider, label_box],
     )
 
-def plot_gps_thumbnail(
+def get_gps_figure(
     lat_raw: DataInstance,
     lon_raw: DataInstance,
-    vel_raw: DataInstance,
 
-    vel_thresh: float = 1,
+    vel_raw: DataInstance = None,
+    vel_thresh: float = 0.5,
     title: str | None = None,
     layout_config: LayoutConfig = DEFAULT_LAYOUT_CONFIG,
     font_config: FontConfig = DEFAULT_FONT_CONFIG,
@@ -141,11 +141,10 @@ def plot_gps_thumbnail(
         Raw latitude data instance, timestamp alignment base
     lon_raw : DataInstance
         Raw longitude data instance
-    vel_raw : DataInstance
+    vel_raw : DataInstance, optional
         Raw velocity data instance
     vel_thresh : float, optional
-        Velocity threshold for trimming, by default 1, same unit as velocity
-        Velocity threshold for trimming, by default 1, same unit as velocity
+        Velocity threshold for trimming, by default 0.5, same unit as velocity
     title : str | None, optional
         Title for the plot, by default None
     layout_config : LayoutConfig, optional
@@ -161,16 +160,24 @@ def plot_gps_thumbnail(
 
     # Align timestamps
     lat_aligned, lon_aligned = left_join_data_instances(lat_raw, lon_raw)
-    _, vel_aligned = left_join_data_instances(lat_aligned, vel_raw)
+    if vel_raw is not None:
+        _, vel_aligned = left_join_data_instances(lat_aligned, vel_raw)
 
-    # Get first/last ts vel>vel_thresh
-    mask = vel_aligned.value_np > vel_thresh
-    ts_first_idx = np.argmax(mask) if mask.any() else -1
-    ts_last_idx = len(mask) - 1 - np.argmax(mask[::-1]) if mask.any() else -1
+        # Get first/last ts vel>vel_thresh
+        mask = vel_aligned.value_np > vel_thresh
+        ts_first_idx = np.argmax(mask) if mask.any() else -1
+        ts_last_idx = len(mask) - 1 - np.argmax(mask[::-1]) if mask.any() else -1
 
-    # Get trimmed data
-    lon_trimmed = lon_aligned.value_np[ts_first_idx : ts_last_idx + 1]
-    lat_trimmed = lat_aligned.value_np[ts_first_idx : ts_last_idx + 1]
+        if ts_first_idx == -1 or ts_last_idx == -1:
+            print("Velocity never exceeds threshold, skip graphing")
+            return
+
+        # Get trimmed data
+        lon_trimmed = lon_aligned.value_np[ts_first_idx : ts_last_idx + 1]
+        lat_trimmed = lat_aligned.value_np[ts_first_idx : ts_last_idx + 1]
+    else:
+        lon_trimmed = lon_aligned.value_np
+        lat_trimmed = lat_aligned.value_np
 
     # Get data for graph
     xmin, xmax = lon_trimmed.min(), lon_trimmed.max()
