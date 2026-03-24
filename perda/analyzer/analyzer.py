@@ -7,9 +7,10 @@ from plotly import graph_objects as go
 from ..plotting.data_instance_plotter import *
 from ..plotting.plotting_constants import *
 from ..utils.data_summary import single_run_summary
-from ..utils.types import Timescale
-from ..utils.search import search
 from ..utils.diff import diff
+from ..utils.frequency_analysis import analyze_frequency as _analyze_frequency
+from ..utils.search import search
+from ..utils.types import Timescale
 from .csv import *
 from .data_instance import DataInstance
 from .single_run_data import SingleRunData
@@ -136,21 +137,18 @@ class Analyzer:
 
     def diff(
         self,
-        incoming_data: SingleRunData,
-        force_compare: bool = False,
+        server_data: SingleRunData,
         timestamp_tolerance_ms: int = 2,
         diff_rtol: float = 1e-3,
         diff_atol: float = 1e-3,
-    ) -> None:
+    ) -> go.Figure:
         """
-        Compute the differences between the current data and incoming data.
+        Compute the differences between the current data (assumed to be from RPI) and server data.
 
         Parameters
         ----------
-        incoming_data : SingleRunData
-            The incoming data to compare against.
-        force_compare : bool, optional
-            If True, compare matched variables even when C++ name sets differ.
+        server_data : SingleRunData
+            The server data to compare against.
         timestamp_tolerance_ms : int, optional
             Timestamp tolerance used to match points between streams.
         diff_rtol : float, optional
@@ -158,13 +156,63 @@ class Analyzer:
         diff_atol : float, optional
             Absolute tolerance for value comparison (numpy.isclose).
         """
-        diff(
+        return diff(
             self.data,
-            incoming_data,
-            force_compare=force_compare,
+            server_data,
             timestamp_tolerance_ms=timestamp_tolerance_ms,
             diff_rtol=diff_rtol,
             diff_atol=diff_atol,
+        )
+
+    def analyze_frequency(
+        self,
+        var: Union[str, int],
+        expected_frequency_hz: float | None = None,
+        gap_threshold_multiplier: float = 2.0,
+        font_config: FontConfig = DEFAULT_FONT_CONFIG,
+        layout_config: LayoutConfig = DEFAULT_LAYOUT_CONFIG,
+        plot_config: ScatterHistogramPlotConfig = DEFAULT_SCATTER_HISTOGRAM_PLOT_CONFIG,
+    ) -> go.Figure:
+        """
+        Analyse the sampling frequency of a variable and return a diagnostic figure.
+
+        Prints a summary to stdout and returns a Plotly figure with two subplots:
+        instantaneous frequency over time and an inter-sample interval histogram.
+
+        Parameters
+        ----------
+        var : Union[str, int]
+            Variable name or ID to look up in the parsed data.
+        expected_frequency_hz : float | None, optional
+            Nominal expected sampling frequency in Hz for error and gap diagnostics.
+            Default is None.
+        gap_threshold_multiplier : float, optional
+            Intervals exceeding this multiple of the expected (or median) interval
+            are flagged as gaps. Default is 2.0.
+        font_config : FontConfig, optional
+            Font sizes for plot elements. Default is DEFAULT_FONT_CONFIG.
+        layout_config : LayoutConfig, optional
+            Plot dimensions and margins. Default is DEFAULT_LAYOUT_CONFIG.
+
+        Returns
+        -------
+        go.Figure
+            Plotly figure with frequency diagnostics.
+
+        Examples
+        --------
+        >>> fig = aly.analyze_frequency("ams.stack.thermistors.temperature[38]", expected_frequency_hz=100)
+        >>> fig.show()
+        """
+        di = self.data[var]
+        return _analyze_frequency(
+            di,
+            expected_frequency_hz=expected_frequency_hz,
+            source_time_unit=self.data.timestamp_unit,
+            gap_threshold_multiplier=gap_threshold_multiplier,
+            font_config=font_config,
+            layout_config=layout_config,
+            plot_config=plot_config,
         )
 
     def _normalize_input(
@@ -174,7 +222,12 @@ class Analyzer:
         """
         Normalize various input types to a list of DataInstances.
         """
-        if isinstance(input_data, list):
-            return [self.data[item] for item in input_data]
+        if isinstance(input_data, DataInstance):
+            return [input_data]
+        elif isinstance(input_data, list):
+            return [
+                item if isinstance(item, DataInstance) else self.data[item]
+                for item in input_data
+            ]
         else:
             return [self.data[input_data]]

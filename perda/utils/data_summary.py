@@ -1,5 +1,6 @@
 from ..analyzer.data_instance import DataInstance
 from ..analyzer.single_run_data import SingleRunData
+from ..constants import DELIMITER, title_block
 from .integrate import average_over_time_range
 from .types import Timescale
 
@@ -45,10 +46,8 @@ def data_instance_summary(
     source_time_unit : Timescale, optional
         Timestamp unit used in `data_instance.timestamp_np`. Default is milliseconds.
     """
-    print(
-        f"{data_instance.label} | ID: {data_instance.var_id} | C++ Name: {data_instance.cpp_name}"
-    )
-    print("-" * 40)
+    print(str(data_instance))
+    print(DELIMITER)
 
     if len(data_instance) > 0:
         min_val = float(data_instance.value_np.min())
@@ -97,9 +96,9 @@ def single_run_summary(
     start_time = _convert_time(start_time, data.timestamp_unit, time_unit)
     end_time = _convert_time(end_time, data.timestamp_unit, time_unit)
 
-    print("==== Data Summary ====")
+    print(title_block("Data Summary"))
     print(f"Logging unit:       {data.timestamp_unit.value}")
     print(f"Time range:         {start_time} to {end_time} ({time_unit.value})")
     print(f"Total Variable:     {len(data.id_to_instance)}")
     print(f"Total Data Points:  {data.total_data_points}")
-    print("======================")
+    print(DELIMITER)

@@ -218,22 +218,3 @@ def inner_join(
     right_values = right_values[matched_indices]
 
     return timestamps, left_values, right_values
-
-
-def name_matches(short_name: str, full_name: str) -> bool:
-    """
-    Check if a short name matches a full CAN variable name.
-
-    Parameters
-    ----------
-    short_name : str
-        Short variable name to search for
-    full_name : str
-        Full CAN variable name (may include description and parentheses)
-
-    Returns
-    -------
-    bool
-        True if short_name is found in full_name (with or without parentheses)
-    """
-    return f"({short_name})" in full_name or f"{short_name}" in full_name

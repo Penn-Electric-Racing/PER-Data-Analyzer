@@ -4,9 +4,8 @@ from typing import Dict, Union
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from .data_instance import DataInstance
-from .joins import name_matches
 from ..utils.types import Timescale
+from .data_instance import DataInstance
 
 
 class SingleRunData(BaseModel):

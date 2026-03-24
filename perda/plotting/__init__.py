@@ -1,3 +1,5 @@
 from .data_instance_plotter import *
-from .gps_trimmer import *
+from .diff_plotter import *
+from .parametric_plot import *
 from .plotting_constants import *
+from .scatter_histogram_plotter import *

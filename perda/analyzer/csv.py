@@ -3,9 +3,9 @@ from collections import defaultdict
 import numpy as np
 from tqdm import tqdm
 
+from ..utils.types import Timescale
 from .data_instance import DataInstance
 from .single_run_data import SingleRunData
-from ..utils.types import Timescale
 
 
 def _resolve_parse_unit(
@@ -15,9 +15,7 @@ def _resolve_parse_unit(
     if isinstance(parse_unit, str):
         parse_unit = parse_unit.strip().lower()
         if parse_unit not in (Timescale.MS.value, Timescale.US.value):
-            raise ValueError(
-                f"parse_unit must be 'ms' or 'us', got {parse_unit}"
-            )
+            raise ValueError(f"parse_unit must be 'ms' or 'us', got {parse_unit}")
         parse_unit = Timescale(parse_unit)
 
     if parse_unit is not None and parse_unit not in (Timescale.MS, Timescale.US):

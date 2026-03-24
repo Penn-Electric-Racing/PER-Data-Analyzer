@@ -6,6 +6,7 @@ nbformat
 nbstripout
 
 # Data Processing
+numba
 numpy
 plotly
 pydantic

@@ -52,6 +52,17 @@ class DataInstance(BaseModel):
         if self.timestamp_np.shape[0] != self.value_np.shape[0]:
             raise ValueError("timestamp_np and value_np must have the same length.")
 
+    def __str__(self) -> str:
+        """
+        Human-readable one-line summary of this DataInstance.
+
+        Returns
+        -------
+        str
+            ``Label | ID: <var_id> | C++ Name: <cpp_name>``
+        """
+        return f"{self.label} | ID: {self.var_id} | C++ Name: {self.cpp_name}"
+
     def __len__(self) -> int:
         """
         Get number of data points in this DataInstance.
