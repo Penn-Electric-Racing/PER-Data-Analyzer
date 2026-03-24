@@ -135,7 +135,7 @@ def create_representative_gps_image(
     title: str | None = None,
     layout_config: LayoutConfig = DEFAULT_LAYOUT_CONFIG,
     font_config: FontConfig = DEFAULT_FONT_CONFIG,
-) -> go.Figure:
+) -> go.Figure | None:
     """
     Generate a GPS image plot from raw latitude, longitude, and velocity data.
 
@@ -174,7 +174,7 @@ def create_representative_gps_image(
 
         if ts_first_idx == -1 or ts_last_idx == -1:
             print("Velocity never exceeds threshold, skip graphing")
-            return
+            return None
 
         # Get trimmed data
         lon_trimmed = lon_aligned.value_np[ts_first_idx : ts_last_idx + 1]

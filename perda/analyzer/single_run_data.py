@@ -6,7 +6,6 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from ..utils.types import Timescale
 from .data_instance import DataInstance
-from .joins import name_matches
 
 
 class SingleRunData(BaseModel):

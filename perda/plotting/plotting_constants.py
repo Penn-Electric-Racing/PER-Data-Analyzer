@@ -42,7 +42,17 @@ class DiffPlotConfig(BaseModel):
     color_total: str = "gray"
 
 
+class ScatterHistogramPlotConfig(BaseModel):
+    """Configuration for frequency analysis visualization."""
+
+    color_scatter: str = "blue"
+    color_line: str = "crimson"
+    color_histogram: str = "blue"
+    histogram_bins: int = 80
+
+
 # Default configuration instances
 DEFAULT_FONT_CONFIG = FontConfig()
 DEFAULT_LAYOUT_CONFIG = LayoutConfig()
 DEFAULT_DIFF_PLOT_CONFIG = DiffPlotConfig()
+DEFAULT_SCATTER_HISTOGRAM_PLOT_CONFIG = ScatterHistogramPlotConfig()

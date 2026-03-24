@@ -8,6 +8,7 @@ from ..plotting.data_instance_plotter import *
 from ..plotting.plotting_constants import *
 from ..utils.data_summary import single_run_summary
 from ..utils.diff import diff
+from ..utils.frequency_analysis import analyze_frequency as _analyze_frequency
 from ..utils.search import search
 from ..utils.types import Timescale
 from .csv import *
@@ -136,18 +137,18 @@ class Analyzer:
 
     def diff(
         self,
-        incoming_data: SingleRunData,
+        server_data: SingleRunData,
         timestamp_tolerance_ms: int = 2,
         diff_rtol: float = 1e-3,
         diff_atol: float = 1e-3,
     ) -> go.Figure:
         """
-        Compute the differences between the current data and incoming data.
+        Compute the differences between the current data (assumed to be from RPI) and server data.
 
         Parameters
         ----------
-        incoming_data : SingleRunData
-            The incoming data to compare against.
+        server_data : SingleRunData
+            The server data to compare against.
         timestamp_tolerance_ms : int, optional
             Timestamp tolerance used to match points between streams.
         diff_rtol : float, optional
@@ -157,10 +158,61 @@ class Analyzer:
         """
         return diff(
             self.data,
-            incoming_data,
+            server_data,
             timestamp_tolerance_ms=timestamp_tolerance_ms,
             diff_rtol=diff_rtol,
             diff_atol=diff_atol,
+        )
+
+    def analyze_frequency(
+        self,
+        var: Union[str, int],
+        expected_frequency_hz: float | None = None,
+        gap_threshold_multiplier: float = 2.0,
+        font_config: FontConfig = DEFAULT_FONT_CONFIG,
+        layout_config: LayoutConfig = DEFAULT_LAYOUT_CONFIG,
+        plot_config: ScatterHistogramPlotConfig = DEFAULT_SCATTER_HISTOGRAM_PLOT_CONFIG,
+    ) -> go.Figure:
+        """
+        Analyse the sampling frequency of a variable and return a diagnostic figure.
+
+        Prints a summary to stdout and returns a Plotly figure with two subplots:
+        instantaneous frequency over time and an inter-sample interval histogram.
+
+        Parameters
+        ----------
+        var : Union[str, int]
+            Variable name or ID to look up in the parsed data.
+        expected_frequency_hz : float | None, optional
+            Nominal expected sampling frequency in Hz for error and gap diagnostics.
+            Default is None.
+        gap_threshold_multiplier : float, optional
+            Intervals exceeding this multiple of the expected (or median) interval
+            are flagged as gaps. Default is 2.0.
+        font_config : FontConfig, optional
+            Font sizes for plot elements. Default is DEFAULT_FONT_CONFIG.
+        layout_config : LayoutConfig, optional
+            Plot dimensions and margins. Default is DEFAULT_LAYOUT_CONFIG.
+
+        Returns
+        -------
+        go.Figure
+            Plotly figure with frequency diagnostics.
+
+        Examples
+        --------
+        >>> fig = aly.analyze_frequency("ams.stack.thermistors.temperature[38]", expected_frequency_hz=100)
+        >>> fig.show()
+        """
+        di = self.data[var]
+        return _analyze_frequency(
+            di,
+            expected_frequency_hz=expected_frequency_hz,
+            source_time_unit=self.data.timestamp_unit,
+            gap_threshold_multiplier=gap_threshold_multiplier,
+            font_config=font_config,
+            layout_config=layout_config,
+            plot_config=plot_config,
         )
 
     def _normalize_input(
