@@ -6,6 +6,7 @@ from tqdm import tqdm
 
 from ..analyzer.data_instance import DataInstance
 from ..analyzer.single_run_data import SingleRunData
+from ..constants import DELIMITER, title_block
 from ..plotting.diff_plotter import plot_diff_bars
 
 
@@ -224,7 +225,9 @@ def diff(
     has_mismatch = bool(in_rpi_not_in_server or in_server_not_in_rpi)
     if has_mismatch:
         print(
-            f"===== Mismatched Variables: {len(in_rpi_not_in_server) + len(in_server_not_in_rpi)} ====="
+            title_block(
+                f"Mismatched Variables: {len(in_rpi_not_in_server) + len(in_server_not_in_rpi)}"
+            )
         )
         if in_rpi_not_in_server:
             print(f"  Only in RPI:     {in_rpi_not_in_server}")
@@ -232,7 +235,7 @@ def diff(
             print(f"  Only in server: {in_server_not_in_rpi}")
         print()
     else:
-        print("===== All C++ names match =====\n")
+        print(title_block("All C++ names match") + "\n")
 
     # ===== Stage 2: Compare DataInstances =====
     rpi_extra_ts_list: list[npt.NDArray[np.int64]] = []
@@ -311,10 +314,10 @@ def diff(
         ),
     ]
     col_width = max(len(label) for label, _ in rows) + 2
-    print("===== Diff Summary =====")
+    print(title_block("Diff Summary"))
     for label, value in rows:
         print(f"{label:<{col_width}}  {value}")
-    print("========================")
+    print(DELIMITER)
 
     fig = plot_diff_bars(
         base_extra_ts=rpi_extra_agg,

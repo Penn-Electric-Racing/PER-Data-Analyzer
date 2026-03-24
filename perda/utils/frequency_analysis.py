@@ -4,6 +4,7 @@ from numpy.typing import NDArray
 from plotly import graph_objects as go
 
 from ..analyzer.data_instance import DataInstance
+from ..constants import DELIMITER, title_block
 from ..plotting.plotting_constants import *
 from ..plotting.scatter_histogram_plotter import plot_scatter_and_histogram
 from .types import Timescale
@@ -96,8 +97,8 @@ def analyze_frequency(
 
     W = 10
     W_Label = 16
-    print(f"{label}  |  ID: {data_instance.var_id}")
-    print("=" * 50)
+    print(str(data_instance))
+    print(DELIMITER)
     print(f"{'Duration:':<{W_Label}} {total_duration_s:{W}.3f} s")
     print(
         f"{'Total samples:':<{W_Label}} {len(data_instance):{W}d}"

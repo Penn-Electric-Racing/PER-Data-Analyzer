@@ -1,4 +1,5 @@
 from ..analyzer.single_run_data import SingleRunData
+from ..constants import DELIMITER, title_block
 
 
 def search(
@@ -32,7 +33,7 @@ def search(
     # Sort by score descending
     query_hits.sort(reverse=True, key=lambda x: x[0])
 
-    print("==== Search Results ====")
+    print(title_block("Search Results"))
     for score, var_id in query_hits:
         descript = data.id_to_descript[var_id]
         cpp_name = data.id_to_cpp_name[var_id]
@@ -40,7 +41,7 @@ def search(
         print(f"Variable: {descript}")
         print(f"ID: {var_id}")
         print(f"C++ Name: {cpp_name}")
-        print("-----------------------")
+        print(DELIMITER)
 
 
 def _determine_query_hit(
