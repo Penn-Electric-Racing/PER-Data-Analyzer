@@ -10,7 +10,9 @@ numba
 numpy
 plotly
 pydantic
+rapidfuzz
 scipy
+sentence-transformers
 
 # Progress Bar
 tqdm

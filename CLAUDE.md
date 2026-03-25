@@ -13,12 +13,12 @@ The library has four layers:
 1. **Analyzer** (`perda/analyzer/analyzer.py`) — the API for generic analysis tasks. Users typically interact with this class
    - Reduce complexity in this class by black-boxing functionality into the layers below
 
-2. **Core data models** (`perda/analyzer/`) - supporting classes and data structures for the `Analyzer` to function. Users may occasionally interact with these directly for more advanced use cases.
+2. **Core data models** (`perda/analyzer/`) — supporting classes and data structures for the `Analyzer` to function. Users may occasionally interact with these directly for more advanced use cases.
    - `DataInstance` — a single time-series variable (Pydantic model wrapping NumPy arrays for timestamps + values). Supports arithmetic operators and join operations. Timestamps must be monotonically non-decreasing float64.
    - `SingleRunData` — dictionary-like container for all variables in one run, supporting lookup by variable ID or name.
    - `joins.py` — timestamp-based alignment via left/inner/outer join with interpolation.
 
-3. **Utilities** (`perda/utils/`) - helper functions that reduce complexity in the main Analyzer by black-boxing some functionality.
+3. **Utilities** (`perda/utils/`) — helper functions that reduce complexity in the main Analyzer by black-boxing some functionality.
    - `search.py` — keyword scoring against variable names/descriptions for natural language variable lookup
    - `diff.py` — comparison of `SingleRunData` object against a backup `SingleRunData` object created from backup server data, reporting variable and value mismatches
    - `integrate.py` — time-series integration
@@ -33,6 +33,8 @@ The library has four layers:
       - `plot_parametric_curve_square` — Same, but with equal axes and a square aspect ratio
       - `plot_parametric_trimmer` — Interactive trimmer widget for a parametric curve, with optional timestamp labels
    - `plotting_constants.py` — All config objects that can be used to configure our plotting functions, as well as sensible defaults
+
+5. **Text Encoder Models** — Cross-encoder language models used in this codebase are installed automatically with `pip install` and packaged under: `perda/models/stsb-cross-encoder/`. They should be available on successful installation.
 
 ## Code Conventions
 
