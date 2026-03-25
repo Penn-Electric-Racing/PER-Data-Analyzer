@@ -68,7 +68,7 @@ def search(data: SingleRunData, query: str) -> None:
     data : SingleRunData
         Parsed CSV telemetry data.
     query : str
-        Free-text search query (e.g. ``"bat wheel"``).
+        Free-text search query (e.g. "bat wheel").
 
     Raises
     ------
@@ -172,7 +172,7 @@ def build_search_card(cpp_name: str, descript: str) -> str:
     Parameters
     ----------
     cpp_name : str
-        C++ variable name (e.g. ``"pcm.requestedTorque"``).
+        C++ variable name (e.g. "pcm.requestedTorque").
     descript : str
         Human-readable variable description.
 
@@ -194,7 +194,7 @@ def build_search_card(cpp_name: str, descript: str) -> str:
 def keyword_score(query_terms: list[str], entry: SearchEntry) -> float:
     """Score a card against query terms using fuzzy partial matching.
 
-    Uses ``rapidfuzz.fuzz.partial_ratio`` per term then averages. Handles
+    Uses rapidfuzz.fuzz.partial_ratio per term then averages. Handles
     prefixes, substrings, and minor typos naturally.
 
     Parameters
@@ -225,7 +225,7 @@ def combine_scores(
     """Combine semantic and keyword scores using a weighted blend.
 
     Short queries (fewer terms) get more keyword weight; longer queries lean
-    on semantic relevance. The blend weight is computed by ``_keyword_weight``.
+    on semantic relevance.
 
     Parameters
     ----------
