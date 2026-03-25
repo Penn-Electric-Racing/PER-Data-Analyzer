@@ -46,7 +46,7 @@ def plot_parametric_curve(
     """
     fig = go.Figure()
     fig.add_trace(
-        go.Scatter(
+        go.Scattergl(
             x=x,
             y=y,
             mode="lines+markers",
@@ -171,7 +171,7 @@ def plot_parametric_trimmer(
 
     fig = go.FigureWidget()
     fig.add_trace(
-        go.Scatter(
+        go.Scattergl(
             x=x,
             y=y,
             mode="lines+markers",
