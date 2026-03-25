@@ -66,7 +66,7 @@ def plot_single_axis(
         timestamps_s = _timestamps_to_seconds(di.timestamp_np, timestamp_unit)
 
         fig.add_trace(
-            go.Scatter(
+            go.Scattergl(
                 x=timestamps_s,
                 y=di.value_np,
                 mode="lines",
@@ -154,7 +154,7 @@ def plot_dual_axis(
         timestamps_s = _timestamps_to_seconds(di.timestamp_np, timestamp_unit)
 
         fig.add_trace(
-            go.Scatter(
+            go.Scattergl(
                 x=timestamps_s,
                 y=di.value_np,
                 mode="lines",
@@ -173,7 +173,7 @@ def plot_dual_axis(
         timestamps_s = _timestamps_to_seconds(di.timestamp_np, timestamp_unit)
 
         fig.add_trace(
-            go.Scatter(
+            go.Scattergl(
                 x=timestamps_s,
                 y=di.value_np,
                 mode="lines",
