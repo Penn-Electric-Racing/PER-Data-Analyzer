@@ -1,63 +1,63 @@
 """Semantic + keyword search.
 
-Each variable is represented by a search card: its C++ name +
-description. Results is combined from semantic cross-encoder score with
-keyword matching. Short queries rely more on keyword
-matching, while longer queries rely more on semantic ranking.
+Each variable is represented by a search card combining its expanded C++
+identifier tokens with its description. Results are ranked by a weighted blend
+of cross-encoder semantic score and rapidfuzz keyword score. Short queries lean
+on keyword matching; longer queries lean on semantic ranking.
 """
 
 import re
-from functools import lru_cache
 from pathlib import Path
 
+from pydantic import BaseModel
+from rapidfuzz import fuzz
 from sentence_transformers.cross_encoder import CrossEncoder
 
 from ..analyzer.single_run_data import SingleRunData
 from ..constants import DELIMITER, title_block
 
-# ---------------------------------------------------------------------------
-# Model resolution
-# ---------------------------------------------------------------------------
+_MODEL_DIR = Path(__file__).resolve().parents[1] / "models" / "stsb-cross-encoder"
+if not _MODEL_DIR.exists():
+    raise RuntimeError(
+        "Search model not found. Please restart your kernel with an internet "
+        "connection so the model can be downloaded on import."
+    )
+_model = CrossEncoder(str(_MODEL_DIR))
 
-_PACKAGED_MODEL_DIR = (
-    Path(__file__).resolve().parents[1] / "models" / "stsb-cross-encoder"
-)
-_REPO_MODEL_DIR = Path(__file__).resolve().parents[2] / "models" / "stsb-cross-encoder"
-_HF_MODEL_ID = "cross-encoder/stsb-distilroberta-base"
-
-
-def _resolve_model_dir() -> Path:
-    """Return the first existing local model directory, or the packaged path."""
-    for candidate in (_PACKAGED_MODEL_DIR, _REPO_MODEL_DIR):
-        if candidate.exists():
-            return candidate
-    return _PACKAGED_MODEL_DIR
-
-
-_LOCAL_MODEL_DIR = _resolve_model_dir()
-
-# ---------------------------------------------------------------------------
-# Domain abbreviations
-# ---------------------------------------------------------------------------
 
 ABBREVIATIONS: dict[str, str] = {
     "pcm": "powertrain control module",
     "pdu": "power distribution unit",
     "ams": "accumulator management system",
     "bms": "battery management system",
+    "lvbms": "low voltage battery management system",
     "dash": "dashboard",
+    "ludwig": "data acquisition dashboard",
+    "daqdash": "data acquisition dashboard",
     "moc": "motor controller",
-    "nav": "navigation",
+    "nav": "vectornav",
+    "vnav": "vectornav",
+    "ins": "inertial navigation system",
     "bat": "battery",
     "bspd": "brake system plausibility device",
     "rtds": "ready to drive sound",
     "imd": "insulation monitoring device",
     "flt": "fault",
+    "smo": "sliding mode observer",
+    "mma": "minimum maximum average",
+    "aerorake": "aero rakes",
+    "shockpot": "shock potentiometer",
+    "regen": "regenerative braking",
 }
 
-# ---------------------------------------------------------------------------
-# Public API
-# ---------------------------------------------------------------------------
+
+class SearchEntry(BaseModel):
+    """One entry in the search deck, holding raw variable data alongside its search card."""
+
+    var_id: int
+    cpp_name: str
+    descript: str
+    card: str
 
 
 def search(data: SingleRunData, query: str) -> None:
@@ -75,218 +75,188 @@ def search(data: SingleRunData, query: str) -> None:
     ValueError
         If the query is empty or has no alphanumeric terms.
     """
-    query = _normalize(query)
+    query = query.strip()
     if not query:
         raise ValueError("Search query cannot be empty.")
 
-    query_terms = _tokenize(query)
-    if not query_terms:
+    keyword_query = re.findall(r"[a-z0-9]+", query.lower())
+    if not keyword_query:
         raise ValueError("Search query must contain letters or numbers.")
 
-    model = _load_model()
+    semantic_query = preprocess_query(query)
 
-    semantic_query = _preprocess_query(query)
+    deck = build_search_deck(data)
 
-    corpus: list[str] = []
-    corpus_meta: list[tuple[int, str, str]] = []
-
-    for var_id, cpp_name in data.id_to_cpp_name.items():
-        descript = data.id_to_descript[var_id]
-
-        if query == _normalize(cpp_name):
-            print("Exact match found!")
-            _print_result(var_id, cpp_name, descript, score=1.0)
-            return
-
-        corpus.append(_build_card(cpp_name, descript))
-        corpus_meta.append((var_id, cpp_name, descript))
-
-    if not corpus:
-        print("No variables available to search.")
-        return
-
+    # rank() returns dicts with "corpus_id" (index into deck) and "score"
     semantic_scores = {
         int(r["corpus_id"]): float(r["score"])
-        for r in model.rank(semantic_query, corpus)
+        for r in _model.rank(semantic_query, [e.card for e in deck])
     }
 
-    kw_weight = _keyword_weight(query_terms)
-    ranked = []
-    for idx, card in enumerate(corpus):
-        _, cpp_name, descript = corpus_meta[idx]
-        sem = semantic_scores.get(idx, 0.0)
-        kw = _keyword_score(query_terms, cpp_name, descript, card)
-        ranked.append((kw_weight * kw + (1.0 - kw_weight) * sem, idx))
+    # Combine semantic and keyword scores
+    num_terms = len(keyword_query)
+    ranked = sorted(
+        (
+            (
+                combine_scores(
+                    semantic_scores.get(idx, 0.0),
+                    keyword_score(keyword_query, entry),
+                    num_terms,
+                ),
+                idx,
+            )
+            for idx, entry in enumerate(deck)
+        ),
+        reverse=True,
+    )
 
-    ranked.sort(key=lambda x: x[0], reverse=True)
-
+    # Print top results
     print(title_block("Search Results"))
     print("Query: ", query)
     for score, idx in ranked[:10]:
         print(DELIMITER)
-        _print_result(*corpus_meta[idx], score=score)
+        print_result(deck[idx], score=score)
 
 
-# ---------------------------------------------------------------------------
-# Text preprocessing
-# ---------------------------------------------------------------------------
+def preprocess_query(query: str) -> str:
+    """Expand domain abbreviations in a search query for semantic ranking.
 
+    Parameters
+    ----------
+    query : str
+        Raw user query string.
 
-def _normalize(text: str) -> str:
-    """Lowercase and collapse whitespace."""
-    return " ".join(text.lower().strip().split())
-
-
-def _tokenize(text: str) -> list[str]:
-    """Extract lowercase alphanumeric tokens from *text*."""
-    return re.findall(r"[a-z0-9]+", _normalize(text))
-
-
-def _tokenize_identifier(identifier: str) -> list[str]:
-    """Split a telemetry identifier into searchable tokens.
-
-    Splits on separators and camelCase boundaries, then expands known
-    abbreviations.
+    Returns
+    -------
+    str
+        Query with known abbreviations expanded and duplicate tokens removed.
     """
-    tokens: list[str] = []
-    for segment in re.split(r"[._]", identifier):
-        if not segment:
-            continue
-        # Split camelCase: "requestedTorque" -> ["requested", "Torque"]
-        parts = re.sub(r"([a-z])([A-Z])", r"\1 \2", segment).split()
-        for part in parts:
-            lowered = part.lower()
-            if lowered in ABBREVIATIONS:
-                tokens.append(f"{ABBREVIATIONS[lowered]} ({part})")
-            else:
-                tokens.append(lowered)
-    return tokens
-
-
-def _preprocess_query(query: str) -> str:
-    """Expand abbreviations and deduplicate tokens for semantic ranking."""
     terms: list[str] = []
-    for term in _tokenize(query):
+    for term in re.findall(r"[a-z0-9]+", query.lower()):
         terms.append(term)
         if term in ABBREVIATIONS:
-            terms.extend(_tokenize(ABBREVIATIONS[term]))
+            terms.extend(ABBREVIATIONS[term].split())
     return " ".join(dict.fromkeys(terms))
 
 
-# ---------------------------------------------------------------------------
-# Card construction
-# ---------------------------------------------------------------------------
+def build_search_deck(data: SingleRunData) -> list[SearchEntry]:
+    """Build the search deck from all variables in a run.
 
+    Parameters
+    ----------
+    data : SingleRunData
+        Parsed CSV telemetry data.
 
-def _build_card(cpp_name: str, descript: str) -> str:
-    """Build one search card from the variable name and description."""
-    id_tokens = _tokenize_identifier(cpp_name)
-    context = " ".join(dict.fromkeys(id_tokens))
-    return f"{context} | {_normalize(descript)}"
-
-
-# ---------------------------------------------------------------------------
-# Scoring
-# ---------------------------------------------------------------------------
-
-
-def _keyword_weight(query_terms: list[str]) -> float:
-    """Compute the blend weight between keyword and semantic scores.
-
-    Short queries get more keyword weight; longer queries lean semantic.
+    Returns
+    -------
+    list[SearchEntry]
+        One entry per variable, containing its ID, names, description, and search card.
     """
-    if not query_terms:
-        return 0.5
-
-    n = len(query_terms)
-    avg_len = sum(len(t) for t in query_terms) / n
-
-    # Linear interpolation: 0.60 at n=1, 0.45 at n=2, 0.35 floor at n>=3
-    base = max(0.35, 0.60 - 0.15 * (n - 1))
-
-    # Abbreviation boost for short single-token queries
-    if n == 1:
-        ramp = max(0.0, min(1.0, 4.0 - avg_len))
-        base += 0.20 * ramp
-
-    return min(base, 1.0)
+    return [
+        SearchEntry(
+            var_id=var_id,
+            cpp_name=cpp_name,
+            descript=data.id_to_descript[var_id],
+            card=build_search_card(cpp_name, data.id_to_descript[var_id]),
+        )
+        for var_id, cpp_name in data.id_to_cpp_name.items()
+    ]
 
 
-def _term_match_strength(
-    term: str,
-    card_tokens: list[str],
-    card_text: str,
-) -> float:
-    """Return how strongly one query term matches a search card.
+def build_search_card(cpp_name: str, descript: str) -> str:
+    """Build a search card for one variable.
 
-    Exact token matches score highest, followed by prefix and substring matches.
+    Splits the C++ identifier on separators and camelCase boundaries, expands
+    known abbreviations inline, and appends the description.
+
+    Parameters
+    ----------
+    cpp_name : str
+        C++ variable name (e.g. ``"pcm.requestedTorque"``).
+    descript : str
+        Human-readable variable description.
+
+    Returns
+    -------
+    str
+        Space-separated card text ready for the cross-encoder and keyword scorer.
     """
-    best = 0.0
-
-    for token in card_tokens:
-        if token == term:
-            return 1.0
-
-        coverage = len(term) / max(len(token), 1)
-        if token.startswith(term):
-            best = max(best, 0.7 + 0.3 * coverage)
-        elif term in token:
-            best = max(best, 0.4 + 0.4 * coverage)
-
-    if best == 0.0 and term in card_text:
-        best = 0.4 + 0.2 * min(len(term) / 10.0, 1.0)
-
-    return min(best, 1.0)
+    tokens: list[str] = []
+    for segment in re.split(r"[._]", cpp_name):
+        for part in re.sub(r"([a-z])([A-Z])", r"\1 \2", segment).split():
+            lowered = part.lower()
+            tokens.append(
+                ABBREVIATIONS[lowered] if lowered in ABBREVIATIONS else lowered
+            )
+    return " ".join(dict.fromkeys(tokens)) + " " + descript.lower()
 
 
-def _keyword_score(
-    query_terms: list[str],
-    cpp_name: str,
-    descript: str,
-    card: str,
+def keyword_score(query_terms: list[str], entry: SearchEntry) -> float:
+    """Score a card against query terms using fuzzy partial matching.
+
+    Uses ``rapidfuzz.fuzz.partial_ratio`` per term then averages. Handles
+    prefixes, substrings, and minor typos naturally.
+
+    Parameters
+    ----------
+    query_terms : list[str]
+        Tokenized query terms.
+    entry : SearchEntry
+        The search entry to score.
+
+    Returns
+    -------
+    float
+        Mean fuzzy match score in [0, 1].
+    """
+    raw_text = entry.cpp_name + " " + entry.descript
+    search_text = " ".join(
+        re.sub(r"([a-z])([A-Z])", r"\1 \2", raw_text).split()
+    ).lower()
+
+    return sum(
+        fuzz.partial_ratio(term, search_text) / 100.0 for term in query_terms
+    ) / len(query_terms)
+
+
+def combine_scores(
+    semantic_score: float, keyword_score: float, num_terms: int
 ) -> float:
-    """Aggregate keyword relevance for all query terms into ``[0, 1]``."""
-    if not query_terms:
-        return 0.0
+    """Combine semantic and keyword scores using a weighted blend.
 
-    card_text = _normalize(f"{cpp_name} {descript} {card}")
-    card_tokens = _tokenize(card_text)
+    Short queries (fewer terms) get more keyword weight; longer queries lean
+    on semantic relevance. The blend weight is computed by ``_keyword_weight``.
 
-    strengths = [_term_match_strength(t, card_tokens, card_text) for t in query_terms]
+    Parameters
+    ----------
+    semantic_score : float
+        Relevance score from the cross-encoder.
+    keyword_score : float
+        Relevance score from fuzzy keyword matching.
+    num_terms : int
+        Number of terms in the original query.
 
-    raw = sum(strengths)
-    coverage = sum(1 for s in strengths if s > 0.0) / len(query_terms)
-    raw += 0.5 * coverage**2
-
-    return min(raw / (len(query_terms) + 0.5), 1.0)
-
-
-# ---------------------------------------------------------------------------
-# Model loading
-# ---------------------------------------------------------------------------
-
-
-@lru_cache(maxsize=1)
-def _load_model() -> CrossEncoder:
-    """Load and cache the cross-encoder, preferring a local copy."""
-    if _LOCAL_MODEL_DIR.exists():
-        return CrossEncoder(str(_LOCAL_MODEL_DIR))
-    return CrossEncoder(_HF_MODEL_ID)
+    Returns
+    -------
+    float
+        Combined score
+    """
+    kw_weight = max(0.3, 0.6 - 0.05 * (num_terms - 1))
+    combined = kw_weight * keyword_score + (1 - kw_weight) * semantic_score
+    return combined
 
 
-# ---------------------------------------------------------------------------
-# Display
-# ---------------------------------------------------------------------------
+def print_result(entry: SearchEntry, score: float) -> None:
+    """Print a single ranked search result.
 
-
-def _print_result(
-    var_id: int,
-    cpp_name: str,
-    descript: str,
-    score: float,
-) -> None:
-    """Print a single ranked result."""
+    Parameters
+    ----------
+    entry : SearchEntry
+        The search entry to display.
+    score : float
+        Combined relevance score.
+    """
     print(f"Score: {score:.2f}")
-    print(f"Variable ID: {var_id}")
-    print(f"C++ Name: {cpp_name}")
-    print(f"Description: {descript}")
+    print(f"Variable ID: {entry.var_id}")
+    print(f"C++ Name: {entry.cpp_name}")
+    print(f"Description: {entry.descript}")
