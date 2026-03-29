@@ -6,6 +6,7 @@ from plotly import graph_objects as go
 
 from ..plotting.data_instance_plotter import *
 from ..plotting.plotting_constants import *
+from ..utils.concat import concat_single_run_data
 from ..utils.data_summary import single_run_summary
 from ..utils.diff import diff
 from ..utils.frequency_analysis import analyze_frequency as _analyze_frequency
@@ -46,6 +47,42 @@ class Analyzer:
             parse_unit=parse_unit,
         )
 
+    @staticmethod
+    def concat(
+        first: "Analyzer",
+        second: "Analyzer",
+        gap: int = 1,
+    ) -> "Analyzer":
+        """
+        Concatenate two Analyzers sequentially in time.
+
+        Variables are matched by cpp_name. Unmatched variables are kept with
+        data from only the run that has them. If the two runs use different
+        timestamp units the ms run is upscaled to us.
+
+        Parameters
+        ----------
+        first : Analyzer
+            First analyzer (earlier in time)
+        second : Analyzer
+            Second analyzer (appended after first)
+        gap : int
+            Gap in timestamp units between the two runs. Default is 1.
+
+        Returns
+        -------
+        Analyzer
+            New Analyzer containing the concatenated data
+
+        Examples
+        --------
+        >>> merged = Analyzer.concat(aly1, aly2)
+        >>> merged.plot("ams.pack.voltage")
+        """
+        merged = object.__new__(Analyzer)
+        merged.data = concat_single_run_data(first.data, second.data, gap=gap)
+        return merged
+
     def __str__(self) -> str:
         old_stdout = sys.stdout
 
@@ -84,9 +121,12 @@ class Analyzer:
         show_legend: bool = True,
         font_config: FontConfig = DEFAULT_FONT_CONFIG,
         layout_config: LayoutConfig = DEFAULT_LAYOUT_CONFIG,
+        vline_config: VLineConfig = DEFAULT_VLINE_CONFIG,
     ) -> go.Figure:
         """
         Display variables from the parsed data on an interactive Plotly plot.
+
+        Concat boundaries (if any) are automatically shown as vertical lines.
 
         Parameters
         ----------
@@ -105,9 +145,20 @@ class Analyzer:
             Font configuration for plot elements. Default is DEFAULT_FONT_CONFIG
         layout_config : LayoutConfig, optional
             Layout configuration for plot dimensions. Default is DEFAULT_LAYOUT_CONFIG
+        vline_config : VLineConfig, optional
+            Visual configuration for concat boundary lines. Default is DEFAULT_VLINE_CONFIG.
         """
         # Normalize left input to List[DataInstance]
         var_1_norm = self._normalize_input(var_1)
+
+        # Convert concat boundaries to seconds for the plotter
+        vlines: List[float] | None = None
+        if self.data.concat_boundaries:
+            unit = self.data.timestamp_unit
+            divisor = (
+                1e6 if unit == Timescale.US else 1e3 if unit == Timescale.MS else 1.0
+            )
+            vlines = [b / divisor for b in self.data.concat_boundaries]
 
         if var_2 is not None:
             # Normalize right input to List[DataInstance]
@@ -123,6 +174,8 @@ class Analyzer:
                 font_config=font_config,
                 layout_config=layout_config,
                 timestamp_unit=self.data.timestamp_unit,
+                vlines=vlines,
+                vline_config=vline_config,
             )
         else:
             return plot_single_axis(
@@ -133,6 +186,8 @@ class Analyzer:
                 font_config=font_config,
                 layout_config=layout_config,
                 timestamp_unit=self.data.timestamp_unit,
+                vlines=vlines,
+                vline_config=vline_config,
             )
 
     def diff(

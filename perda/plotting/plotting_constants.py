@@ -51,8 +51,18 @@ class ScatterHistogramPlotConfig(BaseModel):
     histogram_bins: int = 80
 
 
+class VLineConfig(BaseModel):
+    """Configuration for vertical marker lines on plots."""
+
+    color: str = "gray"
+    width: int = 2
+    dash: str = "dash"
+    opacity: float = 0.7
+
+
 # Default configuration instances
 DEFAULT_FONT_CONFIG = FontConfig()
 DEFAULT_LAYOUT_CONFIG = LayoutConfig()
 DEFAULT_DIFF_PLOT_CONFIG = DiffPlotConfig()
 DEFAULT_SCATTER_HISTOGRAM_PLOT_CONFIG = ScatterHistogramPlotConfig()
+DEFAULT_VLINE_CONFIG = VLineConfig()
