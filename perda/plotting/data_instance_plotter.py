@@ -20,6 +20,33 @@ def _timestamps_to_seconds(
     return timestamps
 
 
+def _add_vlines(
+    fig: go.Figure,
+    vlines: List[float],
+    vline_config: "VLineConfig",
+) -> None:
+    """
+    Add vertical lines to an existing Plotly figure.
+
+    Parameters
+    ----------
+    fig : go.Figure
+        Target figure
+    vlines : List[float]
+        X-axis positions (in seconds) where vertical lines are drawn
+    vline_config : VLineConfig
+        Visual configuration for the vertical lines
+    """
+    for x in vlines:
+        fig.add_vline(
+            x=x,
+            line_dash=vline_config.dash,
+            line_color=vline_config.color,
+            line_width=vline_config.width,
+            opacity=vline_config.opacity,
+        )
+
+
 def plot_single_axis(
     data_instances: List[DataInstance],
     title: str | None = None,
@@ -28,6 +55,8 @@ def plot_single_axis(
     layout_config: LayoutConfig = DEFAULT_LAYOUT_CONFIG,
     font_config: FontConfig = DEFAULT_FONT_CONFIG,
     timestamp_unit: Timescale = Timescale.MS,
+    vlines: List[float] | None = None,
+    vline_config: "VLineConfig" = DEFAULT_VLINE_CONFIG,
 ) -> go.Figure:
     """
     Plot one or more DataInstances on a single y-axis using Plotly.
@@ -46,10 +75,14 @@ def plot_single_axis(
     font_config : FontConfig, optional
     timestamp_unit : Timescale, optional
         Timestamp unit in the underlying data. Converted to seconds for x-axis display.
+    vlines : List[float] | None, optional
+        X-axis positions (in seconds) where vertical lines are drawn. Default is None.
+    vline_config : VLineConfig, optional
+        Visual configuration for the vertical lines. Default is DEFAULT_VLINE_CONFIG.
 
     Returns
     -------
-    None
+    go.Figure
     """
     if not data_instances:
         print("Warning: No data instances provided for plotting")
@@ -95,6 +128,9 @@ def plot_single_axis(
         legend=dict(font=dict(size=font_config.small)),
     )
 
+    if vlines:
+        _add_vlines(fig, vlines, vline_config)
+
     return fig
 
 
@@ -108,6 +144,8 @@ def plot_dual_axis(
     font_config: FontConfig = DEFAULT_FONT_CONFIG,
     layout_config: LayoutConfig = DEFAULT_LAYOUT_CONFIG,
     timestamp_unit: Timescale = Timescale.MS,
+    vlines: List[float] | None = None,
+    vline_config: VLineConfig = DEFAULT_VLINE_CONFIG,
 ) -> go.Figure:
     """
     Plot DataInstances on dual y-axes using Plotly.
@@ -132,6 +170,10 @@ def plot_dual_axis(
         Layout configuration for plot dimensions. Default is DEFAULT_LAYOUT_CONFIG
     timestamp_unit : Timescale, optional
         Timestamp unit in the underlying data. Converted to seconds for x-axis display.
+    vlines : List[float] | None, optional
+        X-axis positions (in seconds) where vertical lines are drawn. Default is None.
+    vline_config : VLineConfig, optional
+        Visual configuration for the vertical lines. Default is DEFAULT_VLINE_CONFIG.
 
     Returns
     -------
@@ -218,5 +260,8 @@ def plot_dual_axis(
         plot_bgcolor=layout_config.plot_bgcolor,
         legend=dict(font=dict(size=font_config.small)),
     )
+
+    if vlines:
+        _add_vlines(fig, vlines, vline_config)
 
     return fig

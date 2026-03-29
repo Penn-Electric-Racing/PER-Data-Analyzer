@@ -1,6 +1,6 @@
 """SingleRunData model for storing parsed CSV data."""
 
-from typing import Dict, Union
+from typing import Dict, List, Union
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -36,6 +36,10 @@ class SingleRunData(BaseModel):
     timestamp_unit: Timescale = Field(
         default=Timescale.MS,
         description="Timestamp logging unit for this run (ms/us)",
+    )
+    concat_boundaries: List[int] = Field(
+        default_factory=list,
+        description="Timestamps where concatenated runs begin (post-shift)",
     )
 
     def __getitem__(
