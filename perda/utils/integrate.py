@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 from numpy.typing import NDArray
 from scipy.integrate import cumulative_trapezoid
+from scipy.signal import savgol_filter
 
 from ..analyzer.data_instance import DataInstance
 from .types import Timescale

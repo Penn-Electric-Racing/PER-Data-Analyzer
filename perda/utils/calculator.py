@@ -1,5 +1,4 @@
 import numpy as np
-from scipy.signal import savgol_filter
 from ..analyzer.analyzer import Analyzer
 from ..analyzer.data_instance import DataInstance
 from ..utils.integrate import get_cumulative_integration
