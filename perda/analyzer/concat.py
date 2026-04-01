@@ -4,8 +4,8 @@ from typing import List
 
 import numpy as np
 
-from ..analyzer.data_instance import DataInstance
-from ..analyzer.single_run_data import SingleRunData
+from .data_instance import DataInstance
+from .single_run_data import SingleRunData
 from ..utils.types import Timescale
 
 
