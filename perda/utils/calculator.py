@@ -1,37 +1,32 @@
-from .analyzer import *
-from scipy.integrate import cumulative_trapezoid
 import numpy as np
 from scipy.signal import savgol_filter
-import pandas as pd
-
-def get_cumulative_integration(data, timescale=1000000, filter_window_size=10, n_sigmas=3, smoothing_window_len=11, smoothing_poly_order=2):
-
-    v = pd.Series(data.value_np)
-    t = np.array(data.timestamp_np)
-
-    # Calculate rolling median and the MAD (Median Absolute Deviation)
-    rolling_median = v.rolling(window=filter_window_size, center=True).median()
-    rolling_std = v.rolling(window=filter_window_size, center=True).apply(lambda x: np.abs(x - x.median()).median()) * 1.4826
-
-    # Identify spikes (points more than X "standard deviations" from the local median)
-    is_outlier = np.abs(v - rolling_median) > (n_sigmas * rolling_std)
-
-    # interpolate the outliers
-    v_cleaned = v.copy()
-    v_cleaned[is_outlier] = np.nan
-    v_cleaned = v_cleaned.interpolate(method='linear').bfill().ffill()
-
-    # Smoothing
-    if len(v_cleaned) > smoothing_window_len:
-        v_smooth = savgol_filter(v_cleaned, smoothing_window_len, smoothing_poly_order)
-    else:
-        v_smooth = v_cleaned
-
-    v_integrated = cumulative_trapezoid(v_smooth, x=t / timescale, initial=0)
-
-    return t, v_smooth, v_integrated
+from ..analyzer.analyzer import Analyzer
+from ..analyzer.data_instance import DataInstance
+from ..utils.integrate import get_cumulative_integration
 
 def detect_accel_event(torque_obj, speed_obj, torque_threshold=100, speed_threshold=0.5):
+    """Detect acceleration events based on torque and speed thresholds.
+
+    An event is active when torque exceeds `torque_threshold` and speed exceeds
+    `speed_threshold`, and ends when speed drops back to or below `speed_threshold`.
+
+    Parameters
+    ----------
+    torque_obj : DataInstance
+        Time-series of motor torque values.
+    speed_obj : DataInstance
+        Time-series of wheel speed values. The output is aligned to these timestamps.
+    torque_threshold : float
+        Minimum torque (in Nm) required to trigger an acceleration event.
+    speed_threshold : float
+        Speed value (in the units of `speed_obj`) used as the trigger floor and reset condition.
+
+    Returns
+    -------
+    DataInstance
+        Binary signal (0.0 or 1.0) on `speed_obj` timestamps, labeled "Accel Event",
+        where 1.0 indicates an active acceleration event.
+    """
     # Align Torque to Speed timestamps
     torque_interp = np.interp(
         speed_obj.timestamp_np,
@@ -62,6 +57,40 @@ def detect_accel_event(torque_obj, speed_obj, torque_threshold=100, speed_thresh
     return var
 
 def get_accel_triggers(aly : Analyzer, target_dist=75, timescale=1000000, torque_threshold=100, speed_threshold=0.5, filter_window_size=10, n_sigmas=3, smoothing_window_len=11, smoothing_poly_order=2):
+    """Find all acceleration events in a run and compute time-to-distance for each.
+
+    Detects acceleration events using `detect_accel_event`, integrates wheel speed to
+    compute cumulative distance, and records the elapsed time from each event start until
+    `target_dist` meters are covered.
+
+    Parameters
+    ----------
+    aly : Analyzer
+        Analyzer instance containing the run data.
+    target_dist : float
+        Target distance in meters to measure time to.
+    timescale : float
+        Factor to convert raw timestamps to seconds (e.g. 1000000 for microseconds).
+    torque_threshold : float
+        Minimum torque (in Nm) to trigger an acceleration event.
+    speed_threshold : float
+        Speed value used as the trigger floor and reset condition for event detection.
+    filter_window_size : int
+        Window size for outlier filtering in cumulative integration.
+    n_sigmas : float
+        Number of standard deviations for outlier detection in cumulative integration.
+    smoothing_window_len : int
+        Window length for Savitzky-Golay smoothing in cumulative integration.
+    smoothing_poly_order : int
+        Polynomial order for Savitzky-Golay smoothing in cumulative integration.
+
+    Returns
+    -------
+    list[dict]
+        List of dicts, one per qualifying event, each with keys:
+        ``start_time`` (raw timestamp), ``time_to_dist`` (seconds to reach `target_dist`),
+        and ``dist_reached`` (target distance in meters).
+    """
 
     speed_obj = (aly.data["pcm.wheelSpeeds.frontRight"] + aly.data["pcm.wheelSpeeds.frontLeft"]) / 2.0
     signal_obj = detect_accel_event(torque_obj=aly.data["pcm.moc.motor.requestedTorque"], speed_obj=aly.data["pcm.wheelSpeeds.frontRight"], torque_threshold=torque_threshold, speed_threshold=speed_threshold)
