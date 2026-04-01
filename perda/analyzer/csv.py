@@ -2,7 +2,7 @@ import numpy as np
 import polars as pl
 from tqdm import tqdm
 
-from ..utils.types import Timescale
+from ..utils.units import Timescale
 from .data_instance import DataInstance
 from .single_run_data import SingleRunData
 

@@ -1,11 +1,3 @@
-"""Semantic + keyword search.
-
-Each variable is represented by a search card combining its expanded C++
-identifier tokens with its description. Results are ranked by a weighted blend
-of cross-encoder semantic score and rapidfuzz keyword score. Short queries lean
-on keyword matching; longer queries lean on semantic ranking.
-"""
-
 import re
 from pathlib import Path
 
@@ -70,10 +62,12 @@ def search(data: SingleRunData, query: str) -> None:
     query : str
         Free-text search query (e.g. "bat wheel").
 
-    Raises
-    ------
-    ValueError
-        If the query is empty or has no alphanumeric terms.
+    Notes
+    -----
+    Results are ranked by weighted blend of cross-encoder semantic score and rapidfuzz keyword score.
+    Each variable is represented by a search card combining its expanded C++ identifier tokens with its description.
+
+    Short queries lean on keyword matching, longer queries lean on semantic ranking.
     """
     query = query.strip()
     if not query:

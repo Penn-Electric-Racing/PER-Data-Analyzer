@@ -4,7 +4,7 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
 from ..analyzer.data_instance import DataInstance
-from ..utils.types import Timescale
+from ..utils.units import Timescale
 from .plotting_constants import *
 
 

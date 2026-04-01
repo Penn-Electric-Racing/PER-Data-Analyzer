@@ -1,12 +1,11 @@
-"""Concatenate two SingleRunData objects sequentially."""
-
 from typing import List
 
 import numpy as np
 
+from ..analyzer.analyzer import Analyzer
+from ..utils.units import Timescale
 from .data_instance import DataInstance
 from .single_run_data import SingleRunData
-from ..utils.types import Timescale
 
 
 def _upscale_to_us(data: SingleRunData) -> SingleRunData:
@@ -46,7 +45,7 @@ def _upscale_to_us(data: SingleRunData) -> SingleRunData:
     )
 
 
-def concat_single_run_data(
+def _concat_single_run_data(
     first: SingleRunData,
     second: SingleRunData,
     gap: int = 1,
@@ -170,3 +169,39 @@ def concat_single_run_data(
         timestamp_unit=ts_unit,
         concat_boundaries=concat_boundaries,
     )
+
+
+def concat(
+    first: Analyzer,
+    second: Analyzer,
+    gap: int = 1,
+) -> Analyzer:
+    """
+    Concatenate two Analyzers sequentially in time.
+
+    Variables are matched by cpp_name. Unmatched variables are kept with
+    data from only the run that has them. If the two runs use different
+    timestamp units the ms run is upscaled to us.
+
+    Parameters
+    ----------
+    first : Analyzer
+        First analyzer (earlier in time)
+    second : Analyzer
+        Second analyzer (appended after first)
+    gap : int
+        Gap in timestamp units between the two runs. Default is 1.
+
+    Returns
+    -------
+    Analyzer
+        New Analyzer containing the concatenated data
+
+    Examples
+    --------
+    >>> merged = Analyzer.concat(aly1, aly2)
+    >>> merged.plot("ams.pack.voltage")
+    """
+    merged = object.__new__(Analyzer)
+    merged.data = _concat_single_run_data(first.data, second.data, gap=gap)
+    return merged

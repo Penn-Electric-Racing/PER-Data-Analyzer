@@ -13,7 +13,7 @@ from ..plotting.plotting_constants import (
     FontConfig,
     LayoutConfig,
 )
-from .types import Timescale
+from .units import Timescale
 
 
 def plot_gps_trimmer(
