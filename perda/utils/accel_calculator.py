@@ -1,6 +1,7 @@
 import numpy as np
 
 from ..analyzer.data_instance import DataInstance
+from .units import *
 
 
 def detect_accel_event(
@@ -58,7 +59,8 @@ def compute_accel_results(
     signal_obj: DataInstance,
     distance_obj: DataInstance,
     target_dist: float = 75,
-    timescale: float = 1000000,
+    source_time_unit: Timescale = Timescale.MS,
+    target_time_unit: Timescale = Timescale.S,
 ) -> list:
     """Compute time-to-distance results for each acceleration event.
 
@@ -70,8 +72,10 @@ def compute_accel_results(
         Cumulative distance signal (in meters) aligned to `signal_obj` timestamps.
     target_dist : float, optional
         Target distance in meters to measure time to. Default is 75.
-    timescale : float, optional
-        Factor to convert raw timestamps to seconds. Default is 1000000.
+    source_time_unit : Timescale, optional
+        Time unit of the input timestamps. Default is Timescale.MS.
+    target_time_unit : Timescale, optional
+        Time unit for the output times. Default is Timescale.S.
 
     Returns
     -------
@@ -114,7 +118,9 @@ def compute_accel_results(
             results.append(
                 {
                     "start_time": t_start,
-                    "time_to_dist": (t_target_hit - t_start) / timescale,
+                    "time_to_dist": convert_time(
+                        t_target_hit - t_start, source_time_unit, target_time_unit
+                    ),
                     "dist_reached": target_dist,
                 }
             )

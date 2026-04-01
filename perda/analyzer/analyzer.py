@@ -15,7 +15,7 @@ from ..utils.diff import diff
 from ..utils.frequency_analysis import analyze_frequency as _analyze_frequency
 from ..utils.integrate import smoothed_filtered_integration
 from ..utils.search import search
-from ..utils.units import Timescale
+from ..utils.units import Timescale, mph_seconds_to_meters
 from .csv import *
 from .data_instance import DataInstance
 from .single_run_data import SingleRunData
@@ -357,14 +357,17 @@ class Analyzer:
             smoothing_poly_order=smoothing_poly_order,
         )
         distance_obj = DataInstance(
-            timestamp_np=time_arr, value_np=distance / 3600 * 1609.34, label="Distance"
+            timestamp_np=time_arr,
+            value_np=mph_seconds_to_meters(distance),
+            label="Distance",
         )
 
         results = compute_accel_results(
             signal_obj,
             distance_obj,
             target_dist=target_dist,
-            timescale=timescale,
+            source_time_unit=self.data.timestamp_unit,
+            target_time_unit=Timescale.S,
         )
 
         for e in results:
