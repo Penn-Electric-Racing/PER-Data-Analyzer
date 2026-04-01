@@ -1,7 +1,25 @@
 import numpy as np
+from pydantic import BaseModel, Field
 
 from ..analyzer.data_instance import DataInstance
 from .units import *
+
+
+class AccelSegmentResult(BaseModel):
+    """Result of a single segment marked as an acceleration test"""
+
+    start_time: float = Field(description="Timestamp when the segment began.")
+    time_to_dist: float = Field(
+        description="Time to travel `dist_reached` meters from segment start."
+    )
+    dist_reached: float = Field(description="Distance of the segment in meters.")
+    timescale: Timescale = Field(description="Time unit for the output times.")
+
+    def __str__(self) -> str:
+        return (
+            f"Accel at {self.start_time:.2f}s: "
+            f"reached {self.dist_reached}m in {self.time_to_dist:.3f}s"
+        )
 
 
 def detect_accel_event(
@@ -61,7 +79,7 @@ def compute_accel_results(
     target_dist: float = 75,
     source_time_unit: Timescale = Timescale.MS,
     target_time_unit: Timescale = Timescale.S,
-) -> list:
+) -> list[AccelSegmentResult]:
     """Compute time-to-distance results for each acceleration event.
 
     Parameters
@@ -69,20 +87,18 @@ def compute_accel_results(
     signal_obj : DataInstance
         Binary accel event signal (0.0/1.0), typically from `detect_accel_event`.
     distance_obj : DataInstance
-        Cumulative distance signal (in meters) aligned to `signal_obj` timestamps.
+        Cumulative distance signal in meters.
     target_dist : float, optional
-        Target distance in meters to measure time to. Default is 75.
+        Target distance in meters. Default is 75.
     source_time_unit : Timescale, optional
-        Time unit of the input timestamps. Default is Timescale.MS.
+        Time unit of input timestamps. Default is Timescale.MS.
     target_time_unit : Timescale, optional
-        Time unit for the output times. Default is Timescale.S.
+        Time unit for output times. Default is Timescale.S.
 
     Returns
     -------
-    list[dict]
-        List of dicts, one per qualifying event, each with keys:
-        ``start_time`` (raw timestamp), ``time_to_dist`` (seconds to reach `target_dist`),
-        and ``dist_reached`` (target distance in meters).
+    list[AccelSegmentResult]
+        One result per qualifying segment.
     """
     sig = signal_obj.value_np
     time = signal_obj.timestamp_np
@@ -116,13 +132,16 @@ def compute_accel_results(
         if future_d[-1] >= target_absolute_dist:
             t_target_hit = np.interp(target_absolute_dist, future_d, future_t)
             results.append(
-                {
-                    "start_time": t_start,
-                    "time_to_dist": convert_time(
+                AccelSegmentResult(
+                    start_time=convert_time(
+                        t_start, source_time_unit, target_time_unit
+                    ),
+                    time_to_dist=convert_time(
                         t_target_hit - t_start, source_time_unit, target_time_unit
                     ),
-                    "dist_reached": target_dist,
-                }
+                    dist_reached=target_dist,
+                    timescale=target_time_unit,
+                )
             )
 
     return results

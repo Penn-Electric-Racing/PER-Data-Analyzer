@@ -6,9 +6,7 @@ from plotly import graph_objects as go
 
 from ..plotting.data_instance_plotter import *
 from ..plotting.plotting_constants import *
-from ..utils.accel_calculator import (
-    compute_accel_results,
-)
+from ..utils.accel_calculator import AccelSegmentResult, compute_accel_results
 from ..utils.accel_calculator import detect_accel_event as _detect_accel_event
 from ..utils.data_summary import single_run_summary
 from ..utils.diff import diff
@@ -331,10 +329,8 @@ class Analyzer:
 
         Returns
         -------
-        list[dict]
-            List of dicts, one per qualifying event, each with keys:
-            ``start_time`` (raw timestamp), ``time_to_dist`` (seconds to reach `target_dist`),
-            and ``dist_reached`` (target distance in meters).
+        list[AccelSegmentResult]
+            One result per qualifying segment.
         """
         speed_obj = (
             self.data["pcm.wheelSpeeds.frontRight"]
@@ -369,11 +365,8 @@ class Analyzer:
             source_time_unit=self.data.timestamp_unit,
             target_time_unit=Timescale.S,
         )
-
         for e in results:
-            print(
-                f"Accel at {e['start_time'] / timescale:.2f}s: reached {target_dist}m in {e['time_to_dist']:.3f}s"
-            )
+            print(e)
 
         return results
 
