@@ -5,16 +5,22 @@ from pydantic import BaseModel
 from rapidfuzz import fuzz
 from sentence_transformers.cross_encoder import CrossEncoder
 
-from ..analyzer.single_run_data import SingleRunData
 from ..constants import DELIMITER, title_block
+from ..models.single_run_data import SingleRunData
 
-_MODEL_DIR = Path(__file__).resolve().parents[1] / "models" / "stsb-cross-encoder"
+_MODEL_DIR = (
+    Path(__file__).resolve().parents[1] / "encoder_models" / "stsb-cross-encoder"
+)
+_HF_MODEL_ID = "cross-encoder/stsb-distilroberta-base"
+
 if not _MODEL_DIR.exists():
-    raise RuntimeError(
-        "Search model not found. Please restart your kernel with an internet "
-        "connection so the model can be downloaded on import."
-    )
-_model = CrossEncoder(str(_MODEL_DIR))
+    print("Downloading cross-encoder model (one-time setup)...")
+    _model = CrossEncoder(_HF_MODEL_ID)
+    _MODEL_DIR.parent.mkdir(parents=True, exist_ok=True)
+    _model.save(str(_MODEL_DIR))
+    print(f"Model saved to: {_MODEL_DIR}")
+else:
+    _model = CrossEncoder(str(_MODEL_DIR))
 
 
 ABBREVIATIONS: dict[str, str] = {

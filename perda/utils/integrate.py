@@ -4,7 +4,7 @@ import numpy.typing as npt
 from scipy.integrate import cumulative_trapezoid
 from scipy.signal import savgol_filter
 
-from ..analyzer.data_instance import DataInstance
+from ..models.data_instance import DataInstance
 from .units import MAD_TO_STD, Timescale, convert_time
 
 

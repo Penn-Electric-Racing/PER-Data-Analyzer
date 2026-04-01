@@ -3,9 +3,9 @@ from typing import List
 import numpy as np
 
 from ..analyzer.analyzer import Analyzer
+from ..models.data_instance import DataInstance
+from ..models.single_run_data import SingleRunData
 from ..utils.units import Timescale
-from .data_instance import DataInstance
-from .single_run_data import SingleRunData
 
 
 def _upscale_to_us(data: SingleRunData) -> SingleRunData:

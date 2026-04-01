@@ -2,9 +2,9 @@ import numpy as np
 import polars as pl
 from tqdm import tqdm
 
+from ..models.data_instance import DataInstance
+from ..models.single_run_data import SingleRunData
 from ..utils.units import Timescale
-from .data_instance import DataInstance
-from .single_run_data import SingleRunData
 
 
 def _resolve_parse_unit(

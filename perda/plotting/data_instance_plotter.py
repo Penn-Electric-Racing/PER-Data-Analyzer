@@ -3,7 +3,7 @@ from typing import List
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
-from ..analyzer.data_instance import DataInstance
+from ..models.data_instance import DataInstance
 from ..utils.units import Timescale
 from .plotting_constants import *
 

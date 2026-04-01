@@ -3,8 +3,8 @@ from numpy import float64
 from numpy.typing import NDArray
 from plotly import graph_objects as go
 
-from ..analyzer.data_instance import DataInstance
 from ..constants import DELIMITER, title_block
+from ..models.data_instance import DataInstance
 from ..plotting.plotting_constants import *
 from ..plotting.scatter_histogram_plotter import plot_scatter_and_histogram
 from .units import Timescale

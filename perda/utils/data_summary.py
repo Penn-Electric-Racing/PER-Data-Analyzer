@@ -1,6 +1,6 @@
-from ..analyzer.data_instance import DataInstance
-from ..analyzer.single_run_data import SingleRunData
 from ..constants import DELIMITER, title_block
+from ..models.data_instance import DataInstance
+from ..models.single_run_data import SingleRunData
 from .integrate import average_over_time_range
 from .units import *
 

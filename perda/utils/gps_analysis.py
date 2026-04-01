@@ -2,7 +2,7 @@ import ipywidgets as widgets
 import numpy as np
 import plotly.graph_objects as go
 
-from ..analyzer.data_instance import DataInstance, left_join_data_instances
+from ..models.data_instance import DataInstance, left_join_data_instances
 from ..plotting.parametric_plot import (
     plot_parametric_curve_square,
     plot_parametric_trimmer,

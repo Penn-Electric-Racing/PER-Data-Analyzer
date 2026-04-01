@@ -4,6 +4,8 @@ from typing import List, Union
 
 from plotly import graph_objects as go
 
+from ..models.data_instance import DataInstance
+from ..models.single_run_data import SingleRunData
 from ..plotting.data_instance_plotter import *
 from ..plotting.plotting_constants import *
 from ..utils.accel_calculator import AccelSegmentResult, compute_accel_results
@@ -15,8 +17,6 @@ from ..utils.integrate import smoothed_filtered_integration
 from ..utils.search import search
 from ..utils.units import Timescale, mph_seconds_to_meters
 from .csv import *
-from .data_instance import DataInstance
-from .single_run_data import SingleRunData
 
 
 class Analyzer:

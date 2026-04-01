@@ -1,7 +1,7 @@
 import numpy as np
 from pydantic import BaseModel, Field
 
-from ..analyzer.data_instance import DataInstance
+from ..models.data_instance import DataInstance
 from .units import *
 
 
