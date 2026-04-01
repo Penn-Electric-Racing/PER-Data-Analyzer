@@ -61,12 +61,12 @@ def detect_accel_event(torque_obj, speed_obj, torque_threshold=100, speed_thresh
 
     return var
 
-def get_accel_triggers(aly : Analyzer, target_dist=75, timescale=1000000, torque_threshold=100, speed_threshold=0.5, window_size=10, n_sigmas=3, window_len=11, poly_order=2):
+def get_accel_triggers(aly : Analyzer, target_dist=75, timescale=1000000, torque_threshold=100, speed_threshold=0.5, filter_window_size=10, n_sigmas=3, smoothing_window_len=11, smoothing_poly_order=2):
 
     speed_obj = (aly.data["pcm.wheelSpeeds.frontRight"] + aly.data["pcm.wheelSpeeds.frontLeft"]) / 2.0
     signal_obj = detect_accel_event(torque_obj=aly.data["pcm.moc.motor.requestedTorque"], speed_obj=aly.data["pcm.wheelSpeeds.frontRight"], torque_threshold=torque_threshold, speed_threshold=speed_threshold)
     
-    time_arr, _, distance = get_cumulative_integration("pcm.wheelSpeeds.frontRight")
+    time_arr, _, distance = get_cumulative_integration(speed_obj, timescale=timescale, filter_window_size=filter_window_size, n_sigmas=n_sigmas, smoothing_window_len=smoothing_window_len, smoothing_poly_order=smoothing_poly_order)
     distance_obj = DataInstance(timestamp_np=time_arr, value_np = distance / 3600 * 1609.34, label="Distance")
 
     sig = signal_obj.value_np
