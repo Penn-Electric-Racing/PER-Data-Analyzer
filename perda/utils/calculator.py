@@ -1,8 +1,15 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import numpy as np
 from scipy.signal import savgol_filter
-from ..analyzer.analyzer import Analyzer
+
 from ..analyzer.data_instance import DataInstance
 from ..utils.integrate import get_cumulative_integration
+
+if TYPE_CHECKING:
+    from ..analyzer.analyzer import Analyzer
 
 def detect_accel_event(torque_obj, speed_obj, torque_threshold=100, speed_threshold=0.5):
     """Detect acceleration events based on torque and speed thresholds.

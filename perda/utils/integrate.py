@@ -151,7 +151,7 @@ def get_data_slice_by_timestamp(
 
 
 def get_cumulative_integration(data, timescale=1000000, filter_window_size=10, n_sigmas=3, smoothing_window_len=11, smoothing_poly_order=2):
-    """Integrate a time-series signal after outlier removal and smoothing.
+    """Integrate a time-series----> 9 from ..utils.concat import concat_single_run_data signal after outlier removal and smoothing.
 
     Cleans spikes via rolling MAD-based outlier detection, applies Savitzky-Golay
     smoothing, then computes the cumulative trapezoidal integral over time.
