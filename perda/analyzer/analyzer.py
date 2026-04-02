@@ -6,7 +6,7 @@ from plotly import graph_objects as go
 
 from ..plotting.data_instance_plotter import *
 from ..plotting.plotting_constants import *
-from ..utils.concat import concat_single_run_data
+from .concat import concat_single_run_data
 from ..utils.data_summary import single_run_summary
 from ..utils.diff import diff
 from ..utils.frequency_analysis import analyze_frequency as _analyze_frequency

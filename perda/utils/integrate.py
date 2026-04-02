@@ -1,5 +1,8 @@
 import numpy as np
+import pandas as pd
 from numpy.typing import NDArray
+from scipy.integrate import cumulative_trapezoid
+from scipy.signal import savgol_filter
 
 from ..analyzer.data_instance import DataInstance
 from .types import Timescale
@@ -146,3 +149,58 @@ def get_data_slice_by_timestamp(
         label=original_instance.label,
         var_id=original_instance.var_id,
     )
+
+
+def get_cumulative_integration(data, timescale=1000000, filter_window_size=10, n_sigmas=3, smoothing_window_len=11, smoothing_poly_order=2):
+    """Integrate a time-series----> 9 from ..utils.concat import concat_single_run_data signal after outlier removal and smoothing.
+
+    Cleans spikes via rolling MAD-based outlier detection, applies Savitzky-Golay
+    smoothing, then computes the cumulative trapezoidal integral over time.
+
+    Parameters
+    ----------
+    data : DataInstance
+        Time-series signal to integrate.
+    timescale : float
+        Factor to convert raw timestamps to seconds (e.g. 1000000 for microseconds).
+    filter_window_size : int
+        Rolling window size used for median and MAD outlier detection.
+    n_sigmas : float
+        Number of scaled MAD units beyond which a point is considered an outlier.
+    smoothing_window_len : int
+        Window length for Savitzky-Golay smoothing filter.
+    smoothing_poly_order : int
+        Polynomial order for Savitzky-Golay smoothing filter.
+
+    Returns
+    -------
+    tuple[NDArray[Float64], NDArray[Float64], NDArray[Float64]]
+        A tuple of (timestamps, smoothed values, cumulative integral), all of the
+        same length as the input signal.
+    """
+
+    v = pd.Series(data.value_np)
+    t = np.array(data.timestamp_np)
+
+    # Calculate rolling median and the MAD (Median Absolute Deviation)
+    rolling_median = v.rolling(window=filter_window_size, center=True).median()
+    rolling_std = v.rolling(window=filter_window_size, center=True).apply(lambda x: np.abs(x - x.median()).median()) * 1.4826
+
+    # Identify spikes (points more than X "standard deviations" from the local median)
+    is_outlier = np.abs(v - rolling_median) > (n_sigmas * rolling_std)
+
+    # interpolate the outliers
+    v_cleaned = v.copy()
+    v_cleaned[is_outlier] = np.nan
+    v_cleaned = v_cleaned.interpolate(method='linear').bfill().ffill()
+
+    # Smoothing
+    if len(v_cleaned) > smoothing_window_len:
+        v_smooth = savgol_filter(v_cleaned, smoothing_window_len, smoothing_poly_order)
+    else:
+        v_smooth = v_cleaned
+
+    v_integrated = cumulative_trapezoid(v_smooth, x=t / timescale, initial=0)
+
+    return t, v_smooth, v_integrated
+
