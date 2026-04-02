@@ -155,6 +155,40 @@ class DataInstance(BaseModel):
             var_id=self.var_id,
         )
 
+    def trim(
+        self,
+        ts_start: float | None = None,
+        ts_end: float | None = None,
+    ) -> "DataInstance":
+        """
+        Return a new DataInstance containing only points within the given timestamp range.
+
+        Parameters
+        ----------
+        ts_start : float | None, optional
+            Lower bound in raw timestamp units (inclusive). Default is None (no lower bound).
+        ts_end : float | None, optional
+            Upper bound in raw timestamp units (inclusive). Default is None (no upper bound).
+
+        Returns
+        -------
+        DataInstance
+            New DataInstance with only in-range data points.
+        """
+        if ts_start is not None and ts_end is not None:
+            mask = (self.timestamp_np >= ts_start) & (self.timestamp_np <= ts_end)
+        elif ts_start is not None:
+            mask = self.timestamp_np >= ts_start
+        else:
+            mask = self.timestamp_np <= ts_end  # type: ignore[operator]
+        return DataInstance(
+            timestamp_np=self.timestamp_np[mask],
+            value_np=self.value_np[mask],
+            label=self.label,
+            var_id=self.var_id,
+            cpp_name=self.cpp_name,
+        )
+
 
 def left_join_data_instances(
     left: DataInstance,
