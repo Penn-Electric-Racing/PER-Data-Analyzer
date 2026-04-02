@@ -55,7 +55,7 @@ def detect_accel_event(torque_obj, speed_obj, torque_threshold=100, speed_thresh
 
     return var
 
-def get_accel_triggers(aly : Analyzer, target_dist=75, timescale=1000000, torque_threshold=100, speed_threshold=0.5, filter_window_size=10, n_sigmas=3, smoothing_window_len=11, smoothing_poly_order=2):
+def get_accel_triggers(aly : Analyzer, target_dist=75, torque_threshold=100, speed_threshold=0.5, filter_window_size=10, n_sigmas=3, smoothing_window_len=11, smoothing_poly_order=2):
     """Find all acceleration events in a run and compute time-to-distance for each.
 
     Detects acceleration events using `detect_accel_event`, integrates wheel speed to
@@ -90,6 +90,15 @@ def get_accel_triggers(aly : Analyzer, target_dist=75, timescale=1000000, torque
         ``start_time`` (raw timestamp), ``time_to_dist`` (seconds to reach `target_dist`),
         and ``dist_reached`` (target distance in meters).
     """
+
+    timescale = 1
+    match aly.data.timestamp_unit:
+        case Timescale.MS:
+            timescale = 1000
+        case Timescale.US:
+            timescale = 1000000
+        case _:
+            pass
 
     speed_obj = (aly.data["pcm.wheelSpeeds.frontRight"] + aly.data["pcm.wheelSpeeds.frontLeft"]) / 2.0
     signal_obj = detect_accel_event(torque_obj=aly.data["pcm.moc.motor.requestedTorque"], speed_obj=aly.data["pcm.wheelSpeeds.frontRight"], torque_threshold=torque_threshold, speed_threshold=speed_threshold)
