@@ -115,6 +115,8 @@ class Analyzer:
         var_2: (
             Union[str, int, DataInstance, List[Union[str, int, DataInstance]]] | None
         ) = None,
+        ts_start: float | None = None,
+        ts_end: float | None = None,
         title: str | None = None,
         y_label_1: str | None = None,
         y_label_2: str | None = None,
@@ -134,6 +136,10 @@ class Analyzer:
             Variable(s) to plot on the left y-axis. Can be variable name(s), variable ID(s), or DataInstance(s)
         var_2 : Union[str, int, DataInstance, List[Union[str, int, DataInstance]]] | None, optional
             Optional variable(s) to plot on the right y-axis. Can be variable name(s), variable ID(s), or DataInstance(s).
+        ts_start : float | None, optional
+            Start of the time window in seconds. Data points before this time are excluded. Default is None (no lower bound).
+        ts_end : float | None, optional
+            End of the time window in seconds. Data points after this time are excluded. Default is None (no upper bound).
         title : str | None, optional
         y_label_1 : str | None, optional
             Label for left y-axis (or only y-axis if no right input).
@@ -151,18 +157,26 @@ class Analyzer:
         # Normalize left input to List[DataInstance]
         var_1_norm = self._normalize_input(var_1)
 
+        # Divisor to convert raw timestamps to seconds (used for vlines and time range filter)
+        unit = self.data.timestamp_unit
+        divisor = 1e6 if unit == Timescale.US else 1e3 if unit == Timescale.MS else 1.0
+
         # Convert concat boundaries to seconds for the plotter
         vlines: List[float] | None = None
         if self.data.concat_boundaries:
-            unit = self.data.timestamp_unit
-            divisor = (
-                1e6 if unit == Timescale.US else 1e3 if unit == Timescale.MS else 1.0
-            )
             vlines = [b / divisor for b in self.data.concat_boundaries]
+
+        # Apply time range filter if specified (convert seconds → raw units for trim)
+        if ts_start is not None or ts_end is not None:
+            start_raw = ts_start * divisor if ts_start is not None else None
+            end_raw = ts_end * divisor if ts_end is not None else None
+            var_1_norm = [di.trim(start_raw, end_raw) for di in var_1_norm]
 
         if var_2 is not None:
             # Normalize right input to List[DataInstance]
             var_2_norm = self._normalize_input(var_2)
+            if ts_start is not None or ts_end is not None:
+                var_2_norm = [di.trim(start_raw, end_raw) for di in var_2_norm]
 
             return plot_dual_axis(
                 left_data_instances=var_1_norm,
