@@ -1,6 +1,7 @@
 import numpy as np
-import numpy.typing as npt
 import polars as pl
+from numpy import float64
+from numpy.typing import NDArray
 from scipy.integrate import cumulative_trapezoid
 from scipy.signal import savgol_filter
 
@@ -38,12 +39,12 @@ def integrate_over_time_range(
 
     Notes
     -----
-    Uses numpy.trapz (trapezoidal rule) for numerical integration of discrete data.
+    Uses numpy.trapezoid (trapezoidal rule) for numerical integration of discrete data.
     """
     if len(data_instance.timestamp_np) < 2:
         return 0.0
 
-    ts: npt.NDArray = convert_time(
+    ts: NDArray[float64] = convert_time(
         data_instance.timestamp_np.astype(np.float64),
         source_time_unit,
         target_time_unit,
@@ -100,7 +101,7 @@ def average_over_time_range(
 
     Notes
     -----
-    Uses numpy.trapz (trapezoidal rule) for numerical integration of discrete data.
+    Uses numpy.trapezoid (trapezoidal rule) for numerical integration of discrete data.
     """
     if len(data_instance.timestamp_np) == 1:
         return float(data_instance.value_np[0])
@@ -108,9 +109,6 @@ def average_over_time_range(
     integral = integrate_over_time_range(
         data_instance, start_time, end_time, source_time_unit, target_time_unit
     )
-
-    if integral == 0.0:
-        return 0.0
 
     ts = data_instance.timestamp_np.astype(np.float64)
     actual_start_time = max(start_time, ts[0])
@@ -161,14 +159,14 @@ def get_data_slice_by_timestamp(
 
 
 def smoothed_filtered_integration(
-    data,
+    data: DataInstance,
     source_time_unit: Timescale = Timescale.US,
     target_time_unit: Timescale = Timescale.S,
-    filter_window_size=10,
-    n_sigmas=3,
-    smoothing_window_len=11,
-    smoothing_poly_order=2,
-):
+    filter_window_size: int = 10,
+    n_sigmas: float = 3,
+    smoothing_window_len: int = 11,
+    smoothing_poly_order: int = 2,
+) -> tuple[NDArray[float64], NDArray[float64], NDArray[float64]]:
     """Integrate a time-series signal after outlier removal and smoothing.
 
     Cleans spikes via rolling MAD-based outlier detection, applies Savitzky-Golay
