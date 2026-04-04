@@ -1,6 +1,5 @@
-from collections import defaultdict
-
 import numpy as np
+import polars as pl
 from tqdm import tqdm
 
 from ..utils.types import Timescale
@@ -56,23 +55,20 @@ def parse_csv(
     id_to_cpp_name: dict[int, str] = {}
     id_to_descript: dict[int, str] = {}
 
-    # Temporary data structure with separate lists for timestamps and values
-    temp_time_value_list_map: defaultdict[
-        int, tuple[list[int] | np.ndarray, list[float] | np.ndarray]
-    ] = defaultdict(lambda: ([], []))
-
-    with open(file_path, "r") as log:
+    with open(file_path, "r") as f:
         # Parse and print first line (header)
-        header_line = next(log, "")
+        header_line = f.readline()
         parse_unit = _resolve_parse_unit(header_line, parse_unit)
         print(f"Header: {header_line.rstrip()}")
         print(f"Timestamp unit: {parse_unit.value}")
 
         # Block 1: Variable ID/Name pairs
         pbar = tqdm(desc="Reading variable ID mappings", unit=" lines", initial=2)
-        line = next(log, None)
-        while line is not None and line.startswith("Value "):
+        skip_rows = 1  # header line
+        line = f.readline()
+        while line and line.startswith("Value "):
             pbar.update(1)
+            skip_rows += 1
 
             # Remove "Value " prefix, separate into variable name and ID
             identifier = line[6:].strip().split(": ")
@@ -108,64 +104,46 @@ def parse_csv(
             except Exception as e:
                 print(f"Error parsing variable ID/Name pair at line {pbar.n}: {e}")
 
-            line = next(log, None)
+            line = f.readline()
         pbar.close()
 
-        # Block 2: Data lines
-        pbar = tqdm(desc="Reading data", unit=" lines", initial=0)
-        data_start_time: int | None = None
-        data_end_time: int = 0
-        parsing_errors = 0
-        while line is not None:
-            pbar.update(1)
-            data = line.strip().split(",")
-            try:
-                var_id = int(data[1])
-                timestamp = int(data[0]) + ts_offset
-                val = float(data[2])
+    # Block 2: Read data with Polars, Block 3: Sort — all in one step
+    print("Reading and sorting data...")
+    df = pl.read_csv(
+        file_path,
+        skip_rows=skip_rows,
+        has_header=False,
+        new_columns=["timestamp", "var_id", "value"],
+        schema={"column_1": pl.Int64, "column_2": pl.Int32, "column_3": pl.Float64},
+        ignore_errors=True,
+        glob=False,
+    )
 
-                if data_start_time is None:
-                    data_start_time = timestamp
-                data_end_time = timestamp
-
-                # Append timestamp and value to temporary lists
-                temp_time_value_list_map[var_id][0].append(timestamp)
-                temp_time_value_list_map[var_id][1].append(val)
-
-            except Exception as e:
-                print(f"Error parsing data line {pbar.n}: {e}")
-                parsing_errors += 1
-
-                if parsing_errors_limit > 0 and parsing_errors >= parsing_errors_limit:
-                    raise Exception("Too many data parsing errors encountered.")
-
-            line = next(log, None)
-        if data_start_time is None:
-            data_start_time = 0
-        total_data_points = pbar.n
-
-        pbar.close()
-
-        # Block 3: Sort timestamps
-        pbar = tqdm(
-            temp_time_value_list_map.items(),
-            desc="Sorting timestamps",
-            unit=" vars",
-            total=len(temp_time_value_list_map),
+    parsing_errors = len(
+        df.filter(
+            df["timestamp"].is_null() | df["var_id"].is_null() | df["value"].is_null()
         )
-        for var_id, (timestamps_list, values_list) in pbar:
-            timestamps_np = np.asarray(timestamps_list, dtype=np.int64)
-            values_np = np.asarray(values_list, dtype=np.float64)
+    )
+    if parsing_errors_limit > 0 and parsing_errors >= parsing_errors_limit:
+        raise Exception("Too many data parsing errors encountered.")
 
-            if timestamps_np.size >= 2:
-                # Use stable sort
-                order = np.argsort(timestamps_np, kind="stable")
-                timestamps_np = timestamps_np[order]
-                values_np = values_np[order]
+    df = (
+        df.drop_nulls()
+        .with_columns((pl.col("timestamp") + ts_offset).alias("timestamp"))
+        .sort(["var_id", "timestamp"])
+    )
 
-            # Now temp_time_value_list_map should all have ndarray
-            temp_time_value_list_map[var_id] = (timestamps_np, values_np)
-        pbar.close()
+    total_data_points = len(df)
+    data_start_time = int(df["timestamp"].min()) if total_data_points > 0 else 0
+    data_end_time = int(df["timestamp"].max()) if total_data_points > 0 else 0
+
+    # Build per-variable numpy arrays from grouped Polars data
+    var_arrays: dict[int, tuple] = {}
+    for (var_id,), group in df.group_by(["var_id"], maintain_order=True):
+        var_arrays[int(var_id)] = (
+            group["timestamp"].to_numpy(),
+            group["value"].to_numpy(),
+        )
 
     # Format data as DataInstances
     id_to_instance: dict[int, DataInstance] = {}
@@ -174,10 +152,12 @@ def parse_csv(
         name = id_to_cpp_name[var_id]
         descript = id_to_descript[var_id]
         cpp_name_to_id[name] = var_id
-        timestamps_list, values_list = temp_time_value_list_map[var_id]
+        timestamps_np, values_np = var_arrays.get(
+            var_id, (np.array([], dtype=np.int64), np.array([], dtype=np.float64))
+        )
         id_to_instance[var_id] = DataInstance(
-            timestamp_np=np.asarray(timestamps_list),
-            value_np=np.asarray(values_list),
+            timestamp_np=timestamps_np,
+            value_np=values_np,
             label=descript,
             var_id=var_id,
             cpp_name=name,

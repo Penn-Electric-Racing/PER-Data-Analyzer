@@ -8,6 +8,7 @@ nbstripout
 # Data Processing
 numba
 numpy
+polars
 plotly
 pydantic
 rapidfuzz
