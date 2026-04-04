@@ -1,11 +1,3 @@
-"""Semantic + keyword search.
-
-Each variable is represented by a search card combining its expanded C++
-identifier tokens with its description. Results are ranked by a weighted blend
-of cross-encoder semantic score and rapidfuzz keyword score. Short queries lean
-on keyword matching; longer queries lean on semantic ranking.
-"""
-
 import re
 from pathlib import Path
 
@@ -13,17 +5,13 @@ from pydantic import BaseModel
 from rapidfuzz import fuzz
 from sentence_transformers.cross_encoder import CrossEncoder
 
-from ..analyzer.single_run_data import SingleRunData
 from ..constants import DELIMITER, title_block
+from ..core_data_structures.single_run_data import SingleRunData
 
 _MODEL_DIR = Path(__file__).resolve().parents[1] / "models" / "stsb-cross-encoder"
-if not _MODEL_DIR.exists():
-    raise RuntimeError(
-        "Search model not found. Please restart your kernel with an internet "
-        "connection so the model can be downloaded on import."
-    )
-_model = CrossEncoder(str(_MODEL_DIR))
+_HF_MODEL_ID = "cross-encoder/stsb-distilroberta-base"
 
+_model: CrossEncoder | None = None  # global variable to hold the loaded model instance
 
 ABBREVIATIONS: dict[str, str] = {
     "pcm": "powertrain control module",
@@ -60,6 +48,19 @@ class SearchEntry(BaseModel):
     card: str
 
 
+def install_encoder() -> None:
+    """Download and save the cross-encoder model for semantic search."""
+    global _model
+    if not _MODEL_DIR.exists():
+        print("Downloading cross-encoder model (one-time setup)...")
+        _model = CrossEncoder(_HF_MODEL_ID)
+        _MODEL_DIR.parent.mkdir(parents=True, exist_ok=True)
+        _model.save(str(_MODEL_DIR))
+        print(f"Model saved to: {_MODEL_DIR}")
+    else:
+        _model = CrossEncoder(str(_MODEL_DIR))
+
+
 def search(data: SingleRunData, query: str) -> None:
     """Search telemetry variables and print the top matches.
 
@@ -70,11 +71,18 @@ def search(data: SingleRunData, query: str) -> None:
     query : str
         Free-text search query (e.g. "bat wheel").
 
-    Raises
-    ------
-    ValueError
-        If the query is empty or has no alphanumeric terms.
+    Notes
+    -----
+    Results are ranked by weighted blend of cross-encoder semantic score and rapidfuzz keyword score.
+    Each variable is represented by a search card combining its expanded C++ identifier tokens with its description.
+
+    Short queries lean on keyword matching, longer queries lean on semantic ranking.
     """
+    install_encoder()
+
+    if not _model:
+        raise RuntimeError("Cross-encoder model failed to load.")
+
     query = query.strip()
     if not query:
         raise ValueError("Search query cannot be empty.")

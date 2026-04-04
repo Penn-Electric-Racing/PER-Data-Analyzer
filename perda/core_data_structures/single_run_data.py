@@ -1,10 +1,8 @@
-"""SingleRunData model for storing parsed CSV data."""
-
 from typing import Dict, List, Union
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from ..utils.types import Timescale
+from ..units import Timescale
 from .data_instance import DataInstance
 
 

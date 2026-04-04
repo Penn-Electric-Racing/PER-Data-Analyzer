@@ -4,17 +4,19 @@ from typing import List, Union
 
 from plotly import graph_objects as go
 
+from ..core_data_structures.data_instance import DataInstance
+from ..core_data_structures.single_run_data import SingleRunData
 from ..plotting.data_instance_plotter import *
 from ..plotting.plotting_constants import *
-from .concat import concat_single_run_data
+from ..units import Timescale, mph_seconds_to_meters
+from ..utils.accel_calculator import AccelSegmentResult, compute_accel_results
+from ..utils.accel_calculator import detect_accel_event as _detect_accel_event
 from ..utils.data_summary import single_run_summary
 from ..utils.diff import diff
 from ..utils.frequency_analysis import analyze_frequency as _analyze_frequency
+from ..utils.integrate import smoothed_filtered_integration
 from ..utils.search import search
-from ..utils.types import Timescale
 from .csv import *
-from .data_instance import DataInstance
-from .single_run_data import SingleRunData
 
 
 class Analyzer:
@@ -23,7 +25,6 @@ class Analyzer:
         filepath: str,
         ts_offset: int = 0,
         parsing_errors_limit: int = 100,
-        parse_unit: Timescale | str | None = None,
     ) -> None:
         """
         Initialize a new analyzer instance.
@@ -44,44 +45,7 @@ class Analyzer:
             filepath,
             ts_offset,
             parsing_errors_limit=parsing_errors_limit,
-            parse_unit=parse_unit,
         )
-
-    @staticmethod
-    def concat(
-        first: "Analyzer",
-        second: "Analyzer",
-        gap: int = 1,
-    ) -> "Analyzer":
-        """
-        Concatenate two Analyzers sequentially in time.
-
-        Variables are matched by cpp_name. Unmatched variables are kept with
-        data from only the run that has them. If the two runs use different
-        timestamp units the ms run is upscaled to us.
-
-        Parameters
-        ----------
-        first : Analyzer
-            First analyzer (earlier in time)
-        second : Analyzer
-            Second analyzer (appended after first)
-        gap : int
-            Gap in timestamp units between the two runs. Default is 1.
-
-        Returns
-        -------
-        Analyzer
-            New Analyzer containing the concatenated data
-
-        Examples
-        --------
-        >>> merged = Analyzer.concat(aly1, aly2)
-        >>> merged.plot("ams.pack.voltage")
-        """
-        merged = object.__new__(Analyzer)
-        merged.data = concat_single_run_data(first.data, second.data, gap=gap)
-        return merged
 
     def __str__(self) -> str:
         old_stdout = sys.stdout
@@ -283,6 +247,126 @@ class Analyzer:
             layout_config=layout_config,
             plot_config=plot_config,
         )
+
+    def detect_accel_event(
+        self,
+        torque_var: Union[str, int],
+        speed_var: Union[str, int],
+        torque_threshold: float = 100,
+        speed_threshold: float = 0.5,
+    ) -> DataInstance:
+        """Detect acceleration events based on torque and speed thresholds.
+
+        An event is active when torque exceeds `torque_threshold` and speed exceeds
+        `speed_threshold`, and ends when speed drops back to or below `speed_threshold`.
+
+        Parameters
+        ----------
+        torque_var : Union[str, int]
+            Variable name or ID for motor torque.
+        speed_var : Union[str, int]
+            Variable name or ID for wheel speed. The output is aligned to these timestamps.
+        torque_threshold : float, optional
+            Minimum torque (in Nm) required to trigger an acceleration event. Default is 100.
+        speed_threshold : float, optional
+            Speed value used as the trigger floor and reset condition. Default is 0.5.
+
+        Returns
+        -------
+        DataInstance
+            Binary signal (0.0 or 1.0) on `speed_var` timestamps, labeled "Accel Event",
+            where 1.0 indicates an active acceleration event.
+        """
+        return _detect_accel_event(
+            self.data[torque_var],
+            self.data[speed_var],
+            torque_threshold=torque_threshold,
+            speed_threshold=speed_threshold,
+        )
+
+    def get_accel_triggers(
+        self,
+        torque_var: Union[str, int] = "pcm.moc.motor.requestedTorque",
+        speed_var: Union[str, int] = "pcm.wheelSpeeds.frontRight",
+        target_dist: float = 75,
+        timescale: float = 1000000,
+        torque_threshold: float = 100,
+        speed_threshold: float = 0.5,
+        filter_window_size: int = 10,
+        n_sigmas: float = 3,
+        smoothing_window_len: int = 11,
+        smoothing_poly_order: int = 2,
+    ) -> list:
+        """Find all acceleration events in a run and compute time-to-distance for each.
+
+        Detects acceleration events, integrates wheel speed to compute cumulative distance,
+        and records the elapsed time from each event start until `target_dist` meters are covered.
+
+        Parameters
+        ----------
+        torque_var : Union[str, int], optional
+            Variable name or ID for motor torque. Default is "pcm.moc.motor.requestedTorque".
+        speed_var : Union[str, int], optional
+            Variable name or ID for wheel speed. Default is "pcm.wheelSpeeds.frontRight".
+        target_dist : float, optional
+            Target distance in meters to measure time to. Default is 75.
+        timescale : float, optional
+            Factor to convert raw timestamps to seconds (e.g. 1000000 for microseconds). Default is 1000000.
+        torque_threshold : float, optional
+            Minimum torque (in Nm) to trigger an acceleration event. Default is 100.
+        speed_threshold : float, optional
+            Speed value used as the trigger floor and reset condition. Default is 0.5.
+        filter_window_size : int, optional
+            Window size for outlier filtering in cumulative integration. Default is 10.
+        n_sigmas : float, optional
+            Number of standard deviations for outlier detection in cumulative integration. Default is 3.
+        smoothing_window_len : int, optional
+            Window length for Savitzky-Golay smoothing in cumulative integration. Default is 11.
+        smoothing_poly_order : int, optional
+            Polynomial order for Savitzky-Golay smoothing in cumulative integration. Default is 2.
+
+        Returns
+        -------
+        list[AccelSegmentResult]
+            One result per qualifying segment.
+        """
+        speed_obj = (
+            self.data["pcm.wheelSpeeds.frontRight"]
+            + self.data["pcm.wheelSpeeds.frontLeft"]
+        ) / 2.0
+        signal_obj = self.detect_accel_event(
+            torque_var=torque_var,
+            speed_var=speed_var,
+            torque_threshold=torque_threshold,
+            speed_threshold=speed_threshold,
+        )
+
+        time_arr, _, distance = smoothed_filtered_integration(
+            speed_obj,
+            source_time_unit=self.data.timestamp_unit,
+            target_time_unit=Timescale.S,
+            filter_window_size=filter_window_size,
+            n_sigmas=n_sigmas,
+            smoothing_window_len=smoothing_window_len,
+            smoothing_poly_order=smoothing_poly_order,
+        )
+        distance_obj = DataInstance(
+            timestamp_np=time_arr,
+            value_np=mph_seconds_to_meters(distance),
+            label="Distance",
+        )
+
+        results = compute_accel_results(
+            signal_obj,
+            distance_obj,
+            target_dist=target_dist,
+            source_time_unit=self.data.timestamp_unit,
+            target_time_unit=Timescale.S,
+        )
+        for e in results:
+            print(e)
+
+        return results
 
     def _normalize_input(
         self,
