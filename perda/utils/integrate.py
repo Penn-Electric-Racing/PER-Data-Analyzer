@@ -1,5 +1,5 @@
 import numpy as np
-import pandas as pd
+import polars as pl
 from numpy.typing import NDArray
 from scipy.integrate import cumulative_trapezoid
 from scipy.signal import savgol_filter
@@ -179,7 +179,7 @@ def get_cumulative_integration(data, timescale=1000000, filter_window_size=10, n
         same length as the input signal.
     """
 
-    v = pd.Series(data.value_np)
+    v = pl.Series(data.value_np)
     t = np.array(data.timestamp_np)
 
     # Calculate rolling median and the MAD (Median Absolute Deviation)
