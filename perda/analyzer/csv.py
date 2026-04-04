@@ -2,37 +2,15 @@ import numpy as np
 import polars as pl
 from tqdm import tqdm
 
-from ..utils.types import Timescale
-from .data_instance import DataInstance
-from .single_run_data import SingleRunData
-
-
-def _resolve_parse_unit(
-    header_line: str,
-    parse_unit: Timescale | str | None,
-) -> Timescale:
-    if isinstance(parse_unit, str):
-        parse_unit = parse_unit.strip().lower()
-        if parse_unit not in (Timescale.MS.value, Timescale.US.value):
-            raise ValueError(f"parse_unit must be 'ms' or 'us', got {parse_unit}")
-        parse_unit = Timescale(parse_unit)
-
-    if parse_unit is not None and parse_unit not in (Timescale.MS, Timescale.US):
-        raise ValueError(
-            f"parse_unit must be Timescale.MS or Timescale.US, got {parse_unit}"
-        )
-
-    if parse_unit is not None:
-        return parse_unit
-
-    return Timescale.US if header_line.rstrip().endswith("v2.0") else Timescale.MS
+from ..core_data_structures.data_instance import DataInstance
+from ..core_data_structures.single_run_data import SingleRunData
+from ..units import Timescale
 
 
 def parse_csv(
     file_path: str,
     ts_offset: int = 0,
     parsing_errors_limit: int = 100,
-    parse_unit: Timescale | str | None = None,
 ) -> SingleRunData:
     """
     Parse CSV file and return SingleRunData model.
@@ -58,7 +36,9 @@ def parse_csv(
     with open(file_path, "r") as f:
         # Parse and print first line (header)
         header_line = f.readline()
-        parse_unit = _resolve_parse_unit(header_line, parse_unit)
+        parse_unit = (
+            Timescale.US if header_line.rstrip().endswith("v2.0") else Timescale.MS
+        )
         print(f"Header: {header_line.rstrip()}")
         print(f"Timestamp unit: {parse_unit.value}")
 
@@ -133,9 +113,12 @@ def parse_csv(
         .sort(["var_id", "timestamp"])
     )
 
+    if df.is_empty():
+        raise Exception("No valid data points found after parsing.")
+
     total_data_points = len(df)
-    data_start_time = int(df["timestamp"].min()) if total_data_points > 0 else 0
-    data_end_time = int(df["timestamp"].max()) if total_data_points > 0 else 0
+    data_start_time = int(df["timestamp"].min())
+    data_end_time = int(df["timestamp"].max())
 
     # Build per-variable numpy arrays from grouped Polars data
     var_arrays: dict[int, tuple] = {}
