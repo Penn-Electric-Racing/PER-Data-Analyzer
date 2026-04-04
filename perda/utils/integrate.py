@@ -200,7 +200,9 @@ def smoothed_filtered_integration(
     v_series = pl.Series(v_np)
 
     # Rolling median and MAD (Median Absolute Deviation)
-    rolling_median = v_series.rolling_median(window_size=filter_window_size, min_periods=1, center=True).to_numpy()
+    rolling_median = v_series.rolling_median(
+        window_size=filter_window_size, min_periods=1, center=True
+    ).to_numpy()
     rolling_std = v_series.rolling_map(
         lambda x: np.median(np.abs(x.to_numpy() - np.median(x.to_numpy()))) * 1.4826,
         window_size=filter_window_size,

@@ -60,9 +60,43 @@ class VLineConfig(BaseModel):
     opacity: float = 0.7
 
 
+class GpsMapConfig(BaseModel):
+    """Configuration for GPS map overlay plots.
+
+    Parameters
+    ----------
+    mapbox_style : str
+        Mapbox tile style. ``"carto-positron"`` is free and requires no token.
+    mapbox_token : str
+        Mapbox access token. Only needed for Mapbox-hosted styles.
+    marker_size : int
+        Marker size on the map trace.
+    line_width : int
+        Line width on the map trace.
+    line_color : str
+        Color of the GPS trace line.
+    zoom_padding : float
+        Extra fraction added around the data extent when auto-zooming.
+    lat_range : tuple[float, float]
+        Valid latitude range. Points outside are filtered.
+    lon_range : tuple[float, float]
+        Valid longitude range. Points outside are filtered.
+    """
+
+    mapbox_style: str = "carto-positron"
+    mapbox_token: str = ""
+    marker_size: int = 3
+    line_width: int = 2
+    line_color: str = "red"
+    zoom_padding: float = 0.4
+    lat_range: tuple[float, float] = (24.0, 50.0)
+    lon_range: tuple[float, float] = (-125.0, -66.0)
+
+
 # Default configuration instances
 DEFAULT_FONT_CONFIG = FontConfig()
 DEFAULT_LAYOUT_CONFIG = LayoutConfig()
 DEFAULT_DIFF_PLOT_CONFIG = DiffPlotConfig()
 DEFAULT_SCATTER_HISTOGRAM_PLOT_CONFIG = ScatterHistogramPlotConfig()
 DEFAULT_VLINE_CONFIG = VLineConfig()
+DEFAULT_GPS_MAP_CONFIG = GpsMapConfig()
