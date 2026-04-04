@@ -4,7 +4,7 @@ import plotly.graph_objects as go
 from numpy import float64
 from numpy.typing import NDArray
 
-from ..utils.units import Timescale
+from ..units import Timescale
 from .plotting_constants import (
     DEFAULT_FONT_CONFIG,
     DEFAULT_LAYOUT_CONFIG,

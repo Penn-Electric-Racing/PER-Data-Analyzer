@@ -2,7 +2,7 @@ from typing import Dict, List, Union
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from ..utils.units import Timescale
+from ..units import Timescale
 from .data_instance import DataInstance
 
 

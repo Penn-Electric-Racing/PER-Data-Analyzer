@@ -1,8 +1,8 @@
 import numpy as np
 from pydantic import BaseModel, Field
 
-from ..models.data_instance import DataInstance
-from .units import *
+from ..core_data_structures.data_instance import DataInstance
+from ..units import *
 
 
 class AccelSegmentResult(BaseModel):

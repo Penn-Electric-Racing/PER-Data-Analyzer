@@ -4,10 +4,11 @@ from typing import List, Union
 
 from plotly import graph_objects as go
 
-from ..models.data_instance import DataInstance
-from ..models.single_run_data import SingleRunData
+from ..core_data_structures.data_instance import DataInstance
+from ..core_data_structures.single_run_data import SingleRunData
 from ..plotting.data_instance_plotter import *
 from ..plotting.plotting_constants import *
+from ..units import Timescale, mph_seconds_to_meters
 from ..utils.accel_calculator import AccelSegmentResult, compute_accel_results
 from ..utils.accel_calculator import detect_accel_event as _detect_accel_event
 from ..utils.data_summary import single_run_summary
@@ -15,7 +16,6 @@ from ..utils.diff import diff
 from ..utils.frequency_analysis import analyze_frequency as _analyze_frequency
 from ..utils.integrate import smoothed_filtered_integration
 from ..utils.search import search
-from ..utils.units import Timescale, mph_seconds_to_meters
 from .csv import *
 
 
@@ -25,7 +25,6 @@ class Analyzer:
         filepath: str,
         ts_offset: int = 0,
         parsing_errors_limit: int = 100,
-        parse_unit: Timescale | str | None = None,
     ) -> None:
         """
         Initialize a new analyzer instance.
@@ -46,7 +45,6 @@ class Analyzer:
             filepath,
             ts_offset,
             parsing_errors_limit=parsing_errors_limit,
-            parse_unit=parse_unit,
         )
 
     def __str__(self) -> str:

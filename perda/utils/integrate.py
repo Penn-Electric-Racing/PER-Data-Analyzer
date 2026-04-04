@@ -1,11 +1,11 @@
 import numpy as np
-import polars as pl
 import numpy.typing as npt
+import polars as pl
 from scipy.integrate import cumulative_trapezoid
 from scipy.signal import savgol_filter
 
-from ..models.data_instance import DataInstance
-from .units import MAD_TO_STD, Timescale, convert_time
+from ..core_data_structures.data_instance import DataInstance
+from ..units import MAD_TO_STD, Timescale, convert_time
 
 
 def integrate_over_time_range(

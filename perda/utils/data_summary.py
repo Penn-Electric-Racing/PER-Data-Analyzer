@@ -1,8 +1,8 @@
 from ..constants import DELIMITER, title_block
-from ..models.data_instance import DataInstance
-from ..models.single_run_data import SingleRunData
+from ..core_data_structures.data_instance import DataInstance
+from ..core_data_structures.single_run_data import SingleRunData
+from ..units import *
 from .integrate import average_over_time_range
-from .units import *
 
 
 def data_instance_summary(
