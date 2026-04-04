@@ -152,7 +152,7 @@ def get_data_slice_by_timestamp(
 
 
 def get_cumulative_integration(data, timescale=1000000, filter_window_size=10, n_sigmas=3, smoothing_window_len=11, smoothing_poly_order=2):
-    """Integrate a time-series----> 9 from ..utils.concat import concat_single_run_data signal after outlier removal and smoothing.
+    """Integrate a time-series signal after outlier removal and smoothing.
 
     Cleans spikes via rolling MAD-based outlier detection, applies Savitzky-Golay
     smoothing, then computes the cumulative trapezoidal integral over time.
@@ -178,21 +178,33 @@ def get_cumulative_integration(data, timescale=1000000, filter_window_size=10, n
         A tuple of (timestamps, smoothed values, cumulative integral), all of the
         same length as the input signal.
     """
+    v_np = np.array(data.value_np, dtype=np.float64)
+    t = np.array(data.timestamp_np, dtype=np.float64)
+    v_series = pl.Series(v_np)
 
-    v = pl.Series(data.value_np)
-    t = np.array(data.timestamp_np)
+    # Rolling median and MAD (Median Absolute Deviation)
+    rolling_median = v_series.rolling_median(window_size=filter_window_size, min_periods=1, center=True).to_numpy()
+    rolling_std = v_series.rolling_map(
+        lambda x: np.median(np.abs(x.to_numpy() - np.median(x.to_numpy()))) * 1.4826,
+        window_size=filter_window_size,
+        min_periods=1,
+        center=True,
+    ).to_numpy()
 
-    # Calculate rolling median and the MAD (Median Absolute Deviation)
-    rolling_median = v.rolling(window=filter_window_size, center=True).median()
-    rolling_std = v.rolling(window=filter_window_size, center=True).apply(lambda x: np.abs(x - x.median()).median()) * 1.4826
-
-    # Identify spikes (points more than X "standard deviations" from the local median)
-    is_outlier = np.abs(v - rolling_median) > (n_sigmas * rolling_std)
-
-    # interpolate the outliers
-    v_cleaned = v.copy()
+    # Identify and replace spikes with NaN
+    is_outlier = np.abs(v_np - rolling_median) > (n_sigmas * rolling_std)
+    v_cleaned = v_np.copy()
     v_cleaned[is_outlier] = np.nan
-    v_cleaned = v_cleaned.interpolate(method='linear').bfill().ffill()
+
+    # Linear interpolation over outlier gaps
+    nans = np.isnan(v_cleaned)
+    if nans.any():
+        idx = np.arange(len(v_cleaned))
+        not_nan_idx = idx[~nans]
+        if len(not_nan_idx) > 1:
+            v_cleaned = np.interp(idx, not_nan_idx, v_cleaned[~nans])
+        elif len(not_nan_idx) == 1:
+            v_cleaned[:] = v_cleaned[not_nan_idx[0]]
 
     # Smoothing
     if len(v_cleaned) > smoothing_window_len:
