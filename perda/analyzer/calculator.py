@@ -1,6 +1,6 @@
 import numpy as np
-from ..analyzer.analyzer import Analyzer
-from ..analyzer.data_instance import DataInstance
+from .analyzer import Analyzer
+from .data_instance import DataInstance
 from ..utils.integrate import *
 
 def detect_accel_event(torque_obj, speed_obj, torque_threshold=100, speed_threshold=0.5):
