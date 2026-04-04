@@ -4,8 +4,11 @@ import plotly.graph_objects as go
 from numpy import float64
 from numpy.typing import NDArray
 
-from ..analyzer.data_instance import DataInstance, left_join_data_instances
-from ..plotting.parametric_plot import plot_parametric_trimmer
+from ..core_data_structures.data_instance import DataInstance, left_join_data_instances
+from ..plotting.parametric_plot import (
+    plot_parametric_curve_square,
+    plot_parametric_trimmer,
+)
 from ..plotting.plotting_constants import (
     DEFAULT_FONT_CONFIG,
     DEFAULT_GPS_MAP_CONFIG,
@@ -14,7 +17,7 @@ from ..plotting.plotting_constants import (
     GpsMapConfig,
     LayoutConfig,
 )
-from .types import Timescale
+from ..units import Timescale
 
 
 def plot_gps_trimmer(

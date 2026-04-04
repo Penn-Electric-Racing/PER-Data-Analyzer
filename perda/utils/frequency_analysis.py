@@ -3,11 +3,11 @@ from numpy import float64
 from numpy.typing import NDArray
 from plotly import graph_objects as go
 
-from ..analyzer.data_instance import DataInstance
 from ..constants import DELIMITER, title_block
+from ..core_data_structures.data_instance import DataInstance
 from ..plotting.plotting_constants import *
 from ..plotting.scatter_histogram_plotter import plot_scatter_and_histogram
-from .types import Timescale
+from ..units import Timescale
 
 
 def _s_conversion_factor(time_unit: Timescale) -> float:
