@@ -2,9 +2,9 @@ import numpy as np
 import polars as pl
 from tqdm import tqdm
 
+from ..utils.types import Timescale
 from .data_instance import DataInstance
 from .single_run_data import SingleRunData
-from ..utils.types import Timescale
 
 
 def _resolve_parse_unit(
@@ -14,9 +14,7 @@ def _resolve_parse_unit(
     if isinstance(parse_unit, str):
         parse_unit = parse_unit.strip().lower()
         if parse_unit not in (Timescale.MS.value, Timescale.US.value):
-            raise ValueError(
-                f"parse_unit must be 'ms' or 'us', got {parse_unit}"
-            )
+            raise ValueError(f"parse_unit must be 'ms' or 'us', got {parse_unit}")
         parse_unit = Timescale(parse_unit)
 
     if parse_unit is not None and parse_unit not in (Timescale.MS, Timescale.US):
@@ -118,15 +116,22 @@ def parse_csv(
         new_columns=["timestamp", "var_id", "value"],
         schema={"column_1": pl.Int64, "column_2": pl.Int32, "column_3": pl.Float64},
         ignore_errors=True,
+        glob=False,
     )
 
-    parsing_errors = len(df.filter(df["timestamp"].is_null() | df["var_id"].is_null() | df["value"].is_null()))
+    parsing_errors = len(
+        df.filter(
+            df["timestamp"].is_null() | df["var_id"].is_null() | df["value"].is_null()
+        )
+    )
     if parsing_errors_limit > 0 and parsing_errors >= parsing_errors_limit:
         raise Exception("Too many data parsing errors encountered.")
 
-    df = df.drop_nulls().with_columns(
-        (pl.col("timestamp") + ts_offset).alias("timestamp")
-    ).sort(["var_id", "timestamp"])
+    df = (
+        df.drop_nulls()
+        .with_columns((pl.col("timestamp") + ts_offset).alias("timestamp"))
+        .sort(["var_id", "timestamp"])
+    )
 
     total_data_points = len(df)
     data_start_time = int(df["timestamp"].min()) if total_data_points > 0 else 0
@@ -147,7 +152,9 @@ def parse_csv(
         name = id_to_cpp_name[var_id]
         descript = id_to_descript[var_id]
         cpp_name_to_id[name] = var_id
-        timestamps_np, values_np = var_arrays.get(var_id, (np.array([], dtype=np.int64), np.array([], dtype=np.float64)))
+        timestamps_np, values_np = var_arrays.get(
+            var_id, (np.array([], dtype=np.int64), np.array([], dtype=np.float64))
+        )
         id_to_instance[var_id] = DataInstance(
             timestamp_np=timestamps_np,
             value_np=values_np,
