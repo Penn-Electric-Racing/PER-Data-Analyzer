@@ -89,7 +89,7 @@ class GpsMapConfig(BaseModel):
     line_width: int = 2
     line_color: str = "red"
     zoom_padding: float = 0.4
-    lat_range: tuple[float, float] = (24.0, 50.0)
+    lat_range: tuple[float, float] = (35.0, 50.0)
     lon_range: tuple[float, float] = (-125.0, -66.0)
 
 
