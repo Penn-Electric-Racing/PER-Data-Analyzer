@@ -204,7 +204,8 @@ def smoothed_filtered_integration(
         window_size=filter_window_size, min_periods=1, center=True
     ).to_numpy()
     rolling_std = v_series.rolling_map(
-        lambda x: np.median(np.abs(x.to_numpy() - np.median(x.to_numpy()))) * 1.4826,
+        lambda x: np.median(np.abs(x.to_numpy() - np.median(x.to_numpy())))
+        * MAD_TO_STD,
         window_size=filter_window_size,
         min_periods=1,
         center=True,

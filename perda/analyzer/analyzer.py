@@ -9,7 +9,7 @@ from ..core_data_structures.single_run_data import SingleRunData
 from ..plotting.data_instance_plotter import *
 from ..plotting.plotting_constants import *
 from ..units import Timescale, mph_seconds_to_meters
-from ..utils.accel_calculator import AccelSegmentResult, compute_accel_results, detect_accel_event
+from ..utils.accel_calculator import *
 from ..utils.data_summary import single_run_summary
 from ..utils.diff import diff
 from ..utils.frequency_analysis import analyze_frequency as _analyze_frequency
@@ -273,12 +273,25 @@ class Analyzer:
         list[AccelSegmentResult]
             List of acceleration segment results.
         """
-        speed_obj = (self.data["pcm.wheelSpeeds.frontRight"] + self.data["pcm.wheelSpeeds.frontLeft"]) / 2.0
-        signal_obj = detect_accel_event(torque_obj=self.data["pcm.moc.motor.requestedTorque"], speed_obj=speed_obj)
-        
-            
-        time_arr, _, distance = smoothed_filtered_integration(data=speed_obj, source_time_unit=self.data.timestamp_unit)
-        distance_obj = DataInstance(timestamp_np=time_arr, value_np = distance / 3600 * 1609.34, label="Distance")
+        speed_obj = (
+            self.data["pcm.wheelSpeeds.frontRight"]
+            + self.data["pcm.wheelSpeeds.frontLeft"]
+        ) / 2.0
+        signal_obj = detect_accel_event(
+            torque_obj=self.data["pcm.moc.motor.requestedTorque"], speed_obj=speed_obj
+        )
 
+        time_arr, _, distance = smoothed_filtered_integration(
+            data=speed_obj, source_time_unit=self.data.timestamp_unit
+        )
+        distance_obj = DataInstance(
+            timestamp_np=time_arr,
+            value_np=mph_seconds_to_meters(distance),
+            label="Distance",
+        )
 
-        return compute_accel_results(signal_obj=signal_obj, distance_obj=distance_obj, source_time_unit=self.data.timestamp_unit)
+        return compute_accel_results(
+            signal_obj=signal_obj,
+            distance_obj=distance_obj,
+            source_time_unit=self.data.timestamp_unit,
+        )
