@@ -1,0 +1,8 @@
+perda.analyzer.csv
+==================
+
+.. automodule:: perda.analyzer.csv
+   :members:
+   :undoc-members:
+   :show-inheritance:
+

@@ -1,0 +1,8 @@
+perda.core\_data\_structures.joins
+==================================
+
+.. automodule:: perda.core_data_structures.joins
+   :members:
+   :undoc-members:
+   :show-inheritance:
+

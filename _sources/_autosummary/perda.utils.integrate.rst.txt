@@ -1,0 +1,8 @@
+perda.utils.integrate
+=====================
+
+.. automodule:: perda.utils.integrate
+   :members:
+   :undoc-members:
+   :show-inheritance:
+

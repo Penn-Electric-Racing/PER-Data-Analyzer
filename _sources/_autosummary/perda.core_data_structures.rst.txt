@@ -1,0 +1,18 @@
+perda.core\_data\_structures
+============================
+
+.. automodule:: perda.core_data_structures
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   data_instance
+   joins
+   single_run_data

@@ -1,0 +1,21 @@
+﻿perda
+=====
+
+.. automodule:: perda
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   analyzer
+   constants
+   core_data_structures
+   plotting
+   units
+   utils

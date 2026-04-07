@@ -1,0 +1,8 @@
+perda.constants
+===============
+
+.. automodule:: perda.constants
+   :members:
+   :undoc-members:
+   :show-inheritance:
+

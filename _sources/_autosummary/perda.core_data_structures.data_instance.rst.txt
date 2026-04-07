@@ -1,0 +1,8 @@
+perda.core\_data\_structures.data\_instance
+===========================================
+
+.. automodule:: perda.core_data_structures.data_instance
+   :members:
+   :undoc-members:
+   :show-inheritance:
+

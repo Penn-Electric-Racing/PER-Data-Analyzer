@@ -1,0 +1,8 @@
+perda.utils.search
+==================
+
+.. automodule:: perda.utils.search
+   :members:
+   :undoc-members:
+   :show-inheritance:
+

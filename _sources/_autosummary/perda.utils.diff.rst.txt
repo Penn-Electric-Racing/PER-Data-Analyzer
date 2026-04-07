@@ -1,0 +1,8 @@
+perda.utils.diff
+================
+
+.. automodule:: perda.utils.diff
+   :members:
+   :undoc-members:
+   :show-inheritance:
+

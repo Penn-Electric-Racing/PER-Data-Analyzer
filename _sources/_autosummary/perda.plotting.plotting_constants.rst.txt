@@ -1,0 +1,8 @@
+perda.plotting.plotting\_constants
+==================================
+
+.. automodule:: perda.plotting.plotting_constants
+   :members:
+   :undoc-members:
+   :show-inheritance:
+

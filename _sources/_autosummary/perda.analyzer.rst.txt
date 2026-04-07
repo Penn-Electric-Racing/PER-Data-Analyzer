@@ -1,0 +1,18 @@
+perda.analyzer
+==============
+
+.. automodule:: perda.analyzer
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   analyzer
+   concat
+   csv

@@ -1,0 +1,811 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>perda.plotting.plotting_constants &#8212; PERDA</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/autodoc_pydantic.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=8d563738"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/perda.plotting.plotting_constants';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="perda.plotting.scatter_histogram_plotter" href="perda.plotting.scatter_histogram_plotter.html" />
+    <link rel="prev" title="perda.plotting.parametric_plot" href="perda.plotting.parametric_plot.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">PERDA</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../getting_started/index.html">
+    Getting Started
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../api/index.html">
+    Code Documentation
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../getting_started/index.html">
+    Getting Started
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../api/index.html">
+    Code Documentation
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="perda.html">perda</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 has-children"><a class="reference internal" href="perda.analyzer.html">perda.analyzer</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="perda.analyzer.analyzer.html">perda.analyzer.analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.analyzer.concat.html">perda.analyzer.concat</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.analyzer.csv.html">perda.analyzer.csv</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="perda.constants.html">perda.constants</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="perda.core_data_structures.html">perda.core_data_structures</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.data_instance.html">perda.core_data_structures.data_instance</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.joins.html">perda.core_data_structures.joins</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.single_run_data.html">perda.core_data_structures.single_run_data</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="perda.plotting.html">perda.plotting</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="perda.plotting.data_instance_plotter.html">perda.plotting.data_instance_plotter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.plotting.diff_plotter.html">perda.plotting.diff_plotter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.plotting.parametric_plot.html">perda.plotting.parametric_plot</a></li>
+<li class="toctree-l3 current active"><a class="current reference internal" href="#">perda.plotting.plotting_constants</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.plotting.scatter_histogram_plotter.html">perda.plotting.scatter_histogram_plotter</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="perda.units.html">perda.units</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="perda.utils.html">perda.utils</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="perda.utils.accel_calculator.html">perda.utils.accel_calculator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.utils.data_summary.html">perda.utils.data_summary</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.utils.diff.html">perda.utils.diff</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.utils.frequency_analysis.html">perda.utils.frequency_analysis</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.utils.gps_analysis.html">perda.utils.gps_analysis</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.utils.integrate.html">perda.utils.integrate</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.utils.search.html">perda.utils.search</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../api/index.html" class="nav-link">Code Documentation</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="perda.html" class="nav-link">perda</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="perda.plotting.html" class="nav-link">perda.plotting</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">perda.plotting.plotting_constants</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="module-perda.plotting.plotting_constants">
+<span id="perda-plotting-plotting-constants"></span><h1>perda.plotting.plotting_constants<a class="headerlink" href="#module-perda.plotting.plotting_constants" title="Link to this heading">#</a></h1>
+<dl class="py class pydantic_model">
+<dt class="sig sig-object py" id="perda.plotting.plotting_constants.DiffPlotConfig">
+<em class="property"><span class="pre">pydantic</span> <span class="pre">model</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">perda.plotting.plotting_constants.</span></span><span class="sig-name descname"><span class="pre">DiffPlotConfig</span></span><a class="reference internal" href="../_modules/perda/plotting/plotting_constants.html#DiffPlotConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.plotting.plotting_constants.DiffPlotConfig" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<p>Configuration for diff bar chart visualization.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Fields<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><a class="reference internal" href="#perda.plotting.plotting_constants.DiffPlotConfig.bucket_size_ms" title="perda.plotting.plotting_constants.DiffPlotConfig.bucket_size_ms"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bucket_size_ms</span> <span class="pre">(int)</span></code></a></p></li>
+<li><p><a class="reference internal" href="#perda.plotting.plotting_constants.DiffPlotConfig.color_base_extra" title="perda.plotting.plotting_constants.DiffPlotConfig.color_base_extra"><code class="xref py py-obj docutils literal notranslate"><span class="pre">color_base_extra</span> <span class="pre">(str)</span></code></a></p></li>
+<li><p><a class="reference internal" href="#perda.plotting.plotting_constants.DiffPlotConfig.color_incom_extra" title="perda.plotting.plotting_constants.DiffPlotConfig.color_incom_extra"><code class="xref py py-obj docutils literal notranslate"><span class="pre">color_incom_extra</span> <span class="pre">(str)</span></code></a></p></li>
+<li><p><a class="reference internal" href="#perda.plotting.plotting_constants.DiffPlotConfig.color_total" title="perda.plotting.plotting_constants.DiffPlotConfig.color_total"><code class="xref py py-obj docutils literal notranslate"><span class="pre">color_total</span> <span class="pre">(str)</span></code></a></p></li>
+<li><p><a class="reference internal" href="#perda.plotting.plotting_constants.DiffPlotConfig.color_value_mismatch" title="perda.plotting.plotting_constants.DiffPlotConfig.color_value_mismatch"><code class="xref py py-obj docutils literal notranslate"><span class="pre">color_value_mismatch</span> <span class="pre">(str)</span></code></a></p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="perda.plotting.plotting_constants.DiffPlotConfig.bucket_size_ms">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">bucket_size_ms</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1000</span></em><a class="headerlink" href="#perda.plotting.plotting_constants.DiffPlotConfig.bucket_size_ms" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="perda.plotting.plotting_constants.DiffPlotConfig.color_base_extra">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">color_base_extra</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'blue'</span></em><a class="headerlink" href="#perda.plotting.plotting_constants.DiffPlotConfig.color_base_extra" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="perda.plotting.plotting_constants.DiffPlotConfig.color_incom_extra">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">color_incom_extra</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'darkorange'</span></em><a class="headerlink" href="#perda.plotting.plotting_constants.DiffPlotConfig.color_incom_extra" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="perda.plotting.plotting_constants.DiffPlotConfig.color_value_mismatch">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">color_value_mismatch</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'crimson'</span></em><a class="headerlink" href="#perda.plotting.plotting_constants.DiffPlotConfig.color_value_mismatch" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="perda.plotting.plotting_constants.DiffPlotConfig.color_total">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">color_total</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'gray'</span></em><a class="headerlink" href="#perda.plotting.plotting_constants.DiffPlotConfig.color_total" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class pydantic_model">
+<dt class="sig sig-object py" id="perda.plotting.plotting_constants.FontConfig">
+<em class="property"><span class="pre">pydantic</span> <span class="pre">model</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">perda.plotting.plotting_constants.</span></span><span class="sig-name descname"><span class="pre">FontConfig</span></span><a class="reference internal" href="../_modules/perda/plotting/plotting_constants.html#FontConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.plotting.plotting_constants.FontConfig" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<p>Font configuration for plot elements.</p>
+<p>Simplified to three sizes:
+- Large: Titles
+- Medium: Axis labels, legend titles
+- Small: Tick labels, legend items</p>
+<dl class="field-list simple">
+<dt class="field-odd">Fields<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><a class="reference internal" href="#perda.plotting.plotting_constants.FontConfig.large" title="perda.plotting.plotting_constants.FontConfig.large"><code class="xref py py-obj docutils literal notranslate"><span class="pre">large</span> <span class="pre">(int)</span></code></a></p></li>
+<li><p><a class="reference internal" href="#perda.plotting.plotting_constants.FontConfig.medium" title="perda.plotting.plotting_constants.FontConfig.medium"><code class="xref py py-obj docutils literal notranslate"><span class="pre">medium</span> <span class="pre">(int)</span></code></a></p></li>
+<li><p><a class="reference internal" href="#perda.plotting.plotting_constants.FontConfig.small" title="perda.plotting.plotting_constants.FontConfig.small"><code class="xref py py-obj docutils literal notranslate"><span class="pre">small</span> <span class="pre">(int)</span></code></a></p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="perda.plotting.plotting_constants.FontConfig.large">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">large</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">20</span></em><a class="headerlink" href="#perda.plotting.plotting_constants.FontConfig.large" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="perda.plotting.plotting_constants.FontConfig.medium">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">medium</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">14</span></em><a class="headerlink" href="#perda.plotting.plotting_constants.FontConfig.medium" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="perda.plotting.plotting_constants.FontConfig.small">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">small</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">10</span></em><a class="headerlink" href="#perda.plotting.plotting_constants.FontConfig.small" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class pydantic_model">
+<dt class="sig sig-object py" id="perda.plotting.plotting_constants.GpsMapConfig">
+<em class="property"><span class="pre">pydantic</span> <span class="pre">model</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">perda.plotting.plotting_constants.</span></span><span class="sig-name descname"><span class="pre">GpsMapConfig</span></span><a class="reference internal" href="../_modules/perda/plotting/plotting_constants.html#GpsMapConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.plotting.plotting_constants.GpsMapConfig" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<p>Configuration for GPS map overlay plots.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mapbox_style</strong> (<em>str</em>) – Mapbox tile style. <code class="docutils literal notranslate"><span class="pre">&quot;carto-positron&quot;</span></code> is free and requires no token.</p></li>
+<li><p><strong>mapbox_token</strong> (<em>str</em>) – Mapbox access token. Only needed for Mapbox-hosted styles.</p></li>
+<li><p><strong>marker_size</strong> (<em>int</em>) – Marker size on the map trace.</p></li>
+<li><p><strong>line_width</strong> (<em>int</em>) – Line width on the map trace.</p></li>
+<li><p><strong>line_color</strong> (<em>str</em>) – Color of the GPS trace line.</p></li>
+<li><p><strong>zoom_padding</strong> (<em>float</em>) – Extra fraction added around the data extent when auto-zooming.</p></li>
+<li><p><strong>lat_range</strong> (<em>tuple</em><em>[</em><em>float</em><em>, </em><em>float</em><em>]</em>) – Valid latitude range. Points outside are filtered.</p></li>
+<li><p><strong>lon_range</strong> (<em>tuple</em><em>[</em><em>float</em><em>, </em><em>float</em><em>]</em>) – Valid longitude range. Points outside are filtered.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Fields<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><a class="reference internal" href="#perda.plotting.plotting_constants.GpsMapConfig.lat_range" title="perda.plotting.plotting_constants.GpsMapConfig.lat_range"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lat_range</span> <span class="pre">(tuple[float,</span> <span class="pre">float])</span></code></a></p></li>
+<li><p><a class="reference internal" href="#perda.plotting.plotting_constants.GpsMapConfig.line_color" title="perda.plotting.plotting_constants.GpsMapConfig.line_color"><code class="xref py py-obj docutils literal notranslate"><span class="pre">line_color</span> <span class="pre">(str)</span></code></a></p></li>
+<li><p><a class="reference internal" href="#perda.plotting.plotting_constants.GpsMapConfig.line_width" title="perda.plotting.plotting_constants.GpsMapConfig.line_width"><code class="xref py py-obj docutils literal notranslate"><span class="pre">line_width</span> <span class="pre">(int)</span></code></a></p></li>
+<li><p><a class="reference internal" href="#perda.plotting.plotting_constants.GpsMapConfig.lon_range" title="perda.plotting.plotting_constants.GpsMapConfig.lon_range"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lon_range</span> <span class="pre">(tuple[float,</span> <span class="pre">float])</span></code></a></p></li>
+<li><p><a class="reference internal" href="#perda.plotting.plotting_constants.GpsMapConfig.mapbox_style" title="perda.plotting.plotting_constants.GpsMapConfig.mapbox_style"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mapbox_style</span> <span class="pre">(str)</span></code></a></p></li>
+<li><p><a class="reference internal" href="#perda.plotting.plotting_constants.GpsMapConfig.mapbox_token" title="perda.plotting.plotting_constants.GpsMapConfig.mapbox_token"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mapbox_token</span> <span class="pre">(str)</span></code></a></p></li>
+<li><p><a class="reference internal" href="#perda.plotting.plotting_constants.GpsMapConfig.marker_size" title="perda.plotting.plotting_constants.GpsMapConfig.marker_size"><code class="xref py py-obj docutils literal notranslate"><span class="pre">marker_size</span> <span class="pre">(int)</span></code></a></p></li>
+<li><p><a class="reference internal" href="#perda.plotting.plotting_constants.GpsMapConfig.zoom_padding" title="perda.plotting.plotting_constants.GpsMapConfig.zoom_padding"><code class="xref py py-obj docutils literal notranslate"><span class="pre">zoom_padding</span> <span class="pre">(float)</span></code></a></p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="perda.plotting.plotting_constants.GpsMapConfig.mapbox_style">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">mapbox_style</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'carto-positron'</span></em><a class="headerlink" href="#perda.plotting.plotting_constants.GpsMapConfig.mapbox_style" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="perda.plotting.plotting_constants.GpsMapConfig.mapbox_token">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">mapbox_token</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#perda.plotting.plotting_constants.GpsMapConfig.mapbox_token" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="perda.plotting.plotting_constants.GpsMapConfig.marker_size">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">marker_size</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></em><a class="headerlink" href="#perda.plotting.plotting_constants.GpsMapConfig.marker_size" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="perda.plotting.plotting_constants.GpsMapConfig.line_width">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">line_width</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#perda.plotting.plotting_constants.GpsMapConfig.line_width" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="perda.plotting.plotting_constants.GpsMapConfig.line_color">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">line_color</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'red'</span></em><a class="headerlink" href="#perda.plotting.plotting_constants.GpsMapConfig.line_color" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="perda.plotting.plotting_constants.GpsMapConfig.zoom_padding">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">zoom_padding</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.4</span></em><a class="headerlink" href="#perda.plotting.plotting_constants.GpsMapConfig.zoom_padding" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="perda.plotting.plotting_constants.GpsMapConfig.lat_range">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">lat_range</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code><span class="pre">[</span><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code><span class="pre">,</span> <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code><span class="pre">]</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(35.0,</span> <span class="pre">50.0)</span></em><a class="headerlink" href="#perda.plotting.plotting_constants.GpsMapConfig.lat_range" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="perda.plotting.plotting_constants.GpsMapConfig.lon_range">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">lon_range</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code><span class="pre">[</span><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code><span class="pre">,</span> <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code><span class="pre">]</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(-125.0,</span> <span class="pre">-66.0)</span></em><a class="headerlink" href="#perda.plotting.plotting_constants.GpsMapConfig.lon_range" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class pydantic_model">
+<dt class="sig sig-object py" id="perda.plotting.plotting_constants.LayoutConfig">
+<em class="property"><span class="pre">pydantic</span> <span class="pre">model</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">perda.plotting.plotting_constants.</span></span><span class="sig-name descname"><span class="pre">LayoutConfig</span></span><a class="reference internal" href="../_modules/perda/plotting/plotting_constants.html#LayoutConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.plotting.plotting_constants.LayoutConfig" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<p>Layout configuration for plot dimensions and spacing.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Fields<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><a class="reference internal" href="#perda.plotting.plotting_constants.LayoutConfig.height" title="perda.plotting.plotting_constants.LayoutConfig.height"><code class="xref py py-obj docutils literal notranslate"><span class="pre">height</span> <span class="pre">(int)</span></code></a></p></li>
+<li><p><a class="reference internal" href="#perda.plotting.plotting_constants.LayoutConfig.margin" title="perda.plotting.plotting_constants.LayoutConfig.margin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">margin</span> <span class="pre">(Dict[str,</span> <span class="pre">int])</span></code></a></p></li>
+<li><p><a class="reference internal" href="#perda.plotting.plotting_constants.LayoutConfig.plot_bgcolor" title="perda.plotting.plotting_constants.LayoutConfig.plot_bgcolor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_bgcolor</span> <span class="pre">(str)</span></code></a></p></li>
+<li><p><a class="reference internal" href="#perda.plotting.plotting_constants.LayoutConfig.title_x" title="perda.plotting.plotting_constants.LayoutConfig.title_x"><code class="xref py py-obj docutils literal notranslate"><span class="pre">title_x</span> <span class="pre">(float)</span></code></a></p></li>
+<li><p><a class="reference internal" href="#perda.plotting.plotting_constants.LayoutConfig.title_xanchor" title="perda.plotting.plotting_constants.LayoutConfig.title_xanchor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">title_xanchor</span> <span class="pre">(str)</span></code></a></p></li>
+<li><p><a class="reference internal" href="#perda.plotting.plotting_constants.LayoutConfig.title_yanchor" title="perda.plotting.plotting_constants.LayoutConfig.title_yanchor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">title_yanchor</span> <span class="pre">(str)</span></code></a></p></li>
+<li><p><a class="reference internal" href="#perda.plotting.plotting_constants.LayoutConfig.width" title="perda.plotting.plotting_constants.LayoutConfig.width"><code class="xref py py-obj docutils literal notranslate"><span class="pre">width</span> <span class="pre">(int)</span></code></a></p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="perda.plotting.plotting_constants.LayoutConfig.width">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">width</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1200</span></em><a class="headerlink" href="#perda.plotting.plotting_constants.LayoutConfig.width" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="perda.plotting.plotting_constants.LayoutConfig.height">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">height</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">700</span></em><a class="headerlink" href="#perda.plotting.plotting_constants.LayoutConfig.height" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="perda.plotting.plotting_constants.LayoutConfig.margin">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">margin</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code><span class="pre">[</span><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><span class="pre">,</span> <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code><span class="pre">]</span></em><em class="property"> <span class="pre">[Optional]</span></em><a class="headerlink" href="#perda.plotting.plotting_constants.LayoutConfig.margin" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="perda.plotting.plotting_constants.LayoutConfig.plot_bgcolor">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">plot_bgcolor</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'white'</span></em><a class="headerlink" href="#perda.plotting.plotting_constants.LayoutConfig.plot_bgcolor" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="perda.plotting.plotting_constants.LayoutConfig.title_x">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">title_x</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.5</span></em><a class="headerlink" href="#perda.plotting.plotting_constants.LayoutConfig.title_x" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="perda.plotting.plotting_constants.LayoutConfig.title_xanchor">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">title_xanchor</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'center'</span></em><a class="headerlink" href="#perda.plotting.plotting_constants.LayoutConfig.title_xanchor" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="perda.plotting.plotting_constants.LayoutConfig.title_yanchor">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">title_yanchor</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'top'</span></em><a class="headerlink" href="#perda.plotting.plotting_constants.LayoutConfig.title_yanchor" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class pydantic_model">
+<dt class="sig sig-object py" id="perda.plotting.plotting_constants.ScatterHistogramPlotConfig">
+<em class="property"><span class="pre">pydantic</span> <span class="pre">model</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">perda.plotting.plotting_constants.</span></span><span class="sig-name descname"><span class="pre">ScatterHistogramPlotConfig</span></span><a class="reference internal" href="../_modules/perda/plotting/plotting_constants.html#ScatterHistogramPlotConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.plotting.plotting_constants.ScatterHistogramPlotConfig" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<p>Configuration for frequency analysis visualization.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Fields<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><a class="reference internal" href="#perda.plotting.plotting_constants.ScatterHistogramPlotConfig.color_histogram" title="perda.plotting.plotting_constants.ScatterHistogramPlotConfig.color_histogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">color_histogram</span> <span class="pre">(str)</span></code></a></p></li>
+<li><p><a class="reference internal" href="#perda.plotting.plotting_constants.ScatterHistogramPlotConfig.color_line" title="perda.plotting.plotting_constants.ScatterHistogramPlotConfig.color_line"><code class="xref py py-obj docutils literal notranslate"><span class="pre">color_line</span> <span class="pre">(str)</span></code></a></p></li>
+<li><p><a class="reference internal" href="#perda.plotting.plotting_constants.ScatterHistogramPlotConfig.color_scatter" title="perda.plotting.plotting_constants.ScatterHistogramPlotConfig.color_scatter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">color_scatter</span> <span class="pre">(str)</span></code></a></p></li>
+<li><p><a class="reference internal" href="#perda.plotting.plotting_constants.ScatterHistogramPlotConfig.histogram_bins" title="perda.plotting.plotting_constants.ScatterHistogramPlotConfig.histogram_bins"><code class="xref py py-obj docutils literal notranslate"><span class="pre">histogram_bins</span> <span class="pre">(int)</span></code></a></p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="perda.plotting.plotting_constants.ScatterHistogramPlotConfig.color_scatter">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">color_scatter</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'blue'</span></em><a class="headerlink" href="#perda.plotting.plotting_constants.ScatterHistogramPlotConfig.color_scatter" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="perda.plotting.plotting_constants.ScatterHistogramPlotConfig.color_line">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">color_line</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'crimson'</span></em><a class="headerlink" href="#perda.plotting.plotting_constants.ScatterHistogramPlotConfig.color_line" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="perda.plotting.plotting_constants.ScatterHistogramPlotConfig.color_histogram">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">color_histogram</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'blue'</span></em><a class="headerlink" href="#perda.plotting.plotting_constants.ScatterHistogramPlotConfig.color_histogram" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="perda.plotting.plotting_constants.ScatterHistogramPlotConfig.histogram_bins">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">histogram_bins</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">80</span></em><a class="headerlink" href="#perda.plotting.plotting_constants.ScatterHistogramPlotConfig.histogram_bins" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class pydantic_model">
+<dt class="sig sig-object py" id="perda.plotting.plotting_constants.VLineConfig">
+<em class="property"><span class="pre">pydantic</span> <span class="pre">model</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">perda.plotting.plotting_constants.</span></span><span class="sig-name descname"><span class="pre">VLineConfig</span></span><a class="reference internal" href="../_modules/perda/plotting/plotting_constants.html#VLineConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.plotting.plotting_constants.VLineConfig" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<p>Configuration for vertical marker lines on plots.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Fields<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><a class="reference internal" href="#perda.plotting.plotting_constants.VLineConfig.color" title="perda.plotting.plotting_constants.VLineConfig.color"><code class="xref py py-obj docutils literal notranslate"><span class="pre">color</span> <span class="pre">(str)</span></code></a></p></li>
+<li><p><a class="reference internal" href="#perda.plotting.plotting_constants.VLineConfig.dash" title="perda.plotting.plotting_constants.VLineConfig.dash"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dash</span> <span class="pre">(str)</span></code></a></p></li>
+<li><p><a class="reference internal" href="#perda.plotting.plotting_constants.VLineConfig.opacity" title="perda.plotting.plotting_constants.VLineConfig.opacity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">opacity</span> <span class="pre">(float)</span></code></a></p></li>
+<li><p><a class="reference internal" href="#perda.plotting.plotting_constants.VLineConfig.width" title="perda.plotting.plotting_constants.VLineConfig.width"><code class="xref py py-obj docutils literal notranslate"><span class="pre">width</span> <span class="pre">(int)</span></code></a></p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="perda.plotting.plotting_constants.VLineConfig.color">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">color</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'gray'</span></em><a class="headerlink" href="#perda.plotting.plotting_constants.VLineConfig.color" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="perda.plotting.plotting_constants.VLineConfig.width">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">width</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#perda.plotting.plotting_constants.VLineConfig.width" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="perda.plotting.plotting_constants.VLineConfig.dash">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dash</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'dash'</span></em><a class="headerlink" href="#perda.plotting.plotting_constants.VLineConfig.dash" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="perda.plotting.plotting_constants.VLineConfig.opacity">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">opacity</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.7</span></em><a class="headerlink" href="#perda.plotting.plotting_constants.VLineConfig.opacity" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="perda.plotting.parametric_plot.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">perda.plotting.parametric_plot</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="perda.plotting.scatter_histogram_plotter.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">perda.plotting.scatter_histogram_plotter</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.plotting.plotting_constants.DiffPlotConfig"><code class="docutils literal notranslate"><span class="pre">DiffPlotConfig</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.plotting.plotting_constants.DiffPlotConfig.bucket_size_ms"><code class="docutils literal notranslate"><span class="pre">DiffPlotConfig.bucket_size_ms</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.plotting.plotting_constants.DiffPlotConfig.color_base_extra"><code class="docutils literal notranslate"><span class="pre">DiffPlotConfig.color_base_extra</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.plotting.plotting_constants.DiffPlotConfig.color_incom_extra"><code class="docutils literal notranslate"><span class="pre">DiffPlotConfig.color_incom_extra</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.plotting.plotting_constants.DiffPlotConfig.color_value_mismatch"><code class="docutils literal notranslate"><span class="pre">DiffPlotConfig.color_value_mismatch</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.plotting.plotting_constants.DiffPlotConfig.color_total"><code class="docutils literal notranslate"><span class="pre">DiffPlotConfig.color_total</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.plotting.plotting_constants.FontConfig"><code class="docutils literal notranslate"><span class="pre">FontConfig</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.plotting.plotting_constants.FontConfig.large"><code class="docutils literal notranslate"><span class="pre">FontConfig.large</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.plotting.plotting_constants.FontConfig.medium"><code class="docutils literal notranslate"><span class="pre">FontConfig.medium</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.plotting.plotting_constants.FontConfig.small"><code class="docutils literal notranslate"><span class="pre">FontConfig.small</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.plotting.plotting_constants.GpsMapConfig"><code class="docutils literal notranslate"><span class="pre">GpsMapConfig</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.plotting.plotting_constants.GpsMapConfig.mapbox_style"><code class="docutils literal notranslate"><span class="pre">GpsMapConfig.mapbox_style</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.plotting.plotting_constants.GpsMapConfig.mapbox_token"><code class="docutils literal notranslate"><span class="pre">GpsMapConfig.mapbox_token</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.plotting.plotting_constants.GpsMapConfig.marker_size"><code class="docutils literal notranslate"><span class="pre">GpsMapConfig.marker_size</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.plotting.plotting_constants.GpsMapConfig.line_width"><code class="docutils literal notranslate"><span class="pre">GpsMapConfig.line_width</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.plotting.plotting_constants.GpsMapConfig.line_color"><code class="docutils literal notranslate"><span class="pre">GpsMapConfig.line_color</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.plotting.plotting_constants.GpsMapConfig.zoom_padding"><code class="docutils literal notranslate"><span class="pre">GpsMapConfig.zoom_padding</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.plotting.plotting_constants.GpsMapConfig.lat_range"><code class="docutils literal notranslate"><span class="pre">GpsMapConfig.lat_range</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.plotting.plotting_constants.GpsMapConfig.lon_range"><code class="docutils literal notranslate"><span class="pre">GpsMapConfig.lon_range</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.plotting.plotting_constants.LayoutConfig"><code class="docutils literal notranslate"><span class="pre">LayoutConfig</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.plotting.plotting_constants.LayoutConfig.width"><code class="docutils literal notranslate"><span class="pre">LayoutConfig.width</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.plotting.plotting_constants.LayoutConfig.height"><code class="docutils literal notranslate"><span class="pre">LayoutConfig.height</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.plotting.plotting_constants.LayoutConfig.margin"><code class="docutils literal notranslate"><span class="pre">LayoutConfig.margin</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.plotting.plotting_constants.LayoutConfig.plot_bgcolor"><code class="docutils literal notranslate"><span class="pre">LayoutConfig.plot_bgcolor</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.plotting.plotting_constants.LayoutConfig.title_x"><code class="docutils literal notranslate"><span class="pre">LayoutConfig.title_x</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.plotting.plotting_constants.LayoutConfig.title_xanchor"><code class="docutils literal notranslate"><span class="pre">LayoutConfig.title_xanchor</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.plotting.plotting_constants.LayoutConfig.title_yanchor"><code class="docutils literal notranslate"><span class="pre">LayoutConfig.title_yanchor</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.plotting.plotting_constants.ScatterHistogramPlotConfig"><code class="docutils literal notranslate"><span class="pre">ScatterHistogramPlotConfig</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.plotting.plotting_constants.ScatterHistogramPlotConfig.color_scatter"><code class="docutils literal notranslate"><span class="pre">ScatterHistogramPlotConfig.color_scatter</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.plotting.plotting_constants.ScatterHistogramPlotConfig.color_line"><code class="docutils literal notranslate"><span class="pre">ScatterHistogramPlotConfig.color_line</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.plotting.plotting_constants.ScatterHistogramPlotConfig.color_histogram"><code class="docutils literal notranslate"><span class="pre">ScatterHistogramPlotConfig.color_histogram</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.plotting.plotting_constants.ScatterHistogramPlotConfig.histogram_bins"><code class="docutils literal notranslate"><span class="pre">ScatterHistogramPlotConfig.histogram_bins</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.plotting.plotting_constants.VLineConfig"><code class="docutils literal notranslate"><span class="pre">VLineConfig</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.plotting.plotting_constants.VLineConfig.color"><code class="docutils literal notranslate"><span class="pre">VLineConfig.color</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.plotting.plotting_constants.VLineConfig.width"><code class="docutils literal notranslate"><span class="pre">VLineConfig.width</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.plotting.plotting_constants.VLineConfig.dash"><code class="docutils literal notranslate"><span class="pre">VLineConfig.dash</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.plotting.plotting_constants.VLineConfig.opacity"><code class="docutils literal notranslate"><span class="pre">VLineConfig.opacity</span></code></a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/_autosummary/perda.plotting.plotting_constants.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2025, Penn Electric Racing.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

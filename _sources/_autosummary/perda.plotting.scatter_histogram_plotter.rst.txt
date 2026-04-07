@@ -1,0 +1,8 @@
+perda.plotting.scatter\_histogram\_plotter
+==========================================
+
+.. automodule:: perda.plotting.scatter_histogram_plotter
+   :members:
+   :undoc-members:
+   :show-inheritance:
+

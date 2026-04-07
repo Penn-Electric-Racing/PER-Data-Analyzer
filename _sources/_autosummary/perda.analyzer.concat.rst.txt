@@ -1,0 +1,6 @@
+perda.analyzer.concat
+=====================
+
+.. currentmodule:: perda.analyzer
+
+.. autofunction:: concat

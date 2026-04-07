@@ -1,0 +1,901 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>perda.core_data_structures.data_instance &#8212; PERDA</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../../_static/documentation_options.js?v=8d563738"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../_static/design-tabs.js?v=f930bc37"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/perda/core_data_structures/data_instance';</script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">PERDA</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../getting_started/index.html">
+    Getting Started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../api/index.html">
+    Code Documentation
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../getting_started/index.html">
+    Getting Started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../api/index.html">
+    Code Documentation
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">perda.core_data_structures.data_instance</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for perda.core_data_structures.data_instance</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">numpy.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">NDArray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">ConfigDict</span><span class="p">,</span> <span class="n">Field</span><span class="p">,</span> <span class="n">field_validator</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.joins</span><span class="w"> </span><span class="kn">import</span> <span class="n">inner_join</span><span class="p">,</span> <span class="n">left_join</span><span class="p">,</span> <span class="n">outer_join</span>
+
+
+<div class="viewcode-block" id="DataInstance">
+<a class="viewcode-back" href="../../../_autosummary/perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.DataInstance">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">DataInstance</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A single time-series variable, pairing a 1D timestamp array with a 1D value array.&quot;&quot;&quot;</span>
+
+    <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span><span class="n">arbitrary_types_allowed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">timestamp_np</span><span class="p">:</span> <span class="n">NDArray</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Timestamps as a 1D NumPy array&quot;</span><span class="p">)</span>
+    <span class="n">value_np</span><span class="p">:</span> <span class="n">NDArray</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Values as a 1D NumPy array&quot;</span><span class="p">)</span>
+    <span class="n">label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Human-readable label for this variable&quot;</span>
+    <span class="p">)</span>
+    <span class="n">var_id</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Unique variable ID&quot;</span><span class="p">)</span>
+    <span class="n">cpp_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;C++ variable name&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="DataInstance.validate_timestamp">
+<a class="viewcode-back" href="../../../_autosummary/perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.DataInstance.validate_timestamp">[docs]</a>
+    <span class="nd">@field_validator</span><span class="p">(</span><span class="s2">&quot;timestamp_np&quot;</span><span class="p">)</span>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate_timestamp</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Validate that timestamp array is 1-dimensional, positive, and strictly increasing.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;timestamp_np must be 1-dimensional array.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;timestamp_np cannot be decreasing.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="ow">and</span> <span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;timestamp_np must be non-negative.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">v</span></div>
+
+
+<div class="viewcode-block" id="DataInstance.validate_value">
+<a class="viewcode-back" href="../../../_autosummary/perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.DataInstance.validate_value">[docs]</a>
+    <span class="nd">@field_validator</span><span class="p">(</span><span class="s2">&quot;value_np&quot;</span><span class="p">)</span>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate_value</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Validate that value array is 1-dimensional</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;value_np must be 1-dimensional array.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">v</span></div>
+
+
+<div class="viewcode-block" id="DataInstance.model_post_init">
+<a class="viewcode-back" href="../../../_autosummary/perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.DataInstance.model_post_init">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">model_post_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__context</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Post-initialization validation that timestamp and value arrays have the same length.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">timestamp_np</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_np</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;timestamp_np and value_np must have the same length.&quot;</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Human-readable one-line summary of this DataInstance.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            ``Label | ID: &lt;var_id&gt; | C++ Name: &lt;cpp_name&gt;``</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="si">}</span><span class="s2"> | ID: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">var_id</span><span class="si">}</span><span class="s2"> | C++ Name: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">cpp_name</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get number of data points in this DataInstance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">timestamp_np</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="s2">&quot;DataInstance&quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s2">&quot;DataInstance&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add two DataInstances or add a scalar to a DataInstance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">DataInstance</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">apply_ufunc_outer_join</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">add</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isscalar</span><span class="p">(</span><span class="n">other</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">DataInstance</span><span class="p">(</span>
+                <span class="n">timestamp_np</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">,</span>
+                <span class="n">value_np</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value_np</span><span class="p">,</span> <span class="n">other</span><span class="p">),</span>
+                <span class="n">label</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">,</span>
+                <span class="n">var_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">var_id</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;add expects (DataInstance, DataInstance|scalar) in any order&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__sub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="s2">&quot;DataInstance&quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s2">&quot;DataInstance&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Subtract a DataInstance or scalar from this DataInstance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">DataInstance</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">apply_ufunc_outer_join</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">subtract</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isscalar</span><span class="p">(</span><span class="n">other</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">DataInstance</span><span class="p">(</span>
+                <span class="n">timestamp_np</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">,</span>
+                <span class="n">value_np</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value_np</span><span class="p">,</span> <span class="n">other</span><span class="p">),</span>
+                <span class="n">label</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">,</span>
+                <span class="n">var_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">var_id</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;sub expects (DataInstance, DataInstance|scalar)&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__mul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="s2">&quot;DataInstance&quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s2">&quot;DataInstance&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Multiply two DataInstances or multiply a DataInstance by a scalar.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">DataInstance</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">apply_ufunc_outer_join</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isscalar</span><span class="p">(</span><span class="n">other</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">DataInstance</span><span class="p">(</span>
+                <span class="n">timestamp_np</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">,</span>
+                <span class="n">value_np</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value_np</span><span class="p">,</span> <span class="n">other</span><span class="p">),</span>
+                <span class="n">label</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">,</span>
+                <span class="n">var_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">var_id</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;mul expects (DataInstance, DataInstance|scalar)&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__truediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="s2">&quot;DataInstance&quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s2">&quot;DataInstance&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Divide this DataInstance by another DataInstance or scalar.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">DataInstance</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">apply_ufunc_outer_join</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">true_divide</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isscalar</span><span class="p">(</span><span class="n">other</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">DataInstance</span><span class="p">(</span>
+                <span class="n">timestamp_np</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">,</span>
+                <span class="n">value_np</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">true_divide</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value_np</span><span class="p">,</span> <span class="n">other</span><span class="p">),</span>
+                <span class="n">label</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">,</span>
+                <span class="n">var_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">var_id</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;div expects (DataInstance, DataInstance|scalar)&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__pow__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="s2">&quot;DataInstance&quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s2">&quot;DataInstance&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Raise this DataInstance to the power of another DataInstance or scalar.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">DataInstance</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">apply_ufunc_outer_join</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isscalar</span><span class="p">(</span><span class="n">other</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">DataInstance</span><span class="p">(</span>
+                <span class="n">timestamp_np</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">,</span>
+                <span class="n">value_np</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value_np</span><span class="p">,</span> <span class="n">other</span><span class="p">),</span>
+                <span class="n">label</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">,</span>
+                <span class="n">var_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">var_id</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;pow_ expects (DataInstance, DataInstance|scalar)&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__neg__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;DataInstance&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Negate all values in this DataInstance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">DataInstance</span><span class="p">(</span>
+            <span class="n">timestamp_np</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">,</span>
+            <span class="n">value_np</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">negative</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value_np</span><span class="p">),</span>
+            <span class="n">label</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">,</span>
+            <span class="n">var_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">var_id</span><span class="p">,</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="DataInstance.trim">
+<a class="viewcode-back" href="../../../_autosummary/perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.DataInstance.trim">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">trim</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">ts_start</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">ts_end</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;DataInstance&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return a new DataInstance containing only points within the given timestamp range.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        ts_start : float | None, optional</span>
+<span class="sd">            Lower bound in raw timestamp units (inclusive). Default is None (no lower bound).</span>
+<span class="sd">        ts_end : float | None, optional</span>
+<span class="sd">            Upper bound in raw timestamp units (inclusive). Default is None (no upper bound).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        DataInstance</span>
+<span class="sd">            New DataInstance with only in-range data points.</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        &gt;&gt;&gt; clipped = di.trim(ts_start=10_000, ts_end=30_000)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">ts_start</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">ts_end</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">timestamp_np</span> <span class="o">&gt;=</span> <span class="n">ts_start</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">timestamp_np</span> <span class="o">&lt;=</span> <span class="n">ts_end</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">ts_start</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">timestamp_np</span> <span class="o">&gt;=</span> <span class="n">ts_start</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">timestamp_np</span> <span class="o">&lt;=</span> <span class="n">ts_end</span>  <span class="c1"># type: ignore[operator]</span>
+        <span class="k">return</span> <span class="n">DataInstance</span><span class="p">(</span>
+            <span class="n">timestamp_np</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">[</span><span class="n">mask</span><span class="p">],</span>
+            <span class="n">value_np</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">value_np</span><span class="p">[</span><span class="n">mask</span><span class="p">],</span>
+            <span class="n">label</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">,</span>
+            <span class="n">var_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">var_id</span><span class="p">,</span>
+            <span class="n">cpp_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cpp_name</span><span class="p">,</span>
+        <span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="left_join_data_instances">
+<a class="viewcode-back" href="../../../_autosummary/perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.left_join_data_instances">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">left_join_data_instances</span><span class="p">(</span>
+    <span class="n">left</span><span class="p">:</span> <span class="n">DataInstance</span><span class="p">,</span>
+    <span class="n">right</span><span class="p">:</span> <span class="n">DataInstance</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">DataInstance</span><span class="p">,</span> <span class="n">DataInstance</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Left join two DataInstances: keep all left timestamps, interpolate right values.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    left : DataInstance</span>
+<span class="sd">        Left DataInstance (all timestamps are kept)</span>
+<span class="sd">    right : DataInstance</span>
+<span class="sd">        Right DataInstance (values are matched/interpolated to left)</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    left_result : DataInstance</span>
+<span class="sd">        Left DataInstance with aligned timestamps</span>
+<span class="sd">    right_result : DataInstance</span>
+<span class="sd">        Right DataInstance with values interpolated to left timestamps</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ts</span><span class="p">,</span> <span class="n">left_val</span><span class="p">,</span> <span class="n">right_val</span> <span class="o">=</span> <span class="n">left_join</span><span class="p">(</span>
+        <span class="n">left</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">,</span> <span class="n">left</span><span class="o">.</span><span class="n">value_np</span><span class="p">,</span> <span class="n">right</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">,</span> <span class="n">right</span><span class="o">.</span><span class="n">value_np</span>
+    <span class="p">)</span>
+
+    <span class="n">left_result</span> <span class="o">=</span> <span class="n">DataInstance</span><span class="p">(</span>
+        <span class="n">timestamp_np</span><span class="o">=</span><span class="n">ts</span><span class="p">,</span> <span class="n">value_np</span><span class="o">=</span><span class="n">left_val</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">left</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">var_id</span><span class="o">=</span><span class="n">left</span><span class="o">.</span><span class="n">var_id</span>
+    <span class="p">)</span>
+    <span class="n">right_result</span> <span class="o">=</span> <span class="n">DataInstance</span><span class="p">(</span>
+        <span class="n">timestamp_np</span><span class="o">=</span><span class="n">ts</span><span class="p">,</span> <span class="n">value_np</span><span class="o">=</span><span class="n">right_val</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">right</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">var_id</span><span class="o">=</span><span class="n">right</span><span class="o">.</span><span class="n">var_id</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">left_result</span><span class="p">,</span> <span class="n">right_result</span></div>
+
+
+
+<div class="viewcode-block" id="outer_join_data_instances">
+<a class="viewcode-back" href="../../../_autosummary/perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.outer_join_data_instances">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">outer_join_data_instances</span><span class="p">(</span>
+    <span class="n">left</span><span class="p">:</span> <span class="n">DataInstance</span><span class="p">,</span>
+    <span class="n">right</span><span class="p">:</span> <span class="n">DataInstance</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">drop_nan</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">fill</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">DataInstance</span><span class="p">,</span> <span class="n">DataInstance</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Outer join two DataInstances: union of timestamps with interpolation.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    left : DataInstance</span>
+<span class="sd">        Left DataInstance</span>
+<span class="sd">    right : DataInstance</span>
+<span class="sd">        Right DataInstance</span>
+<span class="sd">    drop_nan : bool, optional</span>
+<span class="sd">        If True, drop rows where either series has NaN after interpolation.</span>
+<span class="sd">        Default is True.</span>
+<span class="sd">    fill : float, optional</span>
+<span class="sd">        Fill value for NaNs when drop_nan is False. Default is 0.0.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    left_result : DataInstance</span>
+<span class="sd">        Left DataInstance with values interpolated to union timestamps</span>
+<span class="sd">    right_result : DataInstance</span>
+<span class="sd">        Right DataInstance with values interpolated to union timestamps</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ts</span><span class="p">,</span> <span class="n">left_val</span><span class="p">,</span> <span class="n">right_val</span> <span class="o">=</span> <span class="n">outer_join</span><span class="p">(</span>
+        <span class="n">left</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">,</span>
+        <span class="n">left</span><span class="o">.</span><span class="n">value_np</span><span class="p">,</span>
+        <span class="n">right</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">,</span>
+        <span class="n">right</span><span class="o">.</span><span class="n">value_np</span><span class="p">,</span>
+        <span class="n">drop_nan</span><span class="o">=</span><span class="n">drop_nan</span><span class="p">,</span>
+        <span class="n">fill</span><span class="o">=</span><span class="n">fill</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">left_result</span> <span class="o">=</span> <span class="n">DataInstance</span><span class="p">(</span>
+        <span class="n">timestamp_np</span><span class="o">=</span><span class="n">ts</span><span class="p">,</span> <span class="n">value_np</span><span class="o">=</span><span class="n">left_val</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">left</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">var_id</span><span class="o">=</span><span class="n">left</span><span class="o">.</span><span class="n">var_id</span>
+    <span class="p">)</span>
+    <span class="n">right_result</span> <span class="o">=</span> <span class="n">DataInstance</span><span class="p">(</span>
+        <span class="n">timestamp_np</span><span class="o">=</span><span class="n">ts</span><span class="p">,</span> <span class="n">value_np</span><span class="o">=</span><span class="n">right_val</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">right</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">var_id</span><span class="o">=</span><span class="n">right</span><span class="o">.</span><span class="n">var_id</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">left_result</span><span class="p">,</span> <span class="n">right_result</span></div>
+
+
+
+<div class="viewcode-block" id="inner_join_data_instances">
+<a class="viewcode-back" href="../../../_autosummary/perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.inner_join_data_instances">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">inner_join_data_instances</span><span class="p">(</span>
+    <span class="n">left</span><span class="p">:</span> <span class="n">DataInstance</span><span class="p">,</span>
+    <span class="n">right</span><span class="p">:</span> <span class="n">DataInstance</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">tolerance</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">DataInstance</span><span class="p">,</span> <span class="n">DataInstance</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Inner join two DataInstances: keep only left timestamps with matching right timestamps.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    left : DataInstance</span>
+<span class="sd">        Left DataInstance</span>
+<span class="sd">    right : DataInstance</span>
+<span class="sd">        Right DataInstance</span>
+<span class="sd">    tolerance : float</span>
+<span class="sd">        Maximum allowed distance between left and right timestamps for a match.</span>
+<span class="sd">        Timestamps with distance &gt; tolerance are dropped.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    left_result : DataInstance</span>
+<span class="sd">        Left DataInstance with only matched timestamps</span>
+<span class="sd">    right_result : DataInstance</span>
+<span class="sd">        Right DataInstance with only matched timestamps</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ts</span><span class="p">,</span> <span class="n">left_val</span><span class="p">,</span> <span class="n">right_val</span> <span class="o">=</span> <span class="n">inner_join</span><span class="p">(</span>
+        <span class="n">left</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">,</span>
+        <span class="n">left</span><span class="o">.</span><span class="n">value_np</span><span class="p">,</span>
+        <span class="n">right</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">,</span>
+        <span class="n">right</span><span class="o">.</span><span class="n">value_np</span><span class="p">,</span>
+        <span class="n">tolerance</span><span class="o">=</span><span class="n">tolerance</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">left_result</span> <span class="o">=</span> <span class="n">DataInstance</span><span class="p">(</span>
+        <span class="n">timestamp_np</span><span class="o">=</span><span class="n">ts</span><span class="p">,</span> <span class="n">value_np</span><span class="o">=</span><span class="n">left_val</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">left</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">var_id</span><span class="o">=</span><span class="n">left</span><span class="o">.</span><span class="n">var_id</span>
+    <span class="p">)</span>
+    <span class="n">right_result</span> <span class="o">=</span> <span class="n">DataInstance</span><span class="p">(</span>
+        <span class="n">timestamp_np</span><span class="o">=</span><span class="n">ts</span><span class="p">,</span> <span class="n">value_np</span><span class="o">=</span><span class="n">right_val</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">right</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">var_id</span><span class="o">=</span><span class="n">right</span><span class="o">.</span><span class="n">var_id</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">left_result</span><span class="p">,</span> <span class="n">right_result</span></div>
+
+
+
+<div class="viewcode-block" id="apply_ufunc_left_join">
+<a class="viewcode-back" href="../../../_autosummary/perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.apply_ufunc_left_join">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">apply_ufunc_left_join</span><span class="p">(</span>
+    <span class="n">left</span><span class="p">:</span> <span class="n">DataInstance</span><span class="p">,</span>
+    <span class="n">right</span><span class="p">:</span> <span class="n">DataInstance</span><span class="p">,</span>
+    <span class="n">ufunc</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataInstance</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Apply a binary operation to two DataInstances using left join.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    left : DataInstance</span>
+<span class="sd">        Left DataInstance (all timestamps are kept)</span>
+<span class="sd">    right : DataInstance</span>
+<span class="sd">        Right DataInstance (values interpolated to left)</span>
+<span class="sd">    ufunc : Callable</span>
+<span class="sd">        NumPy universal function to apply (e.g., np.add, np.subtract)</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    DataInstance</span>
+<span class="sd">        New DataInstance with combined values</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">left_aligned</span><span class="p">,</span> <span class="n">right_aligned</span> <span class="o">=</span> <span class="n">left_join_data_instances</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">)</span>
+    <span class="n">result_val</span> <span class="o">=</span> <span class="n">ufunc</span><span class="p">(</span><span class="n">left_aligned</span><span class="o">.</span><span class="n">value_np</span><span class="p">,</span> <span class="n">right_aligned</span><span class="o">.</span><span class="n">value_np</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">DataInstance</span><span class="p">(</span>
+        <span class="n">timestamp_np</span><span class="o">=</span><span class="n">left_aligned</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">,</span>
+        <span class="n">value_np</span><span class="o">=</span><span class="n">result_val</span><span class="p">,</span>
+        <span class="n">label</span><span class="o">=</span><span class="n">left</span><span class="o">.</span><span class="n">label</span><span class="p">,</span>
+        <span class="n">var_id</span><span class="o">=</span><span class="n">left</span><span class="o">.</span><span class="n">var_id</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="apply_ufunc_outer_join">
+<a class="viewcode-back" href="../../../_autosummary/perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.apply_ufunc_outer_join">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">apply_ufunc_outer_join</span><span class="p">(</span>
+    <span class="n">left</span><span class="p">:</span> <span class="n">DataInstance</span><span class="p">,</span>
+    <span class="n">right</span><span class="p">:</span> <span class="n">DataInstance</span><span class="p">,</span>
+    <span class="n">ufunc</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">drop_nan</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">fill</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataInstance</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Apply a binary operation to two DataInstances using outer join.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    left : DataInstance</span>
+<span class="sd">        Left DataInstance</span>
+<span class="sd">    right : DataInstance</span>
+<span class="sd">        Right DataInstance</span>
+<span class="sd">    ufunc : Callable</span>
+<span class="sd">        NumPy universal function to apply (e.g., np.add, np.subtract)</span>
+<span class="sd">    drop_nan : bool, optional</span>
+<span class="sd">        If True, drop rows where either series has NaN after interpolation.</span>
+<span class="sd">        Default is True.</span>
+<span class="sd">    fill : float, optional</span>
+<span class="sd">        Fill value for NaNs when drop_nan is False. Default is 0.0.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    DataInstance</span>
+<span class="sd">        New DataInstance with combined values</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">left_aligned</span><span class="p">,</span> <span class="n">right_aligned</span> <span class="o">=</span> <span class="n">outer_join_data_instances</span><span class="p">(</span>
+        <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="n">drop_nan</span><span class="o">=</span><span class="n">drop_nan</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="n">fill</span>
+    <span class="p">)</span>
+    <span class="n">result_val</span> <span class="o">=</span> <span class="n">ufunc</span><span class="p">(</span><span class="n">left_aligned</span><span class="o">.</span><span class="n">value_np</span><span class="p">,</span> <span class="n">right_aligned</span><span class="o">.</span><span class="n">value_np</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">DataInstance</span><span class="p">(</span>
+        <span class="n">timestamp_np</span><span class="o">=</span><span class="n">left_aligned</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">,</span>
+        <span class="n">value_np</span><span class="o">=</span><span class="n">result_val</span><span class="p">,</span>
+        <span class="n">label</span><span class="o">=</span><span class="n">left</span><span class="o">.</span><span class="n">label</span><span class="p">,</span>
+        <span class="n">var_id</span><span class="o">=</span><span class="n">left</span><span class="o">.</span><span class="n">var_id</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="apply_ufunc_inner_join">
+<a class="viewcode-back" href="../../../_autosummary/perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.apply_ufunc_inner_join">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">apply_ufunc_inner_join</span><span class="p">(</span>
+    <span class="n">left</span><span class="p">:</span> <span class="n">DataInstance</span><span class="p">,</span>
+    <span class="n">right</span><span class="p">:</span> <span class="n">DataInstance</span><span class="p">,</span>
+    <span class="n">ufunc</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">tolerance</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataInstance</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Apply a binary operation to two DataInstances using inner join.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    left : DataInstance</span>
+<span class="sd">        Left DataInstance</span>
+<span class="sd">    right : DataInstance</span>
+<span class="sd">        Right DataInstance</span>
+<span class="sd">    ufunc : Callable</span>
+<span class="sd">        NumPy universal function to apply (e.g., np.add, np.subtract)</span>
+<span class="sd">    tolerance : float</span>
+<span class="sd">        Maximum allowed distance between left and right timestamps for a match.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    DataInstance</span>
+<span class="sd">        New DataInstance with combined values</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">left_aligned</span><span class="p">,</span> <span class="n">right_aligned</span> <span class="o">=</span> <span class="n">inner_join_data_instances</span><span class="p">(</span>
+        <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="n">tolerance</span>
+    <span class="p">)</span>
+    <span class="n">result_val</span> <span class="o">=</span> <span class="n">ufunc</span><span class="p">(</span><span class="n">left_aligned</span><span class="o">.</span><span class="n">value_np</span><span class="p">,</span> <span class="n">right_aligned</span><span class="o">.</span><span class="n">value_np</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">DataInstance</span><span class="p">(</span>
+        <span class="n">timestamp_np</span><span class="o">=</span><span class="n">left_aligned</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">,</span>
+        <span class="n">value_np</span><span class="o">=</span><span class="n">result_val</span><span class="p">,</span>
+        <span class="n">label</span><span class="o">=</span><span class="n">left</span><span class="o">.</span><span class="n">label</span><span class="p">,</span>
+        <span class="n">var_id</span><span class="o">=</span><span class="n">left</span><span class="o">.</span><span class="n">var_id</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="FilterOptions">
+<a class="viewcode-back" href="../../../_autosummary/perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.FilterOptions">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">FilterOptions</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Specifies which array(s) a filter function receives as input.&quot;&quot;&quot;</span>
+
+    <span class="n">VALUES</span> <span class="o">=</span> <span class="s2">&quot;left_only&quot;</span>
+    <span class="n">TIMESTAMPS</span> <span class="o">=</span> <span class="s2">&quot;right_only&quot;</span>
+    <span class="n">BOTH</span> <span class="o">=</span> <span class="s2">&quot;both&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="apply_ufunc_filter">
+<a class="viewcode-back" href="../../../_autosummary/perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.apply_ufunc_filter">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">apply_ufunc_filter</span><span class="p">(</span>
+    <span class="n">data</span><span class="p">:</span> <span class="n">DataInstance</span><span class="p">,</span>
+    <span class="n">filter_func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
+    <span class="n">apply_to</span><span class="p">:</span> <span class="n">FilterOptions</span> <span class="o">=</span> <span class="n">FilterOptions</span><span class="o">.</span><span class="n">VALUES</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataInstance</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Apply a filter function to a DataInstance.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : DataInstance</span>
+<span class="sd">        Input DataInstance</span>
+<span class="sd">    filter_func : Callable</span>
+<span class="sd">        Function that takes in values and/or timestamps and returns a boolean mask</span>
+<span class="sd">    apply_to : FilterOptions, optional</span>
+<span class="sd">        Whether to apply the filter to values, timestamps, or both. Default is values</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    DataInstance</span>
+<span class="sd">        Filtered DataInstance</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">apply_to</span> <span class="o">==</span> <span class="n">FilterOptions</span><span class="o">.</span><span class="n">VALUES</span><span class="p">:</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">filter_func</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">value_np</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">apply_to</span> <span class="o">==</span> <span class="n">FilterOptions</span><span class="o">.</span><span class="n">TIMESTAMPS</span><span class="p">:</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">filter_func</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">filter_func</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">value_np</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">DataInstance</span><span class="p">(</span>
+        <span class="n">timestamp_np</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">[</span><span class="n">mask</span><span class="p">],</span>
+        <span class="n">value_np</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">value_np</span><span class="p">[</span><span class="n">mask</span><span class="p">],</span>
+        <span class="n">label</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">label</span><span class="p">,</span>
+        <span class="n">var_id</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">var_id</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2025, Penn Electric Racing.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

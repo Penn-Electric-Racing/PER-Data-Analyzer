@@ -1,0 +1,8 @@
+perda.utils.frequency\_analysis
+===============================
+
+.. automodule:: perda.utils.frequency_analysis
+   :members:
+   :undoc-members:
+   :show-inheritance:
+

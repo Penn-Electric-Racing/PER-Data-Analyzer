@@ -1,0 +1,8 @@
+perda.plotting.parametric\_plot
+===============================
+
+.. automodule:: perda.plotting.parametric_plot
+   :members:
+   :undoc-members:
+   :show-inheritance:
+

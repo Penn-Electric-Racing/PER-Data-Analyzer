@@ -1,0 +1,8 @@
+perda.utils.accel\_calculator
+=============================
+
+.. automodule:: perda.utils.accel_calculator
+   :members:
+   :undoc-members:
+   :show-inheritance:
+

@@ -1,0 +1,8 @@
+perda.plotting.data\_instance\_plotter
+======================================
+
+.. automodule:: perda.plotting.data_instance_plotter
+   :members:
+   :undoc-members:
+   :show-inheritance:
+

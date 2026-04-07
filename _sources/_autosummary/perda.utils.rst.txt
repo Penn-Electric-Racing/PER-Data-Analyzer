@@ -1,0 +1,22 @@
+perda.utils
+===========
+
+.. automodule:: perda.utils
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   accel_calculator
+   data_summary
+   diff
+   frequency_analysis
+   gps_analysis
+   integrate
+   search
