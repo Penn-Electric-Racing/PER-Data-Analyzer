@@ -19,6 +19,8 @@ from .csv import *
 
 
 class Analyzer:
+    """Primary class for loading and analyzing car log data."""
+
     def __init__(
         self,
         filepath: str,
@@ -39,6 +41,11 @@ class Analyzer:
         parse_unit : Timescale | str | None, optional
             Logging timestamp unit for parsing. If None, auto-detect from header:
             lines ending with "v2.0" use us, otherwise ms.
+
+        Examples
+        --------
+        >>> aly = Analyzer("path/to/log.csv")
+        >>> print(aly)  # lists all available variables
         """
         self.data: SingleRunData = parse_csv(
             filepath,
@@ -47,6 +54,7 @@ class Analyzer:
         )
 
     def __str__(self) -> str:
+        """Return a summary of all variables in the loaded run data."""
         old_stdout = sys.stdout
 
         buffer = io.StringIO()
@@ -69,6 +77,10 @@ class Analyzer:
         ----------
         query : str
             Search query
+
+        Examples
+        --------
+        >>> aly.search("front wheel speed")
         """
         search(self.data, query)
 
@@ -116,6 +128,13 @@ class Analyzer:
             Layout configuration for plot dimensions. Default is DEFAULT_LAYOUT_CONFIG
         vline_config : VLineConfig, optional
             Visual configuration for concat boundary lines. Default is DEFAULT_VLINE_CONFIG.
+
+        Examples
+        --------
+        >>> fig = aly.plot("pcm.wheelSpeeds.frontRight")
+        >>> fig = aly.plot(["pcm.wheelSpeeds.frontRight", "pcm.wheelSpeeds.frontLeft"], title="Front Wheel Speeds")
+        >>> fig = aly.plot("pcm.moc.motor.requestedTorque", "pcm.wheelSpeeds.frontRight", ts_start=10.0, ts_end=30.0)
+        >>> fig.show()
         """
         # Normalize left input to List[DataInstance]
         var_1_norm = self._normalize_input(var_1)
@@ -187,6 +206,11 @@ class Analyzer:
             Relative tolerance for value comparison (numpy.isclose).
         diff_atol : float, optional
             Absolute tolerance for value comparison (numpy.isclose).
+
+        Examples
+        --------
+        >>> fig = aly.diff(server_data)
+        >>> fig.show()
         """
         return diff(
             self.data,
@@ -272,6 +296,12 @@ class Analyzer:
         -------
         list[AccelSegmentResult]
             List of acceleration segment results.
+
+        Examples
+        --------
+        >>> results = aly.get_accel_times()
+        >>> for r in results:
+        ...     print(r)
         """
         speed_obj = (
             self.data["pcm.wheelSpeeds.frontRight"]

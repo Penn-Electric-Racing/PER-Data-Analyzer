@@ -16,6 +16,7 @@ class AccelSegmentResult(BaseModel):
     timescale: Timescale = Field(description="Time unit for the output times.")
 
     def __str__(self) -> str:
+        """Return a one-line summary of this acceleration segment result."""
         return (
             f"Accel at {self.start_time:.2f}s: "
             f"reached {self.dist_reached}m in {self.time_to_dist:.3f}s"
@@ -49,6 +50,10 @@ def detect_accel_event(
     DataInstance
         Binary signal (0.0 or 1.0) on `speed_obj` timestamps, labeled "Accel Event",
         where 1.0 indicates an active acceleration event.
+
+    Examples
+    --------
+    >>> signal = detect_accel_event(torque_di, speed_di)
     """
     torque_interp = np.interp(
         speed_obj.timestamp_np, torque_obj.timestamp_np, torque_obj.value_np
@@ -99,6 +104,12 @@ def compute_accel_results(
     -------
     list[AccelSegmentResult]
         One result per qualifying segment.
+
+    Examples
+    --------
+    >>> results = compute_accel_results(signal_di, distance_di)
+    >>> for r in results:
+    ...     print(r)
     """
     sig = signal_obj.value_np
     time = signal_obj.timestamp_np

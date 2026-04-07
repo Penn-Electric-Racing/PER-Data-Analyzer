@@ -12,6 +12,20 @@ def _timestamps_to_seconds(
     timestamp_np,
     timestamp_unit: Timescale,
 ):
+    """Convert a raw timestamp array to seconds for x-axis display.
+
+    Parameters
+    ----------
+    timestamp_np : NDArray
+        Raw integer timestamp array.
+    timestamp_unit : Timescale
+        Unit of the input timestamps.
+
+    Returns
+    -------
+    NDArray
+        Timestamps as float64 seconds.
+    """
     timestamps = timestamp_np.astype(float)
     if timestamp_unit == Timescale.US:
         return timestamps / 1e6
@@ -83,6 +97,11 @@ def plot_single_axis(
     Returns
     -------
     go.Figure
+
+    Examples
+    --------
+    >>> fig = plot_single_axis([speed_di, torque_di], title="Speed & Torque", y_axis_title="Value")
+    >>> fig.show()
     """
     if not data_instances:
         print("Warning: No data instances provided for plotting")
@@ -178,6 +197,11 @@ def plot_dual_axis(
     Returns
     -------
     go.Figure
+
+    Examples
+    --------
+    >>> fig = plot_dual_axis([speed_di], [torque_di], left_y_axis_title="Speed (mph)", right_y_axis_title="Torque (Nm)")
+    >>> fig.show()
     """
     if not left_data_instances and not right_data_instances:
         print("Warning: No data instances provided for plotting")

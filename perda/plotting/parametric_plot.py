@@ -43,6 +43,11 @@ def plot_parametric_curve(
     Returns
     -------
     go.Figure
+
+    Examples
+    --------
+    >>> fig = plot_parametric_curve(lon_arr, lat_arr, x_label="Longitude", y_label="Latitude")
+    >>> fig.show()
     """
     fig = go.Figure()
     fig.add_trace(
@@ -109,6 +114,11 @@ def plot_parametric_curve_square(
     Returns
     -------
     go.Figure
+
+    Examples
+    --------
+    >>> fig = plot_parametric_curve_square(lon_arr, lat_arr, x_label="Longitude", y_label="Latitude")
+    >>> fig.show()
     """
     xmid = (x.min() + x.max()) / 2
     ymid = (y.min() + y.max()) / 2
@@ -166,6 +176,11 @@ def plot_parametric_trimmer(
     Returns
     -------
     ipywidgets.VBox
+
+    Examples
+    --------
+    >>> widget = plot_parametric_trimmer(lon_arr, lat_arr, timestamps=ts_arr, x_label="Longitude", y_label="Latitude")
+    >>> display(widget)
     """
     n = len(x)
 

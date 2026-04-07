@@ -4,16 +4,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-PERDA (PER-Data-Analyzer) is Penn Electric Racing's Python library for parsing and analyzing CAN bus telemetry log files. The primary user-facing API is the `Analyzer` class; the Jupyter notebook `notebooks/Tutorial.ipynb` serves as both documentation and integration demo.
+PERDA (PER-Data-Analyzer) is Penn Electric Racing's in-house Python library for parsing and analyzing log files produced by the car. The primary user-facing API is the `Analyzer` class; the Jupyter notebook `notebooks/Tutorial.ipynb` serves as both documentation and integration demo.
 
 ## Architecture
 
 The library has four layers:
 
-1. **Analyzer** (`perda/analyzer/analyzer.py`) — the API for generic analysis tasks. Users typically interact with this class
+1. **Analyzer** (`perda/analyzer/`) — the API for generic analysis tasks. Users typically interact with this class
    - Reduce complexity in this class by black-boxing functionality into the layers below
 
-2. **Core data models** (`perda/analyzer/`) — supporting classes and data structures for the `Analyzer` to function. Users may occasionally interact with these directly for more advanced use cases.
+2. **Core data structures** (`perda/core_data_structures`) — supporting classes and data structures for the `Analyzer` to function. Users may occasionally interact with these directly for more advanced use cases.
    - `DataInstance` — a single time-series variable (Pydantic model wrapping NumPy arrays for timestamps + values). Supports arithmetic operators and join operations. Timestamps must be monotonically non-decreasing float64.
    - `SingleRunData` — dictionary-like container for all variables in one run, supporting lookup by variable ID or name.
    - `joins.py` — timestamp-based alignment via left/inner/outer join with interpolation.
@@ -34,7 +34,7 @@ The library has four layers:
       - `plot_parametric_trimmer` — Interactive trimmer widget for a parametric curve, with optional timestamp labels
    - `plotting_constants.py` — All config objects that can be used to configure our plotting functions, as well as sensible defaults
 
-5. **Text Encoder Models** — Cross-encoder language models used in this codebase are installed automatically with `pip install` and packaged under: `perda/models/stsb-cross-encoder/`. They should be available on successful installation.
+5. **Text Encoder Models** — Language models used in this codebase are installed lazily, upon calling `search()`, and packaged under: `perda/models/`.
 
 ## Code Conventions
 
@@ -55,6 +55,8 @@ The library has four layers:
 - Functions in `plotting` can have more arguments but should not have any arguments that are specific to a particular analysis or use case. Business logic should be responsible for calling these graphing utilities and reducing complexity by reducing the number of arguments exposed.
 
 - Package-wide defaults should be defined in `constants.py`
+
+- Units and conversion factors should be defined in `units.py`. No magic numbers in code
 
 ## Style Guide
 

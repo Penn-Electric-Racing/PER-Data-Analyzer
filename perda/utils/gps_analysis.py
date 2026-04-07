@@ -50,6 +50,11 @@ def plot_gps_trimmer(
     Returns
     -------
     ipywidgets.VBox
+
+    Examples
+    --------
+    >>> widget = plot_gps_trimmer(lat_di, lon_di, title="GPS Track")
+    >>> display(widget)
     """
     if len(lat) != len(lon):
         raise ValueError(
@@ -142,6 +147,11 @@ def create_representative_gps_image(
     go.Figure | None
         Plotly figure with map background, or None if velocity never exceeds
         the threshold or no points remain after filtering.
+
+    Examples
+    --------
+    >>> fig = create_representative_gps_image(lat_di, lon_di, vel_raw=vel_di, title="Lap Track")
+    >>> fig.show()
     """
     lat_aligned, lon_aligned = left_join_data_instances(lat_raw, lon_raw)
 

@@ -12,3 +12,7 @@ perda.egg-info/
 
 # Local ML model artifacts (downloaded on demand)
 perda/models/stsb-cross-encoder/
+
+# Ignore docs build artifacts
+docs/build/
+docs/source/_autosummary/
