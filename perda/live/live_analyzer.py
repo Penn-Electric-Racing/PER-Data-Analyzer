@@ -8,7 +8,7 @@ from typing import List, Union
 
 from plotly import graph_objects as go
 
-from ..analyzer.data_instance import DataInstance
+from ..core_data_structures.data_instance import DataInstance
 from ..plotting.data_instance_plotter import plot_dual_axis, plot_single_axis
 from ..plotting.plotting_constants import (
     DEFAULT_FONT_CONFIG,
@@ -18,8 +18,8 @@ from ..plotting.plotting_constants import (
     LayoutConfig,
     ScatterHistogramPlotConfig,
 )
+from ..units import Timescale
 from ..utils.frequency_analysis import analyze_frequency as _analyze_frequency
-from ..utils.types import Timescale
 from .cdp_client import CDPClient, CDPException, ValueType
 
 # ---------------------------------------------------------------------------
