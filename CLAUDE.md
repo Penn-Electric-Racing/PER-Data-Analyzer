@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-PERDA (PER-Data-Analyzer) is Penn Electric Racing's Python library for parsing and analyzing CAN bus telemetry log files. The primary user-facing API is the `Analyzer` class; the Jupyter notebook `notebooks/Tutorial.ipynb` serves as both documentation and integration demo.
+PERDA (PER-Data-Analyzer) is Penn Electric Racing's in-house Python library for parsing and analyzing log files produced by the car. The primary user-facing API is the `Analyzer` class; the Jupyter notebook `notebooks/Tutorial.ipynb` serves as both documentation and integration demo.
 
 ## Architecture
 
