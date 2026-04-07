@@ -9,6 +9,8 @@ from .joins import inner_join, left_join, outer_join
 
 
 class DataInstance(BaseModel):
+    """A single time-series variable, pairing a 1D timestamp array with a 1D value array."""
+
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     timestamp_np: NDArray = Field(description="Timestamps as a 1D NumPy array")
@@ -174,6 +176,10 @@ class DataInstance(BaseModel):
         -------
         DataInstance
             New DataInstance with only in-range data points.
+
+        Examples
+        --------
+        >>> clipped = di.trim(ts_start=10_000, ts_end=30_000)
         """
         if ts_start is not None and ts_end is not None:
             mask = (self.timestamp_np >= ts_start) & (self.timestamp_np <= ts_end)
@@ -433,6 +439,8 @@ def apply_ufunc_inner_join(
 
 
 class FilterOptions(Enum):
+    """Specifies which array(s) a filter function receives as input."""
+
     VALUES = "left_only"
     TIMESTAMPS = "right_only"
     BOTH = "both"

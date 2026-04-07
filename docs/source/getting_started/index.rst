@@ -4,8 +4,16 @@ Getting Started
 Installation
 ------------------
 
-1. Install the following tools
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Option 1: Developer Installation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This is the installation method for anyone who wants to contribute to the project or has special use cases. We also recommend
+this method if you prefer to work locally on your machine instead of using Google Colab.
+
+
+1. Ensure you have the following tools
+""""""""""""""""""""""""""""""""""""""""""""""""""
 * `Git <https://git-scm.com/downloads>`_
 * `Python <https://www.python.org/downloads/>`_ (at least version 3.9)
 * `Visual Studio Code <https://code.visualstudio.com/download>`_
@@ -18,7 +26,7 @@ Installation
 
 
 2. Clone the repository
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 .. code-block:: bash
 
@@ -27,7 +35,7 @@ Installation
 
 
 3. Setup Code Environment
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 Run the following commands to setup the development environment:
 
@@ -36,6 +44,7 @@ in the commands below.
 
 .. code-block:: bash
 
+	cd PER-Data-Analyzer
 	python -m venv .venv
 
 	# For Windows:
@@ -51,7 +60,7 @@ in the commands below.
 
 
 4. Run a Notebook
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 1. Select the Virtual Environment to use:
 
@@ -64,55 +73,6 @@ in the commands below.
    * Open whichever notebook you wish to run
    * Click the "Kernel" icon (Computer Symbol) in the top right corner
    * Select the ``.venv`` Python interpreter (same one as above)
-
-
-5. [Optional] Switching Branches
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-1. Figure out the name of the branch you want to switch to. You can see all branches on the repository's Github page.
-
-2. Open the terminal (in your project folder) and run the following commands:
-
-.. code-block:: bash
-
-	git fetch
-	git checkout [name_of_branch]
-
-3. If you have uncommitted changes, Git may force you to deal with them first. Run the following command to stash them
-before switching branches:
-
-.. code-block:: bash
-
-	git add .
-	git stash
-
-	# If needed, you can return to this branch later and restore your stashed changes with
-	git stash pop	# Reach out for help if any issues arise here
-
-
-6. [Optional] Contributing
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-1. Create a new branch before you begin
-
-.. code-block:: bash
-
-	git checkout -b [name_your_new_branch]
-
-2. Make your changes (remember to run a couple different notebooks to verify it works!)
-
-3. Push your changes to Github
-
-.. code-block:: bash
-
-	# Create a commit. You may do this multiple times as you work on your changes
-	git add .
-	git commit -m  "[descriptive_commit_message]"
-
-	git push  # If this is your first push, you may need to follow some instructions in the terminal
-
-4. Go to the `PER-Data-Analyzer GitHub <https://github.com/Penn-Electric-Racing/PER-Data-Analyzer>`_ and use the interface
-to open a Pull Request for your branch. Add a Software lead as a reviewer.
 
 
 .. note::
@@ -131,3 +91,22 @@ installation instructions above.**
    :maxdepth: 1
 
    notebook
+
+
+Option 2: Standard Installation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Not as easy to modify and iterate on the source code, but useful for quick setup and utilizing the
+library in external environments like Google Colab.
+
+1. Install via pip
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+.. code-block:: bash
+	pip install git+https://github.com/Penn-Electric-Racing/PER-Data-Analyzer.git@main
+
+
+.. note::
+	You can embed the above command in a Google Colab notebook to automatically install when you run the notebook.
+	Append an exclamation mark and leave it in a normal code cell like below:
+	`!pip install git+https://github.com/Penn-Electric-Racing/PER-Data-Analyzer.git@main`
