@@ -327,8 +327,8 @@
 <p>PERDA is PER’s in-house data analysis library designed to streamline the process of analyzing vehicle data logs.</p>
 <section id="Static-Analysis">
 <h2>Static Analysis<a class="headerlink" href="#Static-Analysis" title="Link to this heading">#</a></h2>
-<section id="Load-Data">
-<h3>Load Data<a class="headerlink" href="#Load-Data" title="Link to this heading">#</a></h3>
+<section id="Load-Data-(local-csv)">
+<h3>Load Data (local csv)<a class="headerlink" href="#Load-Data-(local-csv)" title="Link to this heading">#</a></h3>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
@@ -337,6 +337,29 @@
 
 <span class="n">csvPath</span> <span class="o">=</span> <span class="s2">&quot;csv_files/26thMar12-00-34.csv&quot;</span>
 <span class="n">aly</span> <span class="o">=</span> <span class="n">Analyzer</span><span class="p">(</span><span class="n">csvPath</span><span class="p">)</span>
+
+<span class="c1"># Print summary of the loaded data</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">aly</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Load-Data-(via-server)">
+<h3>Load Data (via server)<a class="headerlink" href="#Load-Data-(via-server)" title="Link to this heading">#</a></h3>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">perda.analyzer</span><span class="w"> </span><span class="kn">import</span> <span class="n">Analyzer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">perda.server</span><span class="w"> </span><span class="kn">import</span> <span class="n">ServerClient</span>
+
+<span class="c1"># Fill in our server address and password</span>
+<span class="n">client</span> <span class="o">=</span> <span class="n">ServerClient</span><span class="p">(</span><span class="s2">&quot;http://198.74.62.28:5000/&quot;</span><span class="p">)</span>
+<span class="c1"># Optional cache_dir to download and load logs</span>
+<span class="c1"># client = ServerClient(&quot;http://198.74.62.28:5000/&quot;, cache_dir=&quot;~/.perda/cache/&quot;)</span>
+
+<span class="c1"># Please fill in password, you should know what it is... :)</span>
+<span class="n">client</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="s2">&quot;FILL&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -344,7 +367,19 @@
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Print summary of the loaded data</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Find your log by changing the path</span>
+<span class="n">client</span><span class="o">.</span><span class="n">print_logs</span><span class="p">(</span><span class="s2">&quot;REV 11/&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Get/download analyzer via log path on server</span>
+<span class="n">aly</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;REV 11/2026-04-01/test.csv&quot;</span><span class="p">)</span>
+
+<span class="c1"># Print summary of the loaded data</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">aly</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -696,7 +731,8 @@
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Static-Analysis">Static Analysis</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#Load-Data">Load Data</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#Load-Data-(local-csv)">Load Data (local csv)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#Load-Data-(via-server)">Load Data (via server)</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#Search-Data">Search Data</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#Inspect-Data">Inspect Data</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#Graph-GPS">Graph GPS</a></li>

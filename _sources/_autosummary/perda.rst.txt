@@ -18,5 +18,6 @@
    core_data_structures
    live
    plotting
+   server
    units
    utils

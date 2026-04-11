@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>perda.utils &#8212; PERDA</title>
+    <title>perda.server.client &#8212; PERDA</title>
   
   
   
@@ -48,11 +48,11 @@
     <script src="../_static/copybutton.js?v=f281be69"></script>
     <script src="../_static/design-tabs.js?v=f930bc37"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/perda.utils';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/perda.server.client';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="perda.utils.accel_calculator" href="perda.utils.accel_calculator.html" />
-    <link rel="prev" title="perda.units" href="perda.units.html" />
+    <link rel="next" title="perda.server.config" href="perda.server.config.html" />
+    <link rel="prev" title="perda.server" href="perda.server.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
@@ -285,13 +285,13 @@
 <li class="toctree-l3"><a class="reference internal" href="perda.plotting.scatter_histogram_plotter.html">perda.plotting.scatter_histogram_plotter</a></li>
 </ul>
 </details></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="perda.server.html">perda.server</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="perda.server.client.html">perda.server.client</a></li>
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="perda.server.html">perda.server</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l3 current active"><a class="current reference internal" href="#">perda.server.client</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.server.config.html">perda.server.config</a></li>
 </ul>
 </details></li>
 <li class="toctree-l2"><a class="reference internal" href="perda.units.html">perda.units</a></li>
-<li class="toctree-l2 current active has-children"><a class="current reference internal" href="#">perda.utils</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="perda.utils.html">perda.utils</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.accel_calculator.html">perda.utils.accel_calculator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.data_summary.html">perda.utils.data_summary</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.diff.html">perda.utils.diff</a></li>
@@ -349,7 +349,10 @@
     
     <li class="breadcrumb-item"><a href="perda.html" class="nav-link">perda</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">perda.utils</span></li>
+    
+    <li class="breadcrumb-item"><a href="perda.server.html" class="nav-link">perda.server</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">perda.server.client</span></li>
   </ul>
 </nav>
 </div>
@@ -366,35 +369,120 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="module-perda.utils">
-<span id="perda-utils"></span><h1>perda.utils<a class="headerlink" href="#module-perda.utils" title="Link to this heading">#</a></h1>
-<p class="rubric">Modules</p>
-<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="perda.utils.accel_calculator.html#module-perda.utils.accel_calculator" title="perda.utils.accel_calculator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">accel_calculator</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="perda.utils.data_summary.html#module-perda.utils.data_summary" title="perda.utils.data_summary"><code class="xref py py-obj docutils literal notranslate"><span class="pre">data_summary</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="perda.utils.diff.html#module-perda.utils.diff" title="perda.utils.diff"><code class="xref py py-obj docutils literal notranslate"><span class="pre">diff</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="perda.utils.frequency_analysis.html#module-perda.utils.frequency_analysis" title="perda.utils.frequency_analysis"><code class="xref py py-obj docutils literal notranslate"><span class="pre">frequency_analysis</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="perda.utils.gps_analysis.html#module-perda.utils.gps_analysis" title="perda.utils.gps_analysis"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gps_analysis</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="perda.utils.integrate.html#module-perda.utils.integrate" title="perda.utils.integrate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">integrate</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="perda.utils.search.html#module-perda.utils.search" title="perda.utils.search"><code class="xref py py-obj docutils literal notranslate"><span class="pre">search</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-</tbody>
-</table>
+  <section id="module-perda.server.client">
+<span id="perda-server-client"></span><h1>perda.server.client<a class="headerlink" href="#module-perda.server.client" title="Link to this heading">#</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="perda.server.client.ServerClient">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">perda.server.client.</span></span><span class="sig-name descname"><span class="pre">ServerClient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/server/client.html#ServerClient"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.server.client.ServerClient" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Client for accessing log data from the PER data server.</p>
+<p>Authenticates with the gateway, browses available logs with metadata,
+and downloads CSV files directly from S3 for analysis.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>url</strong> (<em>str</em>) – Base URL of the data server (e.g. <code class="docutils literal notranslate"><span class="pre">&quot;https://data.example.com&quot;</span></code>)</p></li>
+<li><p><strong>cache_dir</strong> (<em>str</em><em> | </em><em>None</em>) – Local directory for caching downloaded logs. When set, repeated
+<code class="docutils literal notranslate"><span class="pre">load()</span></code> calls for the same log skip the download. <code class="docutils literal notranslate"><span class="pre">None</span></code>
+disables caching and uses a temporary file each time.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">client</span> <span class="o">=</span> <span class="n">ServerClient</span><span class="p">(</span><span class="s2">&quot;https://data.example.com&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="s2">&quot;password&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">logs</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">list_logs</span><span class="p">(</span><span class="s2">&quot;REV 11/&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aly</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;REV 11/2026-04-01/test.csv&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aly</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s2">&quot;ams.pack.voltage&quot;</span><span class="p">)</span>
+</pre></div>
 </div>
+<dl class="py method">
+<dt class="sig sig-object py" id="perda.server.client.ServerClient.list_logs">
+<span class="sig-name descname"><span class="pre">list_logs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/server/client.html#ServerClient.list_logs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.server.client.ServerClient.list_logs" title="Link to this definition">#</a></dt>
+<dd><p>List available logs under an S3 prefix, with metadata.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>prefix</strong> (<em>str</em>) – S3 key prefix to browse (e.g. <code class="docutils literal notranslate"><span class="pre">&quot;REV</span> <span class="pre">11/&quot;</span></code>).
+Use <code class="docutils literal notranslate"><span class="pre">&quot;&quot;</span></code> for the bucket root.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Combined S3 listing and metadata for each entry.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List[<a class="reference internal" href="perda.server.config.html#perda.server.config.LogEntry" title="perda.server.config.LogEntry">LogEntry</a>]</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">logs</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">list_logs</span><span class="p">(</span><span class="s2">&quot;REV 11/&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">log</span> <span class="ow">in</span> <span class="n">logs</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="n">log</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="perda.server.client.ServerClient.load">
+<span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">log_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts_offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parsing_errors_limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/server/client.html#ServerClient.load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.server.client.ServerClient.load" title="Link to this definition">#</a></dt>
+<dd><p>Download a log from S3 and return an Analyzer instance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>log_key</strong> (<em>str</em>) – Full S3 key of the log file</p></li>
+<li><p><strong>ts_offset</strong> (<em>int</em>) – Timestamp offset passed to <code class="docutils literal notranslate"><span class="pre">Analyzer</span></code>. Default is 0.</p></li>
+<li><p><strong>parsing_errors_limit</strong> (<em>int</em>) – Maximum parsing errors passed to <code class="docutils literal notranslate"><span class="pre">Analyzer</span></code>. Default is 100.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Ready-to-use Analyzer loaded with the downloaded data.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="perda.analyzer.analyzer.html#perda.analyzer.analyzer.Analyzer" title="perda.analyzer.analyzer.Analyzer">Analyzer</a></p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">aly</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;REV 11/2026-04-01/test.csv&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">aly</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="perda.server.client.ServerClient.login">
+<span class="sig-name descname"><span class="pre">login</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">password</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/server/client.html#ServerClient.login"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.server.client.ServerClient.login" title="Link to this definition">#</a></dt>
+<dd><p>Authenticate with the data server.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>password</strong> (<em>str</em>) – Server password</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ConnectionError</strong> – If login fails or the server is unreachable.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="perda.server.client.ServerClient.print_logs">
+<span class="sig-name descname"><span class="pre">print_logs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/server/client.html#ServerClient.print_logs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.server.client.ServerClient.print_logs" title="Link to this definition">#</a></dt>
+<dd><p>Print a formatted listing of available logs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>prefix</strong> (<em>str</em>) – S3 key prefix to browse. Default is <code class="docutils literal notranslate"><span class="pre">&quot;&quot;</span></code> (bucket root).</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">print_logs</span><span class="p">(</span><span class="s2">&quot;REV 11/&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 
 
@@ -408,20 +496,20 @@
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="perda.units.html"
+       href="perda.server.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">perda.units</p>
+        <p class="prev-next-title">perda.server</p>
       </div>
     </a>
     <a class="right-next"
-       href="perda.utils.accel_calculator.html"
+       href="perda.server.config.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">perda.utils.accel_calculator</p>
+        <p class="prev-next-title">perda.server.config</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -437,10 +525,28 @@
 
 
   <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.server.client.ServerClient"><code class="docutils literal notranslate"><span class="pre">ServerClient</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.server.client.ServerClient.list_logs"><code class="docutils literal notranslate"><span class="pre">ServerClient.list_logs()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.server.client.ServerClient.load"><code class="docutils literal notranslate"><span class="pre">ServerClient.load()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.server.client.ServerClient.login"><code class="docutils literal notranslate"><span class="pre">ServerClient.login()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.server.client.ServerClient.print_logs"><code class="docutils literal notranslate"><span class="pre">ServerClient.print_logs()</span></code></a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="../_sources/_autosummary/perda.utils.rst.txt"
+      <li><a href="../_sources/_autosummary/perda.server.client.rst.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div></div>

@@ -1,0 +1,8 @@
+perda.server.client
+===================
+
+.. automodule:: perda.server.client
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
