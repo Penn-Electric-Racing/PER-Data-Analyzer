@@ -262,7 +262,6 @@
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">Penn Electric Racing Data Analyzer: PERDA</a></li>
-
 </ul>
 </div>
 </nav></div>
@@ -326,15 +325,17 @@
   <section id="Penn-Electric-Racing-Data-Analyzer:-PERDA">
 <h1>Penn Electric Racing Data Analyzer: PERDA<a class="headerlink" href="#Penn-Electric-Racing-Data-Analyzer:-PERDA" title="Link to this heading">#</a></h1>
 <p>PERDA is PER’s in-house data analysis library designed to streamline the process of analyzing vehicle data logs.</p>
+<section id="Static-Analysis">
+<h2>Static Analysis<a class="headerlink" href="#Static-Analysis" title="Link to this heading">#</a></h2>
 <section id="Load-Data">
-<h2>Load Data<a class="headerlink" href="#Load-Data" title="Link to this heading">#</a></h2>
+<h3>Load Data<a class="headerlink" href="#Load-Data" title="Link to this heading">#</a></h3>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">perda.analyzer</span><span class="w"> </span><span class="kn">import</span> <span class="n">Analyzer</span>
 
-<span class="n">csvPath</span> <span class="o">=</span> <span class="s2">&quot;csv_files/20thMarch13-21.csv&quot;</span>
+<span class="n">csvPath</span> <span class="o">=</span> <span class="s2">&quot;csv_files/26thMar12-00-34.csv&quot;</span>
 <span class="n">aly</span> <span class="o">=</span> <span class="n">Analyzer</span><span class="p">(</span><span class="n">csvPath</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -350,7 +351,7 @@
 </div>
 </section>
 <section id="Search-Data">
-<h2>Search Data<a class="headerlink" href="#Search-Data" title="Link to this heading">#</a></h2>
+<h3>Search Data<a class="headerlink" href="#Search-Data" title="Link to this heading">#</a></h3>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
@@ -361,7 +362,7 @@
 </div>
 </section>
 <section id="Inspect-Data">
-<h2>Inspect Data<a class="headerlink" href="#Inspect-Data" title="Link to this heading">#</a></h2>
+<h3>Inspect Data<a class="headerlink" href="#Inspect-Data" title="Link to this heading">#</a></h3>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
@@ -370,19 +371,17 @@
 
 <span class="c1"># Print individual variable&#39;s info</span>
 <span class="n">data_instance_summary</span><span class="p">(</span>
-    <span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;bms.pack.current&quot;</span><span class="p">],</span> <span class="n">source_time_unit</span><span class="o">=</span><span class="s2">&quot;us&quot;</span>
-<span class="p">)</span>  <span class="c1"># change source_time_unit to us if v2.0 logs</span>
-
-<span class="nb">print</span><span class="p">()</span>
+    <span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;bms.pack.current&quot;</span><span class="p">],</span> <span class="n">source_time_unit</span><span class="o">=</span><span class="s2">&quot;ms&quot;</span>
+<span class="p">)</span>  <span class="c1"># change source_time_unit to us if using car logs</span>
 
 <span class="c1"># Print the same variable, but accessing the data structure using variable ID instead</span>
-<span class="n">data_instance_summary</span><span class="p">(</span><span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">357</span><span class="p">],</span> <span class="n">source_time_unit</span><span class="o">=</span><span class="s2">&quot;us&quot;</span><span class="p">)</span>
+<span class="n">data_instance_summary</span><span class="p">(</span><span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">422</span><span class="p">],</span> <span class="n">source_time_unit</span><span class="o">=</span><span class="s2">&quot;ms&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </section>
 <section id="Graph-GPS">
-<h2>Graph GPS<a class="headerlink" href="#Graph-GPS" title="Link to this heading">#</a></h2>
+<h3>Graph GPS<a class="headerlink" href="#Graph-GPS" title="Link to this heading">#</a></h3>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
@@ -401,7 +400,7 @@
 </div>
 </section>
 <section id="Graph-Variables-(Single-Y-Axis)">
-<h2>Graph Variables (Single Y-Axis)<a class="headerlink" href="#Graph-Variables-(Single-Y-Axis)" title="Link to this heading">#</a></h2>
+<h3>Graph Variables (Single Y-Axis)<a class="headerlink" href="#Graph-Variables-(Single-Y-Axis)" title="Link to this heading">#</a></h3>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
@@ -417,18 +416,9 @@
 </pre></div>
 </div>
 </div>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># We can also plot small chunks of the data to prevent too much data points</span>
-<span class="n">aly</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">ts_start</span><span class="o">=</span><span class="mi">150</span><span class="p">,</span> <span class="n">ts_end</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
 </section>
 <section id="Graph-Variables-(Dual-Y-Axis)">
-<h2>Graph Variables (Dual Y-Axis)<a class="headerlink" href="#Graph-Variables-(Dual-Y-Axis)" title="Link to this heading">#</a></h2>
+<h3>Graph Variables (Dual Y-Axis)<a class="headerlink" href="#Graph-Variables-(Dual-Y-Axis)" title="Link to this heading">#</a></h3>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
@@ -444,14 +434,12 @@
 <span class="n">variables_right</span> <span class="o">=</span> <span class="p">[</span>
     <span class="s2">&quot;bms.stack.mma.temp.avg&quot;</span><span class="p">,</span>
     <span class="s2">&quot;bms.stack.mma.dieTemp.avg&quot;</span><span class="p">,</span>
-    <span class="mi">357</span><span class="p">,</span>  <span class="c1"># We can also specify variables by variable ID</span>
+    <span class="mi">422</span><span class="p">,</span>  <span class="c1"># We can also specify variables by variable ID</span>
 <span class="p">]</span>
 
 <span class="n">aly</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
     <span class="n">var_1</span><span class="o">=</span><span class="n">variables_left</span><span class="p">,</span>
     <span class="n">var_2</span><span class="o">=</span><span class="n">variables_right</span><span class="p">,</span>
-    <span class="n">ts_start</span><span class="o">=</span><span class="mi">600</span><span class="p">,</span>
-    <span class="n">ts_end</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span>
     <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Dual Y-Axis Example&quot;</span><span class="p">,</span>
     <span class="n">y_label_1</span><span class="o">=</span><span class="s2">&quot;Wheel Speeds (MPH)&quot;</span><span class="p">,</span>
     <span class="n">y_label_2</span><span class="o">=</span><span class="s2">&quot;Minion Temperature Data&quot;</span><span class="p">,</span>
@@ -461,7 +449,7 @@
 </div>
 </section>
 <section id="Data-Manipulation">
-<h2>Data Manipulation<a class="headerlink" href="#Data-Manipulation" title="Link to this heading">#</a></h2>
+<h3>Data Manipulation<a class="headerlink" href="#Data-Manipulation" title="Link to this heading">#</a></h3>
 <p>The core of PERDA is the DataInstance class. Each variable is stored as a DataInstance object.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
@@ -474,14 +462,12 @@
 <span class="n">voltage</span> <span class="o">=</span> <span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;bms.pack.voltage&quot;</span><span class="p">]</span>
 
 <span class="c1"># Print info for current</span>
-<span class="nb">print</span><span class="p">()</span>
 <span class="n">data_instance_summary</span><span class="p">(</span><span class="n">current</span><span class="p">)</span>
 
 <span class="c1"># Basic arithmetic operators are overloaded for DataInstances</span>
 <span class="n">current_plus</span> <span class="o">=</span> <span class="n">current</span> <span class="o">+</span> <span class="mi">10</span>  <span class="c1"># Creates a new DataInstance that is</span>
 <span class="c1"># 10 higher than current at every timestamp</span>
 <span class="n">current_plus</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="s2">&quot;current + 10&quot;</span>  <span class="c1"># Assign our new DataInstance a label</span>
-<span class="nb">print</span><span class="p">()</span>
 <span class="n">data_instance_summary</span><span class="p">(</span><span class="n">current_plus</span><span class="p">)</span>
 
 <span class="c1"># One example of a practical use case is calculating power from current and voltage</span>
@@ -494,7 +480,7 @@
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Let&#39;s compare calculated power with bms.pack.power</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Let&#39;s compare calculated power with ams.pack.power</span>
 <span class="n">variables</span> <span class="o">=</span> <span class="p">[</span>
     <span class="s2">&quot;bms.pack.power&quot;</span><span class="p">,</span>
     <span class="n">power_cal</span><span class="p">,</span>
@@ -505,7 +491,7 @@
 </div>
 </section>
 <section id="Custom-Variables">
-<h2>Custom Variables<a class="headerlink" href="#Custom-Variables" title="Link to this heading">#</a></h2>
+<h3>Custom Variables<a class="headerlink" href="#Custom-Variables" title="Link to this heading">#</a></h3>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
@@ -530,6 +516,7 @@
 </pre></div>
 </div>
 </div>
+</section>
 <section id="Frequency-Analysis">
 <h3>Frequency Analysis<a class="headerlink" href="#Frequency-Analysis" title="Link to this heading">#</a></h3>
 <div class="nbinput nblast docutils container">
@@ -564,47 +551,88 @@
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Compare base and incoming data</span>
-<span class="n">graph</span> <span class="o">=</span> <span class="n">alyBase</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">alyIncom</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">diff_rtol</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span> <span class="n">diff_atol</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">)</span>
-
+<span class="n">graph</span> <span class="o">=</span> <span class="n">alyBase</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">alyIncom</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
 <span class="n">graph</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 </section>
 </section>
+<section id="Live-Analysis">
+<h2>Live Analysis<a class="headerlink" href="#Live-Analysis" title="Link to this heading">#</a></h2>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">perda.live</span><span class="w"> </span><span class="kn">import</span> <span class="n">LiveAnalyzer</span><span class="p">,</span> <span class="n">ValueType</span>
+
+<span class="n">live</span> <span class="o">=</span> <span class="n">LiveAnalyzer</span><span class="o">.</span><span class="n">dataserver</span><span class="p">()</span>  <span class="c1"># Can also choose LiveAnalyzer.local() for local ipc</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">live</span><span class="o">.</span><span class="n">is_connected</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<section id="Getting-Latest-Variables">
+<h3>Getting Latest Variables<a class="headerlink" href="#Getting-Latest-Variables" title="Link to this heading">#</a></h3>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">live</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+    <span class="s2">&quot;pcm.moc.motor.temp&quot;</span><span class="p">,</span> <span class="n">ValueType</span><span class="o">.</span><span class="n">NUMERIC</span>
+<span class="p">)</span>  <span class="c1"># Must specify a ValueType, can be FLOAT, BOOL or NUMERIC</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">live</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;bms.error&quot;</span><span class="p">,</span> <span class="n">ValueType</span><span class="o">.</span><span class="n">BOOL</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
 </section>
-<section id="Concat-CSVs">
-<h1>Concat CSVs<a class="headerlink" href="#Concat-CSVs" title="Link to this heading">#</a></h1>
+<section id="Setting-Variables">
+<h3>Setting Variables<a class="headerlink" href="#Setting-Variables" title="Link to this heading">#</a></h3>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">perda.analyzer</span><span class="w"> </span><span class="kn">import</span> <span class="n">Analyzer</span><span class="p">,</span> <span class="n">concat</span>
-
-<span class="c1"># We can concate multiple csv files into one readings, start with base</span>
-<span class="n">alyBase</span> <span class="o">=</span> <span class="n">Analyzer</span><span class="p">(</span><span class="s2">&quot;csv_files/22ndMar09-53-00&quot;</span><span class="p">)</span>
-
-<span class="c1"># Setup logs we want to merge</span>
-<span class="n">paths</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="s2">&quot;csv_files/22ndMar10-08-00&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;csv_files/22ndMar10-20-00&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;csv_files/22ndMar11-16-00&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;csv_files/22ndMar11-48-00&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;csv_files/22ndMar11-52-00&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;csv_files/22ndMar12-00-00&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;csv_files/22ndMar12-52-00&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;csv_files/22ndMar14-16-00&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;csv_files/22ndMar14-22-00&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;csv_files/22ndMar14-25-00&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;csv_files/22ndMar14-27-00&quot;</span><span class="p">,</span>
-<span class="p">]</span>
-
-<span class="c1"># This might take a while since we are parsing many runs</span>
-<span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">:</span>
-    <span class="c1"># Parse incoming log</span>
-    <span class="n">alyIncom</span> <span class="o">=</span> <span class="n">Analyzer</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-    <span class="c1"># Concat the second analyzer after first analyzer</span>
-    <span class="n">alyBase</span> <span class="o">=</span> <span class="n">concat</span><span class="p">(</span><span class="n">alyBase</span><span class="p">,</span> <span class="n">alyIncom</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">live</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;ludwig.tunable.tractionControl.kd&quot;</span><span class="p">,</span> <span class="mf">1.3</span><span class="p">,</span> <span class="n">ValueType</span><span class="o">.</span><span class="n">FLOAT</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Fetching-Data-Instances">
+<h3>Fetching Data Instances<a class="headerlink" href="#Fetching-Data-Instances" title="Link to this heading">#</a></h3>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">curr</span> <span class="o">=</span> <span class="n">live</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span>
+    <span class="s2">&quot;bms.pack.current&quot;</span><span class="p">,</span> <span class="n">time_secs</span><span class="o">=</span><span class="mi">100</span>
+<span class="p">)</span>  <span class="c1"># Fetch the last 100 seconds of current data</span>
+<span class="n">volt</span> <span class="o">=</span> <span class="n">live</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="s2">&quot;bms.pack.voltage&quot;</span><span class="p">,</span> <span class="n">time_secs</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+<span class="n">power</span> <span class="o">=</span> <span class="n">curr</span> <span class="o">*</span> <span class="n">volt</span>
+<span class="n">live</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">power</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Plotting">
+<h3>Plotting<a class="headerlink" href="#Plotting" title="Link to this heading">#</a></h3>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">live</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s2">&quot;bms.pack.voltage&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -612,17 +640,12 @@
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Plot cell voltage over time for multiple runs</span>
-<span class="n">variables</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="s2">&quot;bms.stack.mma.cellV.min&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;bms.stack.mma.cellV.max&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;bms.stack.mma.cellV.avg&quot;</span><span class="p">,</span>
-<span class="p">]</span>
-
-<span class="n">alyBase</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">variables</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">live</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="s2">&quot;bms.pack.voltage&quot;</span><span class="p">,</span> <span class="s2">&quot;bms.stack.voltage&quot;</span><span class="p">],</span> <span class="n">time_secs</span><span class="o">=</span><span class="mi">120</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
+</section>
+</section>
 </section>
 
 
@@ -672,24 +695,27 @@
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Penn Electric Racing Data Analyzer: PERDA</a><ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Load-Data">Load Data</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Search-Data">Search Data</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Inspect-Data">Inspect Data</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Graph-GPS">Graph GPS</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Graph-Variables-(Single-Y-Axis)">Graph Variables (Single Y-Axis)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Graph-Variables-(Dual-Y-Axis)">Graph Variables (Dual Y-Axis)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Data-Manipulation">Data Manipulation</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Custom-Variables">Custom Variables</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Static-Analysis">Static Analysis</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#Load-Data">Load Data</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#Search-Data">Search Data</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#Inspect-Data">Inspect Data</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#Graph-GPS">Graph GPS</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#Graph-Variables-(Single-Y-Axis)">Graph Variables (Single Y-Axis)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#Graph-Variables-(Dual-Y-Axis)">Graph Variables (Dual Y-Axis)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#Data-Manipulation">Data Manipulation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#Custom-Variables">Custom Variables</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#Frequency-Analysis">Frequency Analysis</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#CSV-Compare-(diff)">CSV Compare (diff)</a></li>
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Live-Analysis">Live Analysis</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#Getting-Latest-Variables">Getting Latest Variables</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#Setting-Variables">Setting Variables</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#Fetching-Data-Instances">Fetching Data Instances</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#Plotting">Plotting</a></li>
 </ul>
 </li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#Concat-CSVs">Concat CSVs</a></li>
 </ul>
-
   </nav></div>
 
   <div class="sidebar-secondary-item">

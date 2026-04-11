@@ -1,0 +1,969 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>perda.live.cdp_client &#8212; PERDA</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../../_static/documentation_options.js?v=8d563738"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../_static/design-tabs.js?v=f930bc37"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/perda/live/cdp_client';</script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">PERDA</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../getting_started/index.html">
+    Getting Started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../api/index.html">
+    Code Documentation
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../getting_started/index.html">
+    Getting Started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../api/index.html">
+    Code Documentation
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">perda.live.cdp_client</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for perda.live.cdp_client</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Python client library for communicating with the Rust CDP IPC server.</span>
+<span class="sd">Supports getting and setting values, as well as fetching time-series ranges.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">socket</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">struct</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="ValueType">
+<a class="viewcode-back" href="../../../_autosummary/perda.live.cdp_client.html#perda.live.ValueType">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ValueType</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Value types supported by the CDP IPC protocol.&quot;&quot;&quot;</span>
+
+    <span class="n">NUMERIC</span> <span class="o">=</span> <span class="mh">0x00</span>
+    <span class="n">FLOAT</span> <span class="o">=</span> <span class="mh">0x01</span>
+    <span class="n">BOOL</span> <span class="o">=</span> <span class="mh">0x02</span>
+    <span class="n">_RANGE</span> <span class="o">=</span> <span class="mh">0x03</span>  <span class="c1"># Internal use only — signals a GetRanged request</span></div>
+
+
+
+<div class="viewcode-block" id="CanType">
+<a class="viewcode-back" href="../../../_autosummary/perda.live.cdp_client.html#perda.live.CanType">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CanType</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;CAN data types as defined by the server.&quot;&quot;&quot;</span>
+
+    <span class="n">Bool</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">UInt8</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">UInt16</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">UInt32</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">UInt64</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">Int8</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">Int16</span> <span class="o">=</span> <span class="mi">6</span>
+    <span class="n">Int32</span> <span class="o">=</span> <span class="mi">7</span>
+    <span class="n">Int64</span> <span class="o">=</span> <span class="mi">8</span>
+    <span class="n">Float</span> <span class="o">=</span> <span class="mi">9</span>
+    <span class="n">Double</span> <span class="o">=</span> <span class="mi">10</span></div>
+
+
+
+<span class="c1"># Maps CanType to (struct format char, byte size)</span>
+<span class="n">_CAN_TYPE_FMT</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">CanType</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">CanType</span><span class="o">.</span><span class="n">Bool</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+    <span class="n">CanType</span><span class="o">.</span><span class="n">UInt8</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+    <span class="n">CanType</span><span class="o">.</span><span class="n">UInt16</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;H&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+    <span class="n">CanType</span><span class="o">.</span><span class="n">UInt32</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;I&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+    <span class="n">CanType</span><span class="o">.</span><span class="n">UInt64</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;Q&quot;</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span>
+    <span class="n">CanType</span><span class="o">.</span><span class="n">Int8</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+    <span class="n">CanType</span><span class="o">.</span><span class="n">Int16</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;h&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+    <span class="n">CanType</span><span class="o">.</span><span class="n">Int32</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;i&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+    <span class="n">CanType</span><span class="o">.</span><span class="n">Int64</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;q&quot;</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span>
+    <span class="n">CanType</span><span class="o">.</span><span class="n">Float</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;f&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+    <span class="n">CanType</span><span class="o">.</span><span class="n">Double</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;d&quot;</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="ResponseStatus">
+<a class="viewcode-back" href="../../../_autosummary/perda.live.cdp_client.html#perda.live.ResponseStatus">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ResponseStatus</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Response status codes from the CDP server.&quot;&quot;&quot;</span>
+
+    <span class="n">GET_SUCCESS</span> <span class="o">=</span> <span class="mh">0x0</span>
+    <span class="n">SET_SUCCESS</span> <span class="o">=</span> <span class="mh">0x1</span>
+    <span class="n">COMM_ERROR</span> <span class="o">=</span> <span class="mh">0x2</span>
+    <span class="n">INVALID_ACCESS</span> <span class="o">=</span> <span class="mh">0x3</span>
+    <span class="n">INCORRECT_TYPE</span> <span class="o">=</span> <span class="mh">0x4</span>
+    <span class="n">DISCONNECTED</span> <span class="o">=</span> <span class="mh">0x5</span>
+    <span class="n">BADLY_FORMED</span> <span class="o">=</span> <span class="mh">0x6</span>
+    <span class="n">GET_RANGED_SUCCESS</span> <span class="o">=</span> <span class="mh">0x7</span></div>
+
+
+
+<div class="viewcode-block" id="CDPException">
+<a class="viewcode-back" href="../../../_autosummary/perda.live.cdp_client.html#perda.live.CDPException">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CDPException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Base exception for CDP client errors.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+
+<div class="viewcode-block" id="CDPProtocolError">
+<a class="viewcode-back" href="../../../_autosummary/perda.live.cdp_client.html#perda.live.CDPProtocolError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CDPProtocolError</span><span class="p">(</span><span class="n">CDPException</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when there&#39;s a protocol-level error.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+
+<div class="viewcode-block" id="CDPServerError">
+<a class="viewcode-back" href="../../../_autosummary/perda.live.cdp_client.html#perda.live.CDPServerError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CDPServerError</span><span class="p">(</span><span class="n">CDPException</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when the server returns an error response.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">status</span><span class="p">:</span> <span class="n">ResponseStatus</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">status</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">)</span></div>
+
+
+
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_RangedPacket</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Parsed contents of a single GetRangedSuccess UDP packet.&quot;&quot;&quot;</span>
+
+    <span class="n">var_id</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">begin</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">end</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">can_type</span><span class="p">:</span> <span class="n">CanType</span>
+    <span class="n">storage_interval</span><span class="p">:</span> <span class="nb">int</span>  <span class="c1"># milliseconds</span>
+    <span class="n">values</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
+    <span class="n">timestamps</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>  <span class="c1"># milliseconds</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_parse_ranged_packet</span><span class="p">(</span><span class="n">payload</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_RangedPacket</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parse the payload of a GetRangedSuccess packet (everything after the 0x7 sig byte).</span>
+
+<span class="sd">    Layout (all little-endian):</span>
+<span class="sd">        4B  id.id           u32</span>
+<span class="sd">        4B  id.index        u32  (ignored)</span>
+<span class="sd">        4B  df.begin        u32</span>
+<span class="sd">        4B  df.end          u32</span>
+<span class="sd">        1B  df.ty           u8   (CanType discriminant)</span>
+<span class="sd">        4B  storage_interval u32  (milliseconds)</span>
+<span class="sd">       NxS  packed samples</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">17</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">CDPProtocolError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;GetRanged payload too short: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span><span class="si">}</span><span class="s2"> bytes&quot;</span><span class="p">)</span>
+
+    <span class="n">var_id</span><span class="p">,</span> <span class="n">_index</span><span class="p">,</span> <span class="n">begin</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">can_type_raw</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack_from</span><span class="p">(</span><span class="s2">&quot;&lt;IIIIB&quot;</span><span class="p">,</span> <span class="n">payload</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="c1"># Header is 4+4+4+4+1 = 17 bytes, then storage_interval u32 = 4 more bytes</span>
+    <span class="n">storage_interval</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack_from</span><span class="p">(</span><span class="s2">&quot;&lt;I&quot;</span><span class="p">,</span> <span class="n">payload</span><span class="p">,</span> <span class="mi">17</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">can_type</span> <span class="o">=</span> <span class="n">CanType</span><span class="p">(</span><span class="n">can_type_raw</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">CDPProtocolError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown CanType discriminant: </span><span class="si">{</span><span class="n">can_type_raw</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">fmt_char</span><span class="p">,</span> <span class="n">sample_size</span> <span class="o">=</span> <span class="n">_CAN_TYPE_FMT</span><span class="p">[</span><span class="n">can_type</span><span class="p">]</span>
+    <span class="n">n_samples</span> <span class="o">=</span> <span class="n">end</span> <span class="o">-</span> <span class="n">begin</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">expected_data_size</span> <span class="o">=</span> <span class="n">n_samples</span> <span class="o">*</span> <span class="n">sample_size</span>
+    <span class="n">data_offset</span> <span class="o">=</span> <span class="mi">21</span>  <span class="c1"># 17 (fixed header) + 4 (storage_interval)</span>
+
+    <span class="n">actual_data_size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span> <span class="o">-</span> <span class="n">data_offset</span>
+    <span class="k">if</span> <span class="n">actual_data_size</span> <span class="o">!=</span> <span class="n">expected_data_size</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">CDPProtocolError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Data size mismatch: expected </span><span class="si">{</span><span class="n">expected_data_size</span><span class="si">}</span><span class="s2">B, got </span><span class="si">{</span><span class="n">actual_data_size</span><span class="si">}</span><span class="s2">B&quot;</span>
+        <span class="p">)</span>
+
+    <span class="n">raw</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack_from</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&lt;</span><span class="si">{</span><span class="n">n_samples</span><span class="si">}{</span><span class="n">fmt_char</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">payload</span><span class="p">,</span> <span class="n">data_offset</span><span class="p">)</span>
+    <span class="n">values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">raw</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
+    <span class="c1"># Reconstruct timestamps in milliseconds</span>
+    <span class="n">timestamps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+        <span class="p">[(</span><span class="n">begin</span> <span class="o">+</span> <span class="n">i</span><span class="p">)</span> <span class="o">*</span> <span class="n">storage_interval</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_samples</span><span class="p">)],</span>
+        <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">_RangedPacket</span><span class="p">(</span>
+        <span class="n">var_id</span><span class="o">=</span><span class="n">var_id</span><span class="p">,</span>
+        <span class="n">begin</span><span class="o">=</span><span class="n">begin</span><span class="p">,</span>
+        <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">,</span>
+        <span class="n">can_type</span><span class="o">=</span><span class="n">can_type</span><span class="p">,</span>
+        <span class="n">storage_interval</span><span class="o">=</span><span class="n">storage_interval</span><span class="p">,</span>
+        <span class="n">values</span><span class="o">=</span><span class="n">values</span><span class="p">,</span>
+        <span class="n">timestamps</span><span class="o">=</span><span class="n">timestamps</span><span class="p">,</span>
+    <span class="p">)</span>
+
+
+<div class="viewcode-block" id="CDPClient">
+<a class="viewcode-back" href="../../../_autosummary/perda.live.cdp_client.html#perda.live.CDPClient">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CDPClient</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Python client for communicating with the Rust CDP IPC server.</span>
+
+<span class="sd">    Example usage:</span>
+<span class="sd">        client = CDPClient()</span>
+<span class="sd">        client.connect(&quot;127.0.0.1&quot;, 5001)</span>
+
+<span class="sd">        # Get a single value</span>
+<span class="sd">        value = client.get(&quot;vehicle.speed&quot;, ValueType.FLOAT)</span>
+
+<span class="sd">        # Get a time-series range (last 10 seconds)</span>
+<span class="sd">        di = client.get_range(&quot;vehicle.speed&quot;, ValueType.FLOAT, time_secs=10)</span>
+
+<span class="sd">        # Set a value</span>
+<span class="sd">        client.set(&quot;vehicle.target_speed&quot;, 65.0, ValueType.FLOAT)</span>
+
+<span class="sd">        client.disconnect()</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">ACCESS_STRING_SIZE</span> <span class="o">=</span> <span class="mi">56</span>
+    <span class="n">PACKET_SIZE</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">ACCESS_STRING_SIZE</span> <span class="o">+</span> <span class="mi">8</span>  <span class="c1"># 65 bytes total</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">5.0</span><span class="p">,</span> <span class="n">range_timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize the CDP client.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            timeout:       Socket timeout for get/set requests (seconds)</span>
+<span class="sd">            range_timeout: Maximum time to wait for all ranged response</span>
+<span class="sd">                           packets before giving up (seconds)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">socket</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">server_addr</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timeout</span> <span class="o">=</span> <span class="n">timeout</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">range_timeout</span> <span class="o">=</span> <span class="n">range_timeout</span>
+
+<div class="viewcode-block" id="CDPClient.connect">
+<a class="viewcode-back" href="../../../_autosummary/perda.live.cdp_client.html#perda.live.CDPClient.connect">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">host</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;127.0.0.1&quot;</span><span class="p">,</span> <span class="n">port</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5001</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Connect to the CDP server.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">socket</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">SOCK_DGRAM</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">socket</span><span class="o">.</span><span class="n">settimeout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">server_addr</span> <span class="o">=</span> <span class="p">(</span><span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Connected to CDP server at </span><span class="si">{</span><span class="n">host</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">port</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">CDPException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to connect to server: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CDPClient.disconnect">
+<a class="viewcode-back" href="../../../_autosummary/perda.live.cdp_client.html#perda.live.CDPClient.disconnect">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">disconnect</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Disconnect from the CDP server.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">socket</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">socket</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">socket</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">server_addr</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Disconnected from CDP server&quot;</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_val</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span>
+
+    <span class="c1"># ------------------------------------------------------------------</span>
+    <span class="c1"># Public API</span>
+    <span class="c1"># ------------------------------------------------------------------</span>
+
+<div class="viewcode-block" id="CDPClient.get">
+<a class="viewcode-back" href="../../../_autosummary/perda.live.cdp_client.html#perda.live.CDPClient.get">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">access_string</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value_type</span><span class="p">:</span> <span class="n">ValueType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the latest value for a signal from the CDP server.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            access_string: The access path (e.g. &quot;vehicle.speed&quot;)</span>
+<span class="sd">            value_type:    Expected type of the value</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            The requested value as float, bool, or int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">sock</span><span class="p">,</span> <span class="n">addr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_connected</span><span class="p">()</span>
+        <span class="n">packet</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_request_packet</span><span class="p">(</span><span class="n">access_string</span><span class="p">,</span> <span class="n">value_type</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;get&quot;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">sock</span><span class="o">.</span><span class="n">sendto</span><span class="p">(</span><span class="n">packet</span><span class="p">,</span> <span class="n">addr</span><span class="p">)</span>
+            <span class="n">response</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">sock</span><span class="o">.</span><span class="n">recvfrom</span><span class="p">(</span><span class="mi">1024</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_get_response</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="n">value_type</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">socket</span><span class="o">.</span><span class="n">timeout</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">CDPException</span><span class="p">(</span><span class="s2">&quot;Request timed out&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">CDPException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Communication error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CDPClient.get_range">
+<a class="viewcode-back" href="../../../_autosummary/perda.live.cdp_client.html#perda.live.CDPClient.get_range">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_range</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">access_string</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">time_secs</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Request a time-series range of data from the CDP server.</span>
+
+<span class="sd">        The server will chunk the response into multiple UDP packets. This</span>
+<span class="sd">        method collects all packets until either the expected sample count is</span>
+<span class="sd">        reached or range_timeout elapses, then assembles them into a single</span>
+<span class="sd">        DataInstance.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            access_string: The access path (e.g. &quot;vehicle.speed&quot;)</span>
+<span class="sd">            value_type:    Expected type of the value</span>
+<span class="sd">            time_secs:     How many seconds of history to retrieve (u32)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A DataInstance with the assembled time-series data</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">perda.analyzer</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataInstance</span>
+
+        <span class="n">sock</span><span class="p">,</span> <span class="n">addr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_connected</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="mi">0</span> <span class="o">&lt;</span> <span class="n">time_secs</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="o">**</span><span class="mi">32</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">CDPException</span><span class="p">(</span><span class="s2">&quot;time_secs must be a positive u32 value&quot;</span><span class="p">)</span>
+
+        <span class="n">packet</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_request_packet</span><span class="p">(</span>
+            <span class="n">access_string</span><span class="p">,</span> <span class="n">ValueType</span><span class="o">.</span><span class="n">_RANGE</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;get_range&quot;</span><span class="p">,</span> <span class="n">time_secs</span><span class="o">=</span><span class="n">time_secs</span>
+        <span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">sock</span><span class="o">.</span><span class="n">sendto</span><span class="p">(</span><span class="n">packet</span><span class="p">,</span> <span class="n">addr</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">CDPException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to send ranged request: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Switch to range_timeout for collection phase</span>
+        <span class="n">sock</span><span class="o">.</span><span class="n">settimeout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">range_timeout</span><span class="p">)</span>
+
+        <span class="n">packets</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">_RangedPacket</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">storage_interval</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">var_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">total_samples_received</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">expected_samples</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">response</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">sock</span><span class="o">.</span><span class="n">recvfrom</span><span class="p">(</span><span class="mi">65535</span><span class="p">)</span>
+                <span class="k">except</span> <span class="n">socket</span><span class="o">.</span><span class="n">timeout</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                        <span class="s2">&quot;get_range timed out waiting for packets; &quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;received </span><span class="si">{</span><span class="n">total_samples_received</span><span class="si">}</span><span class="s2"> of &quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">expected_samples</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s1">&#39;?&#39;</span><span class="si">}</span><span class="s2"> expected samples&quot;</span>
+                    <span class="p">)</span>
+                    <span class="k">break</span>
+
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">response</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">CDPProtocolError</span><span class="p">(</span><span class="s2">&quot;Empty response packet&quot;</span><span class="p">)</span>
+
+                <span class="n">status_byte</span> <span class="o">=</span> <span class="n">response</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+                <span class="c1"># Any error status during a ranged request is fatal</span>
+                <span class="k">if</span> <span class="n">status_byte</span> <span class="o">!=</span> <span class="n">ResponseStatus</span><span class="o">.</span><span class="n">GET_RANGED_SUCCESS</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_raise_server_error</span><span class="p">(</span><span class="n">ResponseStatus</span><span class="p">(</span><span class="n">status_byte</span><span class="p">))</span>
+
+                <span class="n">pkt</span> <span class="o">=</span> <span class="n">_parse_ranged_packet</span><span class="p">(</span><span class="n">response</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+                <span class="n">packets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pkt</span><span class="p">)</span>
+                <span class="n">total_samples_received</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">pkt</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+
+                <span class="c1"># Derive expected total samples from first packet</span>
+                <span class="k">if</span> <span class="n">storage_interval</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">storage_interval</span> <span class="o">=</span> <span class="n">pkt</span><span class="o">.</span><span class="n">storage_interval</span>
+                    <span class="n">var_id</span> <span class="o">=</span> <span class="n">pkt</span><span class="o">.</span><span class="n">var_id</span>
+                    <span class="k">if</span> <span class="n">storage_interval</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">expected_samples</span> <span class="o">=</span> <span class="p">(</span><span class="n">time_secs</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">)</span> <span class="o">//</span> <span class="n">storage_interval</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                            <span class="s2">&quot;storage_interval is zero; terminating on timeout&quot;</span>
+                        <span class="p">)</span>
+
+                <span class="c1"># Terminate early if we have all expected samples</span>
+                <span class="k">if</span> <span class="p">(</span>
+                    <span class="n">expected_samples</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+                    <span class="ow">and</span> <span class="n">total_samples_received</span> <span class="o">&gt;=</span> <span class="n">expected_samples</span>
+                <span class="p">):</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;get_range complete: </span><span class="si">{</span><span class="n">total_samples_received</span><span class="si">}</span><span class="s2"> samples received&quot;</span>
+                    <span class="p">)</span>
+                    <span class="k">break</span>
+
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="c1"># Restore normal timeout</span>
+            <span class="n">sock</span><span class="o">.</span><span class="n">settimeout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">packets</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">CDPException</span><span class="p">(</span><span class="s2">&quot;No ranged response packets received&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Sort packets by begin index to ensure chronological order</span>
+        <span class="n">packets</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">p</span><span class="p">:</span> <span class="n">p</span><span class="o">.</span><span class="n">begin</span><span class="p">)</span>
+
+        <span class="n">all_timestamps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">p</span><span class="o">.</span><span class="n">timestamps</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">packets</span><span class="p">])</span>
+        <span class="n">all_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">p</span><span class="o">.</span><span class="n">values</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">packets</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">DataInstance</span><span class="p">(</span>
+            <span class="n">timestamp_np</span><span class="o">=</span><span class="n">all_timestamps</span><span class="p">,</span>
+            <span class="n">value_np</span><span class="o">=</span><span class="n">all_values</span><span class="p">,</span>
+            <span class="n">label</span><span class="o">=</span><span class="n">access_string</span><span class="p">,</span>
+            <span class="n">var_id</span><span class="o">=</span><span class="n">var_id</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CDPClient.set">
+<a class="viewcode-back" href="../../../_autosummary/perda.live.cdp_client.html#perda.live.CDPClient.set">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">access_string</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span>
+        <span class="n">value_type</span><span class="p">:</span> <span class="n">ValueType</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set a value on the CDP server.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            access_string: The access path (e.g. &quot;vehicle.target_speed&quot;)</span>
+<span class="sd">            value:         The value to set</span>
+<span class="sd">            value_type:    Type of the value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">sock</span><span class="p">,</span> <span class="n">addr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_connected</span><span class="p">()</span>
+        <span class="n">packet</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_request_packet</span><span class="p">(</span>
+            <span class="n">access_string</span><span class="p">,</span> <span class="n">value_type</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;set&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">sock</span><span class="o">.</span><span class="n">sendto</span><span class="p">(</span><span class="n">packet</span><span class="p">,</span> <span class="n">addr</span><span class="p">)</span>
+            <span class="n">response</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">sock</span><span class="o">.</span><span class="n">recvfrom</span><span class="p">(</span><span class="mi">1024</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_parse_set_response</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">socket</span><span class="o">.</span><span class="n">timeout</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">CDPException</span><span class="p">(</span><span class="s2">&quot;Request timed out&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">CDPException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Communication error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+    <span class="c1"># ------------------------------------------------------------------</span>
+    <span class="c1"># Internal helpers</span>
+    <span class="c1"># ------------------------------------------------------------------</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_check_connected</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">socket</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">server_addr</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">CDPException</span><span class="p">(</span><span class="s2">&quot;Not connected to server&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">socket</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">server_addr</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_build_request_packet</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">access_string</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">value_type</span><span class="p">:</span> <span class="n">ValueType</span><span class="p">,</span>
+        <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>  <span class="c1"># &quot;get&quot; | &quot;get_range&quot; | &quot;set&quot;</span>
+        <span class="n">value</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">time_secs</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Build a request packet according to the protocol.</span>
+
+<span class="sd">        Sig byte layout:</span>
+<span class="sd">            bits 0-1 : ValueType (0b11 = Range, triggers GetRanged when bit 7 set)</span>
+<span class="sd">            bit  7   : 1 = Get/GetRanged, 0 = Set</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">access_string</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">))</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">ACCESS_STRING_SIZE</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">CDPException</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Access string too long (max </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ACCESS_STRING_SIZE</span><span class="si">}</span><span class="s2"> bytes)&quot;</span>
+            <span class="p">)</span>
+
+        <span class="n">sig</span> <span class="o">=</span> <span class="n">value_type</span><span class="o">.</span><span class="n">value</span> <span class="o">&amp;</span> <span class="mb">0b11</span>
+
+        <span class="k">if</span> <span class="n">mode</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;get&quot;</span><span class="p">,</span> <span class="s2">&quot;get_range&quot;</span><span class="p">):</span>
+            <span class="n">sig</span> <span class="o">|=</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">7</span>
+        <span class="c1"># mode == &quot;set&quot;: no additional bits</span>
+
+        <span class="n">packet</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">PACKET_SIZE</span><span class="p">)</span>
+        <span class="n">packet</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">sig</span>
+
+        <span class="n">access_bytes</span> <span class="o">=</span> <span class="n">access_string</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+        <span class="n">packet</span><span class="p">[</span><span class="mi">1</span> <span class="p">:</span> <span class="mi">1</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">access_bytes</span><span class="p">)]</span> <span class="o">=</span> <span class="n">access_bytes</span>
+
+        <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;get_range&quot;</span><span class="p">:</span>
+            <span class="c1"># time_secs packed as u32 LE into the 8-byte value field</span>
+            <span class="n">packet</span><span class="p">[</span><span class="mi">1</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">ACCESS_STRING_SIZE</span> <span class="p">:]</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">struct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="s2">&quot;&lt;I&quot;</span><span class="p">,</span> <span class="n">time_secs</span><span class="p">)</span> <span class="o">+</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x00</span><span class="s2">&quot;</span> <span class="o">*</span> <span class="mi">4</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">packet</span><span class="p">[</span><span class="mi">1</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">ACCESS_STRING_SIZE</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="s2">&quot;&lt;d&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="nb">bytes</span><span class="p">(</span><span class="n">packet</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_parse_get_response</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">response</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span> <span class="n">value_type</span><span class="p">:</span> <span class="n">ValueType</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">response</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">CDPProtocolError</span><span class="p">(</span><span class="s2">&quot;Response too short&quot;</span><span class="p">)</span>
+
+        <span class="n">status</span> <span class="o">=</span> <span class="n">ResponseStatus</span><span class="p">(</span><span class="n">response</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">status</span> <span class="o">!=</span> <span class="n">ResponseStatus</span><span class="o">.</span><span class="n">GET_SUCCESS</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_raise_server_error</span><span class="p">(</span><span class="n">status</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">response</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">9</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">CDPProtocolError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Invalid GET response length: expected 9, got </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">response</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+        <span class="n">float_value</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s2">&quot;&lt;d&quot;</span><span class="p">,</span> <span class="n">response</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">9</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">value_type</span> <span class="o">==</span> <span class="n">ValueType</span><span class="o">.</span><span class="n">BOOL</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="n">float_value</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">value_type</span> <span class="o">==</span> <span class="n">ValueType</span><span class="o">.</span><span class="n">NUMERIC</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">float_value</span><span class="p">)</span> <span class="k">if</span> <span class="n">float_value</span><span class="o">.</span><span class="n">is_integer</span><span class="p">()</span> <span class="k">else</span> <span class="n">float_value</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">float_value</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_parse_set_response</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">response</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">response</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">CDPProtocolError</span><span class="p">(</span><span class="s2">&quot;Response too short&quot;</span><span class="p">)</span>
+
+        <span class="n">status</span> <span class="o">=</span> <span class="n">ResponseStatus</span><span class="p">(</span><span class="n">response</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">status</span> <span class="o">!=</span> <span class="n">ResponseStatus</span><span class="o">.</span><span class="n">SET_SUCCESS</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_raise_server_error</span><span class="p">(</span><span class="n">status</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_raise_server_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">status</span><span class="p">:</span> <span class="n">ResponseStatus</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">error_messages</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">ResponseStatus</span><span class="o">.</span><span class="n">COMM_ERROR</span><span class="p">:</span> <span class="s2">&quot;Communication error with backend&quot;</span><span class="p">,</span>
+            <span class="n">ResponseStatus</span><span class="o">.</span><span class="n">INVALID_ACCESS</span><span class="p">:</span> <span class="s2">&quot;Invalid access string&quot;</span><span class="p">,</span>
+            <span class="n">ResponseStatus</span><span class="o">.</span><span class="n">INCORRECT_TYPE</span><span class="p">:</span> <span class="s2">&quot;Incorrect value type&quot;</span><span class="p">,</span>
+            <span class="n">ResponseStatus</span><span class="o">.</span><span class="n">DISCONNECTED</span><span class="p">:</span> <span class="s2">&quot;Server disconnected from backend&quot;</span><span class="p">,</span>
+            <span class="n">ResponseStatus</span><span class="o">.</span><span class="n">BADLY_FORMED</span><span class="p">:</span> <span class="s2">&quot;Badly formed request&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="n">error_messages</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">status</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Unknown server error: </span><span class="si">{</span><span class="n">status</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">CDPServerError</span><span class="p">(</span><span class="n">status</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span></div>
+
+
+
+<span class="c1"># ---------------------------------------------------------------------------</span>
+<span class="c1"># Convenience functions</span>
+<span class="c1"># ---------------------------------------------------------------------------</span>
+
+
+<div class="viewcode-block" id="get_value">
+<a class="viewcode-back" href="../../../_autosummary/perda.live.cdp_client.html#perda.live.get_value">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_value</span><span class="p">(</span>
+    <span class="n">access_string</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">value_type</span><span class="p">:</span> <span class="n">ValueType</span><span class="p">,</span>
+    <span class="n">host</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;127.0.0.1&quot;</span><span class="p">,</span>
+    <span class="n">port</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5001</span><span class="p">,</span>
+    <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">5.0</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convenience function to get a single value.&quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="n">CDPClient</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
+        <span class="n">client</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">access_string</span><span class="p">,</span> <span class="n">value_type</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="set_value">
+<a class="viewcode-back" href="../../../_autosummary/perda.live.cdp_client.html#perda.live.set_value">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">set_value</span><span class="p">(</span>
+    <span class="n">access_string</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span>
+    <span class="n">value_type</span><span class="p">:</span> <span class="n">ValueType</span><span class="p">,</span>
+    <span class="n">host</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;127.0.0.1&quot;</span><span class="p">,</span>
+    <span class="n">port</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5001</span><span class="p">,</span>
+    <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">5.0</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convenience function to set a single value.&quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="n">CDPClient</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
+        <span class="n">client</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">)</span>
+        <span class="n">client</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">access_string</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">value_type</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="get_range_value">
+<a class="viewcode-back" href="../../../_autosummary/perda.live.cdp_client.html#perda.live.get_range_value">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_range_value</span><span class="p">(</span>
+    <span class="n">access_string</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">time_secs</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">host</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;127.0.0.1&quot;</span><span class="p">,</span>
+    <span class="n">port</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5001</span><span class="p">,</span>
+    <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">5.0</span><span class="p">,</span>
+    <span class="n">range_timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convenience function to fetch a time-series range as a DataInstance.&quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="n">CDPClient</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span> <span class="n">range_timeout</span><span class="o">=</span><span class="n">range_timeout</span><span class="p">)</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
+        <span class="n">client</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">client</span><span class="o">.</span><span class="n">get_range</span><span class="p">(</span><span class="n">access_string</span><span class="p">,</span> <span class="n">time_secs</span><span class="p">)</span></div>
+
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">CDPClient</span><span class="p">()</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
+        <span class="n">client</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="s2">&quot;127.0.0.1&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Single value example</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">temp</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;bms.board.glvTemp&quot;</span><span class="p">,</span> <span class="n">ValueType</span><span class="o">.</span><span class="n">FLOAT</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Current temp: </span><span class="si">{</span><span class="n">temp</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">CDPServerError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Server error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2"> (status: </span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">status</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Ranged example — last 30 seconds of motor temperature</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">di</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get_range</span><span class="p">(</span><span class="s2">&quot;motor.temp&quot;</span><span class="p">,</span> <span class="n">ValueType</span><span class="o">.</span><span class="n">FLOAT</span><span class="p">,</span> <span class="n">time_secs</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Got </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">di</span><span class="o">.</span><span class="n">value_np</span><span class="p">)</span><span class="si">}</span><span class="s2"> samples for &#39;</span><span class="si">{</span><span class="n">di</span><span class="o">.</span><span class="n">label</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">CDPServerError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Server error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2"> (status: </span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">status</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2025, Penn Electric Racing.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

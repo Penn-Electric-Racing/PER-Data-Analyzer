@@ -1,7 +1,7 @@
-﻿perda
-=====
+perda.live
+==========
 
-.. automodule:: perda
+.. automodule:: perda.live
    :members:
    :undoc-members:
    :show-inheritance:
@@ -13,10 +13,5 @@
    :toctree:
    :recursive:
 
-   analyzer
-   constants
-   core_data_structures
-   live
-   plotting
-   units
-   utils
+   cdp_client
+   live_analyzer
