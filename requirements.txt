@@ -15,6 +15,10 @@ rapidfuzz
 scipy
 sentence-transformers
 
+# Server Access
+boto3
+requests
+
 # Progress Bar
 tqdm
 
