@@ -308,15 +308,21 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">rapidfuzz</span><span class="w"> </span><span class="kn">import</span> <span class="n">fuzz</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">sentence_transformers.cross_encoder</span><span class="w"> </span><span class="kn">import</span> <span class="n">CrossEncoder</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">..constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">DELIMITER</span><span class="p">,</span> <span class="n">title_block</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..core_data_structures.single_run_data</span><span class="w"> </span><span class="kn">import</span> <span class="n">SingleRunData</span>
 
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">sentence_transformers.cross_encoder</span><span class="w"> </span><span class="kn">import</span> <span class="n">CrossEncoder</span> <span class="k">as</span> <span class="n">_CrossEncoder</span>
+
+    <span class="n">_SEMANTIC_AVAILABLE</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">_SEMANTIC_AVAILABLE</span> <span class="o">=</span> <span class="kc">False</span>
+
 <span class="n">_MODEL_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="o">.</span><span class="n">parents</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="s2">&quot;models&quot;</span> <span class="o">/</span> <span class="s2">&quot;stsb-cross-encoder&quot;</span>
 <span class="n">_HF_MODEL_ID</span> <span class="o">=</span> <span class="s2">&quot;cross-encoder/stsb-distilroberta-base&quot;</span>
 
-<span class="n">_model</span><span class="p">:</span> <span class="n">CrossEncoder</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># global variable to hold the loaded model instance</span>
+<span class="n">_model</span><span class="p">:</span> <span class="n">_CrossEncoder</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># _CrossEncoder instance when loaded, else None</span>
 
 <span class="n">ABBREVIATIONS</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;pcm&quot;</span><span class="p">:</span> <span class="s2">&quot;powertrain control module&quot;</span><span class="p">,</span>
@@ -358,17 +364,42 @@
 
 <div class="viewcode-block" id="install_encoder">
 <a class="viewcode-back" href="../../../_autosummary/perda.utils.search.html#perda.utils.search.install_encoder">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">install_encoder</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Download and save the cross-encoder model for semantic search.&quot;&quot;&quot;</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">install_encoder</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Download and save the cross-encoder model for semantic search.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    bool</span>
+<span class="sd">        True if the model loaded successfully, False otherwise.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Returns False immediately if ``sentence-transformers`` is not installed</span>
+<span class="sd">    (i.e. ``perda[semantic]`` extra was not requested).</span>
+<span class="sd">    Any download or filesystem error is caught and printed; the function</span>
+<span class="sd">    returns False so callers fall back to keyword-only search.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">global</span> <span class="n">_model</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">_MODEL_DIR</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Downloading cross-encoder model (one-time setup)...&quot;</span><span class="p">)</span>
-        <span class="n">_model</span> <span class="o">=</span> <span class="n">CrossEncoder</span><span class="p">(</span><span class="n">_HF_MODEL_ID</span><span class="p">)</span>
-        <span class="n">_MODEL_DIR</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="n">_model</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">_MODEL_DIR</span><span class="p">))</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Model saved to: </span><span class="si">{</span><span class="n">_MODEL_DIR</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">_model</span> <span class="o">=</span> <span class="n">CrossEncoder</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">_MODEL_DIR</span><span class="p">))</span></div>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">_SEMANTIC_AVAILABLE</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">_MODEL_DIR</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Downloading cross-encoder model (one-time setup)...&quot;</span><span class="p">)</span>
+            <span class="n">_model</span> <span class="o">=</span> <span class="n">_CrossEncoder</span><span class="p">(</span><span class="n">_HF_MODEL_ID</span><span class="p">)</span>
+            <span class="n">_MODEL_DIR</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">_model</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">_MODEL_DIR</span><span class="p">))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Model saved to: </span><span class="si">{</span><span class="n">_MODEL_DIR</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">_model</span> <span class="o">=</span> <span class="n">_CrossEncoder</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">_MODEL_DIR</span><span class="p">))</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Warning: cross-encoder model unavailable (</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">). Falling back to keyword-only search.&quot;</span>
+        <span class="p">)</span>
+        <span class="n">_model</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
 
 
 
@@ -386,15 +417,15 @@
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
-<span class="sd">    Results are ranked by weighted blend of cross-encoder semantic score and rapidfuzz keyword score.</span>
-<span class="sd">    Each variable is represented by a search card combining its expanded C++ identifier tokens with its description.</span>
+<span class="sd">    When ``perda[semantic]`` is installed and the cross-encoder model loads</span>
+<span class="sd">    successfully, results are ranked by a weighted blend of semantic score and</span>
+<span class="sd">    rapidfuzz keyword score. Otherwise falls back to keyword-only scoring with</span>
+<span class="sd">    no error raised.</span>
 
-<span class="sd">    Short queries lean on keyword matching, longer queries lean on semantic ranking.</span>
+<span class="sd">    Short queries lean on keyword matching; longer queries lean on semantic</span>
+<span class="sd">    ranking when the model is available.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">install_encoder</span><span class="p">()</span>
-
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">_model</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Cross-encoder model failed to load.&quot;</span><span class="p">)</span>
+    <span class="n">semantic_ready</span> <span class="o">=</span> <span class="n">install_encoder</span><span class="p">()</span>
 
     <span class="n">query</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">query</span><span class="p">:</span>
@@ -404,40 +435,84 @@
     <span class="k">if</span> <span class="ow">not</span> <span class="n">keyword_query</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Search query must contain letters or numbers.&quot;</span><span class="p">)</span>
 
-    <span class="n">semantic_query</span> <span class="o">=</span> <span class="n">preprocess_query</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
-
     <span class="n">deck</span> <span class="o">=</span> <span class="n">build_search_deck</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-
-    <span class="c1"># rank() returns dicts with &quot;corpus_id&quot; (index into deck) and &quot;score&quot;</span>
-    <span class="n">semantic_scores</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="nb">int</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="s2">&quot;corpus_id&quot;</span><span class="p">]):</span> <span class="nb">float</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="s2">&quot;score&quot;</span><span class="p">])</span>
-        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">_model</span><span class="o">.</span><span class="n">rank</span><span class="p">(</span><span class="n">semantic_query</span><span class="p">,</span> <span class="p">[</span><span class="n">e</span><span class="o">.</span><span class="n">card</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">deck</span><span class="p">])</span>
-    <span class="p">}</span>
-
-    <span class="c1"># Combine semantic and keyword scores</span>
     <span class="n">num_terms</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">keyword_query</span><span class="p">)</span>
-    <span class="n">ranked</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
-        <span class="p">(</span>
+
+    <span class="k">if</span> <span class="n">semantic_ready</span> <span class="ow">and</span> <span class="n">_model</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">semantic_query</span> <span class="o">=</span> <span class="n">preprocess_query</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+        <span class="c1"># rank() returns dicts with &quot;corpus_id&quot; (index into deck) and &quot;score&quot;</span>
+        <span class="n">semantic_scores</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="nb">int</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="s2">&quot;corpus_id&quot;</span><span class="p">]):</span> <span class="nb">float</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="s2">&quot;score&quot;</span><span class="p">])</span>
+            <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">_model</span><span class="o">.</span><span class="n">rank</span><span class="p">(</span><span class="n">semantic_query</span><span class="p">,</span> <span class="p">[</span><span class="n">e</span><span class="o">.</span><span class="n">card</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">deck</span><span class="p">])</span>
+        <span class="p">}</span>
+        <span class="n">ranked</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
             <span class="p">(</span>
-                <span class="n">combine_scores</span><span class="p">(</span>
-                    <span class="n">semantic_scores</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span>
-                    <span class="n">keyword_score</span><span class="p">(</span><span class="n">keyword_query</span><span class="p">,</span> <span class="n">entry</span><span class="p">),</span>
-                    <span class="n">num_terms</span><span class="p">,</span>
-                <span class="p">),</span>
-                <span class="n">idx</span><span class="p">,</span>
-            <span class="p">)</span>
-            <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">entry</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">deck</span><span class="p">)</span>
-        <span class="p">),</span>
-        <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="p">)</span>
+                <span class="p">(</span>
+                    <span class="n">combine_scores</span><span class="p">(</span>
+                        <span class="n">semantic_scores</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span>
+                        <span class="n">keyword_score</span><span class="p">(</span><span class="n">keyword_query</span><span class="p">,</span> <span class="n">entry</span><span class="p">),</span>
+                        <span class="n">num_terms</span><span class="p">,</span>
+                    <span class="p">),</span>
+                    <span class="n">idx</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">entry</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">deck</span><span class="p">)</span>
+            <span class="p">),</span>
+            <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ranked</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
+            <span class="p">(</span>
+                <span class="p">(</span><span class="n">keyword_score</span><span class="p">(</span><span class="n">keyword_query</span><span class="p">,</span> <span class="n">entry</span><span class="p">),</span> <span class="n">idx</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">entry</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">deck</span><span class="p">)</span>
+            <span class="p">),</span>
+            <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
 
-    <span class="c1"># Print top results</span>
+    <span class="n">_print_search_results</span><span class="p">(</span>
+        <span class="n">query</span><span class="p">,</span> <span class="p">[</span><span class="n">deck</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">ranked</span><span class="p">[:</span><span class="mi">10</span><span class="p">]],</span> <span class="p">[</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">ranked</span><span class="p">[:</span><span class="mi">10</span><span class="p">]]</span>
+    <span class="p">)</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_print_search_results</span><span class="p">(</span>
+    <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">entries</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">SearchEntry</span><span class="p">],</span> <span class="n">scores</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Print search results as a compact 4-column table.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    query : str</span>
+<span class="sd">        The original search query string.</span>
+<span class="sd">    entries : list[SearchEntry]</span>
+<span class="sd">        Ordered list of search entries to display.</span>
+<span class="sd">    scores : list[float]</span>
+<span class="sd">        Relevance scores corresponding to each entry.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">col_score</span> <span class="o">=</span> <span class="mi">7</span>
+    <span class="n">col_id</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">col_name</span> <span class="o">=</span> <span class="mi">40</span>
+    <span class="n">col_desc</span> <span class="o">=</span> <span class="mi">60</span>
+
     <span class="nb">print</span><span class="p">(</span><span class="n">title_block</span><span class="p">(</span><span class="s2">&quot;Search Results&quot;</span><span class="p">))</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Query: &quot;</span><span class="p">,</span> <span class="n">query</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">score</span><span class="p">,</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">ranked</span><span class="p">[:</span><span class="mi">10</span><span class="p">]:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">DELIMITER</span><span class="p">)</span>
-        <span class="n">print_result</span><span class="p">(</span><span class="n">deck</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">score</span><span class="o">=</span><span class="n">score</span><span class="p">)</span></div>
-
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Query: </span><span class="si">{</span><span class="n">query</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;Score&#39;</span><span class="si">:</span><span class="s2">&lt;</span><span class="si">{</span><span class="n">col_score</span><span class="si">}}</span><span class="s2">  </span><span class="si">{</span><span class="s1">&#39;ID&#39;</span><span class="si">:</span><span class="s2">&lt;</span><span class="si">{</span><span class="n">col_id</span><span class="si">}}</span><span class="s2">  </span><span class="si">{</span><span class="s1">&#39;C++ Name&#39;</span><span class="si">:</span><span class="s2">&lt;</span><span class="si">{</span><span class="n">col_name</span><span class="si">}}</span><span class="s2">  </span><span class="si">{</span><span class="s1">&#39;Description&#39;</span><span class="si">:</span><span class="s2">&lt;</span><span class="si">{</span><span class="n">col_desc</span><span class="si">}}</span><span class="s2">&quot;</span>
+    <span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">DELIMITER</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">entry</span><span class="p">,</span> <span class="n">score</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">entries</span><span class="p">,</span> <span class="n">scores</span><span class="p">):</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">entry</span><span class="o">.</span><span class="n">cpp_name</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">cpp_name</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">col_name</span>
+            <span class="k">else</span> <span class="n">entry</span><span class="o">.</span><span class="n">cpp_name</span><span class="p">[:</span> <span class="n">col_name</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;…&quot;</span>
+        <span class="p">)</span>
+        <span class="n">desc</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">entry</span><span class="o">.</span><span class="n">descript</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">descript</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">col_desc</span>
+            <span class="k">else</span> <span class="n">entry</span><span class="o">.</span><span class="n">descript</span><span class="p">[:</span> <span class="n">col_desc</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;…&quot;</span>
+        <span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">score</span><span class="si">:</span><span class="s2">&lt;</span><span class="si">{</span><span class="n">col_score</span><span class="si">}</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">  </span><span class="si">{</span><span class="n">entry</span><span class="o">.</span><span class="n">var_id</span><span class="si">:</span><span class="s2">&lt;</span><span class="si">{</span><span class="n">col_id</span><span class="si">}}</span><span class="s2">  </span><span class="si">{</span><span class="n">name</span><span class="si">:</span><span class="s2">&lt;</span><span class="si">{</span><span class="n">col_name</span><span class="si">}}</span><span class="s2">  </span><span class="si">{</span><span class="n">desc</span><span class="si">:</span><span class="s2">&lt;</span><span class="si">{</span><span class="n">col_desc</span><span class="si">}}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
 
 
 <div class="viewcode-block" id="preprocess_query">
@@ -580,25 +655,6 @@
     <span class="n">kw_weight</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.6</span> <span class="o">-</span> <span class="mf">0.05</span> <span class="o">*</span> <span class="p">(</span><span class="n">num_terms</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
     <span class="n">combined</span> <span class="o">=</span> <span class="n">kw_weight</span> <span class="o">*</span> <span class="n">keyword_score</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">kw_weight</span><span class="p">)</span> <span class="o">*</span> <span class="n">semantic_score</span>
     <span class="k">return</span> <span class="n">combined</span></div>
-
-
-
-<div class="viewcode-block" id="print_result">
-<a class="viewcode-back" href="../../../_autosummary/perda.utils.search.html#perda.utils.search.print_result">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">print_result</span><span class="p">(</span><span class="n">entry</span><span class="p">:</span> <span class="n">SearchEntry</span><span class="p">,</span> <span class="n">score</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Print a single ranked search result.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    entry : SearchEntry</span>
-<span class="sd">        The search entry to display.</span>
-<span class="sd">    score : float</span>
-<span class="sd">        Combined relevance score.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Score: </span><span class="si">{</span><span class="n">score</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Variable ID: </span><span class="si">{</span><span class="n">entry</span><span class="o">.</span><span class="n">var_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;C++ Name: </span><span class="si">{</span><span class="n">entry</span><span class="o">.</span><span class="n">cpp_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Description: </span><span class="si">{</span><span class="n">entry</span><span class="o">.</span><span class="n">descript</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
 </pre></div>
 

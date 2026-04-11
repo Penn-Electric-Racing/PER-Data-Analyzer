@@ -360,8 +360,8 @@ python<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </s
 <span class="c1"># For Mac/Linux:</span>
 <span class="nb">source</span><span class="w"> </span>.venv/bin/activate
 
-pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt
-pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
+pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements-dev.txt
+
 pre-commit<span class="w"> </span>install
 nbstripout<span class="w"> </span>--install
 </pre></div>
@@ -408,12 +408,28 @@ installation instructions above.</strong></p>
 library in external environments like Google Colab.</p>
 <section id="install-via-pip">
 <h4>1. Install via pip<a class="headerlink" href="#install-via-pip" title="Link to this heading">#</a></h4>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;perda[notebook] @ git+https://github.com/Penn-Electric-Racing/PER-Data-Analyzer.git@main&quot;</span>
+</pre></div>
+</div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>You can embed the above command in a Google Colab notebook to automatically install when you run the notebook.
-Append an exclamation mark and leave it in a normal code cell like below:
-<cite>!pip install git+https://github.com/Penn-Electric-Racing/PER-Data-Analyzer.git&#64;main</cite></p>
+Append an exclamation mark and leave it in a normal code cell like below:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="s2">&quot;perda[notebook] @ git+https://github.com/Penn-Electric-Racing/PER-Data-Analyzer.git@main&quot;</span>
+</pre></div>
 </div>
+</div>
+</section>
+<section id="optional-enable-semantic-search">
+<h4>2. Optional: Enable semantic search<a class="headerlink" href="#optional-enable-semantic-search" title="Link to this heading">#</a></h4>
+<p>The default installation supports keyword-based search. To also enable semantic (AI-powered) search,
+install the <code class="docutils literal notranslate"><span class="pre">full</span></code> extra instead. This pulls in <code class="docutils literal notranslate"><span class="pre">sentence-transformers</span></code> and its dependencies
+(including PyTorch), so expect a larger download.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="s2">&quot;perda[full] @ git+https://github.com/Penn-Electric-Racing/PER-Data-Analyzer.git@main&quot;</span>
+</pre></div>
+</div>
+<p>When the semantic model is available, <a class="reference internal" href="../_autosummary/perda.utils.search.html#perda.utils.search.search" title="perda.utils.search.search"><code class="xref py py-func docutils literal notranslate"><span class="pre">perda.utils.search.search()</span></code></a> automatically uses it.
+If it is not installed, search falls back to keyword-only scoring with no error.</p>
 </section>
 </section>
 </section>
@@ -479,6 +495,7 @@ Append an exclamation mark and leave it in a normal code cell like below:
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#tutorial-notebook">Tutorial Notebook</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#option-2-standard-installation">Option 2: Standard Installation</a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#install-via-pip">1. Install via pip</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#optional-enable-semantic-search">2. Optional: Enable semantic search</a></li>
 </ul>
 </li>
 </ul>

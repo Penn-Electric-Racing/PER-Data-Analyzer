@@ -469,10 +469,18 @@ on semantic relevance.</p>
 <span class="sig-prename descclassname"><span class="pre">perda.utils.search.</span></span><span class="sig-name descname"><span class="pre">install_encoder</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/utils/search.html#install_encoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.utils.search.install_encoder" title="Link to this definition">#</a></dt>
 <dd><p>Download and save the cross-encoder model for semantic search.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>True if the model loaded successfully, False otherwise.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>bool</p>
 </dd>
 </dl>
+<p class="rubric">Notes</p>
+<p>Returns False immediately if <code class="docutils literal notranslate"><span class="pre">sentence-transformers</span></code> is not installed
+(i.e. <code class="docutils literal notranslate"><span class="pre">perda[semantic]</span></code> extra was not requested).
+Any download or filesystem error is caught and printed; the function
+returns False so callers fall back to keyword-only search.</p>
 </dd></dl>
 
 <dl class="py function">
@@ -515,23 +523,6 @@ prefixes, substrings, and minor typos naturally.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="perda.utils.search.print_result">
-<span class="sig-prename descclassname"><span class="pre">perda.utils.search.</span></span><span class="sig-name descname"><span class="pre">print_result</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entry</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">score</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/utils/search.html#print_result"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.utils.search.print_result" title="Link to this definition">#</a></dt>
-<dd><p>Print a single ranked search result.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>entry</strong> (<a class="reference internal" href="#perda.utils.search.SearchEntry" title="perda.utils.search.SearchEntry"><em>SearchEntry</em></a>) – The search entry to display.</p></li>
-<li><p><strong>score</strong> (<em>float</em>) – Combined relevance score.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
 <dt class="sig sig-object py" id="perda.utils.search.search">
 <span class="sig-prename descclassname"><span class="pre">perda.utils.search.</span></span><span class="sig-name descname"><span class="pre">search</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/utils/search.html#search"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.utils.search.search" title="Link to this definition">#</a></dt>
 <dd><p>Search telemetry variables and print the top matches.</p>
@@ -547,9 +538,12 @@ prefixes, substrings, and minor typos naturally.</p>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
-<p>Results are ranked by weighted blend of cross-encoder semantic score and rapidfuzz keyword score.
-Each variable is represented by a search card combining its expanded C++ identifier tokens with its description.</p>
-<p>Short queries lean on keyword matching, longer queries lean on semantic ranking.</p>
+<p>When <code class="docutils literal notranslate"><span class="pre">perda[semantic]</span></code> is installed and the cross-encoder model loads
+successfully, results are ranked by a weighted blend of semantic score and
+rapidfuzz keyword score. Otherwise falls back to keyword-only scoring with
+no error raised.</p>
+<p>Short queries lean on keyword matching; longer queries lean on semantic
+ranking when the model is available.</p>
 </dd></dl>
 
 </section>
@@ -605,7 +599,6 @@ Each variable is represented by a search card combining its expanded C++ identif
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.utils.search.install_encoder"><code class="docutils literal notranslate"><span class="pre">install_encoder()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.utils.search.keyword_score"><code class="docutils literal notranslate"><span class="pre">keyword_score()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.utils.search.preprocess_query"><code class="docutils literal notranslate"><span class="pre">preprocess_query()</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.utils.search.print_result"><code class="docutils literal notranslate"><span class="pre">print_result()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.utils.search.search"><code class="docutils literal notranslate"><span class="pre">search()</span></code></a></li>
 </ul>
   </nav></div>
