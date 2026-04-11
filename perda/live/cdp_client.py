@@ -234,11 +234,11 @@ class CDPClient:
         Returns:
             The requested value as float, bool, or int
         """
-        self._check_connected()
+        sock, addr = self._check_connected()
         packet = self._build_request_packet(access_string, value_type, mode="get")
         try:
-            self.socket.sendto(packet, self.server_addr)
-            response, _ = self.socket.recvfrom(1024)
+            sock.sendto(packet, addr)
+            response, _ = sock.recvfrom(1024)
             return self._parse_get_response(response, value_type)
         except socket.timeout:
             raise CDPException("Request timed out")
@@ -268,7 +268,7 @@ class CDPClient:
         """
         from perda.analyzer import DataInstance
 
-        self._check_connected()
+        sock, addr = self._check_connected()
 
         if not (0 < time_secs < 2**32):
             raise CDPException("time_secs must be a positive u32 value")
@@ -278,12 +278,12 @@ class CDPClient:
         )
 
         try:
-            self.socket.sendto(packet, self.server_addr)
+            sock.sendto(packet, addr)
         except Exception as e:
             raise CDPException(f"Failed to send ranged request: {e}")
 
         # Switch to range_timeout for collection phase
-        self.socket.settimeout(self.range_timeout)
+        sock.settimeout(self.range_timeout)
 
         packets: list[_RangedPacket] = []
         storage_interval: Optional[int] = None
@@ -294,7 +294,7 @@ class CDPClient:
         try:
             while True:
                 try:
-                    response, _ = self.socket.recvfrom(65535)
+                    response, _ = sock.recvfrom(65535)
                 except socket.timeout:
                     logger.warning(
                         "get_range timed out waiting for packets; "
@@ -339,7 +339,7 @@ class CDPClient:
 
         finally:
             # Restore normal timeout
-            self.socket.settimeout(self.timeout)
+            sock.settimeout(self.timeout)
 
         if not packets:
             raise CDPException("No ranged response packets received")
@@ -371,13 +371,13 @@ class CDPClient:
             value:         The value to set
             value_type:    Type of the value
         """
-        self._check_connected()
+        sock, addr = self._check_connected()
         packet = self._build_request_packet(
             access_string, value_type, mode="set", value=float(value)
         )
         try:
-            self.socket.sendto(packet, self.server_addr)
-            response, _ = self.socket.recvfrom(1024)
+            sock.sendto(packet, addr)
+            response, _ = sock.recvfrom(1024)
             self._parse_set_response(response)
         except socket.timeout:
             raise CDPException("Request timed out")
@@ -388,9 +388,10 @@ class CDPClient:
     # Internal helpers
     # ------------------------------------------------------------------
 
-    def _check_connected(self) -> None:
+    def _check_connected(self) -> Tuple[socket.socket, Tuple[str, int]]:
         if not self.socket or not self.server_addr:
             raise CDPException("Not connected to server")
+        return self.socket, self.server_addr
 
     def _build_request_packet(
         self,
