@@ -7,5 +7,9 @@ pydantic
 rapidfuzz
 scipy
 
+# Server Access
+boto3
+requests
+
 # Progress Bar
 tqdm
