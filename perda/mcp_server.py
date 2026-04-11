@@ -16,7 +16,20 @@ else:
     FASTMCP_IMPORT_ERROR = None
 
 from perda.analyzer import Analyzer
+from perda.analyzer.concat import concat
 from perda.core_data_structures.data_instance import DataInstance
+from perda.core_data_structures.data_instance import left_join_data_instances
+from perda.plotting.parametric_plot import (
+    plot_parametric_curve,
+    plot_parametric_curve_square,
+)
+from perda.utils.data_summary import data_instance_summary
+from perda.utils.integrate import (
+    average_over_time_range,
+    get_data_slice_by_timestamp,
+    integrate_over_time_range,
+    smoothed_filtered_integration,
+)
 
 
 _analyzers: dict[str, Analyzer] = {}
@@ -515,6 +528,350 @@ def get_log_metadata(session_id: str) -> str:
         }
         return json.dumps(payload, default=_json_default)
     except KeyError as exc:
+        return _format_error(exc)
+
+
+@mcp.tool()
+def integrate_variable(
+    session_id: str,
+    var_name: str,
+    start_time: int = 0,
+    end_time: int = -1,
+) -> str:
+    """Integrate a variable over a raw timestamp range.
+
+    Parameters
+    ----------
+    session_id : str
+        Client-chosen session identifier.
+    var_name : str
+        Variable C++ name.
+    start_time : int, optional
+        Inclusive start timestamp in raw log units.
+    end_time : int, optional
+        Inclusive end timestamp in raw log units. `-1` means end of data.
+
+    Returns
+    -------
+    str
+        JSON string containing the integral and requested bounds.
+    """
+    try:
+        analyzer = _get_analyzer(session_id)
+        di = analyzer.data[var_name]
+        payload = {
+            "integral": integrate_over_time_range(
+                di,
+                start_time,
+                end_time,
+                source_time_unit=analyzer.data.timestamp_unit,
+            ),
+            "var_name": var_name,
+            "start_time": start_time,
+            "end_time": end_time,
+        }
+        return json.dumps(payload, default=_json_default)
+    except Exception as exc:
+        return _format_error(exc)
+
+
+@mcp.tool()
+def average_variable(
+    session_id: str,
+    var_name: str,
+    start_time: int = 0,
+    end_time: int = -1,
+) -> str:
+    """Average a variable over a raw timestamp range.
+
+    Parameters
+    ----------
+    session_id : str
+        Client-chosen session identifier.
+    var_name : str
+        Variable C++ name.
+    start_time : int, optional
+        Inclusive start timestamp in raw log units.
+    end_time : int, optional
+        Inclusive end timestamp in raw log units. `-1` means end of data.
+
+    Returns
+    -------
+    str
+        JSON string containing the average and requested bounds.
+    """
+    try:
+        analyzer = _get_analyzer(session_id)
+        di = analyzer.data[var_name]
+        payload = {
+            "average": average_over_time_range(
+                di,
+                start_time,
+                end_time,
+                source_time_unit=analyzer.data.timestamp_unit,
+            ),
+            "var_name": var_name,
+            "start_time": start_time,
+            "end_time": end_time,
+        }
+        return json.dumps(payload, default=_json_default)
+    except Exception as exc:
+        return _format_error(exc)
+
+
+@mcp.tool()
+def get_data_slice(
+    session_id: str,
+    var_name: str,
+    start_time: int = 0,
+    end_time: int = -1,
+) -> str:
+    """Return a timestamp slice of a variable as JSON.
+
+    Parameters
+    ----------
+    session_id : str
+        Client-chosen session identifier.
+    var_name : str
+        Variable C++ name.
+    start_time : int, optional
+        Inclusive start timestamp in raw log units.
+    end_time : int, optional
+        Exclusive end timestamp in raw log units. `-1` means end of data.
+
+    Returns
+    -------
+    str
+        JSON string containing timestamps, values, and point count.
+    """
+    try:
+        di = _get_data_instance(session_id, var_name)
+        sliced = get_data_slice_by_timestamp(di, start_time, end_time)
+        keep = _downsample_indices(len(sliced), 1000)
+        payload = {
+            "timestamps": sliced.timestamp_np[keep].tolist(),
+            "values": sliced.value_np[keep].tolist(),
+            "n_points": len(sliced),
+        }
+        return json.dumps(payload, default=_json_default)
+    except Exception as exc:
+        return _format_error(exc)
+
+
+@mcp.tool()
+def integrate_and_smooth(session_id: str, var_name: str) -> str:
+    """Integrate a variable after filtering and smoothing.
+
+    Parameters
+    ----------
+    session_id : str
+        Client-chosen session identifier.
+    var_name : str
+        Variable C++ name.
+
+    Returns
+    -------
+    str
+        JSON string containing summary statistics for the integrated series.
+    """
+    try:
+        analyzer = _get_analyzer(session_id)
+        di = analyzer.data[var_name]
+        timestamps, _, integrated = smoothed_filtered_integration(
+            di,
+            source_time_unit=analyzer.data.timestamp_unit,
+        )
+        n_points = int(len(timestamps))
+        payload = {
+            "n_points": n_points,
+            "first_timestamp": float(timestamps[0]) if n_points else 0.0,
+            "last_timestamp": float(timestamps[-1]) if n_points else 0.0,
+            "final_integral": float(integrated[-1]) if n_points else 0.0,
+        }
+        return json.dumps(payload, default=_json_default)
+    except Exception as exc:
+        return _format_error(exc)
+
+
+@mcp.tool()
+def get_variable_detail_summary(session_id: str, var_name: str) -> str:
+    """Return the detailed printed summary for a variable.
+
+    Parameters
+    ----------
+    session_id : str
+        Client-chosen session identifier.
+    var_name : str
+        Variable C++ name.
+
+    Returns
+    -------
+    str
+        Captured stdout from `data_instance_summary`.
+    """
+    try:
+        analyzer = _get_analyzer(session_id)
+        di = analyzer.data[var_name]
+        buffer = io.StringIO()
+        with contextlib.redirect_stdout(buffer):
+            data_instance_summary(di, source_time_unit=analyzer.data.timestamp_unit)
+        return buffer.getvalue().strip()
+    except Exception as exc:
+        return _format_error(exc)
+
+
+@mcp.tool()
+def plot_parametric(
+    session_id: str,
+    var_x: str,
+    var_y: str,
+    title: str | None = None,
+    square_axes: bool = False,
+) -> str:
+    """Plot one variable against another as a parametric curve.
+
+    Parameters
+    ----------
+    session_id : str
+        Client-chosen session identifier.
+    var_x : str
+        Variable plotted on the x-axis.
+    var_y : str
+        Variable plotted on the y-axis.
+    title : str | None, optional
+        Optional figure title.
+    square_axes : bool, optional
+        Whether to force equal axis scaling.
+
+    Returns
+    -------
+    str
+        Plotly figure serialized with `Figure.to_json()`.
+    """
+    try:
+        analyzer = _get_analyzer(session_id)
+        x_di = analyzer.data[var_x]
+        y_di = analyzer.data[var_y]
+        if square_axes:
+            fig = plot_parametric_curve_square(
+                x=x_di.value_np,
+                y=y_di.value_np,
+                x_label=var_x,
+                y_label=var_y,
+                title=title,
+            )
+        else:
+            fig = plot_parametric_curve(
+                x=x_di.value_np,
+                y=y_di.value_np,
+                x_label=var_x,
+                y_label=var_y,
+                title=title,
+            )
+        return fig.to_json()
+    except Exception as exc:
+        return _format_error(exc)
+
+
+@mcp.tool()
+def diff_sessions(session_id_a: str, session_id_b: str) -> str:
+    """Plot the difference between two loaded sessions.
+
+    Parameters
+    ----------
+    session_id_a : str
+        Baseline session identifier.
+    session_id_b : str
+        Session identifier to compare against the baseline.
+
+    Returns
+    -------
+    str
+        Plotly figure serialized with `Figure.to_json()`.
+    """
+    try:
+        analyzer_a = _get_analyzer(session_id_a)
+        analyzer_b = _get_analyzer(session_id_b)
+        fig = analyzer_a.diff(server_data=analyzer_b.data)
+        return fig.to_json()
+    except Exception as exc:
+        return _format_error(exc)
+
+
+@mcp.tool()
+def concat_logs(
+    session_id_a: str,
+    session_id_b: str,
+    output_session_id: str,
+    gap: int = 1,
+) -> str:
+    """Concatenate two loaded sessions into a new session.
+
+    Parameters
+    ----------
+    session_id_a : str
+        First session identifier.
+    session_id_b : str
+        Second session identifier.
+    output_session_id : str
+        Session identifier for the merged analyzer.
+    gap : int, optional
+        Gap between sessions in raw timestamp units.
+
+    Returns
+    -------
+    str
+        Analyzer summary for the merged session.
+    """
+    try:
+        analyzer_a = _get_analyzer(session_id_a)
+        analyzer_b = _get_analyzer(session_id_b)
+        merged = concat(analyzer_a, analyzer_b, gap=gap)
+        _analyzers[output_session_id] = merged
+        return str(merged)
+    except Exception as exc:
+        return _format_error(exc)
+
+
+@mcp.tool()
+def plot_gps(
+    session_id: str,
+    lat_var: str,
+    lon_var: str,
+    title: str | None = None,
+) -> str:
+    """Plot latitude and longitude as a square parametric curve.
+
+    Parameters
+    ----------
+    session_id : str
+        Client-chosen session identifier.
+    lat_var : str
+        Latitude variable C++ name.
+    lon_var : str
+        Longitude variable C++ name.
+    title : str | None, optional
+        Optional figure title.
+
+    Returns
+    -------
+    str
+        Plotly figure serialized with `Figure.to_json()`.
+    """
+    try:
+        analyzer = _get_analyzer(session_id)
+        lat_di = analyzer.data[lat_var]
+        lon_di = analyzer.data[lon_var]
+        lat_aligned, lon_aligned = left_join_data_instances(lat_di, lon_di)
+        fig = plot_parametric_curve_square(
+            x=lon_aligned.value_np,
+            y=lat_aligned.value_np,
+            x_label="Longitude",
+            y_label="Latitude",
+            title=title,
+        )
+        return fig.to_json()
+    except Exception as exc:
         return _format_error(exc)
 
 
