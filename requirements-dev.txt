@@ -1,0 +1,9 @@
+# Full editable install with all optional extras
+-e .[full]
+
+# Development tooling
+pre-commit
+black
+black[jupyter]
+isort
+mypy
