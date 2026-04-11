@@ -4,6 +4,7 @@ from typing import List
 
 import boto3
 import requests
+from tqdm import tqdm
 
 from ..analyzer.analyzer import Analyzer
 from ..constants import DELIMITER
@@ -111,7 +112,7 @@ class ServerClient:
             )
         return entries
 
-    def download(self, log_key: str) -> str:
+    def _download(self, log_key: str) -> str:
         """Download a log CSV from S3.
 
         Parameters
@@ -130,7 +131,7 @@ class ServerClient:
             if cached_path.exists():
                 return str(cached_path)
 
-        # Download from S3
+        # Download from S3 with progress bar
         creds = self._get_s3_credentials()
         s3 = boto3.client(
             "s3",
@@ -149,7 +150,16 @@ class ServerClient:
             tmp.close()
             dest = Path(tmp.name)
 
-        s3.download_file(creds.bucket_name, log_key, str(dest))
+        head = s3.head_object(Bucket=creds.bucket_name, Key=log_key)
+        total_bytes = head["ContentLength"]
+        filename = log_key.rsplit("/", 1)[-1]
+
+        with tqdm(
+            total=total_bytes, unit="B", unit_scale=True, desc=f"Downloading {filename}"
+        ) as pbar:
+            s3.download_file(
+                creds.bucket_name, log_key, str(dest), Callback=pbar.update
+            )
         return str(dest)
 
     def load(
@@ -179,7 +189,7 @@ class ServerClient:
         >>> aly = client.load("REV 11/2026-04-01/test.csv")
         >>> print(aly)
         """
-        local_path = self.download(log_key)
+        local_path = self._download(log_key)
         return Analyzer(
             local_path,
             ts_offset=ts_offset,

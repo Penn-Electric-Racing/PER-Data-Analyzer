@@ -37,7 +37,7 @@ class LogEntry(BaseModel):
         if self.is_folder:
             return f"[DIR]  {self.name}/"
 
-        parts = [f"       {self.name}"]
+        parts = [f"[FILE] {self.name}"]
         if self.title:
             parts.append(f'  title: "{self.title}"')
         if self.tags:
@@ -54,7 +54,7 @@ class LogEntry(BaseModel):
             for k, v in self.string_metadata.items():
                 parts.append(f"  {k}: {v}")
         if self.numeric_metadata:
-            for k, v in self.numeric_metadata.items():
-                parts.append(f"  {k}: {v}")
+            for nk, nv in self.numeric_metadata.items():
+                parts.append(f"  {nk}: {nv}")
 
         return "\n".join(parts)
