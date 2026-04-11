@@ -3,15 +3,21 @@ from pathlib import Path
 
 from pydantic import BaseModel
 from rapidfuzz import fuzz
-from sentence_transformers.cross_encoder import CrossEncoder
 
 from ..constants import DELIMITER, title_block
 from ..core_data_structures.single_run_data import SingleRunData
 
+try:
+    from sentence_transformers.cross_encoder import CrossEncoder as _CrossEncoder
+
+    _SEMANTIC_AVAILABLE: bool = True
+except ImportError:
+    _SEMANTIC_AVAILABLE = False
+
 _MODEL_DIR = Path(__file__).resolve().parents[1] / "models" / "stsb-cross-encoder"
 _HF_MODEL_ID = "cross-encoder/stsb-distilroberta-base"
 
-_model: CrossEncoder | None = None  # global variable to hold the loaded model instance
+_model: _CrossEncoder | None = None  # _CrossEncoder instance when loaded, else None
 
 ABBREVIATIONS: dict[str, str] = {
     "pcm": "powertrain control module",
@@ -48,17 +54,42 @@ class SearchEntry(BaseModel):
     card: str
 
 
-def install_encoder() -> None:
-    """Download and save the cross-encoder model for semantic search."""
+def install_encoder() -> bool:
+    """Download and save the cross-encoder model for semantic search.
+
+    Returns
+    -------
+    bool
+        True if the model loaded successfully, False otherwise.
+
+    Notes
+    -----
+    Returns False immediately if ``sentence-transformers`` is not installed
+    (i.e. ``perda[semantic]`` extra was not requested).
+    Any download or filesystem error is caught and printed; the function
+    returns False so callers fall back to keyword-only search.
+    """
     global _model
-    if not _MODEL_DIR.exists():
-        print("Downloading cross-encoder model (one-time setup)...")
-        _model = CrossEncoder(_HF_MODEL_ID)
-        _MODEL_DIR.parent.mkdir(parents=True, exist_ok=True)
-        _model.save(str(_MODEL_DIR))
-        print(f"Model saved to: {_MODEL_DIR}")
-    else:
-        _model = CrossEncoder(str(_MODEL_DIR))
+
+    if not _SEMANTIC_AVAILABLE:
+        return False
+
+    try:
+        if not _MODEL_DIR.exists():
+            print("Downloading cross-encoder model (one-time setup)...")
+            _model = _CrossEncoder(_HF_MODEL_ID)
+            _MODEL_DIR.parent.mkdir(parents=True, exist_ok=True)
+            _model.save(str(_MODEL_DIR))
+            print(f"Model saved to: {_MODEL_DIR}")
+        else:
+            _model = _CrossEncoder(str(_MODEL_DIR))
+        return True
+    except Exception as e:
+        print(
+            f"Warning: cross-encoder model unavailable ({e}). Falling back to keyword-only search."
+        )
+        _model = None
+        return False
 
 
 def search(data: SingleRunData, query: str) -> None:
@@ -73,15 +104,15 @@ def search(data: SingleRunData, query: str) -> None:
 
     Notes
     -----
-    Results are ranked by weighted blend of cross-encoder semantic score and rapidfuzz keyword score.
-    Each variable is represented by a search card combining its expanded C++ identifier tokens with its description.
+    When ``perda[semantic]`` is installed and the cross-encoder model loads
+    successfully, results are ranked by a weighted blend of semantic score and
+    rapidfuzz keyword score. Otherwise falls back to keyword-only scoring with
+    no error raised.
 
-    Short queries lean on keyword matching, longer queries lean on semantic ranking.
+    Short queries lean on keyword matching; longer queries lean on semantic
+    ranking when the model is available.
     """
-    install_encoder()
-
-    if not _model:
-        raise RuntimeError("Cross-encoder model failed to load.")
+    semantic_ready = install_encoder()
 
     query = query.strip()
     if not query:
@@ -91,39 +122,83 @@ def search(data: SingleRunData, query: str) -> None:
     if not keyword_query:
         raise ValueError("Search query must contain letters or numbers.")
 
-    semantic_query = preprocess_query(query)
-
     deck = build_search_deck(data)
-
-    # rank() returns dicts with "corpus_id" (index into deck) and "score"
-    semantic_scores = {
-        int(r["corpus_id"]): float(r["score"])
-        for r in _model.rank(semantic_query, [e.card for e in deck])
-    }
-
-    # Combine semantic and keyword scores
     num_terms = len(keyword_query)
-    ranked = sorted(
-        (
+
+    if semantic_ready and _model is not None:
+        semantic_query = preprocess_query(query)
+        # rank() returns dicts with "corpus_id" (index into deck) and "score"
+        semantic_scores = {
+            int(r["corpus_id"]): float(r["score"])
+            for r in _model.rank(semantic_query, [e.card for e in deck])
+        }
+        ranked = sorted(
             (
-                combine_scores(
-                    semantic_scores.get(idx, 0.0),
-                    keyword_score(keyword_query, entry),
-                    num_terms,
-                ),
-                idx,
-            )
-            for idx, entry in enumerate(deck)
-        ),
-        reverse=True,
+                (
+                    combine_scores(
+                        semantic_scores.get(idx, 0.0),
+                        keyword_score(keyword_query, entry),
+                        num_terms,
+                    ),
+                    idx,
+                )
+                for idx, entry in enumerate(deck)
+            ),
+            reverse=True,
+        )
+    else:
+        ranked = sorted(
+            (
+                (keyword_score(keyword_query, entry), idx)
+                for idx, entry in enumerate(deck)
+            ),
+            reverse=True,
+        )
+
+    _print_search_results(
+        query, [deck[idx] for _, idx in ranked[:10]], [s for s, _ in ranked[:10]]
     )
 
-    # Print top results
+
+def _print_search_results(
+    query: str, entries: list[SearchEntry], scores: list[float]
+) -> None:
+    """Print search results as a compact 4-column table.
+
+    Parameters
+    ----------
+    query : str
+        The original search query string.
+    entries : list[SearchEntry]
+        Ordered list of search entries to display.
+    scores : list[float]
+        Relevance scores corresponding to each entry.
+    """
+    col_score = 7
+    col_id = 4
+    col_name = 40
+    col_desc = 60
+
     print(title_block("Search Results"))
-    print("Query: ", query)
-    for score, idx in ranked[:10]:
-        print(DELIMITER)
-        print_result(deck[idx], score=score)
+    print(f"Query: {query}\n")
+    print(
+        f"{'Score':<{col_score}}  {'ID':<{col_id}}  {'C++ Name':<{col_name}}  {'Description':<{col_desc}}"
+    )
+    print(DELIMITER)
+    for entry, score in zip(entries, scores):
+        name = (
+            entry.cpp_name
+            if len(entry.cpp_name) <= col_name
+            else entry.cpp_name[: col_name - 1] + "…"
+        )
+        desc = (
+            entry.descript
+            if len(entry.descript) <= col_desc
+            else entry.descript[: col_desc - 1] + "…"
+        )
+        print(
+            f"{score:<{col_score}.2f}  {entry.var_id:<{col_id}}  {name:<{col_name}}  {desc:<{col_desc}}"
+        )
 
 
 def preprocess_query(query: str) -> str:
@@ -252,19 +327,3 @@ def combine_scores(
     kw_weight = max(0.3, 0.6 - 0.05 * (num_terms - 1))
     combined = kw_weight * keyword_score + (1 - kw_weight) * semantic_score
     return combined
-
-
-def print_result(entry: SearchEntry, score: float) -> None:
-    """Print a single ranked search result.
-
-    Parameters
-    ----------
-    entry : SearchEntry
-        The search entry to display.
-    score : float
-        Combined relevance score.
-    """
-    print(f"Score: {score:.2f}")
-    print(f"Variable ID: {entry.var_id}")
-    print(f"C++ Name: {entry.cpp_name}")
-    print(f"Description: {entry.descript}")

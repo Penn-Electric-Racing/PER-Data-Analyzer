@@ -199,7 +199,7 @@ def concat(
 
     Examples
     --------
-    >>> merged = Analyzer.concat(aly1, aly2)
+    >>> merged = concat(aly1, aly2)
     >>> merged.plot("ams.pack.voltage")
     """
     merged = object.__new__(Analyzer)

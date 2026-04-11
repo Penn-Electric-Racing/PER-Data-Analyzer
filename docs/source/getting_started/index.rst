@@ -53,8 +53,8 @@ in the commands below.
 	# For Mac/Linux:
 	source .venv/bin/activate
 
-	pip install -r requirements.txt
-	pip install -e .
+	pip install -r requirements-dev.txt
+
 	pre-commit install
 	nbstripout --install
 
@@ -103,10 +103,29 @@ library in external environments like Google Colab.
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 .. code-block:: bash
-	pip install git+https://github.com/Penn-Electric-Racing/PER-Data-Analyzer.git@main
+
+	pip install "perda[notebook] @ git+https://github.com/Penn-Electric-Racing/PER-Data-Analyzer.git@main"
 
 
 .. note::
 	You can embed the above command in a Google Colab notebook to automatically install when you run the notebook.
 	Append an exclamation mark and leave it in a normal code cell like below:
-	`!pip install git+https://github.com/Penn-Electric-Racing/PER-Data-Analyzer.git@main`
+
+	.. code-block:: python
+
+		!pip install "perda[notebook] @ git+https://github.com/Penn-Electric-Racing/PER-Data-Analyzer.git@main"
+
+
+2. Optional: Enable semantic search
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+The default installation supports keyword-based search. To also enable semantic (AI-powered) search,
+install the ``full`` extra instead. This pulls in ``sentence-transformers`` and its dependencies
+(including PyTorch), so expect a larger download.
+
+.. code-block:: python
+
+	!pip install "perda[full] @ git+https://github.com/Penn-Electric-Racing/PER-Data-Analyzer.git@main"
+
+When the semantic model is available, :func:`perda.utils.search.search` automatically uses it.
+If it is not installed, search falls back to keyword-only scoring with no error.
