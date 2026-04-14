@@ -1,2 +1,2 @@
 from .analyzer import *
-from .concat import concat
+from .concat_helpers import concat

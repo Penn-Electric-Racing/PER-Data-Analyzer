@@ -7,3 +7,4 @@ black
 black[jupyter]
 isort
 mypy
+pytest
