@@ -8,7 +8,8 @@ from ..core_data_structures.data_instance import DataInstance
 from ..core_data_structures.single_run_data import SingleRunData
 from ..plotting.data_instance_plotter import *
 from ..plotting.plotting_constants import *
-from ..units import Timescale
+from ..plotting.subplots import data_instance_subplots
+from ..units import Timescale, _from_seconds, _to_seconds
 from ..utils.accel_calculator import *
 from ..utils.data_summary import single_run_summary
 from ..utils.diff import diff
@@ -30,7 +31,7 @@ class Analyzer:
     Access by name or variable ID
     ------------------------------
     >>> di = aly.data["pcm.wheelSpeeds.frontRight"]   # by cpp_name
-    >>> di = aly.data[42]                              # by variable ID
+    >>> di = aly.data[42]                             # by variable ID
 
     Check membership
     ----------------
@@ -199,19 +200,17 @@ class Analyzer:
         # Normalize left input to List[DataInstance]
         var_1_norm = self._normalize_input(var_1)
 
-        # Divisor to convert raw timestamps to seconds (used for vlines and time range filter)
         unit = self.data.timestamp_unit
-        divisor = 1e6 if unit == Timescale.US else 1e3 if unit == Timescale.MS else 1.0
 
         # Convert concat boundaries to seconds for the plotter
         vlines: List[float] | None = None
         if self.data.concat_boundaries:
-            vlines = [b / divisor for b in self.data.concat_boundaries]
+            vlines = [_to_seconds(b, unit) for b in self.data.concat_boundaries]
 
         # Apply time range filter if specified (convert seconds → raw units for trim)
         if ts_start is not None or ts_end is not None:
-            start_raw = ts_start * divisor if ts_start is not None else None
-            end_raw = ts_end * divisor if ts_end is not None else None
+            start_raw = _from_seconds(ts_start, unit) if ts_start is not None else None
+            end_raw = _from_seconds(ts_end, unit) if ts_end is not None else None
             var_1_norm = [di.trim(start_raw, end_raw) for di in var_1_norm]
 
         if var_2 is not None:
@@ -245,6 +244,97 @@ class Analyzer:
                 vlines=vlines,
                 vline_config=vline_config,
             )
+
+    def subplots(
+        self,
+        rows: List[
+            Union[
+                str,
+                int,
+                DataInstance,
+                List[Union[str, int, DataInstance]],
+            ]
+        ],
+        title: str | None = None,
+        row_y_labels: List[str | None] | None = None,
+        ts_start: float | None = None,
+        ts_end: float | None = None,
+        show_legend: bool = True,
+        font_config: FontConfig = DEFAULT_FONT_CONFIG,
+        subplot_config: SubplotConfig = DEFAULT_SUBPLOT_CONFIG,
+    ) -> go.Figure:
+        """
+        Plot multiple variables as stacked subplots on a shared time axis.
+
+        Each entry in ``rows`` becomes one subplot row. Pass a list of
+        variables for a row to overlay multiple signals on the same panel,
+        or a single variable for a dedicated panel.
+
+        Parameters
+        ----------
+        rows : List[str | int | DataInstance | List[str | int | DataInstance]]
+            One entry per subplot row (top to bottom). Each entry may be a
+            single variable (name, ID, or DataInstance) or a list of variables
+            to overlay on that row.
+        title : str | None, optional
+            Figure-level title. Default is None.
+        row_y_labels : List[str | None] | None, optional
+            Y-axis label for each row. ``None`` entries fall back to the
+            DataInstance labels. Must match the length of ``rows`` when
+            provided. Default is None.
+        ts_start : float | None, optional
+            Start of the time window in seconds. Data before this time is
+            excluded from all rows. Default is None (no lower bound).
+        ts_end : float | None, optional
+            End of the time window in seconds. Data after this time is
+            excluded from all rows. Default is None (no upper bound).
+        show_legend : bool, optional
+            Whether to show the figure legend. Default is True.
+        font_config : FontConfig, optional
+            Font sizes for plot elements. Default is DEFAULT_FONT_CONFIG.
+        subplot_config : SubplotConfig, optional
+            Row height, spacing, width, and style. Default is DEFAULT_SUBPLOT_CONFIG.
+
+        Returns
+        -------
+        go.Figure
+
+        Examples
+        --------
+        >>> fig = aly.subplots(["pcm.wheelSpeeds.frontRight", "pcm.moc.motor.requestedTorque"])
+        >>> fig = aly.subplots(
+        ...     rows=[
+        ...         ["pcm.wheelSpeeds.frontRight", "pcm.wheelSpeeds.frontLeft"],
+        ...         "pcm.moc.motor.requestedTorque",
+        ...     ],
+        ...     title="Run Overview",
+        ...     row_y_labels=["Wheel Speed (mph)", "Torque (Nm)"],
+        ...     ts_start=5.0,
+        ...     ts_end=30.0,
+        ... )
+        >>> fig.show()
+        """
+        unit = self.data.timestamp_unit
+
+        start_raw = _from_seconds(ts_start, unit) if ts_start is not None else None
+        end_raw = _from_seconds(ts_end, unit) if ts_end is not None else None
+
+        normalized_rows: List[List[DataInstance]] = []
+        for row_entry in rows:
+            row_dis = self._normalize_input(row_entry)
+            if start_raw is not None or end_raw is not None:
+                row_dis = [di.trim(start_raw, end_raw) for di in row_dis]
+            normalized_rows.append(row_dis)
+
+        return data_instance_subplots(
+            rows=normalized_rows,
+            title=title,
+            row_y_labels=row_y_labels,
+            show_legend=show_legend,
+            font_config=font_config,
+            subplot_config=subplot_config,
+            timestamp_unit=unit,
+        )
 
     def diff(
         self,
