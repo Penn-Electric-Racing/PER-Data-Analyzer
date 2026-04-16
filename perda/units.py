@@ -88,26 +88,46 @@ def convert_time(
     return _from_seconds(_to_seconds(timestamp, source_time_unit), target_time_unit)
 
 
-def mph_seconds_to_meters(value: float | npt.NDArray) -> float | npt.NDArray:
-    """Convert a value in mph·s (e.g. integrated speed) to meters.
+def mph_to_m_per_s(value: float | npt.NDArray) -> float | npt.NDArray:
+    """Convert a speed value from miles per hour to meters per second.
 
     Parameters
     ----------
     value : float | NDArray
-        Value in mph·s, such as the result of integrating a speed signal
-        in mph over a time axis in seconds.
+        Speed in mph.
 
     Returns
     -------
     float | NDArray
-        Equivalent distance in meters.
+        Speed in m/s.
 
     Examples
     --------
-    >>> mph_seconds_to_meters(3600.0)
-    1609.34
+    >>> mph_to_m_per_s(1.0)
+    0.44704
     """
     return value / 3600 * 1609.34
+
+
+def in_to_m(value: float | npt.NDArray) -> float | npt.NDArray:
+    """Convert a length value from inches to meters.
+
+    Parameters
+    ----------
+    value : float | NDArray
+        Length in inches.
+
+    Returns
+    -------
+    float | NDArray
+        Length in meters.
+
+    Examples
+    --------
+    >>> in_to_m(1.0)
+    0.0254
+    """
+    return value * 0.0254
 
 
 # Consistency factor to convert MAD to an equivalent standard deviation estimate
