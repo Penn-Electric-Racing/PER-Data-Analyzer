@@ -300,6 +300,7 @@
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.frequency_analysis.html">perda.utils.frequency_analysis</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.gps_analysis.html">perda.utils.gps_analysis</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.integrate.html">perda.utils.integrate</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.utils.preprocessing.html">perda.utils.preprocessing</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.search.html">perda.utils.search</a></li>
 </ul>
 </details></li>
@@ -419,24 +420,45 @@
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="perda.units.mph_seconds_to_meters">
-<span class="sig-prename descclassname"><span class="pre">perda.units.</span></span><span class="sig-name descname"><span class="pre">mph_seconds_to_meters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/units.html#mph_seconds_to_meters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.units.mph_seconds_to_meters" title="Link to this definition">#</a></dt>
-<dd><p>Convert a value in mph·s (e.g. integrated speed) to meters.</p>
+<dt class="sig sig-object py" id="perda.units.in_to_m">
+<span class="sig-prename descclassname"><span class="pre">perda.units.</span></span><span class="sig-name descname"><span class="pre">in_to_m</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/units.html#in_to_m"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.units.in_to_m" title="Link to this definition">#</a></dt>
+<dd><p>Convert a length value from inches to meters.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>value</strong> (<em>float</em><em> | </em><em>NDArray</em>) – Value in mph·s, such as the result of integrating a speed signal
-in mph over a time axis in seconds.</p>
+<dd class="field-odd"><p><strong>value</strong> (<em>float</em><em> | </em><em>NDArray</em>) – Length in inches.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Equivalent distance in meters.</p>
+<dd class="field-even"><p>Length in meters.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>float | NDArray</p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mph_seconds_to_meters</span><span class="p">(</span><span class="mf">3600.0</span><span class="p">)</span>
-<span class="go">1609.34</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">in_to_m</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
+<span class="go">0.0254</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="perda.units.mph_to_m_per_s">
+<span class="sig-prename descclassname"><span class="pre">perda.units.</span></span><span class="sig-name descname"><span class="pre">mph_to_m_per_s</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/units.html#mph_to_m_per_s"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.units.mph_to_m_per_s" title="Link to this definition">#</a></dt>
+<dd><p>Convert a speed value from miles per hour to meters per second.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>value</strong> (<em>float</em><em> | </em><em>NDArray</em>) – Speed in mph.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Speed in m/s.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float | NDArray</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mph_to_m_per_s</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
+<span class="go">0.44704</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -497,7 +519,8 @@ in mph over a time axis in seconds.</p>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.units.convert_time"><code class="docutils literal notranslate"><span class="pre">convert_time()</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.units.mph_seconds_to_meters"><code class="docutils literal notranslate"><span class="pre">mph_seconds_to_meters()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.units.in_to_m"><code class="docutils literal notranslate"><span class="pre">in_to_m()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.units.mph_to_m_per_s"><code class="docutils literal notranslate"><span class="pre">mph_to_m_per_s()</span></code></a></li>
 </ul>
   </nav></div>
 

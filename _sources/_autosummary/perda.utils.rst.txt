@@ -19,4 +19,5 @@ perda.utils
    frequency_analysis
    gps_analysis
    integrate
+   preprocessing
    search

@@ -399,28 +399,51 @@
 
 
 
-<div class="viewcode-block" id="mph_seconds_to_meters">
-<a class="viewcode-back" href="../../_autosummary/perda.units.html#perda.units.mph_seconds_to_meters">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">mph_seconds_to_meters</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert a value in mph·s (e.g. integrated speed) to meters.</span>
+<div class="viewcode-block" id="mph_to_m_per_s">
+<a class="viewcode-back" href="../../_autosummary/perda.units.html#perda.units.mph_to_m_per_s">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">mph_to_m_per_s</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert a speed value from miles per hour to meters per second.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    value : float | NDArray</span>
-<span class="sd">        Value in mph·s, such as the result of integrating a speed signal</span>
-<span class="sd">        in mph over a time axis in seconds.</span>
+<span class="sd">        Speed in mph.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    float | NDArray</span>
-<span class="sd">        Equivalent distance in meters.</span>
+<span class="sd">        Speed in m/s.</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
-<span class="sd">    &gt;&gt;&gt; mph_seconds_to_meters(3600.0)</span>
-<span class="sd">    1609.34</span>
+<span class="sd">    &gt;&gt;&gt; mph_to_m_per_s(1.0)</span>
+<span class="sd">    0.44704</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">value</span> <span class="o">/</span> <span class="mi">3600</span> <span class="o">*</span> <span class="mf">1609.34</span></div>
+
+
+
+<div class="viewcode-block" id="in_to_m">
+<a class="viewcode-back" href="../../_autosummary/perda.units.html#perda.units.in_to_m">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">in_to_m</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert a length value from inches to meters.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    value : float | NDArray</span>
+<span class="sd">        Length in inches.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    float | NDArray</span>
+<span class="sd">        Length in meters.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; in_to_m(1.0)</span>
+<span class="sd">    0.0254</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">value</span> <span class="o">*</span> <span class="mf">0.0254</span></div>
 
 
 

@@ -1,0 +1,597 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>perda.utils.preprocessing &#8212; PERDA</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../../_static/documentation_options.js?v=8d563738"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../_static/design-tabs.js?v=f930bc37"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/perda/utils/preprocessing';</script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">PERDA</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../getting_started/index.html">
+    Getting Started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../api/index.html">
+    Code Documentation
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../getting_started/index.html">
+    Getting Started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../api/index.html">
+    Code Documentation
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">perda.utils.preprocessing</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for perda.utils.preprocessing</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">..core_data_structures.data_instance</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataInstance</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..core_data_structures.single_run_data</span><span class="w"> </span><span class="kn">import</span> <span class="n">SingleRunData</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..units</span><span class="w"> </span><span class="kn">import</span> <span class="n">in_to_m</span><span class="p">,</span> <span class="n">mph_to_m_per_s</span>
+
+<span class="n">GEAR_RATIO</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">5.6</span>
+<span class="n">TIRE_RADIUS_IN</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">7.85</span>
+
+
+<span class="n">_VEL_X</span> <span class="o">=</span> <span class="s2">&quot;pcm.vnav.velocityBody.x&quot;</span>
+<span class="n">_VEL_Y</span> <span class="o">=</span> <span class="s2">&quot;pcm.vnav.velocityBody.y&quot;</span>
+<span class="n">_VEL_Z</span> <span class="o">=</span> <span class="s2">&quot;pcm.vnav.velocityBody.z&quot;</span>
+<span class="n">_YAW</span> <span class="o">=</span> <span class="s2">&quot;pcm.vnav.yawPitchRoll.yaw&quot;</span>
+
+<span class="n">_WS_FR</span> <span class="o">=</span> <span class="s2">&quot;pcm.wheelSpeeds.frontRight&quot;</span>
+<span class="n">_WS_FL</span> <span class="o">=</span> <span class="s2">&quot;pcm.wheelSpeeds.frontLeft&quot;</span>
+<span class="n">_WS_RR</span> <span class="o">=</span> <span class="s2">&quot;pcm.wheelSpeeds.rearRight&quot;</span>
+<span class="n">_WS_RL</span> <span class="o">=</span> <span class="s2">&quot;pcm.wheelSpeeds.rearLeft&quot;</span>
+
+<span class="n">_MOTOR_RPM</span> <span class="o">=</span> <span class="s2">&quot;pcm.moc.motor.angularSpeed&quot;</span>
+<span class="n">_MOTOR_WS</span> <span class="o">=</span> <span class="s2">&quot;pcm.moc.motor.wheelSpeed&quot;</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_replace</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">SingleRunData</span><span class="p">,</span> <span class="n">cpp_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">new_values</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Overwrite the value_np of an existing DataInstance in-place (mutates dict).&quot;&quot;&quot;</span>
+    <span class="n">var_id</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">cpp_name_to_id</span><span class="p">[</span><span class="n">cpp_name</span><span class="p">]</span>
+    <span class="n">old</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">id_to_instance</span><span class="p">[</span><span class="n">var_id</span><span class="p">]</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">id_to_instance</span><span class="p">[</span><span class="n">var_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">DataInstance</span><span class="p">(</span>
+        <span class="n">timestamp_np</span><span class="o">=</span><span class="n">old</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">,</span>
+        <span class="n">value_np</span><span class="o">=</span><span class="n">new_values</span><span class="p">,</span>
+        <span class="n">label</span><span class="o">=</span><span class="n">old</span><span class="o">.</span><span class="n">label</span><span class="p">,</span>
+        <span class="n">var_id</span><span class="o">=</span><span class="n">old</span><span class="o">.</span><span class="n">var_id</span><span class="p">,</span>
+        <span class="n">cpp_name</span><span class="o">=</span><span class="n">old</span><span class="o">.</span><span class="n">cpp_name</span><span class="p">,</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_add</span><span class="p">(</span>
+    <span class="n">data</span><span class="p">:</span> <span class="n">SingleRunData</span><span class="p">,</span>
+    <span class="n">cpp_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">label</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">timestamp_np</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">value_np</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Insert a new derived DataInstance using a synthetic negative ID.&quot;&quot;&quot;</span>
+    <span class="n">synthetic_id</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">id_to_instance</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">di</span> <span class="o">=</span> <span class="n">DataInstance</span><span class="p">(</span>
+        <span class="n">timestamp_np</span><span class="o">=</span><span class="n">timestamp_np</span><span class="p">,</span>
+        <span class="n">value_np</span><span class="o">=</span><span class="n">value_np</span><span class="p">,</span>
+        <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span>
+        <span class="n">var_id</span><span class="o">=</span><span class="n">synthetic_id</span><span class="p">,</span>
+        <span class="n">cpp_name</span><span class="o">=</span><span class="n">cpp_name</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">id_to_instance</span><span class="p">[</span><span class="n">synthetic_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">di</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">cpp_name_to_id</span><span class="p">[</span><span class="n">cpp_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">synthetic_id</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">id_to_cpp_name</span><span class="p">[</span><span class="n">synthetic_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">cpp_name</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">id_to_descript</span><span class="p">[</span><span class="n">synthetic_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">label</span>
+
+
+<div class="viewcode-block" id="Preprocessing">
+<a class="viewcode-back" href="../../../_autosummary/perda.utils.preprocessing.html#perda.utils.preprocessing.Preprocessing">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Preprocessing</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">PATCH_NED_VELOCITY</span> <span class="o">=</span> <span class="s2">&quot;patch_ned_velocity&quot;</span>
+    <span class="n">WHEELSPEEDS_TO_M_PER_S</span> <span class="o">=</span> <span class="s2">&quot;wheelspeeds_to_m_per_s&quot;</span>
+    <span class="n">CORRECT_MOTOR_DATA</span> <span class="o">=</span> <span class="s2">&quot;correct_motor_data&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="patch_ned_velocity">
+<a class="viewcode-back" href="../../../_autosummary/perda.utils.preprocessing.html#perda.utils.preprocessing.patch_ned_velocity">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">patch_ned_velocity</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">SingleRunData</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SingleRunData</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Corrects a VectorNav configuration bug where velocityBody.x/y/z actually contains</span>
+<span class="sd">    NED (North/East/Down) velocities. Copies raw NED to velN/velE/velD, then rotates</span>
+<span class="sd">    into true body frame (FRD) using yaw. Includes sanity checks and ZOH duplicate warnings.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : SingleRunData</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    SingleRunData</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">required</span> <span class="o">=</span> <span class="p">[</span><span class="n">_VEL_X</span><span class="p">,</span> <span class="n">_VEL_Y</span><span class="p">,</span> <span class="n">_VEL_Z</span><span class="p">,</span> <span class="n">_YAW</span><span class="p">]</span>
+    <span class="n">missing</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">required</span> <span class="k">if</span> <span class="n">v</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">missing</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;WARNING: PATCH_NED_VELOCITY skipped — missing variables: </span><span class="si">{</span><span class="n">missing</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">data</span>
+
+    <span class="n">vel_n</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">_VEL_X</span><span class="p">]</span><span class="o">.</span><span class="n">value_np</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="n">vel_e</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">_VEL_Y</span><span class="p">]</span><span class="o">.</span><span class="n">value_np</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="n">vel_d</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">_VEL_Z</span><span class="p">]</span><span class="o">.</span><span class="n">value_np</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="n">yaw_rad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">_YAW</span><span class="p">]</span><span class="o">.</span><span class="n">value_np</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">))</span>
+
+    <span class="c1"># Preserve raw NED copies</span>
+    <span class="n">ts</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">_VEL_X</span><span class="p">]</span><span class="o">.</span><span class="n">timestamp_np</span>
+    <span class="n">_add</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="s2">&quot;velN&quot;</span><span class="p">,</span> <span class="s2">&quot;NED North velocity (raw)&quot;</span><span class="p">,</span> <span class="n">ts</span><span class="p">,</span> <span class="n">vel_n</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
+    <span class="n">_add</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="s2">&quot;velE&quot;</span><span class="p">,</span> <span class="s2">&quot;NED East velocity (raw)&quot;</span><span class="p">,</span> <span class="n">ts</span><span class="p">,</span> <span class="n">vel_e</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
+    <span class="n">_add</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="s2">&quot;velD&quot;</span><span class="p">,</span> <span class="s2">&quot;NED Down velocity (raw)&quot;</span><span class="p">,</span> <span class="n">ts</span><span class="p">,</span> <span class="n">vel_d</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
+
+    <span class="c1"># Rotate NED → body-frame (FRD) using yaw only</span>
+    <span class="n">cos_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">yaw_rad</span><span class="p">)</span>
+    <span class="n">sin_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">yaw_rad</span><span class="p">)</span>
+    <span class="n">_replace</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">_VEL_X</span><span class="p">,</span> <span class="n">vel_n</span> <span class="o">*</span> <span class="n">cos_y</span> <span class="o">+</span> <span class="n">vel_e</span> <span class="o">*</span> <span class="n">sin_y</span><span class="p">)</span>  <span class="c1"># forward</span>
+    <span class="n">_replace</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">_VEL_Y</span><span class="p">,</span> <span class="o">-</span><span class="n">vel_n</span> <span class="o">*</span> <span class="n">sin_y</span> <span class="o">+</span> <span class="n">vel_e</span> <span class="o">*</span> <span class="n">cos_y</span><span class="p">)</span>  <span class="c1"># right</span>
+    <span class="c1"># vel_z (down) identical in NED and FRD — no change needed</span>
+
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;PATCH_NED_VELOCITY: Preserved raw NED velocity in velN/velE/velD, rotated </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">vel_n</span><span class="p">)</span><span class="si">}</span><span class="s2"> points → body frame&quot;</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">data</span></div>
+
+
+
+<div class="viewcode-block" id="convert_wheelspeeds_to_m_per_s">
+<a class="viewcode-back" href="../../../_autosummary/perda.utils.preprocessing.html#perda.utils.preprocessing.convert_wheelspeeds_to_m_per_s">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">convert_wheelspeeds_to_m_per_s</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">SingleRunData</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SingleRunData</span><span class="p">:</span>
+    <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">_WS_FR</span><span class="p">,</span> <span class="n">_WS_FL</span><span class="p">,</span> <span class="n">_WS_RR</span><span class="p">,</span> <span class="n">_WS_RL</span><span class="p">]</span>
+    <span class="n">missing</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">cols</span> <span class="k">if</span> <span class="n">v</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">missing</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;WARNING: WHEELSPEEDS_TO_M_PER_S skipped — missing variables: </span><span class="si">{</span><span class="n">missing</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">data</span>
+
+    <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">cols</span><span class="p">:</span>
+        <span class="n">di</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">col</span><span class="p">]</span>
+        <span class="n">backup_name</span> <span class="o">=</span> <span class="n">col</span> <span class="o">+</span> <span class="s2">&quot;_mph&quot;</span>
+        <span class="k">if</span> <span class="n">backup_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+            <span class="n">_add</span><span class="p">(</span>
+                <span class="n">data</span><span class="p">,</span>
+                <span class="n">backup_name</span><span class="p">,</span>
+                <span class="p">(</span><span class="n">di</span><span class="o">.</span><span class="n">label</span> <span class="ow">or</span> <span class="n">col</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; (mph backup)&quot;</span><span class="p">,</span>
+                <span class="n">di</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">,</span>
+                <span class="n">di</span><span class="o">.</span><span class="n">value_np</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
+            <span class="p">)</span>
+        <span class="n">_replace</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="n">mph_to_m_per_s</span><span class="p">(</span><span class="n">di</span><span class="o">.</span><span class="n">value_np</span><span class="p">))</span>
+
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;WHEELSPEEDS_TO_M_PER_S: Converted </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span><span class="si">}</span><span class="s2"> wheel speed columns mph → m/s, backups in *_mph&quot;</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">data</span></div>
+
+
+
+<div class="viewcode-block" id="correct_motor_data">
+<a class="viewcode-back" href="../../../_autosummary/perda.utils.preprocessing.html#perda.utils.preprocessing.correct_motor_data">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">correct_motor_data</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">SingleRunData</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SingleRunData</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">_MOTOR_RPM</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;WARNING: CORRECT_MOTOR_DATA skipped — missing variable: </span><span class="si">{</span><span class="n">_MOTOR_RPM</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">data</span>
+
+    <span class="n">di</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">_MOTOR_RPM</span><span class="p">]</span>
+    <span class="n">raw_rpm</span> <span class="o">=</span> <span class="n">di</span><span class="o">.</span><span class="n">value_np</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+
+    <span class="n">backup_name</span> <span class="o">=</span> <span class="n">_MOTOR_RPM</span> <span class="o">+</span> <span class="s2">&quot;_raw&quot;</span>
+    <span class="k">if</span> <span class="n">backup_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+        <span class="n">_add</span><span class="p">(</span>
+            <span class="n">data</span><span class="p">,</span>
+            <span class="n">backup_name</span><span class="p">,</span>
+            <span class="s2">&quot;Motor RPM raw (pre-flip)&quot;</span><span class="p">,</span>
+            <span class="n">di</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">,</span>
+            <span class="n">raw_rpm</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
+        <span class="p">)</span>
+
+    <span class="n">flipped</span> <span class="o">=</span> <span class="o">-</span><span class="n">raw_rpm</span>
+    <span class="n">_replace</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">_MOTOR_RPM</span><span class="p">,</span> <span class="n">flipped</span><span class="p">)</span>
+
+    <span class="n">tire_radius_m</span> <span class="o">=</span> <span class="n">in_to_m</span><span class="p">(</span><span class="n">TIRE_RADIUS_IN</span><span class="p">)</span>
+    <span class="n">wheel_speed</span> <span class="o">=</span> <span class="n">flipped</span> <span class="o">*</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">tire_radius_m</span> <span class="o">/</span> <span class="p">(</span><span class="mf">60.0</span> <span class="o">*</span> <span class="n">GEAR_RATIO</span><span class="p">)</span>
+    <span class="n">_add</span><span class="p">(</span>
+        <span class="n">data</span><span class="p">,</span>
+        <span class="n">_MOTOR_WS</span><span class="p">,</span>
+        <span class="s2">&quot;Driven wheel speed from motor RPM (m/s)&quot;</span><span class="p">,</span>
+        <span class="n">di</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">,</span>
+        <span class="n">wheel_speed</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;CORRECT_MOTOR_DATA: Flipped </span><span class="si">{</span><span class="n">_MOTOR_RPM</span><span class="si">}</span><span class="s2"> sign, added </span><span class="si">{</span><span class="n">_MOTOR_WS</span><span class="si">}</span><span class="s2"> &quot;</span>
+        <span class="sa">f</span><span class="s2">&quot;(ratio=</span><span class="si">{</span><span class="n">GEAR_RATIO</span><span class="si">}</span><span class="s2">, r=</span><span class="si">{</span><span class="n">TIRE_RADIUS_IN</span><span class="si">}</span><span class="s2"> in)&quot;</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">data</span></div>
+
+
+
+<span class="n">_PIPELINE</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Preprocessing</span><span class="p">,</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">SingleRunData</span><span class="p">],</span> <span class="n">SingleRunData</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">Preprocessing</span><span class="o">.</span><span class="n">PATCH_NED_VELOCITY</span><span class="p">:</span> <span class="n">patch_ned_velocity</span><span class="p">,</span>
+    <span class="n">Preprocessing</span><span class="o">.</span><span class="n">WHEELSPEEDS_TO_M_PER_S</span><span class="p">:</span> <span class="n">convert_wheelspeeds_to_m_per_s</span><span class="p">,</span>
+    <span class="n">Preprocessing</span><span class="o">.</span><span class="n">CORRECT_MOTOR_DATA</span><span class="p">:</span> <span class="n">correct_motor_data</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="apply_preprocessing">
+<a class="viewcode-back" href="../../../_autosummary/perda.utils.preprocessing.html#perda.utils.preprocessing.apply_preprocessing">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">apply_preprocessing</span><span class="p">(</span>
+    <span class="n">data</span><span class="p">:</span> <span class="n">SingleRunData</span><span class="p">,</span>
+    <span class="n">corrections</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Preprocessing</span><span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SingleRunData</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Run a sequence of preprocessing steps on a parsed SingleRunData instance.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : SingleRunData</span>
+<span class="sd">        Parsed run data to preprocess.</span>
+<span class="sd">    corrections : list[Preprocessing]</span>
+<span class="sd">        Ordered list of preprocessing steps to apply.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    SingleRunData</span>
+<span class="sd">        The same object, modified in-place and returned for chaining.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">correction</span> <span class="ow">in</span> <span class="n">corrections</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">_PIPELINE</span><span class="p">[</span><span class="n">correction</span><span class="p">](</span><span class="n">data</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">data</span></div>
+
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2025, Penn Electric Racing.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

@@ -1,0 +1,8 @@
+perda.utils.preprocessing
+=========================
+
+.. automodule:: perda.utils.preprocessing
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
