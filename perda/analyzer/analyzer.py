@@ -15,12 +15,50 @@ from ..utils.diff import diff
 from ..utils.frequency_analysis import analyze_frequency as _analyze_frequency
 from ..utils.integrate import smoothed_filtered_integration
 from ..utils.preprocessing import Preprocessing, apply_preprocessing
-from ..utils.search import search
+from ..utils.search import SearchResult, search
 from .csv import *
 
 
 class Analyzer:
-    """Primary class for loading and analyzing car log data."""
+    """Primary class for loading and analyzing car log data.
+
+    After loading, all variables live in ``analyzer.data`` (a
+    :class:`~perda.core_data_structures.SingleRunData`), which supports
+    dictionary-like access returning :class:`~perda.core_data_structures.DataInstance`
+    objects.
+
+    Access by name or variable ID
+    ------------------------------
+    >>> di = aly.data["pcm.wheelSpeeds.frontRight"]   # by cpp_name
+    >>> di = aly.data[42]                              # by variable ID
+
+    Check membership
+    ----------------
+    >>> "pcm.wheelSpeeds.frontRight" in aly.data       # True / False
+
+    Read raw arrays
+    ---------------
+    >>> di.timestamp_np   # NDArray[int64] — timestamps in the log's native unit
+    >>> di.value_np       # NDArray[float64] — sample values
+
+    Arithmetic between variables
+    ----------------------------
+    >>> avg_speed = (aly.data["pcm.wheelSpeeds.frontRight"] + aly.data["pcm.wheelSpeeds.frontLeft"]) / 2.0
+
+    Trim to a time window (timestamps in the log's native unit)
+    ------------------------------------------------------------
+    >>> di_trimmed = aly.data["pcm.wheelSpeeds.frontRight"].trim(ts_start=10_000, ts_end=30_000)
+
+    Find variables when you don't know the exact name
+    --------------------------------------------------
+    >>> results = aly.search("front wheel speed")   # prints + returns list[SearchResult]
+    >>> di = aly.data[results[0].cpp_name]
+
+    Enumerate all variables with summary stats
+    ------------------------------------------
+    >>> summaries = aly.variable_summary()          # list[VariableSummary], sorted by name
+    >>> [v.cpp_name for v in summaries]
+    """
 
     def __init__(
         self,
@@ -75,20 +113,30 @@ class Analyzer:
 
         return output
 
-    def search(self, query: str) -> None:
+    def search(self, query: str) -> list[SearchResult]:
         """
         Natural language search for available variables in the parsed data.
+
+        Prints matching results to stdout and returns them for programmatic use.
 
         Parameters
         ----------
         query : str
-            Search query
+            Free-text search query (e.g. "front wheel speed").
+
+        Returns
+        -------
+        list[SearchResult]
+            Top matches in descending relevance order (at most 10 entries).
+            Each entry has ``rank``, ``score``, ``var_id``, ``cpp_name``,
+            and ``descript``.
 
         Examples
         --------
-        >>> aly.search("front wheel speed")
+        >>> results = aly.search("front wheel speed")
+        >>> names = [r.cpp_name for r in results]
         """
-        search(self.data, query)
+        return search(self.data, query)
 
     def plot(
         self,
@@ -140,6 +188,9 @@ class Analyzer:
         >>> fig = aly.plot("pcm.wheelSpeeds.frontRight")
         >>> fig = aly.plot(["pcm.wheelSpeeds.frontRight", "pcm.wheelSpeeds.frontLeft"], title="Front Wheel Speeds")
         >>> fig = aly.plot("pcm.moc.motor.requestedTorque", "pcm.wheelSpeeds.frontRight", ts_start=10.0, ts_end=30.0)
+        >>> # Plot a derived DataInstance (e.g. average of two signals)
+        >>> avg_speed = (aly.data["pcm.wheelSpeeds.frontRight"] + aly.data["pcm.wheelSpeeds.frontLeft"]) / 2.0
+        >>> fig = aly.plot(avg_speed)
         >>> fig.show()
         """
         # Normalize left input to List[DataInstance]
@@ -296,7 +347,8 @@ class Analyzer:
 
     def get_accel_times(self) -> list[AccelSegmentResult]:
         """
-        Get acceleration times from the analyzer.
+        Intelligently detect and extract segments of the log where an
+        acceleration run occurs, then compute acceleration times.
 
         Returns
         -------

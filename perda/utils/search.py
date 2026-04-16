@@ -56,6 +56,30 @@ class SearchEntry(BaseModel):
     card: str
 
 
+class SearchResult(BaseModel):
+    """A single ranked result returned by :func:`search`.
+
+    Attributes
+    ----------
+    rank : int
+        1-based position in the result list (1 = best match).
+    score : float
+        Relevance score (higher is better).
+    var_id : int
+        Internal variable ID.
+    cpp_name : str
+        C++ variable name used for data access.
+    descript : str
+        Human-readable variable description.
+    """
+
+    rank: int
+    score: float
+    var_id: int
+    cpp_name: str
+    descript: str
+
+
 def install_encoder() -> bool:
     """Download and save the cross-encoder model for semantic search.
 
@@ -94,8 +118,8 @@ def install_encoder() -> bool:
         return False
 
 
-def search(data: SingleRunData, query: str) -> None:
-    """Search telemetry variables and print the top matches.
+def search(data: SingleRunData, query: str) -> list[SearchResult]:
+    """Search telemetry variables, print the top matches, and return them.
 
     Parameters
     ----------
@@ -103,6 +127,13 @@ def search(data: SingleRunData, query: str) -> None:
         Parsed CSV telemetry data.
     query : str
         Free-text search query (e.g. "bat wheel").
+
+    Returns
+    -------
+    list[SearchResult]
+        Top matches in descending relevance order (at most 10 entries).
+        Each entry exposes ``rank``, ``score``, ``var_id``, ``cpp_name``,
+        and ``descript`` for programmatic access.
 
     Notes
     -----
@@ -113,6 +144,11 @@ def search(data: SingleRunData, query: str) -> None:
 
     Short queries lean on keyword matching; longer queries lean on semantic
     ranking when the model is available.
+
+    Examples
+    --------
+    >>> results = aly.search("front wheel speed")
+    >>> names = [r.cpp_name for r in results]
     """
     semantic_ready = install_encoder()
 
@@ -157,9 +193,21 @@ def search(data: SingleRunData, query: str) -> None:
             reverse=True,
         )
 
-    _print_search_results(
-        query, [deck[idx] for _, idx in ranked[:10]], [s for s, _ in ranked[:10]]
-    )
+    top_entries = [deck[idx] for _, idx in ranked[:10]]
+    top_scores = [s for s, _ in ranked[:10]]
+
+    _print_search_results(query, top_entries, top_scores)
+
+    return [
+        SearchResult(
+            rank=i + 1,
+            score=score,
+            var_id=entry.var_id,
+            cpp_name=entry.cpp_name,
+            descript=entry.descript,
+        )
+        for i, (entry, score) in enumerate(zip(top_entries, top_scores))
+    ]
 
 
 def _print_search_results(
