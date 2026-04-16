@@ -79,6 +79,20 @@ class SearchResult(BaseModel):
     cpp_name: str
     descript: str
 
+    def __str__(self) -> str:
+        col_score, col_id, col_name, col_desc = 7, 4, 40, 60
+        name = (
+            self.cpp_name
+            if len(self.cpp_name) <= col_name
+            else self.cpp_name[: col_name - 1] + "…"
+        )
+        desc = (
+            self.descript
+            if len(self.descript) <= col_desc
+            else self.descript[: col_desc - 1] + "…"
+        )
+        return f"{self.score:<{col_score}.2f}  {self.var_id:<{col_id}}  {name:<{col_name}}  {desc:<{col_desc}}"
+
 
 def install_encoder() -> bool:
     """Download and save the cross-encoder model for semantic search.
@@ -118,7 +132,7 @@ def install_encoder() -> bool:
         return False
 
 
-def search(data: SingleRunData, query: str) -> list[SearchResult]:
+def search(data: SingleRunData, query: str, top_n: int = 10) -> list[SearchResult]:
     """Search telemetry variables, print the top matches, and return them.
 
     Parameters
@@ -127,11 +141,13 @@ def search(data: SingleRunData, query: str) -> list[SearchResult]:
         Parsed CSV telemetry data.
     query : str
         Free-text search query (e.g. "bat wheel").
+    top_n : int
+        Maximum number of results to return and display (default 10).
 
     Returns
     -------
     list[SearchResult]
-        Top matches in descending relevance order (at most 10 entries).
+        Top matches in descending relevance order (at most ``top_n`` entries).
         Each entry exposes ``rank``, ``score``, ``var_id``, ``cpp_name``,
         and ``descript`` for programmatic access.
 
@@ -193,41 +209,35 @@ def search(data: SingleRunData, query: str) -> list[SearchResult]:
             reverse=True,
         )
 
-    top_entries = [deck[idx] for _, idx in ranked[:10]]
-    top_scores = [s for s, _ in ranked[:10]]
+    top = ranked[:top_n]
 
-    _print_search_results(query, top_entries, top_scores)
-
-    return [
+    results = [
         SearchResult(
             rank=i + 1,
             score=score,
-            var_id=entry.var_id,
-            cpp_name=entry.cpp_name,
-            descript=entry.descript,
+            var_id=deck[idx].var_id,
+            cpp_name=deck[idx].cpp_name,
+            descript=deck[idx].descript,
         )
-        for i, (entry, score) in enumerate(zip(top_entries, top_scores))
+        for i, (score, idx) in enumerate(top)
     ]
 
+    _print_search_results(query, results)
 
-def _print_search_results(
-    query: str, entries: list[SearchEntry], scores: list[float]
-) -> None:
+    return results
+
+
+def _print_search_results(query: str, results: list[SearchResult]) -> None:
     """Print search results as a compact 4-column table.
 
     Parameters
     ----------
     query : str
         The original search query string.
-    entries : list[SearchEntry]
-        Ordered list of search entries to display.
-    scores : list[float]
-        Relevance scores corresponding to each entry.
+    results : list[SearchResult]
+        Ordered list of search results to display.
     """
-    col_score = 7
-    col_id = 4
-    col_name = 40
-    col_desc = 60
+    col_score, col_id, col_name, col_desc = 7, 4, 40, 60
 
     print(title_block("Search Results"))
     print(f"Query: {query}\n")
@@ -235,20 +245,8 @@ def _print_search_results(
         f"{'Score':<{col_score}}  {'ID':<{col_id}}  {'C++ Name':<{col_name}}  {'Description':<{col_desc}}"
     )
     print(DELIMITER)
-    for entry, score in zip(entries, scores):
-        name = (
-            entry.cpp_name
-            if len(entry.cpp_name) <= col_name
-            else entry.cpp_name[: col_name - 1] + "…"
-        )
-        desc = (
-            entry.descript
-            if len(entry.descript) <= col_desc
-            else entry.descript[: col_desc - 1] + "…"
-        )
-        print(
-            f"{score:<{col_score}.2f}  {entry.var_id:<{col_id}}  {name:<{col_name}}  {desc:<{col_desc}}"
-        )
+    for result in results:
+        print(result)
 
 
 def preprocess_query(query: str) -> str:

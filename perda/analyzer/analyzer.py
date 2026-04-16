@@ -113,7 +113,7 @@ class Analyzer:
 
         return output
 
-    def search(self, query: str) -> list[SearchResult]:
+    def search(self, query: str, top_n: int = 10) -> list[SearchResult]:
         """
         Natural language search for available variables in the parsed data.
 
@@ -123,20 +123,23 @@ class Analyzer:
         ----------
         query : str
             Free-text search query (e.g. "front wheel speed").
+        top_n : int
+            Maximum number of results to return and display (default 10).
 
         Returns
         -------
         list[SearchResult]
-            Top matches in descending relevance order (at most 10 entries).
+            Top matches in descending relevance order (at most ``top_n`` entries).
             Each entry has ``rank``, ``score``, ``var_id``, ``cpp_name``,
             and ``descript``.
 
         Examples
         --------
         >>> results = aly.search("front wheel speed")
+        >>> results = aly.search("front wheel speed", top_n=5)
         >>> names = [r.cpp_name for r in results]
         """
-        return search(self.data, query)
+        return search(self.data, query, top_n)
 
     def plot(
         self,
