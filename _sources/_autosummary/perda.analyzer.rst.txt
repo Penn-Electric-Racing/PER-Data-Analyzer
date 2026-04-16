@@ -14,5 +14,5 @@ perda.analyzer
    :recursive:
 
    analyzer
-   concat
+   concat_helpers
    csv

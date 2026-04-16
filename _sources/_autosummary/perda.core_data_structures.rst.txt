@@ -14,5 +14,7 @@ perda.core\_data\_structures
    :recursive:
 
    data_instance
+   deduplication
    joins
+   resampling
    single_run_data

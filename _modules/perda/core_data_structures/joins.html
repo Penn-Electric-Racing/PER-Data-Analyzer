@@ -303,113 +303,88 @@
                 <article class="bd-article">
                   
   <h1>Source code for perda.core_data_structures.joins</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">defaultdict</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tuple</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tuple</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">numpy.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">NDArray</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.resampling</span><span class="w"> </span><span class="kn">import</span> <span class="n">ResampleMethod</span><span class="p">,</span> <span class="n">_interpolate</span>
 
 
 <div class="viewcode-block" id="left_join">
 <a class="viewcode-back" href="../../../_autosummary/perda.core_data_structures.joins.html#perda.core_data_structures.joins.left_join">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">left_join</span><span class="p">(</span>
-    <span class="n">left_ts</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-    <span class="n">left_val</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-    <span class="n">right_ts</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-    <span class="n">right_val</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+    <span class="n">left_ts</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">,</span>
+    <span class="n">left_val</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">,</span>
+    <span class="n">right_ts</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">,</span>
+    <span class="n">right_val</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">method</span><span class="p">:</span> <span class="n">ResampleMethod</span> <span class="o">=</span> <span class="n">ResampleMethod</span><span class="o">.</span><span class="n">LINEAR</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">NDArray</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Left join: keep all left timestamps, match and interpolate right values.</span>
+<span class="sd">    Left join: interpolate right values onto the left timestamp grid.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    left_ts : np.ndarray</span>
-<span class="sd">        Timestamps for left series (these are kept exactly)</span>
-<span class="sd">    left_val : np.ndarray</span>
+<span class="sd">    left_ts : NDArray</span>
+<span class="sd">        Timestamps for left series (used as the target grid)</span>
+<span class="sd">    left_val : NDArray</span>
 <span class="sd">        Values for left series</span>
-<span class="sd">    right_ts : np.ndarray</span>
-<span class="sd">        Timestamps for right series (these will be matched to left)</span>
-<span class="sd">    right_val : np.ndarray</span>
+<span class="sd">    right_ts : NDArray</span>
+<span class="sd">        Timestamps for right series</span>
+<span class="sd">    right_val : NDArray</span>
 <span class="sd">        Values for right series</span>
-<span class="sd">    interpolate : bool, optional</span>
-<span class="sd">        If True, interpolate right values to fill all left timestamps.</span>
-<span class="sd">        If False, only use matched values (NaN for unmatched). Default is True.</span>
+<span class="sd">    method : ResampleMethod, optional</span>
+<span class="sd">        Interpolation method. Default is LINEAR.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    timestamps : np.ndarray</span>
-<span class="sd">        The left timestamps (unchanged)</span>
-<span class="sd">    left_values : np.ndarray</span>
-<span class="sd">        The left values (unchanged)</span>
-<span class="sd">    right_values : np.ndarray</span>
-<span class="sd">        Right values matched/interpolated to left timestamps</span>
-
-<span class="sd">    Notes</span>
-<span class="sd">    -----</span>
-<span class="sd">    Process:</span>
-<span class="sd">    1. For each right timestamp, find the closest left timestamp</span>
-<span class="sd">    2. If multiple right timestamps map to the same left timestamp, average them</span>
-<span class="sd">    3. Interpolate right values to fill remaining left timestamps (if interpolate=True)</span>
+<span class="sd">    timestamps : NDArray</span>
+<span class="sd">        Left timestamps (unchanged)</span>
+<span class="sd">    left_values : NDArray</span>
+<span class="sd">        Left values (unchanged)</span>
+<span class="sd">    right_values : NDArray</span>
+<span class="sd">        Right values interpolated onto left timestamps</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">timestamps</span> <span class="o">=</span> <span class="n">left_ts</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-    <span class="n">left_values</span> <span class="o">=</span> <span class="n">left_val</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-
-    <span class="n">right_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">left_ts</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
-
     <span class="k">if</span> <span class="n">right_ts</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">left_ts</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Both time series must be non-empty&quot;</span><span class="p">)</span>
 
-    <span class="c1"># Find insertion indices</span>
-    <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">searchsorted</span><span class="p">(</span><span class="n">left_ts</span><span class="p">,</span> <span class="n">right_ts</span><span class="p">)</span>
+    <span class="n">target_f</span> <span class="o">=</span> <span class="n">left_ts</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="n">right_values</span> <span class="o">=</span> <span class="n">_interpolate</span><span class="p">(</span>
+        <span class="n">target_f</span><span class="p">,</span> <span class="n">right_ts</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span> <span class="n">right_val</span><span class="p">,</span> <span class="n">method</span>
+    <span class="p">)</span>
 
-    <span class="c1"># Clamp indices to valid range</span>
-    <span class="n">idx_right</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">left_ts</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
-    <span class="n">idx_left</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">idx</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">left_ts</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
-
-    <span class="c1"># Choose closer neighbor</span>
-    <span class="n">dist_left</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">right_ts</span> <span class="o">-</span> <span class="n">left_ts</span><span class="p">[</span><span class="n">idx_left</span><span class="p">])</span>
-    <span class="n">dist_right</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">right_ts</span> <span class="o">-</span> <span class="n">left_ts</span><span class="p">[</span><span class="n">idx_right</span><span class="p">])</span>
-    <span class="n">closest_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">dist_left</span> <span class="o">&lt;=</span> <span class="n">dist_right</span><span class="p">,</span> <span class="n">idx_left</span><span class="p">,</span> <span class="n">idx_right</span><span class="p">)</span>
-
-    <span class="c1"># Average right values mapped to same left index</span>
-    <span class="n">matches</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">li</span><span class="p">,</span> <span class="n">rv</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">closest_idx</span><span class="p">,</span> <span class="n">right_val</span><span class="p">):</span>
-        <span class="n">matches</span><span class="p">[</span><span class="n">li</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rv</span><span class="p">)</span>
-
-    <span class="k">for</span> <span class="n">li</span><span class="p">,</span> <span class="n">vals</span> <span class="ow">in</span> <span class="n">matches</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-        <span class="n">right_values</span><span class="p">[</span><span class="n">li</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span>
-
-    <span class="c1"># Interpolate missing values</span>
-    <span class="n">valid</span> <span class="o">=</span> <span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">right_values</span><span class="p">)</span>
-    <span class="n">right_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">left_ts</span><span class="p">,</span> <span class="n">left_ts</span><span class="p">[</span><span class="n">valid</span><span class="p">],</span> <span class="n">right_values</span><span class="p">[</span><span class="n">valid</span><span class="p">])</span>
-
-    <span class="k">return</span> <span class="n">timestamps</span><span class="p">,</span> <span class="n">left_values</span><span class="p">,</span> <span class="n">right_values</span></div>
+    <span class="k">return</span> <span class="n">left_ts</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">left_val</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">right_values</span></div>
 
 
 
 <div class="viewcode-block" id="outer_join">
 <a class="viewcode-back" href="../../../_autosummary/perda.core_data_structures.joins.html#perda.core_data_structures.joins.outer_join">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">outer_join</span><span class="p">(</span>
-    <span class="n">left_ts</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-    <span class="n">left_val</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-    <span class="n">right_ts</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-    <span class="n">right_val</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">left_ts</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">,</span>
+    <span class="n">left_val</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">,</span>
+    <span class="n">right_ts</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">,</span>
+    <span class="n">right_val</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
+    <span class="n">method</span><span class="p">:</span> <span class="n">ResampleMethod</span> <span class="o">=</span> <span class="n">ResampleMethod</span><span class="o">.</span><span class="n">LINEAR</span><span class="p">,</span>
     <span class="n">drop_nan</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">fill</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">NDArray</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Outer join: union of timestamps with linear interpolation.</span>
+<span class="sd">    Outer join: union of timestamps with interpolation.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    left_ts : np.ndarray</span>
+<span class="sd">    left_ts : NDArray</span>
 <span class="sd">        Timestamps for left series</span>
-<span class="sd">    left_val : np.ndarray</span>
+<span class="sd">    left_val : NDArray</span>
 <span class="sd">        Values for left series</span>
-<span class="sd">    right_ts : np.ndarray</span>
+<span class="sd">    right_ts : NDArray</span>
 <span class="sd">        Timestamps for right series</span>
-<span class="sd">    right_val : np.ndarray</span>
+<span class="sd">    right_val : NDArray</span>
 <span class="sd">        Values for right series</span>
+<span class="sd">    method : ResampleMethod, optional</span>
+<span class="sd">        Interpolation method. Default is LINEAR.</span>
 <span class="sd">    drop_nan : bool, optional</span>
 <span class="sd">        If True, drop rows where either series has NaN after interpolation.</span>
 <span class="sd">        Default is True.</span>
@@ -418,19 +393,22 @@
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    timestamps : np.ndarray</span>
+<span class="sd">    timestamps : NDArray</span>
 <span class="sd">        Union of all timestamps</span>
-<span class="sd">    left_values : np.ndarray</span>
+<span class="sd">    left_values : NDArray</span>
 <span class="sd">        Left values interpolated to union timestamps</span>
-<span class="sd">    right_values : np.ndarray</span>
+<span class="sd">    right_values : NDArray</span>
 <span class="sd">        Right values interpolated to union timestamps</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">right_ts</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">left_ts</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Both time series must be non-empty&quot;</span><span class="p">)</span>
 
     <span class="n">timestamps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">union1d</span><span class="p">(</span><span class="n">left_ts</span><span class="p">,</span> <span class="n">right_ts</span><span class="p">)</span>
-    <span class="n">left_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">timestamps</span><span class="p">,</span> <span class="n">left_ts</span><span class="p">,</span> <span class="n">left_val</span><span class="p">)</span>
-    <span class="n">right_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">timestamps</span><span class="p">,</span> <span class="n">right_ts</span><span class="p">,</span> <span class="n">right_val</span><span class="p">)</span>
+    <span class="n">target_f</span> <span class="o">=</span> <span class="n">timestamps</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="n">left_values</span> <span class="o">=</span> <span class="n">_interpolate</span><span class="p">(</span><span class="n">target_f</span><span class="p">,</span> <span class="n">left_ts</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span> <span class="n">left_val</span><span class="p">,</span> <span class="n">method</span><span class="p">)</span>
+    <span class="n">right_values</span> <span class="o">=</span> <span class="n">_interpolate</span><span class="p">(</span>
+        <span class="n">target_f</span><span class="p">,</span> <span class="n">right_ts</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span> <span class="n">right_val</span><span class="p">,</span> <span class="n">method</span>
+    <span class="p">)</span>
 
     <span class="k">if</span> <span class="n">drop_nan</span><span class="p">:</span>
         <span class="n">keep_mask</span> <span class="o">=</span> <span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">left_values</span><span class="p">)</span> <span class="o">&amp;</span> <span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">right_values</span><span class="p">)</span>
@@ -448,87 +426,60 @@
 <div class="viewcode-block" id="inner_join">
 <a class="viewcode-back" href="../../../_autosummary/perda.core_data_structures.joins.html#perda.core_data_structures.joins.inner_join">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">inner_join</span><span class="p">(</span>
-    <span class="n">left_ts</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-    <span class="n">left_val</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-    <span class="n">right_ts</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-    <span class="n">right_val</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">left_ts</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">,</span>
+    <span class="n">left_val</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">,</span>
+    <span class="n">right_ts</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">,</span>
+    <span class="n">right_val</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">tolerance</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+    <span class="n">method</span><span class="p">:</span> <span class="n">ResampleMethod</span> <span class="o">=</span> <span class="n">ResampleMethod</span><span class="o">.</span><span class="n">LINEAR</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">NDArray</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Inner join: keep only left timestamps that have a matching right timestamp within tolerance.</span>
-
-<span class="sd">    Process:</span>
-<span class="sd">    1. For each left timestamp, find the closest right timestamp</span>
-<span class="sd">    2. Keep the left timestamp only if the distance is within tolerance</span>
-<span class="sd">    3. Match right values to the kept left timestamps</span>
+<span class="sd">    Inner join: keep only left timestamps that have a right timestamp within tolerance,</span>
+<span class="sd">    then interpolate right values onto those timestamps.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    left_ts : np.ndarray</span>
+<span class="sd">    left_ts : NDArray</span>
 <span class="sd">        Timestamps for left series</span>
-<span class="sd">    left_val : np.ndarray</span>
+<span class="sd">    left_val : NDArray</span>
 <span class="sd">        Values for left series</span>
-<span class="sd">    right_ts : np.ndarray</span>
+<span class="sd">    right_ts : NDArray</span>
 <span class="sd">        Timestamps for right series</span>
-<span class="sd">    right_val : np.ndarray</span>
+<span class="sd">    right_val : NDArray</span>
 <span class="sd">        Values for right series</span>
 <span class="sd">    tolerance : float</span>
-<span class="sd">        Maximum allowed distance between left and right timestamps for a match.</span>
-<span class="sd">        Timestamps with distance &gt; tolerance are dropped.</span>
+<span class="sd">        Maximum allowed distance to the nearest right timestamp for a left</span>
+<span class="sd">        timestamp to be kept.</span>
+<span class="sd">    method : ResampleMethod, optional</span>
+<span class="sd">        Interpolation method for right values. Default is LINEAR.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    timestamps : np.ndarray</span>
-<span class="sd">        Subset of left timestamps that have matches within tolerance</span>
-<span class="sd">    left_values : np.ndarray</span>
-<span class="sd">        Left values at the matched timestamps</span>
-<span class="sd">    right_values : np.ndarray</span>
-<span class="sd">        Right values interpolated to the matched timestamps</span>
+<span class="sd">    timestamps : NDArray</span>
+<span class="sd">        Subset of left timestamps within tolerance of a right timestamp</span>
+<span class="sd">    left_values : NDArray</span>
+<span class="sd">        Left values at the kept timestamps</span>
+<span class="sd">    right_values : NDArray</span>
+<span class="sd">        Right values interpolated onto the kept timestamps</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">right_ts</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">left_ts</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Both time series must be non-empty&quot;</span><span class="p">)</span>
 
-    <span class="c1"># Output arrays</span>
-    <span class="n">timestamps</span> <span class="o">=</span> <span class="n">left_ts</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-    <span class="n">left_values</span> <span class="o">=</span> <span class="n">left_val</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-    <span class="n">right_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">left_ts</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
-
-    <span class="c1"># Find insertion points of left_ts into right_ts</span>
+    <span class="c1"># For each left timestamp, find the distance to the nearest right timestamp</span>
     <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">searchsorted</span><span class="p">(</span><span class="n">right_ts</span><span class="p">,</span> <span class="n">left_ts</span><span class="p">)</span>
+    <span class="n">idx_hi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">right_ts</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">idx_lo</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">idx</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">right_ts</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">min_dist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">left_ts</span> <span class="o">-</span> <span class="n">right_ts</span><span class="p">[</span><span class="n">idx_lo</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">left_ts</span> <span class="o">-</span> <span class="n">right_ts</span><span class="p">[</span><span class="n">idx_hi</span><span class="p">])</span>
+    <span class="p">)</span>
 
-    <span class="c1"># Candidate neighbors</span>
-    <span class="n">idx_right</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">right_ts</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
-    <span class="n">idx_left</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">idx</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">right_ts</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
-
-    <span class="c1"># Distances</span>
-    <span class="n">dist_left</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">left_ts</span> <span class="o">-</span> <span class="n">right_ts</span><span class="p">[</span><span class="n">idx_left</span><span class="p">])</span>
-    <span class="n">dist_right</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">left_ts</span> <span class="o">-</span> <span class="n">right_ts</span><span class="p">[</span><span class="n">idx_right</span><span class="p">])</span>
-
-    <span class="c1"># Choose closest right index</span>
-    <span class="n">closest_right_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">dist_left</span> <span class="o">&lt;=</span> <span class="n">dist_right</span><span class="p">,</span> <span class="n">idx_left</span><span class="p">,</span> <span class="n">idx_right</span><span class="p">)</span>
-
-    <span class="c1"># Distance to chosen right timestamp</span>
-    <span class="n">min_dist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">dist_left</span><span class="p">,</span> <span class="n">dist_right</span><span class="p">)</span>
-
-    <span class="c1"># Apply tolerance filter</span>
-    <span class="n">valid_mask</span> <span class="o">=</span> <span class="n">min_dist</span> <span class="o">&lt;=</span> <span class="n">tolerance</span>
-    <span class="n">valid_left_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">valid_mask</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="n">valid_right_idx</span> <span class="o">=</span> <span class="n">closest_right_idx</span><span class="p">[</span><span class="n">valid_mask</span><span class="p">]</span>
-
-    <span class="c1"># Deduplicate: multiple right values may map to same left index</span>
-    <span class="n">matches</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">li</span><span class="p">,</span> <span class="n">ri</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">valid_left_idx</span><span class="p">,</span> <span class="n">valid_right_idx</span><span class="p">):</span>
-        <span class="n">matches</span><span class="p">[</span><span class="n">li</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">right_val</span><span class="p">[</span><span class="n">ri</span><span class="p">])</span>
-
-    <span class="k">for</span> <span class="n">li</span><span class="p">,</span> <span class="n">vals</span> <span class="ow">in</span> <span class="n">matches</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-        <span class="n">right_values</span><span class="p">[</span><span class="n">li</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span>
-
-    <span class="c1"># Filter to only include matched timestamps</span>
-    <span class="n">matched_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">matches</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
-    <span class="n">timestamps</span> <span class="o">=</span> <span class="n">timestamps</span><span class="p">[</span><span class="n">matched_indices</span><span class="p">]</span>
-    <span class="n">left_values</span> <span class="o">=</span> <span class="n">left_values</span><span class="p">[</span><span class="n">matched_indices</span><span class="p">]</span>
-    <span class="n">right_values</span> <span class="o">=</span> <span class="n">right_values</span><span class="p">[</span><span class="n">matched_indices</span><span class="p">]</span>
+    <span class="n">keep</span> <span class="o">=</span> <span class="n">min_dist</span> <span class="o">&lt;=</span> <span class="n">tolerance</span>
+    <span class="n">timestamps</span> <span class="o">=</span> <span class="n">left_ts</span><span class="p">[</span><span class="n">keep</span><span class="p">]</span>
+    <span class="n">left_values</span> <span class="o">=</span> <span class="n">left_val</span><span class="p">[</span><span class="n">keep</span><span class="p">]</span>
+    <span class="n">right_values</span> <span class="o">=</span> <span class="n">_interpolate</span><span class="p">(</span>
+        <span class="n">timestamps</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span> <span class="n">right_ts</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span> <span class="n">right_val</span><span class="p">,</span> <span class="n">method</span>
+    <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">timestamps</span><span class="p">,</span> <span class="n">left_values</span><span class="p">,</span> <span class="n">right_values</span></div>
 

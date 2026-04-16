@@ -51,8 +51,8 @@
     <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/perda.core_data_structures.joins';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="perda.core_data_structures.single_run_data" href="perda.core_data_structures.single_run_data.html" />
-    <link rel="prev" title="perda.core_data_structures.data_instance" href="perda.core_data_structures.data_instance.html" />
+    <link rel="next" title="perda.core_data_structures.resampling" href="perda.core_data_structures.resampling.html" />
+    <link rel="prev" title="perda.core_data_structures.deduplication" href="perda.core_data_structures.deduplication.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
@@ -261,14 +261,16 @@
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="perda.html">perda</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2 has-children"><a class="reference internal" href="perda.analyzer.html">perda.analyzer</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="perda.analyzer.analyzer.html">perda.analyzer.analyzer</a></li>
-<li class="toctree-l3"><a class="reference internal" href="perda.analyzer.concat.html">perda.analyzer.concat</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.analyzer.concat_helpers.html">perda.analyzer.concat_helpers</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.analyzer.csv.html">perda.analyzer.csv</a></li>
 </ul>
 </details></li>
 <li class="toctree-l2"><a class="reference internal" href="perda.constants.html">perda.constants</a></li>
 <li class="toctree-l2 current active has-children"><a class="reference internal" href="perda.core_data_structures.html">perda.core_data_structures</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.data_instance.html">perda.core_data_structures.data_instance</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.deduplication.html">perda.core_data_structures.deduplication</a></li>
 <li class="toctree-l3 current active"><a class="current reference internal" href="#">perda.core_data_structures.joins</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.resampling.html">perda.core_data_structures.resampling</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.single_run_data.html">perda.core_data_structures.single_run_data</a></li>
 </ul>
 </details></li>
@@ -373,31 +375,29 @@
 <span id="perda-core-data-structures-joins"></span><h1>perda.core_data_structures.joins<a class="headerlink" href="#module-perda.core_data_structures.joins" title="Link to this heading">#</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="perda.core_data_structures.joins.inner_join">
-<span class="sig-prename descclassname"><span class="pre">perda.core_data_structures.joins.</span></span><span class="sig-name descname"><span class="pre">inner_join</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">left_ts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">left_val</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">right_ts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">right_val</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/core_data_structures/joins.html#inner_join"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.core_data_structures.joins.inner_join" title="Link to this definition">#</a></dt>
-<dd><p>Inner join: keep only left timestamps that have a matching right timestamp within tolerance.</p>
-<p>Process:
-1. For each left timestamp, find the closest right timestamp
-2. Keep the left timestamp only if the distance is within tolerance
-3. Match right values to the kept left timestamps</p>
+<span class="sig-prename descclassname"><span class="pre">perda.core_data_structures.joins.</span></span><span class="sig-name descname"><span class="pre">inner_join</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">left_ts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">left_val</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">right_ts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">right_val</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">ResampleMethod.LINEAR</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/core_data_structures/joins.html#inner_join"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.core_data_structures.joins.inner_join" title="Link to this definition">#</a></dt>
+<dd><p>Inner join: keep only left timestamps that have a right timestamp within tolerance,
+then interpolate right values onto those timestamps.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>left_ts</strong> (<em>np.ndarray</em>) – Timestamps for left series</p></li>
-<li><p><strong>left_val</strong> (<em>np.ndarray</em>) – Values for left series</p></li>
-<li><p><strong>right_ts</strong> (<em>np.ndarray</em>) – Timestamps for right series</p></li>
-<li><p><strong>right_val</strong> (<em>np.ndarray</em>) – Values for right series</p></li>
-<li><p><strong>tolerance</strong> (<em>float</em>) – Maximum allowed distance between left and right timestamps for a match.
-Timestamps with distance &gt; tolerance are dropped.</p></li>
+<li><p><strong>left_ts</strong> (<em>NDArray</em>) – Timestamps for left series</p></li>
+<li><p><strong>left_val</strong> (<em>NDArray</em>) – Values for left series</p></li>
+<li><p><strong>right_ts</strong> (<em>NDArray</em>) – Timestamps for right series</p></li>
+<li><p><strong>right_val</strong> (<em>NDArray</em>) – Values for right series</p></li>
+<li><p><strong>tolerance</strong> (<em>float</em>) – Maximum allowed distance to the nearest right timestamp for a left
+timestamp to be kept.</p></li>
+<li><p><strong>method</strong> (<a class="reference internal" href="perda.core_data_structures.resampling.html#perda.core_data_structures.resampling.ResampleMethod" title="perda.core_data_structures.resampling.ResampleMethod"><em>ResampleMethod</em></a><em>, </em><em>optional</em>) – Interpolation method for right values. Default is LINEAR.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]</span></p>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">...</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">dtype</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code>(<code class="docutils literal notranslate"><span class="pre">_ScalarT</span></code>, bound= <code class="xref py py-class docutils literal notranslate"><span class="pre">generic</span></code>)]], <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">...</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">dtype</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code>(<code class="docutils literal notranslate"><span class="pre">_ScalarT</span></code>, bound= <code class="xref py py-class docutils literal notranslate"><span class="pre">generic</span></code>)]], <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">...</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">dtype</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code>(<code class="docutils literal notranslate"><span class="pre">_ScalarT</span></code>, bound= <code class="xref py py-class docutils literal notranslate"><span class="pre">generic</span></code>)]]]</span></p>
 </dd>
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><ul class="simple">
-<li><p><strong>timestamps</strong> (<em>np.ndarray</em>) – Subset of left timestamps that have matches within tolerance</p></li>
-<li><p><strong>left_values</strong> (<em>np.ndarray</em>) – Left values at the matched timestamps</p></li>
-<li><p><strong>right_values</strong> (<em>np.ndarray</em>) – Right values interpolated to the matched timestamps</p></li>
+<li><p><strong>timestamps</strong> (<em>NDArray</em>) – Subset of left timestamps within tolerance of a right timestamp</p></li>
+<li><p><strong>left_values</strong> (<em>NDArray</em>) – Left values at the kept timestamps</p></li>
+<li><p><strong>right_values</strong> (<em>NDArray</em>) – Right values interpolated onto the kept timestamps</p></li>
 </ul>
 </p>
 </dd>
@@ -406,62 +406,57 @@ Timestamps with distance &gt; tolerance are dropped.</p></li>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="perda.core_data_structures.joins.left_join">
-<span class="sig-prename descclassname"><span class="pre">perda.core_data_structures.joins.</span></span><span class="sig-name descname"><span class="pre">left_join</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">left_ts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">left_val</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">right_ts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">right_val</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/core_data_structures/joins.html#left_join"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.core_data_structures.joins.left_join" title="Link to this definition">#</a></dt>
-<dd><p>Left join: keep all left timestamps, match and interpolate right values.</p>
+<span class="sig-prename descclassname"><span class="pre">perda.core_data_structures.joins.</span></span><span class="sig-name descname"><span class="pre">left_join</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">left_ts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">left_val</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">right_ts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">right_val</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">ResampleMethod.LINEAR</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/core_data_structures/joins.html#left_join"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.core_data_structures.joins.left_join" title="Link to this definition">#</a></dt>
+<dd><p>Left join: interpolate right values onto the left timestamp grid.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>left_ts</strong> (<em>np.ndarray</em>) – Timestamps for left series (these are kept exactly)</p></li>
-<li><p><strong>left_val</strong> (<em>np.ndarray</em>) – Values for left series</p></li>
-<li><p><strong>right_ts</strong> (<em>np.ndarray</em>) – Timestamps for right series (these will be matched to left)</p></li>
-<li><p><strong>right_val</strong> (<em>np.ndarray</em>) – Values for right series</p></li>
-<li><p><strong>interpolate</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, interpolate right values to fill all left timestamps.
-If False, only use matched values (NaN for unmatched). Default is True.</p></li>
+<li><p><strong>left_ts</strong> (<em>NDArray</em>) – Timestamps for left series (used as the target grid)</p></li>
+<li><p><strong>left_val</strong> (<em>NDArray</em>) – Values for left series</p></li>
+<li><p><strong>right_ts</strong> (<em>NDArray</em>) – Timestamps for right series</p></li>
+<li><p><strong>right_val</strong> (<em>NDArray</em>) – Values for right series</p></li>
+<li><p><strong>method</strong> (<a class="reference internal" href="perda.core_data_structures.resampling.html#perda.core_data_structures.resampling.ResampleMethod" title="perda.core_data_structures.resampling.ResampleMethod"><em>ResampleMethod</em></a><em>, </em><em>optional</em>) – Interpolation method. Default is LINEAR.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]</span></p>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">...</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">dtype</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code>(<code class="docutils literal notranslate"><span class="pre">_ScalarT</span></code>, bound= <code class="xref py py-class docutils literal notranslate"><span class="pre">generic</span></code>)]], <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">...</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">dtype</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code>(<code class="docutils literal notranslate"><span class="pre">_ScalarT</span></code>, bound= <code class="xref py py-class docutils literal notranslate"><span class="pre">generic</span></code>)]], <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">...</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">dtype</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code>(<code class="docutils literal notranslate"><span class="pre">_ScalarT</span></code>, bound= <code class="xref py py-class docutils literal notranslate"><span class="pre">generic</span></code>)]]]</span></p>
 </dd>
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><ul class="simple">
-<li><p><strong>timestamps</strong> (<em>np.ndarray</em>) – The left timestamps (unchanged)</p></li>
-<li><p><strong>left_values</strong> (<em>np.ndarray</em>) – The left values (unchanged)</p></li>
-<li><p><strong>right_values</strong> (<em>np.ndarray</em>) – Right values matched/interpolated to left timestamps</p></li>
+<li><p><strong>timestamps</strong> (<em>NDArray</em>) – Left timestamps (unchanged)</p></li>
+<li><p><strong>left_values</strong> (<em>NDArray</em>) – Left values (unchanged)</p></li>
+<li><p><strong>right_values</strong> (<em>NDArray</em>) – Right values interpolated onto left timestamps</p></li>
 </ul>
 </p>
 </dd>
 </dl>
-<p class="rubric">Notes</p>
-<p>Process:
-1. For each right timestamp, find the closest left timestamp
-2. If multiple right timestamps map to the same left timestamp, average them
-3. Interpolate right values to fill remaining left timestamps (if interpolate=True)</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="perda.core_data_structures.joins.outer_join">
-<span class="sig-prename descclassname"><span class="pre">perda.core_data_structures.joins.</span></span><span class="sig-name descname"><span class="pre">outer_join</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">left_ts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">left_val</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">right_ts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">right_val</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">drop_nan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fill</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/core_data_structures/joins.html#outer_join"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.core_data_structures.joins.outer_join" title="Link to this definition">#</a></dt>
-<dd><p>Outer join: union of timestamps with linear interpolation.</p>
+<span class="sig-prename descclassname"><span class="pre">perda.core_data_structures.joins.</span></span><span class="sig-name descname"><span class="pre">outer_join</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">left_ts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">left_val</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">right_ts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">right_val</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">ResampleMethod.LINEAR</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">drop_nan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fill</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/core_data_structures/joins.html#outer_join"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.core_data_structures.joins.outer_join" title="Link to this definition">#</a></dt>
+<dd><p>Outer join: union of timestamps with interpolation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>left_ts</strong> (<em>np.ndarray</em>) – Timestamps for left series</p></li>
-<li><p><strong>left_val</strong> (<em>np.ndarray</em>) – Values for left series</p></li>
-<li><p><strong>right_ts</strong> (<em>np.ndarray</em>) – Timestamps for right series</p></li>
-<li><p><strong>right_val</strong> (<em>np.ndarray</em>) – Values for right series</p></li>
+<li><p><strong>left_ts</strong> (<em>NDArray</em>) – Timestamps for left series</p></li>
+<li><p><strong>left_val</strong> (<em>NDArray</em>) – Values for left series</p></li>
+<li><p><strong>right_ts</strong> (<em>NDArray</em>) – Timestamps for right series</p></li>
+<li><p><strong>right_val</strong> (<em>NDArray</em>) – Values for right series</p></li>
+<li><p><strong>method</strong> (<a class="reference internal" href="perda.core_data_structures.resampling.html#perda.core_data_structures.resampling.ResampleMethod" title="perda.core_data_structures.resampling.ResampleMethod"><em>ResampleMethod</em></a><em>, </em><em>optional</em>) – Interpolation method. Default is LINEAR.</p></li>
 <li><p><strong>drop_nan</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, drop rows where either series has NaN after interpolation.
 Default is True.</p></li>
 <li><p><strong>fill</strong> (<em>float</em><em>, </em><em>optional</em>) – Fill value for NaNs when drop_nan is False. Default is 0.0.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]</span></p>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">...</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">dtype</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code>(<code class="docutils literal notranslate"><span class="pre">_ScalarT</span></code>, bound= <code class="xref py py-class docutils literal notranslate"><span class="pre">generic</span></code>)]], <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">...</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">dtype</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code>(<code class="docutils literal notranslate"><span class="pre">_ScalarT</span></code>, bound= <code class="xref py py-class docutils literal notranslate"><span class="pre">generic</span></code>)]], <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">...</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">dtype</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code>(<code class="docutils literal notranslate"><span class="pre">_ScalarT</span></code>, bound= <code class="xref py py-class docutils literal notranslate"><span class="pre">generic</span></code>)]]]</span></p>
 </dd>
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><ul class="simple">
-<li><p><strong>timestamps</strong> (<em>np.ndarray</em>) – Union of all timestamps</p></li>
-<li><p><strong>left_values</strong> (<em>np.ndarray</em>) – Left values interpolated to union timestamps</p></li>
-<li><p><strong>right_values</strong> (<em>np.ndarray</em>) – Right values interpolated to union timestamps</p></li>
+<li><p><strong>timestamps</strong> (<em>NDArray</em>) – Union of all timestamps</p></li>
+<li><p><strong>left_values</strong> (<em>NDArray</em>) – Left values interpolated to union timestamps</p></li>
+<li><p><strong>right_values</strong> (<em>NDArray</em>) – Right values interpolated to union timestamps</p></li>
 </ul>
 </p>
 </dd>
@@ -481,20 +476,20 @@ Default is True.</p></li>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="perda.core_data_structures.data_instance.html"
+       href="perda.core_data_structures.deduplication.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">perda.core_data_structures.data_instance</p>
+        <p class="prev-next-title">perda.core_data_structures.deduplication</p>
       </div>
     </a>
     <a class="right-next"
-       href="perda.core_data_structures.single_run_data.html"
+       href="perda.core_data_structures.resampling.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">perda.core_data_structures.single_run_data</p>
+        <p class="prev-next-title">perda.core_data_structures.resampling</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

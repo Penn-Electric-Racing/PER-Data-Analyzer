@@ -422,7 +422,7 @@
       </ul></li>
       <li><a href="_autosummary/perda.utils.accel_calculator.html#perda.utils.accel_calculator.compute_accel_results">compute_accel_results() (in module perda.utils.accel_calculator)</a>
 </li>
-      <li><a href="_autosummary/perda.analyzer.concat.html#perda.analyzer.concat">concat() (in module perda.analyzer)</a>
+      <li><a href="_autosummary/perda.analyzer.concat_helpers.html#perda.analyzer.concat_helpers.concat">concat() (in module perda.analyzer.concat_helpers)</a>
 </li>
       <li><a href="_autosummary/perda.core_data_structures.single_run_data.html#perda.core_data_structures.single_run_data.SingleRunData.concat_boundaries">concat_boundaries (perda.core_data_structures.single_run_data.SingleRunData attribute)</a>
 </li>
@@ -444,6 +444,8 @@
 </li>
       <li><a href="_autosummary/perda.utils.gps_analysis.html#perda.utils.gps_analysis.create_representative_gps_image">create_representative_gps_image() (in module perda.utils.gps_analysis)</a>
 </li>
+      <li><a href="_autosummary/perda.core_data_structures.resampling.html#perda.core_data_structures.resampling.ResampleMethod.CUBIC">CUBIC (perda.core_data_structures.resampling.ResampleMethod attribute)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -464,6 +466,8 @@
         <li><a href="_autosummary/perda.live.html#perda.live.LiveAnalyzer.dataserver">(perda.live.LiveAnalyzer class method)</a>
 </li>
       </ul></li>
+      <li><a href="_autosummary/perda.core_data_structures.deduplication.html#perda.core_data_structures.deduplication.deduplicate">deduplicate() (in module perda.core_data_structures.deduplication)</a>
+</li>
       <li><a href="_autosummary/perda.utils.search.html#perda.utils.search.SearchEntry.descript">descript (perda.utils.search.SearchEntry attribute)</a>
 </li>
       <li><a href="_autosummary/perda.server.config.html#perda.server.config.LogEntry.description">description (perda.server.config.LogEntry attribute)</a>
@@ -684,6 +688,8 @@
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="_autosummary/perda.core_data_structures.resampling.html#perda.core_data_structures.resampling.ResampleMethod.LINEAR">LINEAR (perda.core_data_structures.resampling.ResampleMethod attribute)</a>
+</li>
       <li><a href="_autosummary/perda.server.client.html#perda.server.client.ServerClient.list_logs">list_logs() (perda.server.client.ServerClient method)</a>
 </li>
       <li><a href="_autosummary/perda.live.html#perda.live.LiveAnalyzer">LiveAnalyzer (class in perda.live)</a>
@@ -732,6 +738,8 @@
 </li>
         <li><a href="_autosummary/perda.analyzer.analyzer.html#module-perda.analyzer.analyzer">perda.analyzer.analyzer</a>
 </li>
+        <li><a href="_autosummary/perda.analyzer.concat_helpers.html#module-perda.analyzer.concat_helpers">perda.analyzer.concat_helpers</a>
+</li>
         <li><a href="_autosummary/perda.analyzer.csv.html#module-perda.analyzer.csv">perda.analyzer.csv</a>
 </li>
         <li><a href="_autosummary/perda.constants.html#module-perda.constants">perda.constants</a>
@@ -740,7 +748,11 @@
 </li>
         <li><a href="_autosummary/perda.core_data_structures.data_instance.html#module-perda.core_data_structures.data_instance">perda.core_data_structures.data_instance</a>
 </li>
+        <li><a href="_autosummary/perda.core_data_structures.deduplication.html#module-perda.core_data_structures.deduplication">perda.core_data_structures.deduplication</a>
+</li>
         <li><a href="_autosummary/perda.core_data_structures.joins.html#module-perda.core_data_structures.joins">perda.core_data_structures.joins</a>
+</li>
+        <li><a href="_autosummary/perda.core_data_structures.resampling.html#module-perda.core_data_structures.resampling">perda.core_data_structures.resampling</a>
 </li>
         <li><a href="_autosummary/perda.core_data_structures.single_run_data.html#module-perda.core_data_structures.single_run_data">perda.core_data_structures.single_run_data</a>
 </li>
@@ -801,14 +813,16 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="_autosummary/perda.server.config.html#perda.server.config.LogEntry.name">name (perda.server.config.LogEntry attribute)</a>
 </li>
+      <li><a href="_autosummary/perda.core_data_structures.resampling.html#perda.core_data_structures.resampling.ResampleMethod.NEAREST">NEAREST (perda.core_data_structures.resampling.ResampleMethod attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="_autosummary/perda.live.cdp_client.html#perda.live.cdp_client.ValueType.NUMERIC">NUMERIC (perda.live.cdp_client.ValueType attribute)</a>
 
       <ul>
         <li><a href="_autosummary/perda.live.html#perda.live.ValueType.NUMERIC">(perda.live.ValueType attribute)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="_autosummary/perda.server.config.html#perda.server.config.LogEntry.numeric_metadata">numeric_metadata (perda.server.config.LogEntry attribute)</a>
 </li>
   </ul></td>
@@ -861,6 +875,13 @@
 </li>
       </ul></li>
       <li>
+    perda.analyzer.concat_helpers
+
+      <ul>
+        <li><a href="_autosummary/perda.analyzer.concat_helpers.html#module-perda.analyzer.concat_helpers">module</a>
+</li>
+      </ul></li>
+      <li>
     perda.analyzer.csv
 
       <ul>
@@ -889,10 +910,24 @@
 </li>
       </ul></li>
       <li>
+    perda.core_data_structures.deduplication
+
+      <ul>
+        <li><a href="_autosummary/perda.core_data_structures.deduplication.html#module-perda.core_data_structures.deduplication">module</a>
+</li>
+      </ul></li>
+      <li>
     perda.core_data_structures.joins
 
       <ul>
         <li><a href="_autosummary/perda.core_data_structures.joins.html#module-perda.core_data_structures.joins">module</a>
+</li>
+      </ul></li>
+      <li>
+    perda.core_data_structures.resampling
+
+      <ul>
+        <li><a href="_autosummary/perda.core_data_structures.resampling.html#module-perda.core_data_structures.resampling">module</a>
 </li>
       </ul></li>
       <li>
@@ -951,6 +986,8 @@
         <li><a href="_autosummary/perda.plotting.parametric_plot.html#module-perda.plotting.parametric_plot">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     perda.plotting.plotting_constants
 
@@ -965,8 +1002,6 @@
         <li><a href="_autosummary/perda.plotting.scatter_histogram_plotter.html#module-perda.plotting.scatter_histogram_plotter">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     perda.server
 
@@ -1093,8 +1128,12 @@
         <li><a href="_autosummary/perda.live.html#perda.live.LiveAnalyzer.remote">(perda.live.LiveAnalyzer class method)</a>
 </li>
       </ul></li>
+      <li><a href="_autosummary/perda.core_data_structures.resampling.html#perda.core_data_structures.resampling.resample_to_freq">resample_to_freq() (in module perda.core_data_structures.resampling)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="_autosummary/perda.core_data_structures.resampling.html#perda.core_data_structures.resampling.ResampleMethod">ResampleMethod (class in perda.core_data_structures.resampling)</a>
+</li>
       <li><a href="_autosummary/perda.live.html#perda.live.ResponseStatus">ResponseStatus (class in perda.live)</a>
 
       <ul>
@@ -1258,6 +1297,10 @@
 
 <h2 id="Z">Z</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="_autosummary/perda.core_data_structures.resampling.html#perda.core_data_structures.resampling.ResampleMethod.ZOH">ZOH (perda.core_data_structures.resampling.ResampleMethod attribute)</a>
+</li>
+  </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="_autosummary/perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.GpsMapConfig.zoom_padding">zoom_padding (perda.plotting.plotting_constants.GpsMapConfig attribute)</a>
 </li>

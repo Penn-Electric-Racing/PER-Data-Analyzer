@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>perda.analyzer.concat &#8212; PERDA</title>
+    <title>perda.analyzer.concat_helpers &#8212; PERDA</title>
   
   
   
@@ -47,7 +47,7 @@
     <script src="../../../_static/copybutton.js?v=f281be69"></script>
     <script src="../../../_static/design-tabs.js?v=f930bc37"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/perda/analyzer/concat';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/perda/analyzer/concat_helpers';</script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
@@ -285,7 +285,7 @@
     
     <li class="breadcrumb-item"><a href="../../index.html" class="nav-link">Module code</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">perda.analyzer.concat</span></li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">perda.analyzer.concat_helpers</span></li>
   </ul>
 </nav>
 </div>
@@ -302,15 +302,15 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <h1>Source code for perda.analyzer.concat</h1><div class="highlight"><pre>
+  <h1>Source code for perda.analyzer.concat_helpers</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">..analyzer.analyzer</span><span class="w"> </span><span class="kn">import</span> <span class="n">Analyzer</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..core_data_structures.data_instance</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataInstance</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..core_data_structures.single_run_data</span><span class="w"> </span><span class="kn">import</span> <span class="n">SingleRunData</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..units</span><span class="w"> </span><span class="kn">import</span> <span class="n">Timescale</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.analyzer</span><span class="w"> </span><span class="kn">import</span> <span class="n">Analyzer</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_upscale_to_us</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">SingleRunData</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SingleRunData</span><span class="p">:</span>
@@ -477,7 +477,7 @@
 
 
 <div class="viewcode-block" id="concat">
-<a class="viewcode-back" href="../../../_autosummary/perda.analyzer.concat.html#perda.analyzer.concat">[docs]</a>
+<a class="viewcode-back" href="../../../_autosummary/perda.analyzer.concat_helpers.html#perda.analyzer.concat_helpers.concat">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">concat</span><span class="p">(</span>
     <span class="n">first</span><span class="p">:</span> <span class="n">Analyzer</span><span class="p">,</span>
     <span class="n">second</span><span class="p">:</span> <span class="n">Analyzer</span><span class="p">,</span>

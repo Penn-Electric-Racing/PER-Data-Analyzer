@@ -2,12 +2,12 @@
 <!DOCTYPE html>
 
 
-<html lang="en" data-content_root="../" >
+<html lang="en" data-content_root="../../../" >
 
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Overview: module code &#8212; PERDA</title>
+    <title>perda.core_data_structures.deduplication &#8212; PERDA</title>
   
   
   
@@ -26,30 +26,30 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+  <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
-    <link rel="stylesheet" type="text/css" href="../_static/autodoc_pydantic.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- So that users can add custom icons -->
-  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <script src="../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=8d563738"></script>
-    <script src="../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
-    <script src="../_static/copybutton.js?v=f281be69"></script>
-    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script src="../../../_static/documentation_options.js?v=8d563738"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../_static/design-tabs.js?v=f930bc37"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/index';</script>
-    <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" />
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/perda/core_data_structures/deduplication';</script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
@@ -71,7 +71,7 @@
   <dialog id="pst-search-dialog">
     
 <form class="bd-search d-flex align-items-center"
-      action="../search.html"
+      action="../../../search.html"
       method="get">
   <i class="fa-solid fa-magnifying-glass"></i>
   <input type="search"
@@ -107,7 +107,7 @@
     
   
 
-<a class="navbar-brand logo" href="../index.html">
+<a class="navbar-brand logo" href="../../../index.html">
   
   
   
@@ -129,14 +129,14 @@
   <ul class="bd-navbar-elements navbar-nav">
     
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../getting_started/index.html">
+  <a class="nav-link nav-internal" href="../../../getting_started/index.html">
     Getting Started
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../api/index.html">
+  <a class="nav-link nav-internal" href="../../../api/index.html">
     Code Documentation
   </a>
 </li>
@@ -213,14 +213,14 @@
   <ul class="bd-navbar-elements navbar-nav">
     
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../getting_started/index.html">
+  <a class="nav-link nav-internal" href="../../../getting_started/index.html">
     Getting Started
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../api/index.html">
+  <a class="nav-link nav-internal" href="../../../api/index.html">
     Code Documentation
   </a>
 </li>
@@ -278,11 +278,14 @@
   <ul class="bd-breadcrumbs">
     
     <li class="breadcrumb-item breadcrumb-home">
-      <a href="../index.html" class="nav-link" aria-label="Home">
+      <a href="../../../index.html" class="nav-link" aria-label="Home">
         <i class="fa-solid fa-home"></i>
       </a>
     </li>
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Overview: module code</span></li>
+    
+    <li class="breadcrumb-item"><a href="../../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">perda.core_data_structures.deduplication</span></li>
   </ul>
 </nav>
 </div>
@@ -299,34 +302,41 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <h1>All modules for which code is available</h1>
-<ul><li><a href="perda/analyzer/analyzer.html">perda.analyzer.analyzer</a></li>
-<li><a href="perda/analyzer/concat_helpers.html">perda.analyzer.concat_helpers</a></li>
-<li><a href="perda/analyzer/csv.html">perda.analyzer.csv</a></li>
-<li><a href="perda/constants.html">perda.constants</a></li>
-<li><a href="perda/core_data_structures/data_instance.html">perda.core_data_structures.data_instance</a></li>
-<li><a href="perda/core_data_structures/deduplication.html">perda.core_data_structures.deduplication</a></li>
-<li><a href="perda/core_data_structures/joins.html">perda.core_data_structures.joins</a></li>
-<li><a href="perda/core_data_structures/resampling.html">perda.core_data_structures.resampling</a></li>
-<li><a href="perda/core_data_structures/single_run_data.html">perda.core_data_structures.single_run_data</a></li>
-<li><a href="perda/live/cdp_client.html">perda.live.cdp_client</a></li>
-<li><a href="perda/live/live_analyzer.html">perda.live.live_analyzer</a></li>
-<li><a href="perda/plotting/data_instance_plotter.html">perda.plotting.data_instance_plotter</a></li>
-<li><a href="perda/plotting/diff_plotter.html">perda.plotting.diff_plotter</a></li>
-<li><a href="perda/plotting/parametric_plot.html">perda.plotting.parametric_plot</a></li>
-<li><a href="perda/plotting/plotting_constants.html">perda.plotting.plotting_constants</a></li>
-<li><a href="perda/plotting/scatter_histogram_plotter.html">perda.plotting.scatter_histogram_plotter</a></li>
-<li><a href="perda/server/client.html">perda.server.client</a></li>
-<li><a href="perda/server/config.html">perda.server.config</a></li>
-<li><a href="perda/units.html">perda.units</a></li>
-<li><a href="perda/utils/accel_calculator.html">perda.utils.accel_calculator</a></li>
-<li><a href="perda/utils/data_summary.html">perda.utils.data_summary</a></li>
-<li><a href="perda/utils/diff.html">perda.utils.diff</a></li>
-<li><a href="perda/utils/frequency_analysis.html">perda.utils.frequency_analysis</a></li>
-<li><a href="perda/utils/gps_analysis.html">perda.utils.gps_analysis</a></li>
-<li><a href="perda/utils/integrate.html">perda.utils.integrate</a></li>
-<li><a href="perda/utils/search.html">perda.utils.search</a></li>
-</ul>
+  <h1>Source code for perda.core_data_structures.deduplication</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.data_instance</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataInstance</span>
+
+
+<div class="viewcode-block" id="deduplicate">
+<a class="viewcode-back" href="../../../_autosummary/perda.core_data_structures.deduplication.html#perda.core_data_structures.deduplication.deduplicate">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">deduplicate</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">DataInstance</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataInstance</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Remove consecutive duplicate values from a DataInstance.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : DataInstance</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    DataInstance</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; gps_deduped = deduplicate(analyzer.data[&quot;gps.lat&quot;])</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">src_v</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">value_np</span>
+    <span class="n">keep</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(([</span><span class="kc">True</span><span class="p">],</span> <span class="n">src_v</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">!=</span> <span class="n">src_v</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+    <span class="k">return</span> <span class="n">DataInstance</span><span class="p">(</span>
+        <span class="n">timestamp_np</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">[</span><span class="n">keep</span><span class="p">],</span>
+        <span class="n">value_np</span><span class="o">=</span><span class="n">src_v</span><span class="p">[</span><span class="n">keep</span><span class="p">],</span>
+        <span class="n">label</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">label</span><span class="p">,</span>
+        <span class="n">var_id</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">var_id</span><span class="p">,</span>
+        <span class="n">cpp_name</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">cpp_name</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+</pre></div>
 
                 </article>
               
@@ -355,8 +365,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
-<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">

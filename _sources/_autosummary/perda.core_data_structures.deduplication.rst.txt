@@ -1,0 +1,8 @@
+perda.core\_data\_structures.deduplication
+==========================================
+
+.. automodule:: perda.core_data_structures.deduplication
+   :members:
+   :undoc-members:
+   :show-inheritance:
+

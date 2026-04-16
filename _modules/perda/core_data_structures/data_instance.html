@@ -304,13 +304,14 @@
                   
   <h1>Source code for perda.core_data_structures.data_instance</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">numpy.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">NDArray</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">ConfigDict</span><span class="p">,</span> <span class="n">Field</span><span class="p">,</span> <span class="n">field_validator</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">.joins</span><span class="w"> </span><span class="kn">import</span> <span class="n">inner_join</span><span class="p">,</span> <span class="n">left_join</span><span class="p">,</span> <span class="n">outer_join</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.resampling</span><span class="w"> </span><span class="kn">import</span> <span class="n">ResampleMethod</span><span class="p">,</span> <span class="n">_interpolate</span>
 
 
 <div class="viewcode-block" id="DataInstance">
@@ -336,7 +337,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Validate that timestamp array is 1-dimensional, positive, and strictly increasing.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;timestamp_np must be 1-dimensional array.&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">):</span>
@@ -354,7 +355,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Validate that value array is 1-dimensional</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;value_np must be 1-dimensional array.&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">v</span></div>
@@ -392,7 +393,7 @@
 <span class="sd">        Add two DataInstances or add a scalar to a DataInstance.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">DataInstance</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">apply_ufunc_outer_join</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">add</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">apply_ufunc_left_join</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">add</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isscalar</span><span class="p">(</span><span class="n">other</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">DataInstance</span><span class="p">(</span>
                 <span class="n">timestamp_np</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">,</span>
@@ -407,7 +408,7 @@
 <span class="sd">        Subtract a DataInstance or scalar from this DataInstance.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">DataInstance</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">apply_ufunc_outer_join</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">subtract</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">apply_ufunc_left_join</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">subtract</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isscalar</span><span class="p">(</span><span class="n">other</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">DataInstance</span><span class="p">(</span>
                 <span class="n">timestamp_np</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">,</span>
@@ -422,7 +423,7 @@
 <span class="sd">        Multiply two DataInstances or multiply a DataInstance by a scalar.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">DataInstance</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">apply_ufunc_outer_join</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">apply_ufunc_left_join</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isscalar</span><span class="p">(</span><span class="n">other</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">DataInstance</span><span class="p">(</span>
                 <span class="n">timestamp_np</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">,</span>
@@ -437,7 +438,7 @@
 <span class="sd">        Divide this DataInstance by another DataInstance or scalar.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">DataInstance</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">apply_ufunc_outer_join</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">true_divide</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">apply_ufunc_left_join</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">true_divide</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isscalar</span><span class="p">(</span><span class="n">other</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">DataInstance</span><span class="p">(</span>
                 <span class="n">timestamp_np</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">,</span>
@@ -452,7 +453,7 @@
 <span class="sd">        Raise this DataInstance to the power of another DataInstance or scalar.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">DataInstance</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">apply_ufunc_outer_join</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">apply_ufunc_left_join</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isscalar</span><span class="p">(</span><span class="n">other</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">DataInstance</span><span class="p">(</span>
                 <span class="n">timestamp_np</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">,</span>
@@ -520,37 +521,72 @@
 <a class="viewcode-back" href="../../../_autosummary/perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.left_join_data_instances">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">left_join_data_instances</span><span class="p">(</span>
     <span class="n">left</span><span class="p">:</span> <span class="n">DataInstance</span><span class="p">,</span>
-    <span class="n">right</span><span class="p">:</span> <span class="n">DataInstance</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">DataInstance</span><span class="p">,</span> <span class="n">DataInstance</span><span class="p">]:</span>
+    <span class="n">right</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">DataInstance</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">DataInstance</span><span class="p">]],</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">method</span><span class="p">:</span> <span class="n">ResampleMethod</span> <span class="o">=</span> <span class="n">ResampleMethod</span><span class="o">.</span><span class="n">LINEAR</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">DataInstance</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Left join two DataInstances: keep all left timestamps, interpolate right values.</span>
+<span class="sd">    Left join one or more DataInstances onto the left timestamp grid.</span>
+
+<span class="sd">    All right series are interpolated onto the left series timestamps.</span>
+<span class="sd">    To resample onto a uniform frequency grid first, call</span>
+<span class="sd">    ``resample_to_freq`` on the left instance before passing it here.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    left : DataInstance</span>
-<span class="sd">        Left DataInstance (all timestamps are kept)</span>
-<span class="sd">    right : DataInstance</span>
-<span class="sd">        Right DataInstance (values are matched/interpolated to left)</span>
+<span class="sd">        Left DataInstance (defines the target timestamp grid)</span>
+<span class="sd">    right : DataInstance or list of DataInstance</span>
+<span class="sd">        One or more right DataInstances to align to the left grid</span>
+<span class="sd">    method : ResampleMethod, optional</span>
+<span class="sd">        Interpolation method. Default is LINEAR.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    left_result : DataInstance</span>
-<span class="sd">        Left DataInstance with aligned timestamps</span>
-<span class="sd">    right_result : DataInstance</span>
-<span class="sd">        Right DataInstance with values interpolated to left timestamps</span>
+<span class="sd">    tuple of DataInstance</span>
+<span class="sd">        First element is the left DataInstance (unchanged), followed by one</span>
+<span class="sd">        aligned DataInstance per right input, in the same order.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; left_a, right_b, right_c = left_join_data_instances(a, [b, c])</span>
+<span class="sd">    &gt;&gt;&gt; left_a, right_b = left_join_data_instances(a, b, method=ResampleMethod.ZOH)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">ts</span><span class="p">,</span> <span class="n">left_val</span><span class="p">,</span> <span class="n">right_val</span> <span class="o">=</span> <span class="n">left_join</span><span class="p">(</span>
-        <span class="n">left</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">,</span> <span class="n">left</span><span class="o">.</span><span class="n">value_np</span><span class="p">,</span> <span class="n">right</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">,</span> <span class="n">right</span><span class="o">.</span><span class="n">value_np</span>
+    <span class="n">rights</span> <span class="o">=</span> <span class="p">[</span><span class="n">right</span><span class="p">]</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">right</span><span class="p">,</span> <span class="n">DataInstance</span><span class="p">)</span> <span class="k">else</span> <span class="nb">list</span><span class="p">(</span><span class="n">right</span><span class="p">)</span>
+
+    <span class="n">ts</span><span class="p">,</span> <span class="n">left_val</span><span class="p">,</span> <span class="n">first_right_val</span> <span class="o">=</span> <span class="n">left_join</span><span class="p">(</span>
+        <span class="n">left</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">,</span>
+        <span class="n">left</span><span class="o">.</span><span class="n">value_np</span><span class="p">,</span>
+        <span class="n">rights</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">,</span>
+        <span class="n">rights</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">value_np</span><span class="p">,</span>
+        <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">,</span>
     <span class="p">)</span>
 
-    <span class="n">left_result</span> <span class="o">=</span> <span class="n">DataInstance</span><span class="p">(</span>
-        <span class="n">timestamp_np</span><span class="o">=</span><span class="n">ts</span><span class="p">,</span> <span class="n">value_np</span><span class="o">=</span><span class="n">left_val</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">left</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">var_id</span><span class="o">=</span><span class="n">left</span><span class="o">.</span><span class="n">var_id</span>
-    <span class="p">)</span>
-    <span class="n">right_result</span> <span class="o">=</span> <span class="n">DataInstance</span><span class="p">(</span>
-        <span class="n">timestamp_np</span><span class="o">=</span><span class="n">ts</span><span class="p">,</span> <span class="n">value_np</span><span class="o">=</span><span class="n">right_val</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">right</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">var_id</span><span class="o">=</span><span class="n">right</span><span class="o">.</span><span class="n">var_id</span>
-    <span class="p">)</span>
+    <span class="n">results</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">DataInstance</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">DataInstance</span><span class="p">(</span>
+            <span class="n">timestamp_np</span><span class="o">=</span><span class="n">ts</span><span class="p">,</span> <span class="n">value_np</span><span class="o">=</span><span class="n">left_val</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">left</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">var_id</span><span class="o">=</span><span class="n">left</span><span class="o">.</span><span class="n">var_id</span>
+        <span class="p">),</span>
+        <span class="n">DataInstance</span><span class="p">(</span>
+            <span class="n">timestamp_np</span><span class="o">=</span><span class="n">ts</span><span class="p">,</span>
+            <span class="n">value_np</span><span class="o">=</span><span class="n">first_right_val</span><span class="p">,</span>
+            <span class="n">label</span><span class="o">=</span><span class="n">rights</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">label</span><span class="p">,</span>
+            <span class="n">var_id</span><span class="o">=</span><span class="n">rights</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">var_id</span><span class="p">,</span>
+        <span class="p">),</span>
+    <span class="p">]</span>
 
-    <span class="k">return</span> <span class="n">left_result</span><span class="p">,</span> <span class="n">right_result</span></div>
+    <span class="c1"># Interpolate remaining right series onto the already-computed target grid</span>
+    <span class="n">target_f</span> <span class="o">=</span> <span class="n">ts</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">di</span> <span class="ow">in</span> <span class="n">rights</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+        <span class="n">vals</span> <span class="o">=</span> <span class="n">_interpolate</span><span class="p">(</span>
+            <span class="n">target_f</span><span class="p">,</span> <span class="n">di</span><span class="o">.</span><span class="n">timestamp_np</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span> <span class="n">di</span><span class="o">.</span><span class="n">value_np</span><span class="p">,</span> <span class="n">method</span>
+        <span class="p">)</span>
+        <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="n">DataInstance</span><span class="p">(</span>
+                <span class="n">timestamp_np</span><span class="o">=</span><span class="n">ts</span><span class="p">,</span> <span class="n">value_np</span><span class="o">=</span><span class="n">vals</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">di</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">var_id</span><span class="o">=</span><span class="n">di</span><span class="o">.</span><span class="n">var_id</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">results</span><span class="p">)</span></div>
 
 
 
@@ -612,6 +648,7 @@
     <span class="n">right</span><span class="p">:</span> <span class="n">DataInstance</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">tolerance</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">method</span><span class="p">:</span> <span class="n">ResampleMethod</span> <span class="o">=</span> <span class="n">ResampleMethod</span><span class="o">.</span><span class="n">LINEAR</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">DataInstance</span><span class="p">,</span> <span class="n">DataInstance</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Inner join two DataInstances: keep only left timestamps with matching right timestamps.</span>
@@ -625,6 +662,8 @@
 <span class="sd">    tolerance : float</span>
 <span class="sd">        Maximum allowed distance between left and right timestamps for a match.</span>
 <span class="sd">        Timestamps with distance &gt; tolerance are dropped.</span>
+<span class="sd">    method : ResampleMethod, optional</span>
+<span class="sd">        Interpolation method for right values. Default is LINEAR.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -639,6 +678,7 @@
         <span class="n">right</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">,</span>
         <span class="n">right</span><span class="o">.</span><span class="n">value_np</span><span class="p">,</span>
         <span class="n">tolerance</span><span class="o">=</span><span class="n">tolerance</span><span class="p">,</span>
+        <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">,</span>
     <span class="p">)</span>
 
     <span class="n">left_result</span> <span class="o">=</span> <span class="n">DataInstance</span><span class="p">(</span>
