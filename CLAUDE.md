@@ -58,6 +58,10 @@ The library has four layers:
 
 - Units and conversion factors should be defined in `units.py`. No magic numbers in code
 
+- Unit tests should not be bundled in classes. Write individual functions.
+
+- If specific state is needed across multiple tests, use pytest fixtures to set up that state in a consistent way.
+
 ## Style Guide
 
 - To run any commands or code, a Python virtual environment, setup in the root of the repository, must be activated. All new dependencies should be added to `requirements.txt` and installed in the virtual environment.

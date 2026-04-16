@@ -1,105 +1,80 @@
-from collections import defaultdict
 from typing import Tuple
 
 import numpy as np
+from numpy.typing import NDArray
+
+from .resampling import ResampleMethod, _interpolate
 
 
 def left_join(
-    left_ts: np.ndarray,
-    left_val: np.ndarray,
-    right_ts: np.ndarray,
-    right_val: np.ndarray,
-) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    left_ts: NDArray,
+    left_val: NDArray,
+    right_ts: NDArray,
+    right_val: NDArray,
+    *,
+    method: ResampleMethod = ResampleMethod.LINEAR,
+) -> Tuple[NDArray, NDArray, NDArray]:
     """
-    Left join: keep all left timestamps, match and interpolate right values.
+    Left join: interpolate right values onto the left timestamp grid.
 
     Parameters
     ----------
-    left_ts : np.ndarray
-        Timestamps for left series (these are kept exactly)
-    left_val : np.ndarray
+    left_ts : NDArray
+        Timestamps for left series (used as the target grid)
+    left_val : NDArray
         Values for left series
-    right_ts : np.ndarray
-        Timestamps for right series (these will be matched to left)
-    right_val : np.ndarray
+    right_ts : NDArray
+        Timestamps for right series
+    right_val : NDArray
         Values for right series
-    interpolate : bool, optional
-        If True, interpolate right values to fill all left timestamps.
-        If False, only use matched values (NaN for unmatched). Default is True.
+    method : ResampleMethod, optional
+        Interpolation method. Default is LINEAR.
 
     Returns
     -------
-    timestamps : np.ndarray
-        The left timestamps (unchanged)
-    left_values : np.ndarray
-        The left values (unchanged)
-    right_values : np.ndarray
-        Right values matched/interpolated to left timestamps
-
-    Notes
-    -----
-    Process:
-    1. For each right timestamp, find the closest left timestamp
-    2. If multiple right timestamps map to the same left timestamp, average them
-    3. Interpolate right values to fill remaining left timestamps (if interpolate=True)
+    timestamps : NDArray
+        Left timestamps (unchanged)
+    left_values : NDArray
+        Left values (unchanged)
+    right_values : NDArray
+        Right values interpolated onto left timestamps
     """
-    timestamps = left_ts.copy()
-    left_values = left_val.copy()
-
-    right_values = np.full(left_ts.shape, np.nan, dtype=float)
-
     if right_ts.size == 0 or left_ts.size == 0:
         raise ValueError("Both time series must be non-empty")
 
-    # Find insertion indices
-    idx = np.searchsorted(left_ts, right_ts)
+    target_f = left_ts.astype(np.float64)
+    right_values = _interpolate(
+        target_f, right_ts.astype(np.float64), right_val, method
+    )
 
-    # Clamp indices to valid range
-    idx_right = np.clip(idx, 0, len(left_ts) - 1)
-    idx_left = np.clip(idx - 1, 0, len(left_ts) - 1)
-
-    # Choose closer neighbor
-    dist_left = np.abs(right_ts - left_ts[idx_left])
-    dist_right = np.abs(right_ts - left_ts[idx_right])
-    closest_idx = np.where(dist_left <= dist_right, idx_left, idx_right)
-
-    # Average right values mapped to same left index
-    matches = defaultdict(list)
-    for li, rv in zip(closest_idx, right_val):
-        matches[li].append(rv)
-
-    for li, vals in matches.items():
-        right_values[li] = np.mean(vals)
-
-    # Interpolate missing values
-    valid = ~np.isnan(right_values)
-    right_values = np.interp(left_ts, left_ts[valid], right_values[valid])
-
-    return timestamps, left_values, right_values
+    return left_ts.copy(), left_val.copy(), right_values
 
 
 def outer_join(
-    left_ts: np.ndarray,
-    left_val: np.ndarray,
-    right_ts: np.ndarray,
-    right_val: np.ndarray,
+    left_ts: NDArray,
+    left_val: NDArray,
+    right_ts: NDArray,
+    right_val: NDArray,
     *,
+    method: ResampleMethod = ResampleMethod.LINEAR,
     drop_nan: bool = True,
     fill: float = 0.0,
-) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+) -> Tuple[NDArray, NDArray, NDArray]:
     """
-    Outer join: union of timestamps with linear interpolation.
+    Outer join: union of timestamps with interpolation.
 
     Parameters
     ----------
-    left_ts : np.ndarray
+    left_ts : NDArray
         Timestamps for left series
-    left_val : np.ndarray
+    left_val : NDArray
         Values for left series
-    right_ts : np.ndarray
+    right_ts : NDArray
         Timestamps for right series
-    right_val : np.ndarray
+    right_val : NDArray
         Values for right series
+    method : ResampleMethod, optional
+        Interpolation method. Default is LINEAR.
     drop_nan : bool, optional
         If True, drop rows where either series has NaN after interpolation.
         Default is True.
@@ -108,19 +83,22 @@ def outer_join(
 
     Returns
     -------
-    timestamps : np.ndarray
+    timestamps : NDArray
         Union of all timestamps
-    left_values : np.ndarray
+    left_values : NDArray
         Left values interpolated to union timestamps
-    right_values : np.ndarray
+    right_values : NDArray
         Right values interpolated to union timestamps
     """
     if right_ts.size == 0 or left_ts.size == 0:
         raise ValueError("Both time series must be non-empty")
 
     timestamps = np.union1d(left_ts, right_ts)
-    left_values = np.interp(timestamps, left_ts, left_val)
-    right_values = np.interp(timestamps, right_ts, right_val)
+    target_f = timestamps.astype(np.float64)
+    left_values = _interpolate(target_f, left_ts.astype(np.float64), left_val, method)
+    right_values = _interpolate(
+        target_f, right_ts.astype(np.float64), right_val, method
+    )
 
     if drop_nan:
         keep_mask = ~np.isnan(left_values) & ~np.isnan(right_values)
@@ -135,86 +113,59 @@ def outer_join(
 
 
 def inner_join(
-    left_ts: np.ndarray,
-    left_val: np.ndarray,
-    right_ts: np.ndarray,
-    right_val: np.ndarray,
+    left_ts: NDArray,
+    left_val: NDArray,
+    right_ts: NDArray,
+    right_val: NDArray,
     *,
     tolerance: float,
-) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    method: ResampleMethod = ResampleMethod.LINEAR,
+) -> Tuple[NDArray, NDArray, NDArray]:
     """
-    Inner join: keep only left timestamps that have a matching right timestamp within tolerance.
-
-    Process:
-    1. For each left timestamp, find the closest right timestamp
-    2. Keep the left timestamp only if the distance is within tolerance
-    3. Match right values to the kept left timestamps
+    Inner join: keep only left timestamps that have a right timestamp within tolerance,
+    then interpolate right values onto those timestamps.
 
     Parameters
     ----------
-    left_ts : np.ndarray
+    left_ts : NDArray
         Timestamps for left series
-    left_val : np.ndarray
+    left_val : NDArray
         Values for left series
-    right_ts : np.ndarray
+    right_ts : NDArray
         Timestamps for right series
-    right_val : np.ndarray
+    right_val : NDArray
         Values for right series
     tolerance : float
-        Maximum allowed distance between left and right timestamps for a match.
-        Timestamps with distance > tolerance are dropped.
+        Maximum allowed distance to the nearest right timestamp for a left
+        timestamp to be kept.
+    method : ResampleMethod, optional
+        Interpolation method for right values. Default is LINEAR.
 
     Returns
     -------
-    timestamps : np.ndarray
-        Subset of left timestamps that have matches within tolerance
-    left_values : np.ndarray
-        Left values at the matched timestamps
-    right_values : np.ndarray
-        Right values interpolated to the matched timestamps
+    timestamps : NDArray
+        Subset of left timestamps within tolerance of a right timestamp
+    left_values : NDArray
+        Left values at the kept timestamps
+    right_values : NDArray
+        Right values interpolated onto the kept timestamps
     """
     if right_ts.size == 0 or left_ts.size == 0:
         raise ValueError("Both time series must be non-empty")
 
-    # Output arrays
-    timestamps = left_ts.copy()
-    left_values = left_val.copy()
-    right_values = np.full(left_ts.shape, np.nan, dtype=float)
-
-    # Find insertion points of left_ts into right_ts
+    # For each left timestamp, find the distance to the nearest right timestamp
     idx = np.searchsorted(right_ts, left_ts)
+    idx_hi = np.clip(idx, 0, len(right_ts) - 1)
+    idx_lo = np.clip(idx - 1, 0, len(right_ts) - 1)
+    min_dist = np.minimum(
+        np.abs(left_ts - right_ts[idx_lo]), np.abs(left_ts - right_ts[idx_hi])
+    )
 
-    # Candidate neighbors
-    idx_right = np.clip(idx, 0, len(right_ts) - 1)
-    idx_left = np.clip(idx - 1, 0, len(right_ts) - 1)
-
-    # Distances
-    dist_left = np.abs(left_ts - right_ts[idx_left])
-    dist_right = np.abs(left_ts - right_ts[idx_right])
-
-    # Choose closest right index
-    closest_right_idx = np.where(dist_left <= dist_right, idx_left, idx_right)
-
-    # Distance to chosen right timestamp
-    min_dist = np.minimum(dist_left, dist_right)
-
-    # Apply tolerance filter
-    valid_mask = min_dist <= tolerance
-    valid_left_idx = np.where(valid_mask)[0]
-    valid_right_idx = closest_right_idx[valid_mask]
-
-    # Deduplicate: multiple right values may map to same left index
-    matches = defaultdict(list)
-    for li, ri in zip(valid_left_idx, valid_right_idx):
-        matches[li].append(right_val[ri])
-
-    for li, vals in matches.items():
-        right_values[li] = np.mean(vals)
-
-    # Filter to only include matched timestamps
-    matched_indices = np.array(sorted(matches.keys()))
-    timestamps = timestamps[matched_indices]
-    left_values = left_values[matched_indices]
-    right_values = right_values[matched_indices]
+    keep = min_dist <= tolerance
+    timestamps = left_ts[keep]
+    left_values = left_val[keep]
+    right_values = _interpolate(
+        timestamps.astype(np.float64), right_ts.astype(np.float64), right_val, method
+    )
 
     return timestamps, left_values, right_values

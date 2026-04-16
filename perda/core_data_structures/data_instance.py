@@ -1,11 +1,12 @@
 from enum import Enum
-from typing import Any, Callable, Tuple, Union
+from typing import Any, Callable, List, Tuple, Union
 
 import numpy as np
 from numpy.typing import NDArray
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from .joins import inner_join, left_join, outer_join
+from .resampling import ResampleMethod, _interpolate
 
 
 class DataInstance(BaseModel):
@@ -27,7 +28,7 @@ class DataInstance(BaseModel):
         """
         Validate that timestamp array is 1-dimensional, positive, and strictly increasing.
         """
-        v = np.asarray(v, dtype=np.int64)
+        v = v.astype(np.int64)
         if v.ndim != 1:
             raise ValueError("timestamp_np must be 1-dimensional array.")
         if not np.all(np.diff(v) >= 0):
@@ -42,7 +43,7 @@ class DataInstance(BaseModel):
         """
         Validate that value array is 1-dimensional
         """
-        v = np.asarray(v, dtype=np.float64)
+        v = v.astype(np.float64)
         if v.ndim != 1:
             raise ValueError("value_np must be 1-dimensional array.")
         return v
@@ -76,7 +77,7 @@ class DataInstance(BaseModel):
         Add two DataInstances or add a scalar to a DataInstance.
         """
         if isinstance(other, DataInstance):
-            return apply_ufunc_outer_join(self, other, np.add)
+            return apply_ufunc_left_join(self, other, np.add)
         if np.isscalar(other):
             return DataInstance(
                 timestamp_np=self.timestamp_np,
@@ -91,7 +92,7 @@ class DataInstance(BaseModel):
         Subtract a DataInstance or scalar from this DataInstance.
         """
         if isinstance(other, DataInstance):
-            return apply_ufunc_outer_join(self, other, np.subtract)
+            return apply_ufunc_left_join(self, other, np.subtract)
         if np.isscalar(other):
             return DataInstance(
                 timestamp_np=self.timestamp_np,
@@ -106,7 +107,7 @@ class DataInstance(BaseModel):
         Multiply two DataInstances or multiply a DataInstance by a scalar.
         """
         if isinstance(other, DataInstance):
-            return apply_ufunc_outer_join(self, other, np.multiply)
+            return apply_ufunc_left_join(self, other, np.multiply)
         if np.isscalar(other):
             return DataInstance(
                 timestamp_np=self.timestamp_np,
@@ -121,7 +122,7 @@ class DataInstance(BaseModel):
         Divide this DataInstance by another DataInstance or scalar.
         """
         if isinstance(other, DataInstance):
-            return apply_ufunc_outer_join(self, other, np.true_divide)
+            return apply_ufunc_left_join(self, other, np.true_divide)
         if np.isscalar(other):
             return DataInstance(
                 timestamp_np=self.timestamp_np,
@@ -136,7 +137,7 @@ class DataInstance(BaseModel):
         Raise this DataInstance to the power of another DataInstance or scalar.
         """
         if isinstance(other, DataInstance):
-            return apply_ufunc_outer_join(self, other, np.power)
+            return apply_ufunc_left_join(self, other, np.power)
         if np.isscalar(other):
             return DataInstance(
                 timestamp_np=self.timestamp_np,
@@ -198,37 +199,72 @@ class DataInstance(BaseModel):
 
 def left_join_data_instances(
     left: DataInstance,
-    right: DataInstance,
-) -> Tuple[DataInstance, DataInstance]:
+    right: Union[DataInstance, List[DataInstance]],
+    *,
+    method: ResampleMethod = ResampleMethod.LINEAR,
+) -> Tuple[DataInstance, ...]:
     """
-    Left join two DataInstances: keep all left timestamps, interpolate right values.
+    Left join one or more DataInstances onto the left timestamp grid.
+
+    All right series are interpolated onto the left series timestamps.
+    To resample onto a uniform frequency grid first, call
+    ``resample_to_freq`` on the left instance before passing it here.
 
     Parameters
     ----------
     left : DataInstance
-        Left DataInstance (all timestamps are kept)
-    right : DataInstance
-        Right DataInstance (values are matched/interpolated to left)
+        Left DataInstance (defines the target timestamp grid)
+    right : DataInstance or list of DataInstance
+        One or more right DataInstances to align to the left grid
+    method : ResampleMethod, optional
+        Interpolation method. Default is LINEAR.
 
     Returns
     -------
-    left_result : DataInstance
-        Left DataInstance with aligned timestamps
-    right_result : DataInstance
-        Right DataInstance with values interpolated to left timestamps
+    tuple of DataInstance
+        First element is the left DataInstance (unchanged), followed by one
+        aligned DataInstance per right input, in the same order.
+
+    Examples
+    --------
+    >>> left_a, right_b, right_c = left_join_data_instances(a, [b, c])
+    >>> left_a, right_b = left_join_data_instances(a, b, method=ResampleMethod.ZOH)
     """
-    ts, left_val, right_val = left_join(
-        left.timestamp_np, left.value_np, right.timestamp_np, right.value_np
+    rights = [right] if isinstance(right, DataInstance) else list(right)
+
+    ts, left_val, first_right_val = left_join(
+        left.timestamp_np,
+        left.value_np,
+        rights[0].timestamp_np,
+        rights[0].value_np,
+        method=method,
     )
 
-    left_result = DataInstance(
-        timestamp_np=ts, value_np=left_val, label=left.label, var_id=left.var_id
-    )
-    right_result = DataInstance(
-        timestamp_np=ts, value_np=right_val, label=right.label, var_id=right.var_id
-    )
+    results: List[DataInstance] = [
+        DataInstance(
+            timestamp_np=ts, value_np=left_val, label=left.label, var_id=left.var_id
+        ),
+        DataInstance(
+            timestamp_np=ts,
+            value_np=first_right_val,
+            label=rights[0].label,
+            var_id=rights[0].var_id,
+        ),
+    ]
 
-    return left_result, right_result
+    # Interpolate remaining right series onto the already-computed target grid
+    target_f = ts.astype(np.float64)
+    for di in rights[1:]:
+        vals = _interpolate(
+            target_f, di.timestamp_np.astype(np.float64), di.value_np, method
+        )
+        results.append(
+            DataInstance(
+                timestamp_np=ts, value_np=vals, label=di.label, var_id=di.var_id
+            )
+        )
+
+    return tuple(results)
 
 
 def outer_join_data_instances(
@@ -284,6 +320,7 @@ def inner_join_data_instances(
     right: DataInstance,
     *,
     tolerance: float,
+    method: ResampleMethod = ResampleMethod.LINEAR,
 ) -> Tuple[DataInstance, DataInstance]:
     """
     Inner join two DataInstances: keep only left timestamps with matching right timestamps.
@@ -297,6 +334,8 @@ def inner_join_data_instances(
     tolerance : float
         Maximum allowed distance between left and right timestamps for a match.
         Timestamps with distance > tolerance are dropped.
+    method : ResampleMethod, optional
+        Interpolation method for right values. Default is LINEAR.
 
     Returns
     -------
@@ -311,6 +350,7 @@ def inner_join_data_instances(
         right.timestamp_np,
         right.value_np,
         tolerance=tolerance,
+        method=method,
     )
 
     left_result = DataInstance(

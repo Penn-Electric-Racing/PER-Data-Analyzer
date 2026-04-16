@@ -2,10 +2,10 @@ from typing import List
 
 import numpy as np
 
-from ..analyzer.analyzer import Analyzer
 from ..core_data_structures.data_instance import DataInstance
 from ..core_data_structures.single_run_data import SingleRunData
 from ..units import Timescale
+from .analyzer import Analyzer
 
 
 def _upscale_to_us(data: SingleRunData) -> SingleRunData:
