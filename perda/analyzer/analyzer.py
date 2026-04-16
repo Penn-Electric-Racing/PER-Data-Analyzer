@@ -8,12 +8,13 @@ from ..core_data_structures.data_instance import DataInstance
 from ..core_data_structures.single_run_data import SingleRunData
 from ..plotting.data_instance_plotter import *
 from ..plotting.plotting_constants import *
-from ..units import Timescale, mph_seconds_to_meters
+from ..units import Timescale
 from ..utils.accel_calculator import *
 from ..utils.data_summary import single_run_summary
 from ..utils.diff import diff
 from ..utils.frequency_analysis import analyze_frequency as _analyze_frequency
 from ..utils.integrate import smoothed_filtered_integration
+from ..utils.preprocessing import Preprocessing, apply_preprocessing
 from ..utils.search import search
 from .csv import *
 
@@ -26,6 +27,7 @@ class Analyzer:
         filepath: str,
         ts_offset: int = 0,
         parsing_errors_limit: int = 100,
+        corrections: list[Preprocessing] | None = None,
     ) -> None:
         """
         Initialize a new analyzer instance.
@@ -33,18 +35,20 @@ class Analyzer:
         Parameters
         ----------
         filepath : str
-            Path to the CSV file containing CAN bus variables
+            Path to the CSV file containing CAN bus variables.
         ts_offset : int, optional
-            Timestamp offset to apply to all data points. Default is 0
+            Timestamp offset to apply to all data points. Default is 0.
         parsing_errors_limit : int, optional
-            Maximum number of parsing errors before stopping. Default is 100
-        parse_unit : Timescale | str | None, optional
-            Logging timestamp unit for parsing. If None, auto-detect from header:
-            lines ending with "v2.0" use us, otherwise ms.
+            Maximum number of parsing errors before stopping. Default is 100.
+        corrections : list[Preprocessing] | None, optional
+            Ordered list of post-parse corrections to apply. Each correction
+            is skipped with a warning if required variables are absent.
+            Default is None (no corrections).
 
         Examples
         --------
-        >>> aly = Analyzer("path/to/log.csv")
+        >>> from perda.utils import Preprocessing
+        >>> aly = Analyzer("path/to/log.csv", corrections=[Preprocessing.NED_VELOCITY])
         >>> print(aly)  # lists all available variables
         """
         self.data: SingleRunData = parse_csv(
@@ -52,6 +56,8 @@ class Analyzer:
             ts_offset,
             parsing_errors_limit=parsing_errors_limit,
         )
+        if corrections:
+            self.data = apply_preprocessing(self.data, corrections)
 
     def __str__(self) -> str:
         """Return a summary of all variables in the loaded run data."""
@@ -316,7 +322,7 @@ class Analyzer:
         )
         distance_obj = DataInstance(
             timestamp_np=time_arr,
-            value_np=mph_seconds_to_meters(distance),
+            value_np=distance,
             label="Distance",
         )
 
