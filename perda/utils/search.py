@@ -8,7 +8,7 @@ from ..constants import DELIMITER, title_block
 from ..core_data_structures.single_run_data import SingleRunData
 
 try:
-    from sentence_transformers.cross_encoder import CrossEncoder as _CrossEncoder
+    from sentence_transformers.cross_encoder import CrossEncoder
 
     _SEMANTIC_AVAILABLE: bool = True
 except ImportError:
@@ -17,7 +17,7 @@ except ImportError:
 _MODEL_DIR = Path(__file__).resolve().parents[1] / "models" / "stsb-cross-encoder"
 _HF_MODEL_ID = "cross-encoder/stsb-distilroberta-base"
 
-_model: _CrossEncoder | None = None  # _CrossEncoder instance when loaded, else None
+_model: "CrossEncoder" | None = None  # CrossEncoder instance when loaded, else None
 
 ABBREVIATIONS: dict[str, str] = {
     "pcm": "powertrain control module",
@@ -77,12 +77,12 @@ def install_encoder() -> bool:
     try:
         if not _MODEL_DIR.exists():
             print("Downloading cross-encoder model (one-time setup)...")
-            _model = _CrossEncoder(_HF_MODEL_ID)
+            _model = CrossEncoder(_HF_MODEL_ID)
             _MODEL_DIR.parent.mkdir(parents=True, exist_ok=True)
             _model.save(str(_MODEL_DIR))
             print(f"Model saved to: {_MODEL_DIR}")
         else:
-            _model = _CrossEncoder(str(_MODEL_DIR))
+            _model = CrossEncoder(str(_MODEL_DIR))
         return True
     except Exception as e:
         print(
