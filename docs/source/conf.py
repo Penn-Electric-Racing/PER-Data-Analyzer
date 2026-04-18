@@ -50,6 +50,7 @@ extensions = [
     "sphinx.ext.viewcode",  # Add links to source code
     "sphinx_copybutton",  # For copy buttons on code blocks
     "sphinx_design",  # For better CSS
+    "sphinx_markdown_builder"  # For MCP Markdown file
 ]
 
 # Configure autodoc-typehints to work with pydantic
