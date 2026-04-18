@@ -120,6 +120,34 @@ class SubplotConfig(BaseModel):
     margin: Dict[str, int] = Field(default_factory=lambda: dict(l=70, r=50, t=90, b=70))
 
 
+class FFTPlotConfig(BaseModel):
+    """Configuration for FFT magnitude spectrum plots.
+
+    Parameters
+    ----------
+    log_x : bool
+        Logarithmic x-axis (frequency). Default is True.
+    log_y : bool
+        Logarithmic y-axis (magnitude). Default is False.
+    line_color : str
+        Color of the spectrum trace(s). Default is ``"steelblue"``.
+    cutoff_color : str
+        Color of the vertical cutoff marker line. Default is ``"crimson"``.
+    cutoff_dash : str
+        Dash style for the cutoff line. Default is ``"dash"``.
+    height_single : int
+        Figure height in pixels when ``stacked=False`` (single-panel view).
+        Default is 500.
+    """
+
+    log_x: bool = True
+    log_y: bool = False
+    line_color: str = "steelblue"
+    cutoff_color: str = "crimson"
+    cutoff_dash: str = "dash"
+    height_single: int = 500
+
+
 # Default configuration instances
 DEFAULT_FONT_CONFIG = FontConfig()
 DEFAULT_LAYOUT_CONFIG = LayoutConfig()
@@ -128,3 +156,4 @@ DEFAULT_SCATTER_HISTOGRAM_PLOT_CONFIG = ScatterHistogramPlotConfig()
 DEFAULT_VLINE_CONFIG = VLineConfig()
 DEFAULT_GPS_MAP_CONFIG = GpsMapConfig()
 DEFAULT_SUBPLOT_CONFIG = SubplotConfig()
+DEFAULT_FFT_PLOT_CONFIG = FFTPlotConfig()
