@@ -13,3 +13,5 @@ requests
 
 # Progress Bar
 tqdm
+
+fastmcp
