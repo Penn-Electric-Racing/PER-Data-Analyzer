@@ -505,11 +505,15 @@
 <span class="sd">        &gt;&gt;&gt; print(aly)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">local_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_download</span><span class="p">(</span><span class="n">log_key</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">Analyzer</span><span class="p">(</span>
-            <span class="n">local_path</span><span class="p">,</span>
-            <span class="n">ts_offset</span><span class="o">=</span><span class="n">ts_offset</span><span class="p">,</span>
-            <span class="n">parsing_errors_limit</span><span class="o">=</span><span class="n">parsing_errors_limit</span><span class="p">,</span>
-        <span class="p">)</span></div>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Analyzer</span><span class="p">(</span>
+                <span class="n">local_path</span><span class="p">,</span>
+                <span class="n">ts_offset</span><span class="o">=</span><span class="n">ts_offset</span><span class="p">,</span>
+                <span class="n">parsing_errors_limit</span><span class="o">=</span><span class="n">parsing_errors_limit</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cache_dir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">Path</span><span class="p">(</span><span class="n">local_path</span><span class="p">)</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">missing_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="ServerClient.print_logs">
