@@ -190,11 +190,15 @@ class ServerClient:
         >>> print(aly)
         """
         local_path = self._download(log_key)
-        return Analyzer(
-            local_path,
-            ts_offset=ts_offset,
-            parsing_errors_limit=parsing_errors_limit,
-        )
+        try:
+            return Analyzer(
+                local_path,
+                ts_offset=ts_offset,
+                parsing_errors_limit=parsing_errors_limit,
+            )
+        finally:
+            if self._cache_dir is None:
+                Path(local_path).unlink(missing_ok=True)
 
     def print_logs(self, prefix: str = "") -> None:
         """Print a formatted listing of available logs.

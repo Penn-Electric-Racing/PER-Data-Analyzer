@@ -1,5 +1,6 @@
 import re
 from pathlib import Path
+from typing import Any
 
 from pydantic import BaseModel
 from rapidfuzz import fuzz
@@ -17,7 +18,8 @@ except ImportError:
 _MODEL_DIR = Path(__file__).resolve().parents[1] / "models" / "stsb-cross-encoder"
 _HF_MODEL_ID = "cross-encoder/stsb-distilroberta-base"
 
-_model: "CrossEncoder" | None = None  # CrossEncoder instance when loaded, else None
+# CrossEncoder instance when loaded, else None
+_model: Any = None
 
 ABBREVIATIONS: dict[str, str] = {
     "pcm": "powertrain control module",

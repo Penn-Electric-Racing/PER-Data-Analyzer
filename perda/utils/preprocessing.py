@@ -3,7 +3,7 @@ from typing import Callable
 
 import numpy as np
 
-from ..core_data_structures.data_instance import DataInstance
+from ..core_data_structures.data_instance import DataInstance, left_join_data_instances
 from ..core_data_structures.single_run_data import SingleRunData
 from ..units import in_to_m, mph_to_m_per_s
 
@@ -85,16 +85,19 @@ def patch_ned_velocity(data: SingleRunData) -> SingleRunData:
         print(f"WARNING: PATCH_NED_VELOCITY skipped — missing variables: {missing}")
         return data
 
-    vel_n = data[_VEL_X].value_np.astype(np.float64)
-    vel_e = data[_VEL_Y].value_np.astype(np.float64)
-    vel_d = data[_VEL_Z].value_np.astype(np.float64)
-    yaw_rad = np.radians(data[_YAW].value_np.astype(np.float64))
+    vel_n1, vel_e1, vel_d1, yaw_deg = left_join_data_instances(
+        data[_VEL_X], [data[_VEL_Y], data[_VEL_Z], data[_YAW]]
+    )
+
+    vel_n = vel_n1.value_np
+    vel_e = vel_e1.value_np
+    vel_d = vel_d1.value_np
+    yaw_rad = np.radians(yaw_deg.value_np)
 
     # Preserve raw NED copies
-    ts = data[_VEL_X].timestamp_np
-    _add(data, "velN", "NED North velocity (raw)", ts, vel_n.copy())
-    _add(data, "velE", "NED East velocity (raw)", ts, vel_e.copy())
-    _add(data, "velD", "NED Down velocity (raw)", ts, vel_d.copy())
+    _add(data, "velN", "NED North velocity (raw)", vel_n1.timestamp_np, vel_n.copy())
+    _add(data, "velE", "NED East velocity (raw)", vel_e1.timestamp_np, vel_e.copy())
+    _add(data, "velD", "NED Down velocity (raw)", vel_d1.timestamp_np, vel_d.copy())
 
     # Rotate NED → body-frame (FRD) using yaw only
     cos_y = np.cos(yaw_rad)
