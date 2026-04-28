@@ -181,11 +181,11 @@ class Analyzer:
         show_legend : bool, optional
             Whether to show plot legends. Default is True
         font_config : FontConfig, optional
-            Font configuration for plot elements. Default is DEFAULT_FONT_CONFIG
+            Font configuration for plot elements.
         layout_config : LayoutConfig, optional
-            Layout configuration for plot dimensions. Default is DEFAULT_LAYOUT_CONFIG
+            Layout configuration for plot dimensions.
         vline_config : VLineConfig, optional
-            Visual configuration for concat boundary lines. Default is DEFAULT_VLINE_CONFIG.
+            Visual configuration for concat boundary lines.
 
         Examples
         --------
@@ -291,9 +291,9 @@ class Analyzer:
         show_legend : bool, optional
             Whether to show the figure legend. Default is True.
         font_config : FontConfig, optional
-            Font sizes for plot elements. Default is DEFAULT_FONT_CONFIG.
+            Font sizes for plot elements.
         subplot_config : SubplotConfig, optional
-            Row height, spacing, width, and style. Default is DEFAULT_SUBPLOT_CONFIG.
+            Row height, spacing, width, and style.
 
         Returns
         -------
@@ -396,9 +396,9 @@ class Analyzer:
             Intervals exceeding this multiple of the expected (or median) interval
             are flagged as gaps. Default is 2.0.
         font_config : FontConfig, optional
-            Font sizes for plot elements. Default is DEFAULT_FONT_CONFIG.
+            Font sizes for plot elements.
         layout_config : LayoutConfig, optional
-            Plot dimensions and margins. Default is DEFAULT_LAYOUT_CONFIG.
+            Plot dimensions and margins.
 
         Returns
         -------

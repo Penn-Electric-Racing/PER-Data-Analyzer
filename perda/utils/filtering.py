@@ -1,7 +1,3 @@
-"""Digital signal filtering and FFT computation utilities for DataInstances."""
-
-from __future__ import annotations
-
 import numpy as np
 from numpy import float64, int64
 from numpy.typing import NDArray
@@ -12,82 +8,11 @@ from scipy.signal import butter, sosfiltfilt
 from ..core_data_structures.data_instance import DataInstance, left_join_data_instances
 from ..units import Timescale, _to_seconds
 
-# ---------------------------------------------------------------------------
-# Variables that should not be lowpass-filtered on raw values because they
-# contain wrapping discontinuities (e.g. yaw angle wraps at ±180°).
-# Filter after unwrapping if needed.
-# ---------------------------------------------------------------------------
-_NEVER_FILTER: frozenset[str] = frozenset(
-    {
-        "pcm.vnav.yawPitchRoll.yaw",
-    }
-)
 
-
-# ---------------------------------------------------------------------------
-# Internal helpers
-# ---------------------------------------------------------------------------
-
-
-def _ensure_list_di(
-    di: DataInstance | list[DataInstance],
-) -> tuple[list[DataInstance], bool]:
-    """Normalize a single DataInstance or list to a list, reporting original type.
-
-    Parameters
-    ----------
-    di : DataInstance | list[DataInstance]
-        Input to normalize.
-
-    Returns
-    -------
-    tuple[list[DataInstance], bool]
-        The normalized list and a flag that is ``True`` when the input was a
-        single ``DataInstance`` (so the caller can unwrap the result).
-    """
-    if isinstance(di, DataInstance):
-        return [di], True
-    return list(di), False
-
-
-def _median_sample_spacing_s(
-    timestamp_np: NDArray[int64],
-    source_time_unit: Timescale,
-) -> float:
-    """Compute the median sample spacing in seconds.
-
-    Parameters
-    ----------
-    timestamp_np : NDArray[int64]
-        Raw integer timestamps in the given time unit.
-    source_time_unit : Timescale
-        Unit of the timestamps.
-
-    Returns
-    -------
-    float
-        Median inter-sample interval in seconds.
-
-    Notes
-    -----
-    Raises ``ValueError`` when the median spacing is non-positive, which
-    indicates a degenerate or non-monotonic timestamp array.
-    """
-    ts_s = _to_seconds(timestamp_np.astype(np.float64), source_time_unit)
-    dt = np.median(np.diff(ts_s))
-    if dt <= 0:
-        raise ValueError(
-            "Non-positive median sample spacing; cannot determine sample rate. "
-            "Ensure timestamps are strictly increasing."
-        )
-    return float(dt)
-
-
-def _apply_sos_filter(
+def apply_sos_filter(
     signal: NDArray[float64],
     sos: NDArray[float64],
     order: int,
-    label: str,
 ) -> NDArray[float64] | None:
     """Apply a second-order-section filter with NaN masking.
 
@@ -99,8 +24,6 @@ def _apply_sos_filter(
         Second-order sections from ``scipy.signal.butter``.
     order : int
         Filter order (used to compute minimum valid sample threshold).
-    label : str
-        Variable label for diagnostic messages.
 
     Returns
     -------
@@ -110,21 +33,15 @@ def _apply_sos_filter(
     """
     valid = ~np.isnan(signal)
     min_samples = 3 * (2 * order + 1)
-    if valid.sum() < min_samples:
-        print(
-            f"  [filter] {label}: too few valid points "
-            f"({int(valid.sum())} < {min_samples}), skipping"
-        )
+
+    count = int(valid.sum())
+    if count < min_samples:
+        print(f"Too few valid points " f"({count} < {min_samples}), skipping")
         return None
 
     filtered = np.full_like(signal, np.nan)
     filtered[valid] = sosfiltfilt(sos, signal[valid])
     return filtered
-
-
-# ---------------------------------------------------------------------------
-# Public API
-# ---------------------------------------------------------------------------
 
 
 def lowpass_filter(
@@ -168,18 +85,25 @@ def lowpass_filter(
     >>> di_filtered = lowpass_filter(di, cutoff_hz=10.0)
     >>> di_filtered = lowpass_filter([di_a, di_b], cutoff_hz=5.0)
     """
-    di_list, was_single = _ensure_list_di(di)
+    di_list = [di] if isinstance(di, DataInstance) else di
+
     results: list[DataInstance] = []
 
     for instance in di_list:
-        label = instance.label or f"var_id={instance.var_id}"
-        dt_s = _median_sample_spacing_s(instance.timestamp_np, source_time_unit)
-        fs = 1.0 / dt_s
+        ts_s = _to_seconds(instance.timestamp_np.astype(np.float64), source_time_unit)
+        dt = float(np.median(np.diff(ts_s)))
+        if dt <= 0:
+            raise ValueError(
+                "Non-positive median time step "
+                f"({dt:.6f} s). Cannot determine sample rate."
+            )
+
+        fs = 1.0 / dt
         nyq = fs / 2.0
 
         if cutoff_hz >= nyq:
             print(
-                f"  [filter] {label}: cutoff ({cutoff_hz} Hz) >= Nyquist "
+                f"Cutoff frequency ({cutoff_hz} Hz) greater than Nyquist frequency"
                 f"({nyq:.1f} Hz), skipping filter"
             )
             results.append(instance)
@@ -187,27 +111,23 @@ def lowpass_filter(
 
         sos = butter(order, cutoff_hz / nyq, btype="low", output="sos")
         signal = instance.value_np.astype(np.float64)
-        filtered = _apply_sos_filter(signal, sos, order, label)
+        filtered = apply_sos_filter(signal, sos, order)
 
         if filtered is None:
             results.append(instance)
             continue
 
-        print(
-            f"  [filter] {label}: lowpass @ {cutoff_hz} Hz  "
-            f"({len(instance)} pts, fs={fs:.1f} Hz)"
-        )
         results.append(
             DataInstance(
                 timestamp_np=instance.timestamp_np,
                 value_np=filtered,
-                label=instance.label,
+                label=instance.label or f"var_id={instance.var_id}",
                 var_id=instance.var_id,
                 cpp_name=instance.cpp_name,
             )
         )
 
-    return results[0] if was_single else results
+    return results[0] if len(results) == 1 else results
 
 
 def lowpass_filter_by_distance(
@@ -244,12 +164,10 @@ def lowpass_filter_by_distance(
     --------
     >>> di_filtered = lowpass_filter_by_distance(di, distance_di, cutoff_freq_per_meter=0.05)
     """
-    di_list, was_single = _ensure_list_di(di)
+    di_list = [di] if isinstance(di, DataInstance) else di
     results: list[DataInstance] = []
 
     for instance in di_list:
-        label = instance.label or f"var_id={instance.var_id}"
-
         # Align distance onto the signal's timestamp grid
         _, distance_aligned = left_join_data_instances(instance, distance_di)
         dist_values = distance_aligned.value_np.astype(np.float64)
@@ -257,8 +175,8 @@ def lowpass_filter_by_distance(
         dx_median = float(np.median(np.diff(dist_values)))
         if dx_median <= 0:
             raise ValueError(
-                f"  [filter] {label}: non-positive median distance step "
-                f"({dx_median:.6f} m); cannot determine spatial sample rate."
+                f"Non-positive median distance step "
+                f"({dx_median:.6f} m). Cannot determine spatial sample rate."
             )
 
         fs = 1.0 / dx_median
@@ -266,35 +184,31 @@ def lowpass_filter_by_distance(
 
         if cutoff_freq_per_meter >= nyq:
             print(
-                f"  [filter] {label}: cutoff ({cutoff_freq_per_meter} 1/m) >= "
-                f"Nyquist ({nyq:.4f} 1/m), skipping filter"
+                f"Cutoff frequency ({cutoff_freq_per_meter} 1/m) greater than Nyquist frequency"
+                f"({nyq:.4f} 1/m), skipping filter"
             )
             results.append(instance)
             continue
 
         sos = butter(order, cutoff_freq_per_meter / nyq, btype="low", output="sos")
         signal = instance.value_np.astype(np.float64)
-        filtered = _apply_sos_filter(signal, sos, order, label)
+        filtered = apply_sos_filter(signal, sos, order)
 
         if filtered is None:
             results.append(instance)
             continue
 
-        print(
-            f"  [filter] {label}: lowpass @ {cutoff_freq_per_meter} 1/m  "
-            f"({len(instance)} pts, fs={fs:.4f} 1/m)"
-        )
         results.append(
             DataInstance(
                 timestamp_np=instance.timestamp_np,
                 value_np=filtered,
-                label=instance.label,
+                label=instance.label or f"var_id={instance.var_id}",
                 var_id=instance.var_id,
                 cpp_name=instance.cpp_name,
             )
         )
 
-    return results[0] if was_single else results
+    return results[0] if len(results) == 1 else results
 
 
 def zscore_filter(
@@ -329,13 +243,20 @@ def zscore_filter(
     --------
     >>> di_clean = zscore_filter(di, window_s=1.0, threshold=3.0)
     """
-    di_list, was_single = _ensure_list_di(di)
+    di_list = [di] if isinstance(di, DataInstance) else di
+
     results: list[DataInstance] = []
 
     for instance in di_list:
-        label = instance.label or f"var_id={instance.var_id}"
-        dt_s = _median_sample_spacing_s(instance.timestamp_np, source_time_unit)
-        fs = 1.0 / dt_s
+        ts_s = _to_seconds(instance.timestamp_np.astype(np.float64), source_time_unit)
+        dt = float(np.median(np.diff(ts_s)))
+        if dt <= 0:
+            raise ValueError(
+                "Non-positive median time step "
+                f"({dt:.6f} s). Cannot determine sample rate."
+            )
+
+        fs = 1.0 / dt
         win_samples = max(3, int(round(window_s * fs)))
 
         signal = instance.value_np.astype(np.float64)
@@ -364,28 +285,24 @@ def zscore_filter(
                     filtered[valid_mask],
                 )
 
-        print(
-            f"  [zscore] {label}: window={window_s} s ({win_samples} pts), "
-            f"threshold={threshold}, masked {n_masked}/{len(instance)} pts (interpolated)"
-        )
         results.append(
             DataInstance(
                 timestamp_np=instance.timestamp_np,
                 value_np=filtered,
-                label=instance.label,
+                label=instance.label or f"var_id={instance.var_id}",
                 var_id=instance.var_id,
                 cpp_name=instance.cpp_name,
             )
         )
 
-    return results[0] if was_single else results
+    return results[0] if len(results) == 1 else results
 
 
 def compute_fft(
     di: DataInstance,
     source_time_unit: Timescale = Timescale.MS,
     distance_di: DataInstance | None = None,
-) -> tuple[NDArray[float64], NDArray[float64], str]:
+) -> tuple[NDArray[float64], NDArray[float64]]:
     """Compute the real FFT magnitude spectrum of a DataInstance.
 
     NaN values are dropped before the transform.  The signal is
@@ -410,13 +327,11 @@ def compute_fft(
         Frequency axis values.
     magnitudes : NDArray[float64]
         FFT magnitude (``abs(rfft(signal - mean))``).
-    freq_unit : str
-        ``"Hz"`` for time-domain, ``"1/m"`` for spatial-domain.
 
     Examples
     --------
-    >>> freqs, mags, unit = compute_fft(di)
-    >>> fig = plot_fft_spectrum([freqs], [mags], [di.label], freq_unit=unit)
+    >>> freqs, mags = compute_fft(di)
+    >>> fig = plot_fft_spectrum([freqs], [mags], [di.label])
     """
     signal = di.value_np.astype(np.float64)
     valid = ~np.isnan(signal)
@@ -430,12 +345,16 @@ def compute_fft(
             raise ValueError(
                 "Non-positive median distance step; cannot compute spatial FFT."
             )
-        freq_unit = "1/m"
     else:
-        dt_s = _median_sample_spacing_s(di.timestamp_np, source_time_unit)
-        dx = dt_s
-        freq_unit = "Hz"
+        ts_s = _to_seconds(di.timestamp_np.astype(np.float64), source_time_unit)
+        dt = float(np.median(np.diff(ts_s)))
+        if dt <= 0:
+            raise ValueError(
+                "Non-positive median time step "
+                f"({dt:.6f} s). Cannot determine sample rate."
+            )
+        dx = dt
 
     frequencies: NDArray[float64] = rfftfreq(len(signal_clean), d=dx)
     magnitudes: NDArray[float64] = np.abs(rfft(signal_clean - np.mean(signal_clean)))
-    return frequencies, magnitudes, freq_unit
+    return frequencies, magnitudes

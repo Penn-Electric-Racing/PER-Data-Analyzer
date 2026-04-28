@@ -6,6 +6,84 @@ from perda.core_data_structures.single_run_data import SingleRunData
 from perda.units import Timescale
 
 # ---------------------------------------------------------------------------
+# Filtering fixtures
+# ---------------------------------------------------------------------------
+
+
+@pytest.fixture
+def sine_di_factory():
+    """Factory that builds a DataInstance containing a pure sine wave.
+
+    Defaults: 1000 samples, 200 Hz sample rate, timestamps in milliseconds.
+    """
+
+    def _factory(
+        freq_hz: float,
+        *,
+        n: int = 1000,
+        fs_hz: float = 200.0,
+        label: str = "sine",
+        var_id: int = 1,
+    ) -> DataInstance:
+        t = np.arange(n) / fs_hz
+        values = np.sin(2 * np.pi * freq_hz * t).astype(np.float64)
+        ts_ms = (t * 1000).astype(np.int64)
+        return DataInstance(
+            timestamp_np=ts_ms,
+            value_np=values,
+            label=label,
+            var_id=var_id,
+            cpp_name=f"test.{label}",
+        )
+
+    return _factory
+
+
+@pytest.fixture
+def sine_di_ms():
+    """5 Hz sine wave with timestamps in milliseconds (200 Hz, 1000 samples)."""
+    n, fs_hz, freq_hz = 1000, 200.0, 5.0
+    t = np.arange(n) / fs_hz
+    values = np.sin(2 * np.pi * freq_hz * t).astype(np.float64)
+    return DataInstance(
+        timestamp_np=(t * 1_000).astype(np.int64),
+        value_np=values,
+        label="sine_ms",
+        var_id=10,
+        cpp_name="test.sine_ms",
+    )
+
+
+@pytest.fixture
+def sine_di_us():
+    """Same 5 Hz sine wave but with timestamps in microseconds."""
+    n, fs_hz, freq_hz = 1000, 200.0, 5.0
+    t = np.arange(n) / fs_hz
+    values = np.sin(2 * np.pi * freq_hz * t).astype(np.float64)
+    return DataInstance(
+        timestamp_np=(t * 1_000_000).astype(np.int64),
+        value_np=values,
+        label="sine_us",
+        var_id=11,
+        cpp_name="test.sine_us",
+    )
+
+
+@pytest.fixture
+def uniform_di():
+    """500-sample constant-1.0 signal at 1 sample/ms (used for z-score / FFT tests)."""
+    n = 500
+    ts_ms = np.arange(n, dtype=np.int64)
+    return DataInstance(
+        timestamp_np=ts_ms,
+        value_np=np.ones(n, dtype=np.float64),
+        label="uniform",
+        var_id=20,
+        cpp_name="test.uniform",
+    )
+
+
+# ---------------------------------------------------------------------------
 # DataInstance fixtures
 # ---------------------------------------------------------------------------
 

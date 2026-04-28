@@ -66,7 +66,7 @@ def plot_single_axis(
     vlines : List[float] | None, optional
         X-axis positions (in seconds) where vertical lines are drawn. Default is None.
     vline_config : VLineConfig, optional
-        Visual configuration for the vertical lines. Default is DEFAULT_VLINE_CONFIG.
+        Visual configuration for the vertical lines.
 
     Returns
     -------
@@ -158,15 +158,15 @@ def plot_dual_axis(
     show_legend : bool, optional
         Whether to show plot legends. Default is True
     font_config : FontConfig, optional
-        Font configuration for plot elements. Default is DEFAULT_FONT_CONFIG
+        Font configuration for plot elements.
     layout_config : LayoutConfig, optional
-        Layout configuration for plot dimensions. Default is DEFAULT_LAYOUT_CONFIG
+        Layout configuration for plot dimensions.
     timestamp_unit : Timescale, optional
         Timestamp unit in the underlying data. Converted to seconds for x-axis display.
     vlines : List[float] | None, optional
         X-axis positions (in seconds) where vertical lines are drawn. Default is None.
     vline_config : VLineConfig, optional
-        Visual configuration for the vertical lines. Default is DEFAULT_VLINE_CONFIG.
+        Visual configuration for the vertical lines.
 
     Returns
     -------

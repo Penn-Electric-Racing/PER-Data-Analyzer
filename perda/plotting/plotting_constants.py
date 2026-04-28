@@ -131,10 +131,6 @@ class FFTPlotConfig(BaseModel):
         Logarithmic y-axis (magnitude). Default is False.
     line_color : str
         Color of the spectrum trace(s). Default is ``"steelblue"``.
-    cutoff_color : str
-        Color of the vertical cutoff marker line. Default is ``"crimson"``.
-    cutoff_dash : str
-        Dash style for the cutoff line. Default is ``"dash"``.
     height_single : int
         Figure height in pixels when ``stacked=False`` (single-panel view).
         Default is 500.
@@ -143,8 +139,6 @@ class FFTPlotConfig(BaseModel):
     log_x: bool = True
     log_y: bool = False
     line_color: str = "steelblue"
-    cutoff_color: str = "crimson"
-    cutoff_dash: str = "dash"
     height_single: int = 500
 
 

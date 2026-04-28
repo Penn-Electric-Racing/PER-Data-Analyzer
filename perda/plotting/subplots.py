@@ -40,10 +40,8 @@ def data_instance_subplots(
         Whether to show the figure legend. Default is True.
     font_config : FontConfig, optional
         Font sizes for title, axis labels, tick labels, and legend.
-        Default is DEFAULT_FONT_CONFIG.
     subplot_config : SubplotConfig, optional
         Dimensions, spacing, and style for the subplot grid.
-        Default is DEFAULT_SUBPLOT_CONFIG.
     timestamp_unit : Timescale, optional
         Timestamp unit of the underlying DataInstances. Converted to seconds
         for x-axis display. Default is Timescale.MS.
