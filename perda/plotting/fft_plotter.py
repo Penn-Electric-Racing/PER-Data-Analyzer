@@ -57,11 +57,16 @@ def plot_fft_spectrum(
 
     Examples
     --------
-    >>> freqs, mags, unit = compute_fft(di)
-    >>> fig = plot_fft_spectrum([freqs], [mags], [di.label], freq_unit=unit)
+    >>> freqs, mags = compute_fft(di)
+    >>> fig = plot_fft_spectrum([freqs], [mags], [di.label])
     >>> fig.show()
     """
     n = len(frequencies)
+    if n == 0:
+        raise ValueError("At least one series must be provided.")
+    if not (len(magnitudes) == n == len(series_names)):
+        raise ValueError("Inconsistent array lengths.")
+
     x_axis_type = "log" if fft_config.log_x else "linear"
     y_axis_type = "log" if fft_config.log_y else "linear"
 

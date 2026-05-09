@@ -166,6 +166,9 @@ def search(data: SingleRunData, query: str, top_n: int = 10) -> list[SearchResul
     >>> results = aly.search("front wheel speed")
     >>> names = [r.cpp_name for r in results]
     """
+    if top_n <= 0:
+        raise ValueError("top_n must be a positive integer.")
+
     semantic_ready = install_encoder()
 
     query = query.strip()

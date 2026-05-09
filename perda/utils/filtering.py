@@ -1,5 +1,5 @@
 import numpy as np
-from numpy import float64, int64
+from numpy import float64
 from numpy.typing import NDArray
 from scipy.fft import rfft, rfftfreq
 from scipy.ndimage import uniform_filter1d
@@ -92,7 +92,7 @@ def lowpass_filter(
     for instance in di_list:
         ts_s = _to_seconds(instance.timestamp_np.astype(np.float64), source_time_unit)
         dt = float(np.median(np.diff(ts_s)))
-        if dt <= 0:
+        if dt <= 0 or not np.isfinite(dt):
             raise ValueError(
                 "Non-positive median time step "
                 f"({dt:.6f} s). Cannot determine sample rate."
@@ -337,11 +337,14 @@ def compute_fft(
     valid = ~np.isnan(signal)
     signal_clean = signal[valid]
 
+    if len(signal_clean) < 2:
+        raise ValueError("Not enough valid samples to compute FFT.")
+
     if distance_di is not None:
         _, distance_aligned = left_join_data_instances(di, distance_di)
         dist_values = distance_aligned.value_np.astype(np.float64)[valid]
         dx = float(np.median(np.diff(dist_values)))
-        if dx <= 0:
+        if dx <= 0 or not np.isfinite(dx):
             raise ValueError(
                 "Non-positive median distance step; cannot compute spatial FFT."
             )
