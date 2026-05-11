@@ -284,3 +284,69 @@ def motor_srd():
         data_end_time=3,
         timestamp_unit=Timescale.MS,
     )
+
+
+@pytest.fixture
+def steering_srd():
+    """SingleRunData with both raw voltage and pre-existing angle channels.
+    Raw voltage intentionally hits the three default calibration points (1.86, 2.93, 3.96 V)
+    plus a midpoint.
+    """
+    ts = np.arange(4, dtype=np.int64)
+    raw_volts = np.array([1.86, 2.93, 3.96, 2.93], dtype=np.float64)
+    stale_angles = np.array(
+        [-90.0, 5.0, 85.0, 5.0], dtype=np.float64
+    )  # deliberately wrong
+    return SingleRunData(
+        id_to_instance={
+            1: DataInstance(
+                timestamp_np=ts,
+                value_np=raw_volts,
+                label="ludwig.steeringWheel.raw",
+                var_id=1,
+                cpp_name="ludwig.steeringWheel.raw",
+            ),
+            2: DataInstance(
+                timestamp_np=ts,
+                value_np=stale_angles,
+                label="ludwig.steeringWheel.angle",
+                var_id=2,
+                cpp_name="ludwig.steeringWheel.angle",
+            ),
+        },
+        cpp_name_to_id={
+            "ludwig.steeringWheel.raw": 1,
+            "ludwig.steeringWheel.angle": 2,
+        },
+        id_to_cpp_name={1: "ludwig.steeringWheel.raw", 2: "ludwig.steeringWheel.angle"},
+        id_to_descript={1: "", 2: ""},
+        total_data_points=8,
+        data_start_time=0,
+        data_end_time=3,
+        timestamp_unit=Timescale.MS,
+    )
+
+
+@pytest.fixture
+def steering_srd_no_angle():
+    """SingleRunData with only the raw voltage channel (no pre-existing angle)."""
+    ts = np.arange(3, dtype=np.int64)
+    raw_volts = np.array([1.86, 2.93, 3.96], dtype=np.float64)
+    return SingleRunData(
+        id_to_instance={
+            1: DataInstance(
+                timestamp_np=ts,
+                value_np=raw_volts,
+                label="ludwig.steeringWheel.raw",
+                var_id=1,
+                cpp_name="ludwig.steeringWheel.raw",
+            ),
+        },
+        cpp_name_to_id={"ludwig.steeringWheel.raw": 1},
+        id_to_cpp_name={1: "ludwig.steeringWheel.raw"},
+        id_to_descript={1: ""},
+        total_data_points=3,
+        data_start_time=0,
+        data_end_time=2,
+        timestamp_unit=Timescale.MS,
+    )

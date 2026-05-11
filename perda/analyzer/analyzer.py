@@ -15,7 +15,7 @@ from ..utils.data_summary import single_run_summary
 from ..utils.diff import diff
 from ..utils.frequency_analysis import analyze_frequency as _analyze_frequency
 from ..utils.integrate import smoothed_filtered_integration
-from ..utils.preprocessing import Preprocessing, apply_preprocessing
+from ..utils.preprocessing import PreprocessingStep, apply_preprocessing
 from ..utils.search import SearchResult, search
 from .csv import *
 
@@ -66,7 +66,7 @@ class Analyzer:
         filepath: str,
         ts_offset: int = 0,
         parsing_errors_limit: int = 100,
-        corrections: list[Preprocessing] | None = None,
+        preprocessing: list[PreprocessingStep] | None = None,
     ) -> None:
         """
         Initialize a new analyzer instance.
@@ -79,15 +79,19 @@ class Analyzer:
             Timestamp offset to apply to all data points. Default is 0.
         parsing_errors_limit : int, optional
             Maximum number of parsing errors before stopping. Default is 100.
-        corrections : list[Preprocessing] | None, optional
-            Ordered list of post-parse corrections to apply. Each correction
-            is skipped with a warning if required variables are absent.
-            Default is None (no corrections).
+        preprocessing : list[PreprocessingStep] | None, optional
+            Ordered list of post-parse preprocessing steps to apply. Each step
+            is a ``SingleRunData → SingleRunData`` callable. Steps are skipped
+            with a warning if required variables are absent. Default is None.
 
         Examples
         --------
-        >>> from perda.utils import Preprocessing
-        >>> aly = Analyzer("path/to/log.csv", corrections=[Preprocessing.NED_VELOCITY])
+        >>> from perda.utils.preprocessing import correct_motor_data, correct_steering_angle
+        >>> aly = Analyzer("path/to/log.csv", preprocessing=[correct_motor_data])
+        >>> aly = Analyzer("path/to/log.csv", preprocessing=[
+        ...     correct_motor_data,
+        ...     correct_steering_angle(calibration=((1.5, -90.0), (3.0, 0.0), (4.5, 90.0))),
+        ... ])
         >>> print(aly)  # lists all available variables
         """
         self.data: SingleRunData = parse_csv(
@@ -95,8 +99,8 @@ class Analyzer:
             ts_offset,
             parsing_errors_limit=parsing_errors_limit,
         )
-        if corrections:
-            self.data = apply_preprocessing(self.data, corrections)
+        if preprocessing:
+            self.data = apply_preprocessing(self.data, preprocessing)
 
     def __str__(self) -> str:
         """Return a summary of all variables in the loaded run data."""
