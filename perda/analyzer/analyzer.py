@@ -8,26 +8,65 @@ from ..core_data_structures.data_instance import DataInstance
 from ..core_data_structures.single_run_data import SingleRunData
 from ..plotting.data_instance_plotter import *
 from ..plotting.plotting_constants import *
-from ..units import Timescale
+from ..plotting.subplots import data_instance_subplots
+from ..units import Timescale, _from_seconds, _to_seconds
 from ..utils.accel_calculator import *
 from ..utils.data_summary import single_run_summary
 from ..utils.diff import diff
 from ..utils.frequency_analysis import analyze_frequency as _analyze_frequency
 from ..utils.integrate import smoothed_filtered_integration
-from ..utils.preprocessing import Preprocessing, apply_preprocessing
-from ..utils.search import search
+from ..utils.preprocessing import PreprocessingStep, apply_preprocessing
+from ..utils.search import SearchResult, search
 from .csv import *
 
 
 class Analyzer:
-    """Primary class for loading and analyzing car log data."""
+    """Primary class for loading and analyzing car log data.
+
+    After loading, all variables live in ``analyzer.data`` (a
+    :class:`~perda.core_data_structures.SingleRunData`), which supports
+    dictionary-like access returning :class:`~perda.core_data_structures.DataInstance`
+    objects.
+
+    Access by name or variable ID
+    ------------------------------
+    >>> di = aly.data["pcm.wheelSpeeds.frontRight"]   # by cpp_name
+    >>> di = aly.data[42]                             # by variable ID
+
+    Check membership
+    ----------------
+    >>> "pcm.wheelSpeeds.frontRight" in aly.data       # True / False
+
+    Read raw arrays
+    ---------------
+    >>> di.timestamp_np   # NDArray[int64] — timestamps in the log's native unit
+    >>> di.value_np       # NDArray[float64] — sample values
+
+    Arithmetic between variables
+    ----------------------------
+    >>> avg_speed = (aly.data["pcm.wheelSpeeds.frontRight"] + aly.data["pcm.wheelSpeeds.frontLeft"]) / 2.0
+
+    Trim to a time window (timestamps in the log's native unit)
+    ------------------------------------------------------------
+    >>> di_trimmed = aly.data["pcm.wheelSpeeds.frontRight"].trim(ts_start=10_000, ts_end=30_000)
+
+    Find variables when you don't know the exact name
+    --------------------------------------------------
+    >>> results = aly.search("front wheel speed")   # prints + returns list[SearchResult]
+    >>> di = aly.data[results[0].cpp_name]
+
+    Enumerate all variables with summary stats
+    ------------------------------------------
+    >>> summaries = aly.variable_summary()          # list[VariableSummary], sorted by name
+    >>> [v.cpp_name for v in summaries]
+    """
 
     def __init__(
         self,
         filepath: str,
         ts_offset: int = 0,
         parsing_errors_limit: int = 100,
-        corrections: list[Preprocessing] | None = None,
+        preprocessing: list[PreprocessingStep] | None = None,
     ) -> None:
         """
         Initialize a new analyzer instance.
@@ -40,15 +79,19 @@ class Analyzer:
             Timestamp offset to apply to all data points. Default is 0.
         parsing_errors_limit : int, optional
             Maximum number of parsing errors before stopping. Default is 100.
-        corrections : list[Preprocessing] | None, optional
-            Ordered list of post-parse corrections to apply. Each correction
-            is skipped with a warning if required variables are absent.
-            Default is None (no corrections).
+        preprocessing : list[PreprocessingStep] | None, optional
+            Ordered list of post-parse preprocessing steps to apply. Each step
+            is a ``SingleRunData → SingleRunData`` callable. Steps are skipped
+            with a warning if required variables are absent. Default is None.
 
         Examples
         --------
-        >>> from perda.utils import Preprocessing
-        >>> aly = Analyzer("path/to/log.csv", corrections=[Preprocessing.NED_VELOCITY])
+        >>> from perda.utils.preprocessing import correct_motor_data, correct_steering_angle
+        >>> aly = Analyzer("path/to/log.csv", preprocessing=[correct_motor_data])
+        >>> aly = Analyzer("path/to/log.csv", preprocessing=[
+        ...     correct_motor_data,
+        ...     correct_steering_angle(calibration=((1.5, -90.0), (3.0, 0.0), (4.5, 90.0))),
+        ... ])
         >>> print(aly)  # lists all available variables
         """
         self.data: SingleRunData = parse_csv(
@@ -56,8 +99,8 @@ class Analyzer:
             ts_offset,
             parsing_errors_limit=parsing_errors_limit,
         )
-        if corrections:
-            self.data = apply_preprocessing(self.data, corrections)
+        if preprocessing:
+            self.data = apply_preprocessing(self.data, preprocessing)
 
     def __str__(self) -> str:
         """Return a summary of all variables in the loaded run data."""
@@ -75,20 +118,33 @@ class Analyzer:
 
         return output
 
-    def search(self, query: str) -> None:
+    def search(self, query: str, top_n: int = 10) -> list[SearchResult]:
         """
         Natural language search for available variables in the parsed data.
+
+        Prints matching results to stdout and returns them for programmatic use.
 
         Parameters
         ----------
         query : str
-            Search query
+            Free-text search query (e.g. "front wheel speed").
+        top_n : int
+            Maximum number of results to return and display (default 10).
+
+        Returns
+        -------
+        list[SearchResult]
+            Top matches in descending relevance order (at most ``top_n`` entries).
+            Each entry has ``rank``, ``score``, ``var_id``, ``cpp_name``,
+            and ``descript``.
 
         Examples
         --------
-        >>> aly.search("front wheel speed")
+        >>> results = aly.search("front wheel speed")
+        >>> results = aly.search("front wheel speed", top_n=5)
+        >>> names = [r.cpp_name for r in results]
         """
-        search(self.data, query)
+        return search(self.data, query, top_n)
 
     def plot(
         self,
@@ -129,35 +185,36 @@ class Analyzer:
         show_legend : bool, optional
             Whether to show plot legends. Default is True
         font_config : FontConfig, optional
-            Font configuration for plot elements. Default is DEFAULT_FONT_CONFIG
+            Font configuration for plot elements.
         layout_config : LayoutConfig, optional
-            Layout configuration for plot dimensions. Default is DEFAULT_LAYOUT_CONFIG
+            Layout configuration for plot dimensions.
         vline_config : VLineConfig, optional
-            Visual configuration for concat boundary lines. Default is DEFAULT_VLINE_CONFIG.
+            Visual configuration for concat boundary lines.
 
         Examples
         --------
         >>> fig = aly.plot("pcm.wheelSpeeds.frontRight")
         >>> fig = aly.plot(["pcm.wheelSpeeds.frontRight", "pcm.wheelSpeeds.frontLeft"], title="Front Wheel Speeds")
         >>> fig = aly.plot("pcm.moc.motor.requestedTorque", "pcm.wheelSpeeds.frontRight", ts_start=10.0, ts_end=30.0)
+        >>> # Plot a derived DataInstance (e.g. average of two signals)
+        >>> avg_speed = (aly.data["pcm.wheelSpeeds.frontRight"] + aly.data["pcm.wheelSpeeds.frontLeft"]) / 2.0
+        >>> fig = aly.plot(avg_speed)
         >>> fig.show()
         """
         # Normalize left input to List[DataInstance]
         var_1_norm = self._normalize_input(var_1)
 
-        # Divisor to convert raw timestamps to seconds (used for vlines and time range filter)
         unit = self.data.timestamp_unit
-        divisor = 1e6 if unit == Timescale.US else 1e3 if unit == Timescale.MS else 1.0
 
         # Convert concat boundaries to seconds for the plotter
         vlines: List[float] | None = None
         if self.data.concat_boundaries:
-            vlines = [b / divisor for b in self.data.concat_boundaries]
+            vlines = [_to_seconds(b, unit) for b in self.data.concat_boundaries]
 
         # Apply time range filter if specified (convert seconds → raw units for trim)
         if ts_start is not None or ts_end is not None:
-            start_raw = ts_start * divisor if ts_start is not None else None
-            end_raw = ts_end * divisor if ts_end is not None else None
+            start_raw = _from_seconds(ts_start, unit) if ts_start is not None else None
+            end_raw = _from_seconds(ts_end, unit) if ts_end is not None else None
             var_1_norm = [di.trim(start_raw, end_raw) for di in var_1_norm]
 
         if var_2 is not None:
@@ -191,6 +248,97 @@ class Analyzer:
                 vlines=vlines,
                 vline_config=vline_config,
             )
+
+    def subplots(
+        self,
+        rows: List[
+            Union[
+                str,
+                int,
+                DataInstance,
+                List[Union[str, int, DataInstance]],
+            ]
+        ],
+        title: str | None = None,
+        row_y_labels: List[str | None] | None = None,
+        ts_start: float | None = None,
+        ts_end: float | None = None,
+        show_legend: bool = True,
+        font_config: FontConfig = DEFAULT_FONT_CONFIG,
+        subplot_config: SubplotConfig = DEFAULT_SUBPLOT_CONFIG,
+    ) -> go.Figure:
+        """
+        Plot multiple variables as stacked subplots on a shared time axis.
+
+        Each entry in ``rows`` becomes one subplot row. Pass a list of
+        variables for a row to overlay multiple signals on the same panel,
+        or a single variable for a dedicated panel.
+
+        Parameters
+        ----------
+        rows : List[str | int | DataInstance | List[str | int | DataInstance]]
+            One entry per subplot row (top to bottom). Each entry may be a
+            single variable (name, ID, or DataInstance) or a list of variables
+            to overlay on that row.
+        title : str | None, optional
+            Figure-level title. Default is None.
+        row_y_labels : List[str | None] | None, optional
+            Y-axis label for each row. ``None`` entries fall back to the
+            DataInstance labels. Must match the length of ``rows`` when
+            provided. Default is None.
+        ts_start : float | None, optional
+            Start of the time window in seconds. Data before this time is
+            excluded from all rows. Default is None (no lower bound).
+        ts_end : float | None, optional
+            End of the time window in seconds. Data after this time is
+            excluded from all rows. Default is None (no upper bound).
+        show_legend : bool, optional
+            Whether to show the figure legend. Default is True.
+        font_config : FontConfig, optional
+            Font sizes for plot elements.
+        subplot_config : SubplotConfig, optional
+            Row height, spacing, width, and style.
+
+        Returns
+        -------
+        go.Figure
+
+        Examples
+        --------
+        >>> fig = aly.subplots(["pcm.wheelSpeeds.frontRight", "pcm.moc.motor.requestedTorque"])
+        >>> fig = aly.subplots(
+        ...     rows=[
+        ...         ["pcm.wheelSpeeds.frontRight", "pcm.wheelSpeeds.frontLeft"],
+        ...         "pcm.moc.motor.requestedTorque",
+        ...     ],
+        ...     title="Run Overview",
+        ...     row_y_labels=["Wheel Speed (mph)", "Torque (Nm)"],
+        ...     ts_start=5.0,
+        ...     ts_end=30.0,
+        ... )
+        >>> fig.show()
+        """
+        unit = self.data.timestamp_unit
+
+        start_raw = _from_seconds(ts_start, unit) if ts_start is not None else None
+        end_raw = _from_seconds(ts_end, unit) if ts_end is not None else None
+
+        normalized_rows: List[List[DataInstance]] = []
+        for row_entry in rows:
+            row_dis = self._normalize_input(row_entry)
+            if start_raw is not None or end_raw is not None:
+                row_dis = [di.trim(start_raw, end_raw) for di in row_dis]
+            normalized_rows.append(row_dis)
+
+        return data_instance_subplots(
+            rows=normalized_rows,
+            title=title,
+            row_y_labels=row_y_labels,
+            show_legend=show_legend,
+            font_config=font_config,
+            subplot_config=subplot_config,
+            timestamp_unit=unit,
+        )
 
     def diff(
         self,
@@ -252,9 +400,9 @@ class Analyzer:
             Intervals exceeding this multiple of the expected (or median) interval
             are flagged as gaps. Default is 2.0.
         font_config : FontConfig, optional
-            Font sizes for plot elements. Default is DEFAULT_FONT_CONFIG.
+            Font sizes for plot elements.
         layout_config : LayoutConfig, optional
-            Plot dimensions and margins. Default is DEFAULT_LAYOUT_CONFIG.
+            Plot dimensions and margins.
 
         Returns
         -------
@@ -296,7 +444,8 @@ class Analyzer:
 
     def get_accel_times(self) -> list[AccelSegmentResult]:
         """
-        Get acceleration times from the analyzer.
+        Intelligently detect and extract segments of the log where an
+        acceleration run occurs, then compute acceleration times.
 
         Returns
         -------

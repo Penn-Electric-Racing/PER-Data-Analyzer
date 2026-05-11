@@ -50,11 +50,11 @@ def analyze_frequency(
         expected interval (if ``expected_frequency_hz`` is given) or the median
         interval. Default is 2.0.
     font_config : FontConfig, optional
-        Font sizes for plot elements. Default is DEFAULT_FONT_CONFIG.
+        Font sizes for plot elements.
     layout_config : LayoutConfig, optional
-        Plot dimensions and margins. Default is DEFAULT_LAYOUT_CONFIG.
+        Plot dimensions and margins.
     plot_config : ScatterHistogramPlotConfig | None, optional
-        Colors and histogram bin count. Default is DEFAULT_SCATTER_HISTOGRAM_PLOT_CONFIG.
+        Colors and histogram bin count.
 
     Returns
     -------

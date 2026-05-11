@@ -4,34 +4,8 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
 from ..core_data_structures.data_instance import DataInstance
-from ..units import Timescale
+from ..units import Timescale, _to_seconds
 from .plotting_constants import *
-
-
-def _timestamps_to_seconds(
-    timestamp_np,
-    timestamp_unit: Timescale,
-):
-    """Convert a raw timestamp array to seconds for x-axis display.
-
-    Parameters
-    ----------
-    timestamp_np : NDArray
-        Raw integer timestamp array.
-    timestamp_unit : Timescale
-        Unit of the input timestamps.
-
-    Returns
-    -------
-    NDArray
-        Timestamps as float64 seconds.
-    """
-    timestamps = timestamp_np.astype(float)
-    if timestamp_unit == Timescale.US:
-        return timestamps / 1e6
-    if timestamp_unit == Timescale.MS:
-        return timestamps / 1e3
-    return timestamps
 
 
 def _add_vlines(
@@ -92,7 +66,7 @@ def plot_single_axis(
     vlines : List[float] | None, optional
         X-axis positions (in seconds) where vertical lines are drawn. Default is None.
     vline_config : VLineConfig, optional
-        Visual configuration for the vertical lines. Default is DEFAULT_VLINE_CONFIG.
+        Visual configuration for the vertical lines.
 
     Returns
     -------
@@ -115,7 +89,7 @@ def plot_single_axis(
             continue
 
         # Convert timestamps from the log unit to seconds for plotting.
-        timestamps_s = _timestamps_to_seconds(di.timestamp_np, timestamp_unit)
+        timestamps_s = _to_seconds(di.timestamp_np.astype(float), timestamp_unit)
 
         fig.add_trace(
             go.Scattergl(
@@ -184,15 +158,15 @@ def plot_dual_axis(
     show_legend : bool, optional
         Whether to show plot legends. Default is True
     font_config : FontConfig, optional
-        Font configuration for plot elements. Default is DEFAULT_FONT_CONFIG
+        Font configuration for plot elements.
     layout_config : LayoutConfig, optional
-        Layout configuration for plot dimensions. Default is DEFAULT_LAYOUT_CONFIG
+        Layout configuration for plot dimensions.
     timestamp_unit : Timescale, optional
         Timestamp unit in the underlying data. Converted to seconds for x-axis display.
     vlines : List[float] | None, optional
         X-axis positions (in seconds) where vertical lines are drawn. Default is None.
     vline_config : VLineConfig, optional
-        Visual configuration for the vertical lines. Default is DEFAULT_VLINE_CONFIG.
+        Visual configuration for the vertical lines.
 
     Returns
     -------
@@ -217,7 +191,7 @@ def plot_dual_axis(
             continue
 
         # Convert timestamps from the log unit to seconds for plotting.
-        timestamps_s = _timestamps_to_seconds(di.timestamp_np, timestamp_unit)
+        timestamps_s = _to_seconds(di.timestamp_np.astype(float), timestamp_unit)
 
         fig.add_trace(
             go.Scattergl(
@@ -236,7 +210,7 @@ def plot_dual_axis(
             continue
 
         # Convert timestamps from the log unit to seconds for plotting.
-        timestamps_s = _timestamps_to_seconds(di.timestamp_np, timestamp_unit)
+        timestamps_s = _to_seconds(di.timestamp_np.astype(float), timestamp_unit)
 
         fig.add_trace(
             go.Scattergl(
