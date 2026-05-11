@@ -282,9 +282,11 @@
 <li class="toctree-l2 has-children"><a class="reference internal" href="perda.plotting.html">perda.plotting</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="perda.plotting.data_instance_plotter.html">perda.plotting.data_instance_plotter</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.plotting.diff_plotter.html">perda.plotting.diff_plotter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.plotting.fft_plotter.html">perda.plotting.fft_plotter</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.plotting.parametric_plot.html">perda.plotting.parametric_plot</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.plotting.plotting_constants.html">perda.plotting.plotting_constants</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.plotting.scatter_histogram_plotter.html">perda.plotting.scatter_histogram_plotter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.plotting.subplots.html">perda.plotting.subplots</a></li>
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="perda.server.html">perda.server</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -297,6 +299,7 @@
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.accel_calculator.html">perda.utils.accel_calculator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.data_summary.html">perda.utils.data_summary</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.diff.html">perda.utils.diff</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.utils.filtering.html">perda.utils.filtering</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.frequency_analysis.html">perda.utils.frequency_analysis</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.gps_analysis.html">perda.utils.gps_analysis</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.integrate.html">perda.utils.integrate</a></li>
@@ -376,19 +379,58 @@
 <span id="perda-analyzer-analyzer"></span><h1>perda.analyzer.analyzer<a class="headerlink" href="#module-perda.analyzer.analyzer" title="Link to this heading">#</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="perda.analyzer.analyzer.Analyzer">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">perda.analyzer.analyzer.</span></span><span class="sig-name descname"><span class="pre">Analyzer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts_offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parsing_errors_limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">corrections</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/analyzer/analyzer.html#Analyzer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.analyzer.analyzer.Analyzer" title="Link to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">perda.analyzer.analyzer.</span></span><span class="sig-name descname"><span class="pre">Analyzer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts_offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parsing_errors_limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preprocessing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/analyzer/analyzer.html#Analyzer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.analyzer.analyzer.Analyzer" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Primary class for loading and analyzing car log data.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>filepath</strong> (<em>str</em>)</p></li>
-<li><p><strong>ts_offset</strong> (<em>int</em>)</p></li>
-<li><p><strong>parsing_errors_limit</strong> (<em>int</em>)</p></li>
-<li><p><strong>corrections</strong> (<em>list</em><em>[</em><a class="reference internal" href="perda.utils.preprocessing.html#perda.utils.preprocessing.Preprocessing" title="perda.utils.preprocessing.Preprocessing"><em>Preprocessing</em></a><em>] </em><em>| </em><em>None</em>)</p></li>
-</ul>
-</dd>
-</dl>
+<p>After loading, all variables live in <code class="docutils literal notranslate"><span class="pre">analyzer.data</span></code> (a
+<code class="xref py py-class docutils literal notranslate"><span class="pre">SingleRunData</span></code>), which supports
+dictionary-like access returning <code class="xref py py-class docutils literal notranslate"><span class="pre">DataInstance</span></code>
+objects.</p>
+<section id="access-by-name-or-variable-id">
+<h2>Access by name or variable ID<a class="headerlink" href="#access-by-name-or-variable-id" title="Link to this heading">#</a></h2>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">di</span> <span class="o">=</span> <span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;pcm.wheelSpeeds.frontRight&quot;</span><span class="p">]</span>   <span class="c1"># by cpp_name</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">di</span> <span class="o">=</span> <span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">42</span><span class="p">]</span>                             <span class="c1"># by variable ID</span>
+</pre></div>
+</div>
+</section>
+<section id="check-membership">
+<h2>Check membership<a class="headerlink" href="#check-membership" title="Link to this heading">#</a></h2>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="s2">&quot;pcm.wheelSpeeds.frontRight&quot;</span> <span class="ow">in</span> <span class="n">aly</span><span class="o">.</span><span class="n">data</span>       <span class="c1"># True / False</span>
+</pre></div>
+</div>
+</section>
+<section id="read-raw-arrays">
+<h2>Read raw arrays<a class="headerlink" href="#read-raw-arrays" title="Link to this heading">#</a></h2>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">di</span><span class="o">.</span><span class="n">timestamp_np</span>   <span class="c1"># NDArray[int64] — timestamps in the log&#39;s native unit</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">di</span><span class="o">.</span><span class="n">value_np</span>       <span class="c1"># NDArray[float64] — sample values</span>
+</pre></div>
+</div>
+</section>
+<section id="arithmetic-between-variables">
+<h2>Arithmetic between variables<a class="headerlink" href="#arithmetic-between-variables" title="Link to this heading">#</a></h2>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">avg_speed</span> <span class="o">=</span> <span class="p">(</span><span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;pcm.wheelSpeeds.frontRight&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;pcm.wheelSpeeds.frontLeft&quot;</span><span class="p">])</span> <span class="o">/</span> <span class="mf">2.0</span>
+</pre></div>
+</div>
+</section>
+<section id="trim-to-a-time-window-timestamps-in-the-log-s-native-unit">
+<h2>Trim to a time window (timestamps in the log’s native unit)<a class="headerlink" href="#trim-to-a-time-window-timestamps-in-the-log-s-native-unit" title="Link to this heading">#</a></h2>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">di_trimmed</span> <span class="o">=</span> <span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;pcm.wheelSpeeds.frontRight&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">trim</span><span class="p">(</span><span class="n">ts_start</span><span class="o">=</span><span class="mi">10_000</span><span class="p">,</span> <span class="n">ts_end</span><span class="o">=</span><span class="mi">30_000</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="find-variables-when-you-don-t-know-the-exact-name">
+<h2>Find variables when you don’t know the exact name<a class="headerlink" href="#find-variables-when-you-don-t-know-the-exact-name" title="Link to this heading">#</a></h2>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">results</span> <span class="o">=</span> <span class="n">aly</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s2">&quot;front wheel speed&quot;</span><span class="p">)</span>   <span class="c1"># prints + returns list[SearchResult]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">di</span> <span class="o">=</span> <span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">cpp_name</span><span class="p">]</span>
+</pre></div>
+</div>
+</section>
+<section id="enumerate-all-variables-with-summary-stats">
+<h2>Enumerate all variables with summary stats<a class="headerlink" href="#enumerate-all-variables-with-summary-stats" title="Link to this heading">#</a></h2>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">summaries</span> <span class="o">=</span> <span class="n">aly</span><span class="o">.</span><span class="n">variable_summary</span><span class="p">()</span>          <span class="c1"># list[VariableSummary], sorted by name</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">cpp_name</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">summaries</span><span class="p">]</span>
+</pre></div>
+</div>
 <dl class="py method">
 <dt class="sig sig-object py" id="perda.analyzer.analyzer.Analyzer.analyze_frequency">
 <span class="sig-name descname"><span class="pre">analyze_frequency</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">var</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_frequency_hz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gap_threshold_multiplier</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">font_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">FontConfig(large=20,</span> <span class="pre">medium=14,</span> <span class="pre">small=10)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layout_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">LayoutConfig(width=1200,</span> <span class="pre">height=700,</span> <span class="pre">margin={'l':</span> <span class="pre">70,</span> <span class="pre">'r':</span> <span class="pre">50,</span> <span class="pre">'t':</span> <span class="pre">90,</span> <span class="pre">'b':</span> <span class="pre">70},</span> <span class="pre">plot_bgcolor='white',</span> <span class="pre">title_x=0.5,</span> <span class="pre">title_xanchor='center',</span> <span class="pre">title_yanchor='top')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">ScatterHistogramPlotConfig(color_scatter='blue',</span> <span class="pre">color_line='crimson',</span> <span class="pre">color_histogram='blue',</span> <span class="pre">histogram_bins=80)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/analyzer/analyzer.html#Analyzer.analyze_frequency"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.analyzer.analyzer.Analyzer.analyze_frequency" title="Link to this definition">#</a></dt>
@@ -403,8 +445,8 @@ instantaneous frequency over time and an inter-sample interval histogram.</p>
 Default is None.</p></li>
 <li><p><strong>gap_threshold_multiplier</strong> (<em>float</em><em>, </em><em>optional</em>) – Intervals exceeding this multiple of the expected (or median) interval
 are flagged as gaps. Default is 2.0.</p></li>
-<li><p><strong>font_config</strong> (<a class="reference internal" href="perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.FontConfig" title="perda.plotting.plotting_constants.FontConfig"><em>FontConfig</em></a><em>, </em><em>optional</em>) – Font sizes for plot elements. Default is DEFAULT_FONT_CONFIG.</p></li>
-<li><p><strong>layout_config</strong> (<a class="reference internal" href="perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.LayoutConfig" title="perda.plotting.plotting_constants.LayoutConfig"><em>LayoutConfig</em></a><em>, </em><em>optional</em>) – Plot dimensions and margins. Default is DEFAULT_LAYOUT_CONFIG.</p></li>
+<li><p><strong>font_config</strong> (<a class="reference internal" href="perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.FontConfig" title="perda.plotting.plotting_constants.FontConfig"><em>FontConfig</em></a><em>, </em><em>optional</em>) – Font sizes for plot elements.</p></li>
+<li><p><strong>layout_config</strong> (<a class="reference internal" href="perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.LayoutConfig" title="perda.plotting.plotting_constants.LayoutConfig"><em>LayoutConfig</em></a><em>, </em><em>optional</em>) – Plot dimensions and margins.</p></li>
 <li><p><strong>plot_config</strong> (<a class="reference internal" href="perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.ScatterHistogramPlotConfig" title="perda.plotting.plotting_constants.ScatterHistogramPlotConfig"><em>ScatterHistogramPlotConfig</em></a>)</p></li>
 </ul>
 </dd>
@@ -449,7 +491,8 @@ are flagged as gaps. Default is 2.0.</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="perda.analyzer.analyzer.Analyzer.get_accel_times">
 <span class="sig-name descname"><span class="pre">get_accel_times</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/analyzer/analyzer.html#Analyzer.get_accel_times"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.analyzer.analyzer.Analyzer.get_accel_times" title="Link to this definition">#</a></dt>
-<dd><p>Get acceleration times from the analyzer.</p>
+<dd><p>Intelligently detect and extract segments of the log where an
+acceleration run occurs, then compute acceleration times.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>List of acceleration segment results.</p>
@@ -482,9 +525,9 @@ are flagged as gaps. Default is 2.0.</p></li>
 <li><p><strong>y_label_1</strong> (<em>str</em><em> | </em><em>None</em><em>, </em><em>optional</em>) – Label for left y-axis (or only y-axis if no right input).</p></li>
 <li><p><strong>y_label_2</strong> (<em>str</em><em> | </em><em>None</em><em>, </em><em>optional</em>) – Label for right y-axis.</p></li>
 <li><p><strong>show_legend</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to show plot legends. Default is True</p></li>
-<li><p><strong>font_config</strong> (<a class="reference internal" href="perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.FontConfig" title="perda.plotting.plotting_constants.FontConfig"><em>FontConfig</em></a><em>, </em><em>optional</em>) – Font configuration for plot elements. Default is DEFAULT_FONT_CONFIG</p></li>
-<li><p><strong>layout_config</strong> (<a class="reference internal" href="perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.LayoutConfig" title="perda.plotting.plotting_constants.LayoutConfig"><em>LayoutConfig</em></a><em>, </em><em>optional</em>) – Layout configuration for plot dimensions. Default is DEFAULT_LAYOUT_CONFIG</p></li>
-<li><p><strong>vline_config</strong> (<a class="reference internal" href="perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.VLineConfig" title="perda.plotting.plotting_constants.VLineConfig"><em>VLineConfig</em></a><em>, </em><em>optional</em>) – Visual configuration for concat boundary lines. Default is DEFAULT_VLINE_CONFIG.</p></li>
+<li><p><strong>font_config</strong> (<a class="reference internal" href="perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.FontConfig" title="perda.plotting.plotting_constants.FontConfig"><em>FontConfig</em></a><em>, </em><em>optional</em>) – Font configuration for plot elements.</p></li>
+<li><p><strong>layout_config</strong> (<a class="reference internal" href="perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.LayoutConfig" title="perda.plotting.plotting_constants.LayoutConfig"><em>LayoutConfig</em></a><em>, </em><em>optional</em>) – Layout configuration for plot dimensions.</p></li>
+<li><p><strong>vline_config</strong> (<a class="reference internal" href="perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.VLineConfig" title="perda.plotting.plotting_constants.VLineConfig"><em>VLineConfig</em></a><em>, </em><em>optional</em>) – Visual configuration for concat boundary lines.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
@@ -495,6 +538,9 @@ are flagged as gaps. Default is 2.0.</p></li>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span> <span class="o">=</span> <span class="n">aly</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s2">&quot;pcm.wheelSpeeds.frontRight&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span> <span class="o">=</span> <span class="n">aly</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="s2">&quot;pcm.wheelSpeeds.frontRight&quot;</span><span class="p">,</span> <span class="s2">&quot;pcm.wheelSpeeds.frontLeft&quot;</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Front Wheel Speeds&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span> <span class="o">=</span> <span class="n">aly</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s2">&quot;pcm.moc.motor.requestedTorque&quot;</span><span class="p">,</span> <span class="s2">&quot;pcm.wheelSpeeds.frontRight&quot;</span><span class="p">,</span> <span class="n">ts_start</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span> <span class="n">ts_end</span><span class="o">=</span><span class="mf">30.0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Plot a derived DataInstance (e.g. average of two signals)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">avg_speed</span> <span class="o">=</span> <span class="p">(</span><span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;pcm.wheelSpeeds.frontRight&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;pcm.wheelSpeeds.frontLeft&quot;</span><span class="p">])</span> <span class="o">/</span> <span class="mf">2.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span> <span class="o">=</span> <span class="n">aly</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">avg_speed</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -502,22 +548,91 @@ are flagged as gaps. Default is 2.0.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="perda.analyzer.analyzer.Analyzer.search">
-<span class="sig-name descname"><span class="pre">search</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/analyzer/analyzer.html#Analyzer.search"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.analyzer.analyzer.Analyzer.search" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">search</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">top_n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/analyzer/analyzer.html#Analyzer.search"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.analyzer.analyzer.Analyzer.search" title="Link to this definition">#</a></dt>
 <dd><p>Natural language search for available variables in the parsed data.</p>
+<p>Prints matching results to stdout and returns them for programmatic use.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>query</strong> (<em>str</em>) – Search query</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>query</strong> (<em>str</em>) – Free-text search query (e.g. “front wheel speed”).</p></li>
+<li><p><strong>top_n</strong> (<em>int</em>) – Maximum number of results to return and display (default 10).</p></li>
+</ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Top matches in descending relevance order (at most <code class="docutils literal notranslate"><span class="pre">top_n</span></code> entries).
+Each entry has <code class="docutils literal notranslate"><span class="pre">rank</span></code>, <code class="docutils literal notranslate"><span class="pre">score</span></code>, <code class="docutils literal notranslate"><span class="pre">var_id</span></code>, <code class="docutils literal notranslate"><span class="pre">cpp_name</span></code>,
+and <code class="docutils literal notranslate"><span class="pre">descript</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[<a class="reference internal" href="perda.utils.search.html#perda.utils.search.SearchResult" title="perda.utils.search.SearchResult">SearchResult</a>]</p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">aly</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s2">&quot;front wheel speed&quot;</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">results</span> <span class="o">=</span> <span class="n">aly</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s2">&quot;front wheel speed&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">results</span> <span class="o">=</span> <span class="n">aly</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s2">&quot;front wheel speed&quot;</span><span class="p">,</span> <span class="n">top_n</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span><span class="o">.</span><span class="n">cpp_name</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">results</span><span class="p">]</span>
 </pre></div>
 </div>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="perda.analyzer.analyzer.Analyzer.subplots">
+<span class="sig-name descname"><span class="pre">subplots</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rows</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_y_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts_start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts_end</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_legend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">font_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">FontConfig(large=20,</span> <span class="pre">medium=14,</span> <span class="pre">small=10)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subplot_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">SubplotConfig(height_per_row=250,</span> <span class="pre">vertical_spacing=0.04,</span> <span class="pre">width=1200,</span> <span class="pre">show_subplot_titles=True,</span> <span class="pre">plot_bgcolor='white',</span> <span class="pre">margin={'l':</span> <span class="pre">70,</span> <span class="pre">'r':</span> <span class="pre">50,</span> <span class="pre">'t':</span> <span class="pre">90,</span> <span class="pre">'b':</span> <span class="pre">70})</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/analyzer/analyzer.html#Analyzer.subplots"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.analyzer.analyzer.Analyzer.subplots" title="Link to this definition">#</a></dt>
+<dd><p>Plot multiple variables as stacked subplots on a shared time axis.</p>
+<p>Each entry in <code class="docutils literal notranslate"><span class="pre">rows</span></code> becomes one subplot row. Pass a list of
+variables for a row to overlay multiple signals on the same panel,
+or a single variable for a dedicated panel.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rows</strong> (<em>List</em><em>[</em><em>str</em><em> | </em><em>int</em><em> | </em><a class="reference internal" href="perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance"><em>DataInstance</em></a><em> | </em><em>List</em><em>[</em><em>str</em><em> | </em><em>int</em><em> | </em><a class="reference internal" href="perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance"><em>DataInstance</em></a><em>]</em><em>]</em>) – One entry per subplot row (top to bottom). Each entry may be a
+single variable (name, ID, or DataInstance) or a list of variables
+to overlay on that row.</p></li>
+<li><p><strong>title</strong> (<em>str</em><em> | </em><em>None</em><em>, </em><em>optional</em>) – Figure-level title. Default is None.</p></li>
+<li><p><strong>row_y_labels</strong> (<em>List</em><em>[</em><em>str</em><em> | </em><em>None</em><em>] </em><em>| </em><em>None</em><em>, </em><em>optional</em>) – Y-axis label for each row. <code class="docutils literal notranslate"><span class="pre">None</span></code> entries fall back to the
+DataInstance labels. Must match the length of <code class="docutils literal notranslate"><span class="pre">rows</span></code> when
+provided. Default is None.</p></li>
+<li><p><strong>ts_start</strong> (<em>float</em><em> | </em><em>None</em><em>, </em><em>optional</em>) – Start of the time window in seconds. Data before this time is
+excluded from all rows. Default is None (no lower bound).</p></li>
+<li><p><strong>ts_end</strong> (<em>float</em><em> | </em><em>None</em><em>, </em><em>optional</em>) – End of the time window in seconds. Data after this time is
+excluded from all rows. Default is None (no upper bound).</p></li>
+<li><p><strong>show_legend</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to show the figure legend. Default is True.</p></li>
+<li><p><strong>font_config</strong> (<a class="reference internal" href="perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.FontConfig" title="perda.plotting.plotting_constants.FontConfig"><em>FontConfig</em></a><em>, </em><em>optional</em>) – Font sizes for plot elements.</p></li>
+<li><p><strong>subplot_config</strong> (<a class="reference internal" href="perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.SubplotConfig" title="perda.plotting.plotting_constants.SubplotConfig"><em>SubplotConfig</em></a><em>, </em><em>optional</em>) – Row height, spacing, width, and style.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>go.Figure</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span> <span class="o">=</span> <span class="n">aly</span><span class="o">.</span><span class="n">subplots</span><span class="p">([</span><span class="s2">&quot;pcm.wheelSpeeds.frontRight&quot;</span><span class="p">,</span> <span class="s2">&quot;pcm.moc.motor.requestedTorque&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span> <span class="o">=</span> <span class="n">aly</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">rows</span><span class="o">=</span><span class="p">[</span>
+<span class="gp">... </span>        <span class="p">[</span><span class="s2">&quot;pcm.wheelSpeeds.frontRight&quot;</span><span class="p">,</span> <span class="s2">&quot;pcm.wheelSpeeds.frontLeft&quot;</span><span class="p">],</span>
+<span class="gp">... </span>        <span class="s2">&quot;pcm.moc.motor.requestedTorque&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="p">],</span>
+<span class="gp">... </span>    <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Run Overview&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">row_y_labels</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Wheel Speed (mph)&quot;</span><span class="p">,</span> <span class="s2">&quot;Torque (Nm)&quot;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">ts_start</span><span class="o">=</span><span class="mf">5.0</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">ts_end</span><span class="o">=</span><span class="mf">30.0</span><span class="p">,</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filepath</strong> (<em>str</em>)</p></li>
+<li><p><strong>ts_offset</strong> (<em>int</em>)</p></li>
+<li><p><strong>parsing_errors_limit</strong> (<em>int</em>)</p></li>
+<li><p><strong>preprocessing</strong> (<em>list</em><em>[</em><em>Callable</em><em>[</em><em>[</em><a class="reference internal" href="perda.core_data_structures.single_run_data.html#perda.core_data_structures.single_run_data.SingleRunData" title="perda.core_data_structures.single_run_data.SingleRunData"><em>SingleRunData</em></a><em>]</em><em>, </em><a class="reference internal" href="perda.core_data_structures.single_run_data.html#perda.core_data_structures.single_run_data.SingleRunData" title="perda.core_data_structures.single_run_data.SingleRunData"><em>SingleRunData</em></a><em>]</em><em>] </em><em>| </em><em>None</em>)</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 </section>
@@ -575,6 +690,7 @@ are flagged as gaps. Default is 2.0.</p></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.analyzer.analyzer.Analyzer.get_accel_times"><code class="docutils literal notranslate"><span class="pre">Analyzer.get_accel_times()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.analyzer.analyzer.Analyzer.plot"><code class="docutils literal notranslate"><span class="pre">Analyzer.plot()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.analyzer.analyzer.Analyzer.search"><code class="docutils literal notranslate"><span class="pre">Analyzer.search()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.analyzer.analyzer.Analyzer.subplots"><code class="docutils literal notranslate"><span class="pre">Analyzer.subplots()</span></code></a></li>
 </ul>
 </li>
 </ul>

@@ -309,34 +309,8 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">plotly.subplots</span><span class="w"> </span><span class="kn">import</span> <span class="n">make_subplots</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">..core_data_structures.data_instance</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataInstance</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">..units</span><span class="w"> </span><span class="kn">import</span> <span class="n">Timescale</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..units</span><span class="w"> </span><span class="kn">import</span> <span class="n">Timescale</span><span class="p">,</span> <span class="n">_to_seconds</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.plotting_constants</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">_timestamps_to_seconds</span><span class="p">(</span>
-    <span class="n">timestamp_np</span><span class="p">,</span>
-    <span class="n">timestamp_unit</span><span class="p">:</span> <span class="n">Timescale</span><span class="p">,</span>
-<span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert a raw timestamp array to seconds for x-axis display.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    timestamp_np : NDArray</span>
-<span class="sd">        Raw integer timestamp array.</span>
-<span class="sd">    timestamp_unit : Timescale</span>
-<span class="sd">        Unit of the input timestamps.</span>
-
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    NDArray</span>
-<span class="sd">        Timestamps as float64 seconds.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">timestamps</span> <span class="o">=</span> <span class="n">timestamp_np</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">timestamp_unit</span> <span class="o">==</span> <span class="n">Timescale</span><span class="o">.</span><span class="n">US</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">timestamps</span> <span class="o">/</span> <span class="mf">1e6</span>
-    <span class="k">if</span> <span class="n">timestamp_unit</span> <span class="o">==</span> <span class="n">Timescale</span><span class="o">.</span><span class="n">MS</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">timestamps</span> <span class="o">/</span> <span class="mf">1e3</span>
-    <span class="k">return</span> <span class="n">timestamps</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_add_vlines</span><span class="p">(</span>
@@ -399,7 +373,7 @@
 <span class="sd">    vlines : List[float] | None, optional</span>
 <span class="sd">        X-axis positions (in seconds) where vertical lines are drawn. Default is None.</span>
 <span class="sd">    vline_config : VLineConfig, optional</span>
-<span class="sd">        Visual configuration for the vertical lines. Default is DEFAULT_VLINE_CONFIG.</span>
+<span class="sd">        Visual configuration for the vertical lines.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -422,7 +396,7 @@
             <span class="k">continue</span>
 
         <span class="c1"># Convert timestamps from the log unit to seconds for plotting.</span>
-        <span class="n">timestamps_s</span> <span class="o">=</span> <span class="n">_timestamps_to_seconds</span><span class="p">(</span><span class="n">di</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">,</span> <span class="n">timestamp_unit</span><span class="p">)</span>
+        <span class="n">timestamps_s</span> <span class="o">=</span> <span class="n">_to_seconds</span><span class="p">(</span><span class="n">di</span><span class="o">.</span><span class="n">timestamp_np</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">),</span> <span class="n">timestamp_unit</span><span class="p">)</span>
 
         <span class="n">fig</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span>
             <span class="n">go</span><span class="o">.</span><span class="n">Scattergl</span><span class="p">(</span>
@@ -494,15 +468,15 @@
 <span class="sd">    show_legend : bool, optional</span>
 <span class="sd">        Whether to show plot legends. Default is True</span>
 <span class="sd">    font_config : FontConfig, optional</span>
-<span class="sd">        Font configuration for plot elements. Default is DEFAULT_FONT_CONFIG</span>
+<span class="sd">        Font configuration for plot elements.</span>
 <span class="sd">    layout_config : LayoutConfig, optional</span>
-<span class="sd">        Layout configuration for plot dimensions. Default is DEFAULT_LAYOUT_CONFIG</span>
+<span class="sd">        Layout configuration for plot dimensions.</span>
 <span class="sd">    timestamp_unit : Timescale, optional</span>
 <span class="sd">        Timestamp unit in the underlying data. Converted to seconds for x-axis display.</span>
 <span class="sd">    vlines : List[float] | None, optional</span>
 <span class="sd">        X-axis positions (in seconds) where vertical lines are drawn. Default is None.</span>
 <span class="sd">    vline_config : VLineConfig, optional</span>
-<span class="sd">        Visual configuration for the vertical lines. Default is DEFAULT_VLINE_CONFIG.</span>
+<span class="sd">        Visual configuration for the vertical lines.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -527,7 +501,7 @@
             <span class="k">continue</span>
 
         <span class="c1"># Convert timestamps from the log unit to seconds for plotting.</span>
-        <span class="n">timestamps_s</span> <span class="o">=</span> <span class="n">_timestamps_to_seconds</span><span class="p">(</span><span class="n">di</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">,</span> <span class="n">timestamp_unit</span><span class="p">)</span>
+        <span class="n">timestamps_s</span> <span class="o">=</span> <span class="n">_to_seconds</span><span class="p">(</span><span class="n">di</span><span class="o">.</span><span class="n">timestamp_np</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">),</span> <span class="n">timestamp_unit</span><span class="p">)</span>
 
         <span class="n">fig</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span>
             <span class="n">go</span><span class="o">.</span><span class="n">Scattergl</span><span class="p">(</span>
@@ -546,7 +520,7 @@
             <span class="k">continue</span>
 
         <span class="c1"># Convert timestamps from the log unit to seconds for plotting.</span>
-        <span class="n">timestamps_s</span> <span class="o">=</span> <span class="n">_timestamps_to_seconds</span><span class="p">(</span><span class="n">di</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">,</span> <span class="n">timestamp_unit</span><span class="p">)</span>
+        <span class="n">timestamps_s</span> <span class="o">=</span> <span class="n">_to_seconds</span><span class="p">(</span><span class="n">di</span><span class="o">.</span><span class="n">timestamp_np</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">),</span> <span class="n">timestamp_unit</span><span class="p">)</span>
 
         <span class="n">fig</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span>
             <span class="n">go</span><span class="o">.</span><span class="n">Scattergl</span><span class="p">(</span>

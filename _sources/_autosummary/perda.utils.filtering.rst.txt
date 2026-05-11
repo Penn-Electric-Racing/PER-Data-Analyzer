@@ -1,0 +1,8 @@
+perda.utils.filtering
+=====================
+
+.. automodule:: perda.utils.filtering
+   :members:
+   :undoc-members:
+   :show-inheritance:
+

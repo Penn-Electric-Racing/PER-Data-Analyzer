@@ -334,10 +334,10 @@
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">perda.analyzer</span><span class="w"> </span><span class="kn">import</span> <span class="n">Analyzer</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">perda.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">Preprocessing</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">perda.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">patch_ned_velocity</span>
 
 <span class="n">csvPath</span> <span class="o">=</span> <span class="s2">&quot;csv_files/16thApr10-52-00.csv&quot;</span>
-<span class="n">aly</span> <span class="o">=</span> <span class="n">Analyzer</span><span class="p">(</span><span class="n">csvPath</span><span class="p">,</span> <span class="n">corrections</span><span class="o">=</span><span class="p">[</span><span class="n">Preprocessing</span><span class="o">.</span><span class="n">PATCH_NED_VELOCITY</span><span class="p">])</span>
+<span class="n">aly</span> <span class="o">=</span> <span class="n">Analyzer</span><span class="p">(</span><span class="n">csvPath</span><span class="p">,</span> <span class="n">preprocessing</span><span class="o">=</span><span class="p">[</span><span class="n">patch_ned_velocity</span><span class="p">])</span>
 
 <span class="c1"># Print summary of the loaded data</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">aly</span><span class="p">)</span>
@@ -392,7 +392,7 @@
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">aly</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s2">&quot;vectornav&quot;</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">search_results</span> <span class="o">=</span> <span class="n">aly</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s2">&quot;vectornav&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>

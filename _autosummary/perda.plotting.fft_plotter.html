@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>perda.utils &#8212; PERDA</title>
+    <title>perda.plotting.fft_plotter &#8212; PERDA</title>
   
   
   
@@ -48,11 +48,11 @@
     <script src="../_static/copybutton.js?v=f281be69"></script>
     <script src="../_static/design-tabs.js?v=f930bc37"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/perda.utils';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/perda.plotting.fft_plotter';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="perda.utils.accel_calculator" href="perda.utils.accel_calculator.html" />
-    <link rel="prev" title="perda.units" href="perda.units.html" />
+    <link rel="next" title="perda.plotting.parametric_plot" href="perda.plotting.parametric_plot.html" />
+    <link rel="prev" title="perda.plotting.diff_plotter" href="perda.plotting.diff_plotter.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
@@ -279,10 +279,10 @@
 <li class="toctree-l3"><a class="reference internal" href="perda.live.live_analyzer.html">perda.live.live_analyzer</a></li>
 </ul>
 </details></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="perda.plotting.html">perda.plotting</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="perda.plotting.html">perda.plotting</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="perda.plotting.data_instance_plotter.html">perda.plotting.data_instance_plotter</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.plotting.diff_plotter.html">perda.plotting.diff_plotter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="perda.plotting.fft_plotter.html">perda.plotting.fft_plotter</a></li>
+<li class="toctree-l3 current active"><a class="current reference internal" href="#">perda.plotting.fft_plotter</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.plotting.parametric_plot.html">perda.plotting.parametric_plot</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.plotting.plotting_constants.html">perda.plotting.plotting_constants</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.plotting.scatter_histogram_plotter.html">perda.plotting.scatter_histogram_plotter</a></li>
@@ -295,7 +295,7 @@
 </ul>
 </details></li>
 <li class="toctree-l2"><a class="reference internal" href="perda.units.html">perda.units</a></li>
-<li class="toctree-l2 current active has-children"><a class="current reference internal" href="#">perda.utils</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="perda.utils.html">perda.utils</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.accel_calculator.html">perda.utils.accel_calculator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.data_summary.html">perda.utils.data_summary</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.diff.html">perda.utils.diff</a></li>
@@ -355,7 +355,10 @@
     
     <li class="breadcrumb-item"><a href="perda.html" class="nav-link">perda</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">perda.utils</span></li>
+    
+    <li class="breadcrumb-item"><a href="perda.plotting.html" class="nav-link">perda.plotting</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">perda.plotting.fft_plotter</span></li>
   </ul>
 </nav>
 </div>
@@ -372,41 +375,42 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="module-perda.utils">
-<span id="perda-utils"></span><h1>perda.utils<a class="headerlink" href="#module-perda.utils" title="Link to this heading">#</a></h1>
-<p class="rubric">Modules</p>
-<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="perda.utils.accel_calculator.html#module-perda.utils.accel_calculator" title="perda.utils.accel_calculator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">accel_calculator</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="perda.utils.data_summary.html#module-perda.utils.data_summary" title="perda.utils.data_summary"><code class="xref py py-obj docutils literal notranslate"><span class="pre">data_summary</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="perda.utils.diff.html#module-perda.utils.diff" title="perda.utils.diff"><code class="xref py py-obj docutils literal notranslate"><span class="pre">diff</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="perda.utils.filtering.html#module-perda.utils.filtering" title="perda.utils.filtering"><code class="xref py py-obj docutils literal notranslate"><span class="pre">filtering</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="perda.utils.frequency_analysis.html#module-perda.utils.frequency_analysis" title="perda.utils.frequency_analysis"><code class="xref py py-obj docutils literal notranslate"><span class="pre">frequency_analysis</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="perda.utils.gps_analysis.html#module-perda.utils.gps_analysis" title="perda.utils.gps_analysis"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gps_analysis</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="perda.utils.integrate.html#module-perda.utils.integrate" title="perda.utils.integrate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">integrate</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="perda.utils.preprocessing.html#module-perda.utils.preprocessing" title="perda.utils.preprocessing"><code class="xref py py-obj docutils literal notranslate"><span class="pre">preprocessing</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="perda.utils.search.html#module-perda.utils.search" title="perda.utils.search"><code class="xref py py-obj docutils literal notranslate"><span class="pre">search</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-</tbody>
-</table>
+  <section id="module-perda.plotting.fft_plotter">
+<span id="perda-plotting-fft-plotter"></span><h1>perda.plotting.fft_plotter<a class="headerlink" href="#module-perda.plotting.fft_plotter" title="Link to this heading">#</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="perda.plotting.fft_plotter.plot_fft_spectrum">
+<span class="sig-prename descclassname"><span class="pre">perda.plotting.fft_plotter.</span></span><span class="sig-name descname"><span class="pre">plot_fft_spectrum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frequencies</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">magnitudes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">series_names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Frequency</span> <span class="pre">(Hz)'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Magnitude'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stacked</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">font_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">FontConfig(large=20,</span> <span class="pre">medium=14,</span> <span class="pre">small=10)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subplot_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">SubplotConfig(height_per_row=250,</span> <span class="pre">vertical_spacing=0.04,</span> <span class="pre">width=1200,</span> <span class="pre">show_subplot_titles=True,</span> <span class="pre">plot_bgcolor='white',</span> <span class="pre">margin={'l':</span> <span class="pre">70,</span> <span class="pre">'r':</span> <span class="pre">50,</span> <span class="pre">'t':</span> <span class="pre">90,</span> <span class="pre">'b':</span> <span class="pre">70})</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fft_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">FFTPlotConfig(log_x=True,</span> <span class="pre">log_y=False,</span> <span class="pre">line_color='steelblue',</span> <span class="pre">height_single=500)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/plotting/fft_plotter.html#plot_fft_spectrum"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.plotting.fft_plotter.plot_fft_spectrum" title="Link to this definition">#</a></dt>
+<dd><p>Plot one or more pre-computed FFT magnitude spectra.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>frequencies</strong> (<em>list</em><em>[</em><em>NDArray</em><em>[</em><em>float64</em><em>]</em><em>]</em>) – Frequency axis arrays, one per series.</p></li>
+<li><p><strong>magnitudes</strong> (<em>list</em><em>[</em><em>NDArray</em><em>[</em><em>float64</em><em>]</em><em>]</em>) – Magnitude arrays (same length as corresponding <code class="docutils literal notranslate"><span class="pre">frequencies</span></code>
+entry), one per series.</p></li>
+<li><p><strong>series_names</strong> (<em>list</em><em>[</em><em>str</em><em>]</em>) – Display labels for each series, used as subplot titles when
+<code class="docutils literal notranslate"><span class="pre">stacked=True</span></code> and legend entries when <code class="docutils literal notranslate"><span class="pre">stacked=False</span></code>.</p></li>
+<li><p><strong>title</strong> (<em>str</em><em> | </em><em>None</em><em>, </em><em>optional</em>) – Overall figure title.</p></li>
+<li><p><strong>stacked</strong> (<em>bool</em><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, render one subplot per series sharing the x-axis.
+If <code class="docutils literal notranslate"><span class="pre">False</span></code>, overlay all series on a single plot. Default is True.</p></li>
+<li><p><strong>font_config</strong> (<a class="reference internal" href="perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.FontConfig" title="perda.plotting.plotting_constants.FontConfig"><em>FontConfig</em></a><em>, </em><em>optional</em>) – Font sizes for plot elements.</p></li>
+<li><p><strong>subplot_config</strong> (<a class="reference internal" href="perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.SubplotConfig" title="perda.plotting.plotting_constants.SubplotConfig"><em>SubplotConfig</em></a><em>, </em><em>optional</em>) – Row height and spacing used when <code class="docutils literal notranslate"><span class="pre">stacked=True</span></code></p></li>
+<li><p><strong>fft_config</strong> (<a class="reference internal" href="perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.FFTPlotConfig" title="perda.plotting.plotting_constants.FFTPlotConfig"><em>FFTPlotConfig</em></a><em>, </em><em>optional</em>) – Axis scaling, trace color</p></li>
+<li><p><strong>x_label</strong> (<em>str</em>)</p></li>
+<li><p><strong>y_label</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>go.Figure</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">freqs</span><span class="p">,</span> <span class="n">mags</span> <span class="o">=</span> <span class="n">compute_fft</span><span class="p">(</span><span class="n">di</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span> <span class="o">=</span> <span class="n">plot_fft_spectrum</span><span class="p">([</span><span class="n">freqs</span><span class="p">],</span> <span class="p">[</span><span class="n">mags</span><span class="p">],</span> <span class="p">[</span><span class="n">di</span><span class="o">.</span><span class="n">label</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
 </div>
+</dd></dl>
+
 </section>
 
 
@@ -420,20 +424,20 @@
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="perda.units.html"
+       href="perda.plotting.diff_plotter.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">perda.units</p>
+        <p class="prev-next-title">perda.plotting.diff_plotter</p>
       </div>
     </a>
     <a class="right-next"
-       href="perda.utils.accel_calculator.html"
+       href="perda.plotting.parametric_plot.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">perda.utils.accel_calculator</p>
+        <p class="prev-next-title">perda.plotting.parametric_plot</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -449,10 +453,22 @@
 
 
   <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.plotting.fft_plotter.plot_fft_spectrum"><code class="docutils literal notranslate"><span class="pre">plot_fft_spectrum()</span></code></a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="../_sources/_autosummary/perda.utils.rst.txt"
+      <li><a href="../_sources/_autosummary/perda.plotting.fft_plotter.rst.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div></div>

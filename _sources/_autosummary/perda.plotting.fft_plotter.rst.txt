@@ -1,0 +1,8 @@
+perda.plotting.fft\_plotter
+===========================
+
+.. automodule:: perda.plotting.fft_plotter
+   :members:
+   :undoc-members:
+   :show-inheritance:
+

@@ -416,6 +416,61 @@
 
 
 
+<div class="viewcode-block" id="SubplotConfig">
+<a class="viewcode-back" href="../../../_autosummary/perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.SubplotConfig">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SubplotConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Layout configuration for stacked subplot figures.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    height_per_row : int</span>
+<span class="sd">        Pixel height allocated to each subplot row.</span>
+<span class="sd">    vertical_spacing : float</span>
+<span class="sd">        Vertical gap between subplot rows as a fraction of the total figure height.</span>
+<span class="sd">    width : int</span>
+<span class="sd">        Total figure width in pixels.</span>
+<span class="sd">    show_subplot_titles : bool</span>
+<span class="sd">        If True, each row receives a subtitle taken from the DataInstance label.</span>
+<span class="sd">    plot_bgcolor : str</span>
+<span class="sd">        Background color of each subplot panel.</span>
+<span class="sd">    margin : Dict[str, int]</span>
+<span class="sd">        Figure margins as a dict with keys ``l``, ``r``, ``t``, ``b``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">height_per_row</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">250</span>
+    <span class="n">vertical_spacing</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.04</span>
+    <span class="n">width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1200</span>
+    <span class="n">show_subplot_titles</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">plot_bgcolor</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;white&quot;</span>
+    <span class="n">margin</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span><span class="n">l</span><span class="o">=</span><span class="mi">70</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">70</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="FFTPlotConfig">
+<a class="viewcode-back" href="../../../_autosummary/perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.FFTPlotConfig">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">FFTPlotConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Configuration for FFT magnitude spectrum plots.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    log_x : bool</span>
+<span class="sd">        Logarithmic x-axis (frequency). Default is True.</span>
+<span class="sd">    log_y : bool</span>
+<span class="sd">        Logarithmic y-axis (magnitude). Default is False.</span>
+<span class="sd">    line_color : str</span>
+<span class="sd">        Color of the spectrum trace(s). Default is ``&quot;steelblue&quot;``.</span>
+<span class="sd">    height_single : int</span>
+<span class="sd">        Figure height in pixels when ``stacked=False`` (single-panel view).</span>
+<span class="sd">        Default is 500.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">log_x</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">log_y</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">line_color</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;steelblue&quot;</span>
+    <span class="n">height_single</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">500</span></div>
+
+
+
 <span class="c1"># Default configuration instances</span>
 <span class="n">DEFAULT_FONT_CONFIG</span> <span class="o">=</span> <span class="n">FontConfig</span><span class="p">()</span>
 <span class="n">DEFAULT_LAYOUT_CONFIG</span> <span class="o">=</span> <span class="n">LayoutConfig</span><span class="p">()</span>
@@ -423,6 +478,8 @@
 <span class="n">DEFAULT_SCATTER_HISTOGRAM_PLOT_CONFIG</span> <span class="o">=</span> <span class="n">ScatterHistogramPlotConfig</span><span class="p">()</span>
 <span class="n">DEFAULT_VLINE_CONFIG</span> <span class="o">=</span> <span class="n">VLineConfig</span><span class="p">()</span>
 <span class="n">DEFAULT_GPS_MAP_CONFIG</span> <span class="o">=</span> <span class="n">GpsMapConfig</span><span class="p">()</span>
+<span class="n">DEFAULT_SUBPLOT_CONFIG</span> <span class="o">=</span> <span class="n">SubplotConfig</span><span class="p">()</span>
+<span class="n">DEFAULT_FFT_PLOT_CONFIG</span> <span class="o">=</span> <span class="n">FFTPlotConfig</span><span class="p">()</span>
 </pre></div>
 
                 </article>

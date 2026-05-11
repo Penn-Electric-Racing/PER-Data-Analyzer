@@ -313,28 +313,67 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">..core_data_structures.single_run_data</span><span class="w"> </span><span class="kn">import</span> <span class="n">SingleRunData</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..plotting.data_instance_plotter</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..plotting.plotting_constants</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">..units</span><span class="w"> </span><span class="kn">import</span> <span class="n">Timescale</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..plotting.subplots</span><span class="w"> </span><span class="kn">import</span> <span class="n">data_instance_subplots</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..units</span><span class="w"> </span><span class="kn">import</span> <span class="n">Timescale</span><span class="p">,</span> <span class="n">_from_seconds</span><span class="p">,</span> <span class="n">_to_seconds</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..utils.accel_calculator</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..utils.data_summary</span><span class="w"> </span><span class="kn">import</span> <span class="n">single_run_summary</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..utils.diff</span><span class="w"> </span><span class="kn">import</span> <span class="n">diff</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..utils.frequency_analysis</span><span class="w"> </span><span class="kn">import</span> <span class="n">analyze_frequency</span> <span class="k">as</span> <span class="n">_analyze_frequency</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..utils.integrate</span><span class="w"> </span><span class="kn">import</span> <span class="n">smoothed_filtered_integration</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">..utils.preprocessing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Preprocessing</span><span class="p">,</span> <span class="n">apply_preprocessing</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">..utils.search</span><span class="w"> </span><span class="kn">import</span> <span class="n">search</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..utils.preprocessing</span><span class="w"> </span><span class="kn">import</span> <span class="n">PreprocessingStep</span><span class="p">,</span> <span class="n">apply_preprocessing</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..utils.search</span><span class="w"> </span><span class="kn">import</span> <span class="n">SearchResult</span><span class="p">,</span> <span class="n">search</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.csv</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
 
 
 <div class="viewcode-block" id="Analyzer">
 <a class="viewcode-back" href="../../../_autosummary/perda.analyzer.analyzer.html#perda.analyzer.analyzer.Analyzer">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Analyzer</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Primary class for loading and analyzing car log data.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Primary class for loading and analyzing car log data.</span>
+
+<span class="sd">    After loading, all variables live in ``analyzer.data`` (a</span>
+<span class="sd">    :class:`~perda.core_data_structures.SingleRunData`), which supports</span>
+<span class="sd">    dictionary-like access returning :class:`~perda.core_data_structures.DataInstance`</span>
+<span class="sd">    objects.</span>
+
+<span class="sd">    Access by name or variable ID</span>
+<span class="sd">    ------------------------------</span>
+<span class="sd">    &gt;&gt;&gt; di = aly.data[&quot;pcm.wheelSpeeds.frontRight&quot;]   # by cpp_name</span>
+<span class="sd">    &gt;&gt;&gt; di = aly.data[42]                             # by variable ID</span>
+
+<span class="sd">    Check membership</span>
+<span class="sd">    ----------------</span>
+<span class="sd">    &gt;&gt;&gt; &quot;pcm.wheelSpeeds.frontRight&quot; in aly.data       # True / False</span>
+
+<span class="sd">    Read raw arrays</span>
+<span class="sd">    ---------------</span>
+<span class="sd">    &gt;&gt;&gt; di.timestamp_np   # NDArray[int64] — timestamps in the log&#39;s native unit</span>
+<span class="sd">    &gt;&gt;&gt; di.value_np       # NDArray[float64] — sample values</span>
+
+<span class="sd">    Arithmetic between variables</span>
+<span class="sd">    ----------------------------</span>
+<span class="sd">    &gt;&gt;&gt; avg_speed = (aly.data[&quot;pcm.wheelSpeeds.frontRight&quot;] + aly.data[&quot;pcm.wheelSpeeds.frontLeft&quot;]) / 2.0</span>
+
+<span class="sd">    Trim to a time window (timestamps in the log&#39;s native unit)</span>
+<span class="sd">    ------------------------------------------------------------</span>
+<span class="sd">    &gt;&gt;&gt; di_trimmed = aly.data[&quot;pcm.wheelSpeeds.frontRight&quot;].trim(ts_start=10_000, ts_end=30_000)</span>
+
+<span class="sd">    Find variables when you don&#39;t know the exact name</span>
+<span class="sd">    --------------------------------------------------</span>
+<span class="sd">    &gt;&gt;&gt; results = aly.search(&quot;front wheel speed&quot;)   # prints + returns list[SearchResult]</span>
+<span class="sd">    &gt;&gt;&gt; di = aly.data[results[0].cpp_name]</span>
+
+<span class="sd">    Enumerate all variables with summary stats</span>
+<span class="sd">    ------------------------------------------</span>
+<span class="sd">    &gt;&gt;&gt; summaries = aly.variable_summary()          # list[VariableSummary], sorted by name</span>
+<span class="sd">    &gt;&gt;&gt; [v.cpp_name for v in summaries]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">ts_offset</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
         <span class="n">parsing_errors_limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
-        <span class="n">corrections</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Preprocessing</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">preprocessing</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">PreprocessingStep</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialize a new analyzer instance.</span>
@@ -347,15 +386,19 @@
 <span class="sd">            Timestamp offset to apply to all data points. Default is 0.</span>
 <span class="sd">        parsing_errors_limit : int, optional</span>
 <span class="sd">            Maximum number of parsing errors before stopping. Default is 100.</span>
-<span class="sd">        corrections : list[Preprocessing] | None, optional</span>
-<span class="sd">            Ordered list of post-parse corrections to apply. Each correction</span>
-<span class="sd">            is skipped with a warning if required variables are absent.</span>
-<span class="sd">            Default is None (no corrections).</span>
+<span class="sd">        preprocessing : list[PreprocessingStep] | None, optional</span>
+<span class="sd">            Ordered list of post-parse preprocessing steps to apply. Each step</span>
+<span class="sd">            is a ``SingleRunData → SingleRunData`` callable. Steps are skipped</span>
+<span class="sd">            with a warning if required variables are absent. Default is None.</span>
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
-<span class="sd">        &gt;&gt;&gt; from perda.utils import Preprocessing</span>
-<span class="sd">        &gt;&gt;&gt; aly = Analyzer(&quot;path/to/log.csv&quot;, corrections=[Preprocessing.NED_VELOCITY])</span>
+<span class="sd">        &gt;&gt;&gt; from perda.utils.preprocessing import correct_motor_data, correct_steering_angle</span>
+<span class="sd">        &gt;&gt;&gt; aly = Analyzer(&quot;path/to/log.csv&quot;, preprocessing=[correct_motor_data])</span>
+<span class="sd">        &gt;&gt;&gt; aly = Analyzer(&quot;path/to/log.csv&quot;, preprocessing=[</span>
+<span class="sd">        ...     correct_motor_data,</span>
+<span class="sd">        ...     correct_steering_angle(calibration=((1.5, -90.0), (3.0, 0.0), (4.5, 90.0))),</span>
+<span class="sd">        ... ])</span>
 <span class="sd">        &gt;&gt;&gt; print(aly)  # lists all available variables</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">:</span> <span class="n">SingleRunData</span> <span class="o">=</span> <span class="n">parse_csv</span><span class="p">(</span>
@@ -363,8 +406,8 @@
             <span class="n">ts_offset</span><span class="p">,</span>
             <span class="n">parsing_errors_limit</span><span class="o">=</span><span class="n">parsing_errors_limit</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="k">if</span> <span class="n">corrections</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">apply_preprocessing</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">corrections</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">preprocessing</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">apply_preprocessing</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">preprocessing</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a summary of all variables in the loaded run data.&quot;&quot;&quot;</span>
@@ -384,20 +427,33 @@
 
 <div class="viewcode-block" id="Analyzer.search">
 <a class="viewcode-back" href="../../../_autosummary/perda.analyzer.analyzer.html#perda.analyzer.analyzer.Analyzer.search">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">search</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">search</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">top_n</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">SearchResult</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Natural language search for available variables in the parsed data.</span>
+
+<span class="sd">        Prints matching results to stdout and returns them for programmatic use.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        query : str</span>
-<span class="sd">            Search query</span>
+<span class="sd">            Free-text search query (e.g. &quot;front wheel speed&quot;).</span>
+<span class="sd">        top_n : int</span>
+<span class="sd">            Maximum number of results to return and display (default 10).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list[SearchResult]</span>
+<span class="sd">            Top matches in descending relevance order (at most ``top_n`` entries).</span>
+<span class="sd">            Each entry has ``rank``, ``score``, ``var_id``, ``cpp_name``,</span>
+<span class="sd">            and ``descript``.</span>
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
-<span class="sd">        &gt;&gt;&gt; aly.search(&quot;front wheel speed&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; results = aly.search(&quot;front wheel speed&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; results = aly.search(&quot;front wheel speed&quot;, top_n=5)</span>
+<span class="sd">        &gt;&gt;&gt; names = [r.cpp_name for r in results]</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">search</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">query</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">search</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">query</span><span class="p">,</span> <span class="n">top_n</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Analyzer.plot">
@@ -441,35 +497,36 @@
 <span class="sd">        show_legend : bool, optional</span>
 <span class="sd">            Whether to show plot legends. Default is True</span>
 <span class="sd">        font_config : FontConfig, optional</span>
-<span class="sd">            Font configuration for plot elements. Default is DEFAULT_FONT_CONFIG</span>
+<span class="sd">            Font configuration for plot elements.</span>
 <span class="sd">        layout_config : LayoutConfig, optional</span>
-<span class="sd">            Layout configuration for plot dimensions. Default is DEFAULT_LAYOUT_CONFIG</span>
+<span class="sd">            Layout configuration for plot dimensions.</span>
 <span class="sd">        vline_config : VLineConfig, optional</span>
-<span class="sd">            Visual configuration for concat boundary lines. Default is DEFAULT_VLINE_CONFIG.</span>
+<span class="sd">            Visual configuration for concat boundary lines.</span>
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
 <span class="sd">        &gt;&gt;&gt; fig = aly.plot(&quot;pcm.wheelSpeeds.frontRight&quot;)</span>
 <span class="sd">        &gt;&gt;&gt; fig = aly.plot([&quot;pcm.wheelSpeeds.frontRight&quot;, &quot;pcm.wheelSpeeds.frontLeft&quot;], title=&quot;Front Wheel Speeds&quot;)</span>
 <span class="sd">        &gt;&gt;&gt; fig = aly.plot(&quot;pcm.moc.motor.requestedTorque&quot;, &quot;pcm.wheelSpeeds.frontRight&quot;, ts_start=10.0, ts_end=30.0)</span>
+<span class="sd">        &gt;&gt;&gt; # Plot a derived DataInstance (e.g. average of two signals)</span>
+<span class="sd">        &gt;&gt;&gt; avg_speed = (aly.data[&quot;pcm.wheelSpeeds.frontRight&quot;] + aly.data[&quot;pcm.wheelSpeeds.frontLeft&quot;]) / 2.0</span>
+<span class="sd">        &gt;&gt;&gt; fig = aly.plot(avg_speed)</span>
 <span class="sd">        &gt;&gt;&gt; fig.show()</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Normalize left input to List[DataInstance]</span>
         <span class="n">var_1_norm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_normalize_input</span><span class="p">(</span><span class="n">var_1</span><span class="p">)</span>
 
-        <span class="c1"># Divisor to convert raw timestamps to seconds (used for vlines and time range filter)</span>
         <span class="n">unit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">timestamp_unit</span>
-        <span class="n">divisor</span> <span class="o">=</span> <span class="mf">1e6</span> <span class="k">if</span> <span class="n">unit</span> <span class="o">==</span> <span class="n">Timescale</span><span class="o">.</span><span class="n">US</span> <span class="k">else</span> <span class="mf">1e3</span> <span class="k">if</span> <span class="n">unit</span> <span class="o">==</span> <span class="n">Timescale</span><span class="o">.</span><span class="n">MS</span> <span class="k">else</span> <span class="mf">1.0</span>
 
         <span class="c1"># Convert concat boundaries to seconds for the plotter</span>
         <span class="n">vlines</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">concat_boundaries</span><span class="p">:</span>
-            <span class="n">vlines</span> <span class="o">=</span> <span class="p">[</span><span class="n">b</span> <span class="o">/</span> <span class="n">divisor</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">concat_boundaries</span><span class="p">]</span>
+            <span class="n">vlines</span> <span class="o">=</span> <span class="p">[</span><span class="n">_to_seconds</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">unit</span><span class="p">)</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">concat_boundaries</span><span class="p">]</span>
 
         <span class="c1"># Apply time range filter if specified (convert seconds → raw units for trim)</span>
         <span class="k">if</span> <span class="n">ts_start</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">ts_end</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">start_raw</span> <span class="o">=</span> <span class="n">ts_start</span> <span class="o">*</span> <span class="n">divisor</span> <span class="k">if</span> <span class="n">ts_start</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
-            <span class="n">end_raw</span> <span class="o">=</span> <span class="n">ts_end</span> <span class="o">*</span> <span class="n">divisor</span> <span class="k">if</span> <span class="n">ts_end</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+            <span class="n">start_raw</span> <span class="o">=</span> <span class="n">_from_seconds</span><span class="p">(</span><span class="n">ts_start</span><span class="p">,</span> <span class="n">unit</span><span class="p">)</span> <span class="k">if</span> <span class="n">ts_start</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+            <span class="n">end_raw</span> <span class="o">=</span> <span class="n">_from_seconds</span><span class="p">(</span><span class="n">ts_end</span><span class="p">,</span> <span class="n">unit</span><span class="p">)</span> <span class="k">if</span> <span class="n">ts_end</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
             <span class="n">var_1_norm</span> <span class="o">=</span> <span class="p">[</span><span class="n">di</span><span class="o">.</span><span class="n">trim</span><span class="p">(</span><span class="n">start_raw</span><span class="p">,</span> <span class="n">end_raw</span><span class="p">)</span> <span class="k">for</span> <span class="n">di</span> <span class="ow">in</span> <span class="n">var_1_norm</span><span class="p">]</span>
 
         <span class="k">if</span> <span class="n">var_2</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -503,6 +560,100 @@
                 <span class="n">vlines</span><span class="o">=</span><span class="n">vlines</span><span class="p">,</span>
                 <span class="n">vline_config</span><span class="o">=</span><span class="n">vline_config</span><span class="p">,</span>
             <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Analyzer.subplots">
+<a class="viewcode-back" href="../../../_autosummary/perda.analyzer.analyzer.html#perda.analyzer.analyzer.Analyzer.subplots">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">subplots</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">rows</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span>
+            <span class="n">Union</span><span class="p">[</span>
+                <span class="nb">str</span><span class="p">,</span>
+                <span class="nb">int</span><span class="p">,</span>
+                <span class="n">DataInstance</span><span class="p">,</span>
+                <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">DataInstance</span><span class="p">]],</span>
+            <span class="p">]</span>
+        <span class="p">],</span>
+        <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">row_y_labels</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">ts_start</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">ts_end</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">show_legend</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">font_config</span><span class="p">:</span> <span class="n">FontConfig</span> <span class="o">=</span> <span class="n">DEFAULT_FONT_CONFIG</span><span class="p">,</span>
+        <span class="n">subplot_config</span><span class="p">:</span> <span class="n">SubplotConfig</span> <span class="o">=</span> <span class="n">DEFAULT_SUBPLOT_CONFIG</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Plot multiple variables as stacked subplots on a shared time axis.</span>
+
+<span class="sd">        Each entry in ``rows`` becomes one subplot row. Pass a list of</span>
+<span class="sd">        variables for a row to overlay multiple signals on the same panel,</span>
+<span class="sd">        or a single variable for a dedicated panel.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        rows : List[str | int | DataInstance | List[str | int | DataInstance]]</span>
+<span class="sd">            One entry per subplot row (top to bottom). Each entry may be a</span>
+<span class="sd">            single variable (name, ID, or DataInstance) or a list of variables</span>
+<span class="sd">            to overlay on that row.</span>
+<span class="sd">        title : str | None, optional</span>
+<span class="sd">            Figure-level title. Default is None.</span>
+<span class="sd">        row_y_labels : List[str | None] | None, optional</span>
+<span class="sd">            Y-axis label for each row. ``None`` entries fall back to the</span>
+<span class="sd">            DataInstance labels. Must match the length of ``rows`` when</span>
+<span class="sd">            provided. Default is None.</span>
+<span class="sd">        ts_start : float | None, optional</span>
+<span class="sd">            Start of the time window in seconds. Data before this time is</span>
+<span class="sd">            excluded from all rows. Default is None (no lower bound).</span>
+<span class="sd">        ts_end : float | None, optional</span>
+<span class="sd">            End of the time window in seconds. Data after this time is</span>
+<span class="sd">            excluded from all rows. Default is None (no upper bound).</span>
+<span class="sd">        show_legend : bool, optional</span>
+<span class="sd">            Whether to show the figure legend. Default is True.</span>
+<span class="sd">        font_config : FontConfig, optional</span>
+<span class="sd">            Font sizes for plot elements.</span>
+<span class="sd">        subplot_config : SubplotConfig, optional</span>
+<span class="sd">            Row height, spacing, width, and style.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        go.Figure</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        &gt;&gt;&gt; fig = aly.subplots([&quot;pcm.wheelSpeeds.frontRight&quot;, &quot;pcm.moc.motor.requestedTorque&quot;])</span>
+<span class="sd">        &gt;&gt;&gt; fig = aly.subplots(</span>
+<span class="sd">        ...     rows=[</span>
+<span class="sd">        ...         [&quot;pcm.wheelSpeeds.frontRight&quot;, &quot;pcm.wheelSpeeds.frontLeft&quot;],</span>
+<span class="sd">        ...         &quot;pcm.moc.motor.requestedTorque&quot;,</span>
+<span class="sd">        ...     ],</span>
+<span class="sd">        ...     title=&quot;Run Overview&quot;,</span>
+<span class="sd">        ...     row_y_labels=[&quot;Wheel Speed (mph)&quot;, &quot;Torque (Nm)&quot;],</span>
+<span class="sd">        ...     ts_start=5.0,</span>
+<span class="sd">        ...     ts_end=30.0,</span>
+<span class="sd">        ... )</span>
+<span class="sd">        &gt;&gt;&gt; fig.show()</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">unit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">timestamp_unit</span>
+
+        <span class="n">start_raw</span> <span class="o">=</span> <span class="n">_from_seconds</span><span class="p">(</span><span class="n">ts_start</span><span class="p">,</span> <span class="n">unit</span><span class="p">)</span> <span class="k">if</span> <span class="n">ts_start</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="n">end_raw</span> <span class="o">=</span> <span class="n">_from_seconds</span><span class="p">(</span><span class="n">ts_end</span><span class="p">,</span> <span class="n">unit</span><span class="p">)</span> <span class="k">if</span> <span class="n">ts_end</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+
+        <span class="n">normalized_rows</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">DataInstance</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">row_entry</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+            <span class="n">row_dis</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_normalize_input</span><span class="p">(</span><span class="n">row_entry</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">start_raw</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">end_raw</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">row_dis</span> <span class="o">=</span> <span class="p">[</span><span class="n">di</span><span class="o">.</span><span class="n">trim</span><span class="p">(</span><span class="n">start_raw</span><span class="p">,</span> <span class="n">end_raw</span><span class="p">)</span> <span class="k">for</span> <span class="n">di</span> <span class="ow">in</span> <span class="n">row_dis</span><span class="p">]</span>
+            <span class="n">normalized_rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row_dis</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">data_instance_subplots</span><span class="p">(</span>
+            <span class="n">rows</span><span class="o">=</span><span class="n">normalized_rows</span><span class="p">,</span>
+            <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
+            <span class="n">row_y_labels</span><span class="o">=</span><span class="n">row_y_labels</span><span class="p">,</span>
+            <span class="n">show_legend</span><span class="o">=</span><span class="n">show_legend</span><span class="p">,</span>
+            <span class="n">font_config</span><span class="o">=</span><span class="n">font_config</span><span class="p">,</span>
+            <span class="n">subplot_config</span><span class="o">=</span><span class="n">subplot_config</span><span class="p">,</span>
+            <span class="n">timestamp_unit</span><span class="o">=</span><span class="n">unit</span><span class="p">,</span>
+        <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Analyzer.diff">
@@ -570,9 +721,9 @@
 <span class="sd">            Intervals exceeding this multiple of the expected (or median) interval</span>
 <span class="sd">            are flagged as gaps. Default is 2.0.</span>
 <span class="sd">        font_config : FontConfig, optional</span>
-<span class="sd">            Font sizes for plot elements. Default is DEFAULT_FONT_CONFIG.</span>
+<span class="sd">            Font sizes for plot elements.</span>
 <span class="sd">        layout_config : LayoutConfig, optional</span>
-<span class="sd">            Plot dimensions and margins. Default is DEFAULT_LAYOUT_CONFIG.</span>
+<span class="sd">            Plot dimensions and margins.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -617,7 +768,8 @@
 <a class="viewcode-back" href="../../../_autosummary/perda.analyzer.analyzer.html#perda.analyzer.analyzer.Analyzer.get_accel_times">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_accel_times</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">AccelSegmentResult</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Get acceleration times from the analyzer.</span>
+<span class="sd">        Intelligently detect and extract segments of the log where an</span>
+<span class="sd">        acceleration run occurs, then compute acceleration times.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>

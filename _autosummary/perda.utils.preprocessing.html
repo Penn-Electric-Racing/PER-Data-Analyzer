@@ -282,9 +282,11 @@
 <li class="toctree-l2 has-children"><a class="reference internal" href="perda.plotting.html">perda.plotting</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="perda.plotting.data_instance_plotter.html">perda.plotting.data_instance_plotter</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.plotting.diff_plotter.html">perda.plotting.diff_plotter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.plotting.fft_plotter.html">perda.plotting.fft_plotter</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.plotting.parametric_plot.html">perda.plotting.parametric_plot</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.plotting.plotting_constants.html">perda.plotting.plotting_constants</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.plotting.scatter_histogram_plotter.html">perda.plotting.scatter_histogram_plotter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.plotting.subplots.html">perda.plotting.subplots</a></li>
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="perda.server.html">perda.server</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -297,6 +299,7 @@
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.accel_calculator.html">perda.utils.accel_calculator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.data_summary.html">perda.utils.data_summary</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.diff.html">perda.utils.diff</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.utils.filtering.html">perda.utils.filtering</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.frequency_analysis.html">perda.utils.frequency_analysis</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.gps_analysis.html">perda.utils.gps_analysis</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.integrate.html">perda.utils.integrate</a></li>
@@ -375,35 +378,29 @@
   <section id="module-perda.utils.preprocessing">
 <span id="perda-utils-preprocessing"></span><h1>perda.utils.preprocessing<a class="headerlink" href="#module-perda.utils.preprocessing" title="Link to this heading">#</a></h1>
 <dl class="py class">
-<dt class="sig sig-object py" id="perda.utils.preprocessing.Preprocessing">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">perda.utils.preprocessing.</span></span><span class="sig-name descname"><span class="pre">Preprocessing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/utils/preprocessing.html#Preprocessing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.utils.preprocessing.Preprocessing" title="Link to this definition">#</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="perda.utils.preprocessing.Preprocessing.CORRECT_MOTOR_DATA">
-<span class="sig-name descname"><span class="pre">CORRECT_MOTOR_DATA</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'correct_motor_data'</span></em><a class="headerlink" href="#perda.utils.preprocessing.Preprocessing.CORRECT_MOTOR_DATA" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="perda.utils.preprocessing.Preprocessing.PATCH_NED_VELOCITY">
-<span class="sig-name descname"><span class="pre">PATCH_NED_VELOCITY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'patch_ned_velocity'</span></em><a class="headerlink" href="#perda.utils.preprocessing.Preprocessing.PATCH_NED_VELOCITY" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="perda.utils.preprocessing.Preprocessing.WHEELSPEEDS_TO_M_PER_S">
-<span class="sig-name descname"><span class="pre">WHEELSPEEDS_TO_M_PER_S</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'wheelspeeds_to_m_per_s'</span></em><a class="headerlink" href="#perda.utils.preprocessing.Preprocessing.WHEELSPEEDS_TO_M_PER_S" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
+<dt class="sig sig-object py" id="perda.utils.preprocessing.CorrectSteeringAngleLambda">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">perda.utils.preprocessing.</span></span><span class="sig-name descname"><span class="pre">CorrectSteeringAngleLambda</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">calibration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">((1.86,</span> <span class="pre">-97.0),</span> <span class="pre">(2.93,</span> <span class="pre">0.0),</span> <span class="pre">(3.96,</span> <span class="pre">97.0))</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/utils/preprocessing.html#CorrectSteeringAngleLambda"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.utils.preprocessing.CorrectSteeringAngleLambda" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Callable preprocessing step for recomputing the steering angle to account for drift.</p>
+<p>Fits a polynomial through the calibration points and
+rewrites the angle channel in-place, preserving the original as
+<code class="docutils literal notranslate"><span class="pre">ludwig.steeringWheel.angle_original</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>calibration</strong> (<em>tuple</em><em>[</em><em>tuple</em><em>[</em><em>float</em><em>, </em><em>float</em><em>]</em><em>, </em><em>...</em><em>]</em>)</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="perda.utils.preprocessing.apply_preprocessing">
-<span class="sig-prename descclassname"><span class="pre">perda.utils.preprocessing.</span></span><span class="sig-name descname"><span class="pre">apply_preprocessing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">corrections</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/utils/preprocessing.html#apply_preprocessing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.utils.preprocessing.apply_preprocessing" title="Link to this definition">#</a></dt>
-<dd><p>Run a sequence of preprocessing steps on a parsed SingleRunData instance.</p>
+<span class="sig-prename descclassname"><span class="pre">perda.utils.preprocessing.</span></span><span class="sig-name descname"><span class="pre">apply_preprocessing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/utils/preprocessing.html#apply_preprocessing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.utils.preprocessing.apply_preprocessing" title="Link to this definition">#</a></dt>
+<dd><p>Run a sequence of preprocessing steps on a SingleRunData instance.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> (<a class="reference internal" href="perda.core_data_structures.single_run_data.html#perda.core_data_structures.single_run_data.SingleRunData" title="perda.core_data_structures.single_run_data.SingleRunData"><em>SingleRunData</em></a>) – Parsed run data to preprocess.</p></li>
-<li><p><strong>corrections</strong> (<em>list</em><em>[</em><a class="reference internal" href="#perda.utils.preprocessing.Preprocessing" title="perda.utils.preprocessing.Preprocessing"><em>Preprocessing</em></a><em>]</em>) – Ordered list of preprocessing steps to apply.</p></li>
+<li><p><strong>steps</strong> (<em>list</em><em> of </em><em>PreprocessingStep</em>) – Ordered list of <code class="docutils literal notranslate"><span class="pre">SingleRunData</span> <span class="pre">→</span> <span class="pre">SingleRunData</span></code> callables to apply.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -413,17 +410,26 @@
 <dd class="field-odd"><p><a class="reference internal" href="perda.core_data_structures.single_run_data.html#perda.core_data_structures.single_run_data.SingleRunData" title="perda.core_data_structures.single_run_data.SingleRunData">SingleRunData</a></p>
 </dd>
 </dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">apply_preprocessing</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="p">[</span><span class="n">correct_motor_data</span><span class="p">,</span> <span class="n">convert_wheelspeeds_to_m_per_s</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">apply_preprocessing</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="p">[</span>
+<span class="gp">... </span>    <span class="n">correct_motor_data</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">correct_steering_angle</span><span class="p">(</span><span class="n">calibration</span><span class="o">=</span><span class="p">((</span><span class="mf">1.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">90.0</span><span class="p">),</span> <span class="p">(</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span> <span class="p">(</span><span class="mf">4.5</span><span class="p">,</span> <span class="mf">90.0</span><span class="p">))),</span>
+<span class="gp">... </span><span class="p">])</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="perda.utils.preprocessing.convert_wheelspeeds_to_m_per_s">
 <span class="sig-prename descclassname"><span class="pre">perda.utils.preprocessing.</span></span><span class="sig-name descname"><span class="pre">convert_wheelspeeds_to_m_per_s</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/utils/preprocessing.html#convert_wheelspeeds_to_m_per_s"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.utils.preprocessing.convert_wheelspeeds_to_m_per_s" title="Link to this definition">#</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="perda.core_data_structures.single_run_data.html#perda.core_data_structures.single_run_data.SingleRunData" title="perda.core_data_structures.single_run_data.SingleRunData"><code class="xref py py-class docutils literal notranslate"><span class="pre">SingleRunData</span></code></a></span></p>
+<dd><p>Convert wheel speed channels from mph to m/s, preserving originals as <a href="#id1"><span class="problematic" id="id2">*</span></a>_mph.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data</strong> (<a class="reference internal" href="perda.core_data_structures.single_run_data.html#perda.core_data_structures.single_run_data.SingleRunData" title="perda.core_data_structures.single_run_data.SingleRunData"><em>SingleRunData</em></a>)</p>
 </dd>
-<dt class="field-even">Parameters<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>data</strong> (<a class="reference internal" href="perda.core_data_structures.single_run_data.html#perda.core_data_structures.single_run_data.SingleRunData" title="perda.core_data_structures.single_run_data.SingleRunData"><em>SingleRunData</em></a>)</p>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="perda.core_data_structures.single_run_data.html#perda.core_data_structures.single_run_data.SingleRunData" title="perda.core_data_structures.single_run_data.SingleRunData">SingleRunData</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -431,12 +437,13 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="perda.utils.preprocessing.correct_motor_data">
 <span class="sig-prename descclassname"><span class="pre">perda.utils.preprocessing.</span></span><span class="sig-name descname"><span class="pre">correct_motor_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/utils/preprocessing.html#correct_motor_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.utils.preprocessing.correct_motor_data" title="Link to this definition">#</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="perda.core_data_structures.single_run_data.html#perda.core_data_structures.single_run_data.SingleRunData" title="perda.core_data_structures.single_run_data.SingleRunData"><code class="xref py py-class docutils literal notranslate"><span class="pre">SingleRunData</span></code></a></span></p>
+<dd><p>Flip the motor RPM sign and derive driven wheel speed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data</strong> (<a class="reference internal" href="perda.core_data_structures.single_run_data.html#perda.core_data_structures.single_run_data.SingleRunData" title="perda.core_data_structures.single_run_data.SingleRunData"><em>SingleRunData</em></a>)</p>
 </dd>
-<dt class="field-even">Parameters<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>data</strong> (<a class="reference internal" href="perda.core_data_structures.single_run_data.html#perda.core_data_structures.single_run_data.SingleRunData" title="perda.core_data_structures.single_run_data.SingleRunData"><em>SingleRunData</em></a>)</p>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="perda.core_data_structures.single_run_data.html#perda.core_data_structures.single_run_data.SingleRunData" title="perda.core_data_structures.single_run_data.SingleRunData">SingleRunData</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -444,9 +451,8 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="perda.utils.preprocessing.patch_ned_velocity">
 <span class="sig-prename descclassname"><span class="pre">perda.utils.preprocessing.</span></span><span class="sig-name descname"><span class="pre">patch_ned_velocity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/utils/preprocessing.html#patch_ned_velocity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.utils.preprocessing.patch_ned_velocity" title="Link to this definition">#</a></dt>
-<dd><p>Corrects a VectorNav configuration bug where velocityBody.x/y/z actually contains
-NED (North/East/Down) velocities. Copies raw NED to velN/velE/velD, then rotates
-into true body frame (FRD) using yaw. Includes sanity checks and ZOH duplicate warnings.</p>
+<dd><p>Correct a VectorNav bug where velocityBody.x/y/z contains NED instead of body-frame velocities.</p>
+<p>Copies the raw NED values to velN/velE/velD, then rotates into true body-frame (FRD) using yaw.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>data</strong> (<a class="reference internal" href="perda.core_data_structures.single_run_data.html#perda.core_data_structures.single_run_data.SingleRunData" title="perda.core_data_structures.single_run_data.SingleRunData"><em>SingleRunData</em></a>)</p>
@@ -506,12 +512,7 @@ into true body frame (FRD) using yaw. Includes sanity checks and ZOH duplicate w
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.utils.preprocessing.Preprocessing"><code class="docutils literal notranslate"><span class="pre">Preprocessing</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.utils.preprocessing.Preprocessing.CORRECT_MOTOR_DATA"><code class="docutils literal notranslate"><span class="pre">Preprocessing.CORRECT_MOTOR_DATA</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.utils.preprocessing.Preprocessing.PATCH_NED_VELOCITY"><code class="docutils literal notranslate"><span class="pre">Preprocessing.PATCH_NED_VELOCITY</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.utils.preprocessing.Preprocessing.WHEELSPEEDS_TO_M_PER_S"><code class="docutils literal notranslate"><span class="pre">Preprocessing.WHEELSPEEDS_TO_M_PER_S</span></code></a></li>
-</ul>
-</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.utils.preprocessing.CorrectSteeringAngleLambda"><code class="docutils literal notranslate"><span class="pre">CorrectSteeringAngleLambda</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.utils.preprocessing.apply_preprocessing"><code class="docutils literal notranslate"><span class="pre">apply_preprocessing()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.utils.preprocessing.convert_wheelspeeds_to_m_per_s"><code class="docutils literal notranslate"><span class="pre">convert_wheelspeeds_to_m_per_s()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.utils.preprocessing.correct_motor_data"><code class="docutils literal notranslate"><span class="pre">correct_motor_data()</span></code></a></li>

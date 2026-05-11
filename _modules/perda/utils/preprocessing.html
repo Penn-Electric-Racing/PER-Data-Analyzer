@@ -303,10 +303,11 @@
                 <article class="bd-article">
                   
   <h1>Source code for perda.utils.preprocessing</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="kn">import</span> <span class="n">float64</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">numpy.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">NDArray</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">..core_data_structures.data_instance</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataInstance</span><span class="p">,</span> <span class="n">left_join_data_instances</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..core_data_structures.single_run_data</span><span class="w"> </span><span class="kn">import</span> <span class="n">SingleRunData</span>
@@ -315,22 +316,35 @@
 <span class="n">GEAR_RATIO</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">5.6</span>
 <span class="n">TIRE_RADIUS_IN</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">7.85</span>
 
+<span class="n">VECTORNAV_BODY_VEL_X</span> <span class="o">=</span> <span class="s2">&quot;pcm.vnav.velocityBody.x&quot;</span>
+<span class="n">VECTORNAV_BODY_VEL_Y</span> <span class="o">=</span> <span class="s2">&quot;pcm.vnav.velocityBody.y&quot;</span>
+<span class="n">VECTORNAV_BODY_VEL_Z</span> <span class="o">=</span> <span class="s2">&quot;pcm.vnav.velocityBody.z&quot;</span>
+<span class="n">VECTORNAV_YAW</span> <span class="o">=</span> <span class="s2">&quot;pcm.vnav.yawPitchRoll.yaw&quot;</span>
 
-<span class="n">_VEL_X</span> <span class="o">=</span> <span class="s2">&quot;pcm.vnav.velocityBody.x&quot;</span>
-<span class="n">_VEL_Y</span> <span class="o">=</span> <span class="s2">&quot;pcm.vnav.velocityBody.y&quot;</span>
-<span class="n">_VEL_Z</span> <span class="o">=</span> <span class="s2">&quot;pcm.vnav.velocityBody.z&quot;</span>
-<span class="n">_YAW</span> <span class="o">=</span> <span class="s2">&quot;pcm.vnav.yawPitchRoll.yaw&quot;</span>
+<span class="n">WHEELSPEED_FR</span> <span class="o">=</span> <span class="s2">&quot;pcm.wheelSpeeds.frontRight&quot;</span>
+<span class="n">WHEELSPEED_FL</span> <span class="o">=</span> <span class="s2">&quot;pcm.wheelSpeeds.frontLeft&quot;</span>
+<span class="n">WHEELSPEED_RR</span> <span class="o">=</span> <span class="s2">&quot;pcm.wheelSpeeds.rearRight&quot;</span>
+<span class="n">WHEELSPEED_RL</span> <span class="o">=</span> <span class="s2">&quot;pcm.wheelSpeeds.rearLeft&quot;</span>
 
-<span class="n">_WS_FR</span> <span class="o">=</span> <span class="s2">&quot;pcm.wheelSpeeds.frontRight&quot;</span>
-<span class="n">_WS_FL</span> <span class="o">=</span> <span class="s2">&quot;pcm.wheelSpeeds.frontLeft&quot;</span>
-<span class="n">_WS_RR</span> <span class="o">=</span> <span class="s2">&quot;pcm.wheelSpeeds.rearRight&quot;</span>
-<span class="n">_WS_RL</span> <span class="o">=</span> <span class="s2">&quot;pcm.wheelSpeeds.rearLeft&quot;</span>
+<span class="n">MOTOR_RPM</span> <span class="o">=</span> <span class="s2">&quot;pcm.moc.motor.angularSpeed&quot;</span>
+<span class="n">MOTOR_WHEELSPEED</span> <span class="o">=</span> <span class="s2">&quot;pcm.moc.motor.wheelSpeed&quot;</span>
 
-<span class="n">_MOTOR_RPM</span> <span class="o">=</span> <span class="s2">&quot;pcm.moc.motor.angularSpeed&quot;</span>
-<span class="n">_MOTOR_WS</span> <span class="o">=</span> <span class="s2">&quot;pcm.moc.motor.wheelSpeed&quot;</span>
+<span class="n">STEERING_RAW</span> <span class="o">=</span> <span class="s2">&quot;ludwig.steeringWheel.raw&quot;</span>
+<span class="n">STEERING_ANGLE</span> <span class="o">=</span> <span class="s2">&quot;ludwig.steeringWheel.angle&quot;</span>
+
+<span class="c1"># Default 3-point voltage→angle calibration for the steering pot.</span>
+<span class="n">SteeringCalibration</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="o">...</span><span class="p">]</span>
+<span class="n">DEFAULT_STEERING_CALIBRATION</span><span class="p">:</span> <span class="n">SteeringCalibration</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="p">(</span><span class="mf">1.86</span><span class="p">,</span> <span class="o">-</span><span class="mf">97.0</span><span class="p">),</span>  <span class="c1"># max left</span>
+    <span class="p">(</span><span class="mf">2.93</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span>  <span class="c1"># zero</span>
+    <span class="p">(</span><span class="mf">3.96</span><span class="p">,</span> <span class="mf">97.0</span><span class="p">),</span>  <span class="c1"># max right</span>
+<span class="p">)</span>
+
+<span class="c1"># Type alias for a preprocessing step function that takes and returns a SingleRunData instance.</span>
+<span class="n">PreprocessingStep</span> <span class="o">=</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">SingleRunData</span><span class="p">],</span> <span class="n">SingleRunData</span><span class="p">]</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_replace</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">SingleRunData</span><span class="p">,</span> <span class="n">cpp_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">new_values</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_replace</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">SingleRunData</span><span class="p">,</span> <span class="n">cpp_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">new_values</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Overwrite the value_np of an existing DataInstance in-place (mutates dict).&quot;&quot;&quot;</span>
     <span class="n">var_id</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">cpp_name_to_id</span><span class="p">[</span><span class="n">cpp_name</span><span class="p">]</span>
     <span class="n">old</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">id_to_instance</span><span class="p">[</span><span class="n">var_id</span><span class="p">]</span>
@@ -347,8 +361,8 @@
     <span class="n">data</span><span class="p">:</span> <span class="n">SingleRunData</span><span class="p">,</span>
     <span class="n">cpp_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">label</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-    <span class="n">timestamp_np</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-    <span class="n">value_np</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">timestamp_np</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span>
+    <span class="n">value_np</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Insert a new derived DataInstance using a synthetic negative ID.&quot;&quot;&quot;</span>
     <span class="n">synthetic_id</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">id_to_instance</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
@@ -365,21 +379,12 @@
     <span class="n">data</span><span class="o">.</span><span class="n">id_to_descript</span><span class="p">[</span><span class="n">synthetic_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">label</span>
 
 
-<div class="viewcode-block" id="Preprocessing">
-<a class="viewcode-back" href="../../../_autosummary/perda.utils.preprocessing.html#perda.utils.preprocessing.Preprocessing">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">Preprocessing</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
-    <span class="n">PATCH_NED_VELOCITY</span> <span class="o">=</span> <span class="s2">&quot;patch_ned_velocity&quot;</span>
-    <span class="n">WHEELSPEEDS_TO_M_PER_S</span> <span class="o">=</span> <span class="s2">&quot;wheelspeeds_to_m_per_s&quot;</span>
-    <span class="n">CORRECT_MOTOR_DATA</span> <span class="o">=</span> <span class="s2">&quot;correct_motor_data&quot;</span></div>
-
-
-
 <div class="viewcode-block" id="patch_ned_velocity">
 <a class="viewcode-back" href="../../../_autosummary/perda.utils.preprocessing.html#perda.utils.preprocessing.patch_ned_velocity">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">patch_ned_velocity</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">SingleRunData</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SingleRunData</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Corrects a VectorNav configuration bug where velocityBody.x/y/z actually contains</span>
-<span class="sd">    NED (North/East/Down) velocities. Copies raw NED to velN/velE/velD, then rotates</span>
-<span class="sd">    into true body frame (FRD) using yaw. Includes sanity checks and ZOH duplicate warnings.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Correct a VectorNav bug where velocityBody.x/y/z contains NED instead of body-frame velocities.</span>
+
+<span class="sd">    Copies the raw NED values to velN/velE/velD, then rotates into true body-frame (FRD) using yaw.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -389,14 +394,20 @@
 <span class="sd">    -------</span>
 <span class="sd">    SingleRunData</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">required</span> <span class="o">=</span> <span class="p">[</span><span class="n">_VEL_X</span><span class="p">,</span> <span class="n">_VEL_Y</span><span class="p">,</span> <span class="n">_VEL_Z</span><span class="p">,</span> <span class="n">_YAW</span><span class="p">]</span>
+    <span class="n">required</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">VECTORNAV_BODY_VEL_X</span><span class="p">,</span>
+        <span class="n">VECTORNAV_BODY_VEL_Y</span><span class="p">,</span>
+        <span class="n">VECTORNAV_BODY_VEL_Z</span><span class="p">,</span>
+        <span class="n">VECTORNAV_YAW</span><span class="p">,</span>
+    <span class="p">]</span>
     <span class="n">missing</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">required</span> <span class="k">if</span> <span class="n">v</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">missing</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;WARNING: PATCH_NED_VELOCITY skipped — missing variables: </span><span class="si">{</span><span class="n">missing</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;WARNING: patch_ned_velocity skipped — missing variables: </span><span class="si">{</span><span class="n">missing</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">data</span>
 
     <span class="n">vel_n1</span><span class="p">,</span> <span class="n">vel_e1</span><span class="p">,</span> <span class="n">vel_d1</span><span class="p">,</span> <span class="n">yaw_deg</span> <span class="o">=</span> <span class="n">left_join_data_instances</span><span class="p">(</span>
-        <span class="n">data</span><span class="p">[</span><span class="n">_VEL_X</span><span class="p">],</span> <span class="p">[</span><span class="n">data</span><span class="p">[</span><span class="n">_VEL_Y</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="n">_VEL_Z</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="n">_YAW</span><span class="p">]]</span>
+        <span class="n">data</span><span class="p">[</span><span class="n">VECTORNAV_BODY_VEL_X</span><span class="p">],</span>
+        <span class="p">[</span><span class="n">data</span><span class="p">[</span><span class="n">VECTORNAV_BODY_VEL_Y</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="n">VECTORNAV_BODY_VEL_Z</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="n">VECTORNAV_YAW</span><span class="p">]],</span>
     <span class="p">)</span>
 
     <span class="n">vel_n</span> <span class="o">=</span> <span class="n">vel_n1</span><span class="o">.</span><span class="n">value_np</span>
@@ -404,20 +415,18 @@
     <span class="n">vel_d</span> <span class="o">=</span> <span class="n">vel_d1</span><span class="o">.</span><span class="n">value_np</span>
     <span class="n">yaw_rad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">yaw_deg</span><span class="o">.</span><span class="n">value_np</span><span class="p">)</span>
 
-    <span class="c1"># Preserve raw NED copies</span>
     <span class="n">_add</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="s2">&quot;velN&quot;</span><span class="p">,</span> <span class="s2">&quot;NED North velocity (raw)&quot;</span><span class="p">,</span> <span class="n">vel_n1</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">,</span> <span class="n">vel_n</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
     <span class="n">_add</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="s2">&quot;velE&quot;</span><span class="p">,</span> <span class="s2">&quot;NED East velocity (raw)&quot;</span><span class="p">,</span> <span class="n">vel_e1</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">,</span> <span class="n">vel_e</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
     <span class="n">_add</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="s2">&quot;velD&quot;</span><span class="p">,</span> <span class="s2">&quot;NED Down velocity (raw)&quot;</span><span class="p">,</span> <span class="n">vel_d1</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">,</span> <span class="n">vel_d</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
 
-    <span class="c1"># Rotate NED → body-frame (FRD) using yaw only</span>
     <span class="n">cos_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">yaw_rad</span><span class="p">)</span>
     <span class="n">sin_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">yaw_rad</span><span class="p">)</span>
-    <span class="n">_replace</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">_VEL_X</span><span class="p">,</span> <span class="n">vel_n</span> <span class="o">*</span> <span class="n">cos_y</span> <span class="o">+</span> <span class="n">vel_e</span> <span class="o">*</span> <span class="n">sin_y</span><span class="p">)</span>  <span class="c1"># forward</span>
-    <span class="n">_replace</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">_VEL_Y</span><span class="p">,</span> <span class="o">-</span><span class="n">vel_n</span> <span class="o">*</span> <span class="n">sin_y</span> <span class="o">+</span> <span class="n">vel_e</span> <span class="o">*</span> <span class="n">cos_y</span><span class="p">)</span>  <span class="c1"># right</span>
-    <span class="c1"># vel_z (down) identical in NED and FRD — no change needed</span>
+    <span class="n">_replace</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">VECTORNAV_BODY_VEL_X</span><span class="p">,</span> <span class="n">vel_n</span> <span class="o">*</span> <span class="n">cos_y</span> <span class="o">+</span> <span class="n">vel_e</span> <span class="o">*</span> <span class="n">sin_y</span><span class="p">)</span>  <span class="c1"># forward</span>
+    <span class="n">_replace</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">VECTORNAV_BODY_VEL_Y</span><span class="p">,</span> <span class="o">-</span><span class="n">vel_n</span> <span class="o">*</span> <span class="n">sin_y</span> <span class="o">+</span> <span class="n">vel_e</span> <span class="o">*</span> <span class="n">cos_y</span><span class="p">)</span>  <span class="c1"># right</span>
+    <span class="c1"># vel_z (down) is identical in NED and FRD — no change needed</span>
 
     <span class="nb">print</span><span class="p">(</span>
-        <span class="sa">f</span><span class="s2">&quot;PATCH_NED_VELOCITY: Preserved raw NED velocity in velN/velE/velD, rotated </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">vel_n</span><span class="p">)</span><span class="si">}</span><span class="s2"> points → body frame&quot;</span>
+        <span class="sa">f</span><span class="s2">&quot;patch_ned_velocity: preserved raw NED in velN/velE/velD, rotated </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">vel_n</span><span class="p">)</span><span class="si">}</span><span class="s2"> points to body frame&quot;</span>
     <span class="p">)</span>
     <span class="k">return</span> <span class="n">data</span></div>
 
@@ -426,10 +435,22 @@
 <div class="viewcode-block" id="convert_wheelspeeds_to_m_per_s">
 <a class="viewcode-back" href="../../../_autosummary/perda.utils.preprocessing.html#perda.utils.preprocessing.convert_wheelspeeds_to_m_per_s">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">convert_wheelspeeds_to_m_per_s</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">SingleRunData</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SingleRunData</span><span class="p">:</span>
-    <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">_WS_FR</span><span class="p">,</span> <span class="n">_WS_FL</span><span class="p">,</span> <span class="n">_WS_RR</span><span class="p">,</span> <span class="n">_WS_RL</span><span class="p">]</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert wheel speed channels from mph to m/s, preserving originals as *_mph.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : SingleRunData</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    SingleRunData</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">WHEELSPEED_FR</span><span class="p">,</span> <span class="n">WHEELSPEED_FL</span><span class="p">,</span> <span class="n">WHEELSPEED_RR</span><span class="p">,</span> <span class="n">WHEELSPEED_RL</span><span class="p">]</span>
     <span class="n">missing</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">cols</span> <span class="k">if</span> <span class="n">v</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">missing</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;WARNING: WHEELSPEEDS_TO_M_PER_S skipped — missing variables: </span><span class="si">{</span><span class="n">missing</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;WARNING: convert_wheelspeeds_to_m_per_s skipped — missing variables: </span><span class="si">{</span><span class="n">missing</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
         <span class="k">return</span> <span class="n">data</span>
 
     <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">cols</span><span class="p">:</span>
@@ -446,7 +467,7 @@
         <span class="n">_replace</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="n">mph_to_m_per_s</span><span class="p">(</span><span class="n">di</span><span class="o">.</span><span class="n">value_np</span><span class="p">))</span>
 
     <span class="nb">print</span><span class="p">(</span>
-        <span class="sa">f</span><span class="s2">&quot;WHEELSPEEDS_TO_M_PER_S: Converted </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span><span class="si">}</span><span class="s2"> wheel speed columns mph → m/s, backups in *_mph&quot;</span>
+        <span class="sa">f</span><span class="s2">&quot;convert_wheelspeeds_to_m_per_s: converted </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span><span class="si">}</span><span class="s2"> channels mph → m/s, backups in *_mph&quot;</span>
     <span class="p">)</span>
     <span class="k">return</span> <span class="n">data</span></div>
 
@@ -455,14 +476,24 @@
 <div class="viewcode-block" id="correct_motor_data">
 <a class="viewcode-back" href="../../../_autosummary/perda.utils.preprocessing.html#perda.utils.preprocessing.correct_motor_data">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">correct_motor_data</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">SingleRunData</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SingleRunData</span><span class="p">:</span>
-    <span class="k">if</span> <span class="n">_MOTOR_RPM</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;WARNING: CORRECT_MOTOR_DATA skipped — missing variable: </span><span class="si">{</span><span class="n">_MOTOR_RPM</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Flip the motor RPM sign and derive driven wheel speed.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : SingleRunData</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    SingleRunData</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">MOTOR_RPM</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;WARNING: correct_motor_data skipped — missing variable: </span><span class="si">{</span><span class="n">MOTOR_RPM</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">data</span>
 
-    <span class="n">di</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">_MOTOR_RPM</span><span class="p">]</span>
-    <span class="n">raw_rpm</span> <span class="o">=</span> <span class="n">di</span><span class="o">.</span><span class="n">value_np</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="n">di</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">MOTOR_RPM</span><span class="p">]</span>
+    <span class="n">raw_rpm</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]</span> <span class="o">=</span> <span class="n">di</span><span class="o">.</span><span class="n">value_np</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
 
-    <span class="n">backup_name</span> <span class="o">=</span> <span class="n">_MOTOR_RPM</span> <span class="o">+</span> <span class="s2">&quot;_raw&quot;</span>
+    <span class="n">backup_name</span> <span class="o">=</span> <span class="n">MOTOR_RPM</span> <span class="o">+</span> <span class="s2">&quot;_raw&quot;</span>
     <span class="k">if</span> <span class="n">backup_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
         <span class="n">_add</span><span class="p">(</span>
             <span class="n">data</span><span class="p">,</span>
@@ -473,55 +504,154 @@
         <span class="p">)</span>
 
     <span class="n">flipped</span> <span class="o">=</span> <span class="o">-</span><span class="n">raw_rpm</span>
-    <span class="n">_replace</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">_MOTOR_RPM</span><span class="p">,</span> <span class="n">flipped</span><span class="p">)</span>
+    <span class="n">_replace</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">MOTOR_RPM</span><span class="p">,</span> <span class="n">flipped</span><span class="p">)</span>
 
     <span class="n">tire_radius_m</span> <span class="o">=</span> <span class="n">in_to_m</span><span class="p">(</span><span class="n">TIRE_RADIUS_IN</span><span class="p">)</span>
-    <span class="n">wheel_speed</span> <span class="o">=</span> <span class="n">flipped</span> <span class="o">*</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">tire_radius_m</span> <span class="o">/</span> <span class="p">(</span><span class="mf">60.0</span> <span class="o">*</span> <span class="n">GEAR_RATIO</span><span class="p">)</span>
+    <span class="n">wheel_speed</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">flipped</span> <span class="o">*</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">tire_radius_m</span> <span class="o">/</span> <span class="p">(</span><span class="mf">60.0</span> <span class="o">*</span> <span class="n">GEAR_RATIO</span><span class="p">)</span>
+    <span class="p">)</span>
     <span class="n">_add</span><span class="p">(</span>
         <span class="n">data</span><span class="p">,</span>
-        <span class="n">_MOTOR_WS</span><span class="p">,</span>
+        <span class="n">MOTOR_WHEELSPEED</span><span class="p">,</span>
         <span class="s2">&quot;Driven wheel speed from motor RPM (m/s)&quot;</span><span class="p">,</span>
         <span class="n">di</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">,</span>
         <span class="n">wheel_speed</span><span class="p">,</span>
     <span class="p">)</span>
 
     <span class="nb">print</span><span class="p">(</span>
-        <span class="sa">f</span><span class="s2">&quot;CORRECT_MOTOR_DATA: Flipped </span><span class="si">{</span><span class="n">_MOTOR_RPM</span><span class="si">}</span><span class="s2"> sign, added </span><span class="si">{</span><span class="n">_MOTOR_WS</span><span class="si">}</span><span class="s2"> &quot;</span>
+        <span class="sa">f</span><span class="s2">&quot;correct_motor_data: flipped </span><span class="si">{</span><span class="n">MOTOR_RPM</span><span class="si">}</span><span class="s2"> sign, added </span><span class="si">{</span><span class="n">MOTOR_WHEELSPEED</span><span class="si">}</span><span class="s2"> &quot;</span>
         <span class="sa">f</span><span class="s2">&quot;(ratio=</span><span class="si">{</span><span class="n">GEAR_RATIO</span><span class="si">}</span><span class="s2">, r=</span><span class="si">{</span><span class="n">TIRE_RADIUS_IN</span><span class="si">}</span><span class="s2"> in)&quot;</span>
     <span class="p">)</span>
     <span class="k">return</span> <span class="n">data</span></div>
 
 
 
-<span class="n">_PIPELINE</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Preprocessing</span><span class="p">,</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">SingleRunData</span><span class="p">],</span> <span class="n">SingleRunData</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="n">Preprocessing</span><span class="o">.</span><span class="n">PATCH_NED_VELOCITY</span><span class="p">:</span> <span class="n">patch_ned_velocity</span><span class="p">,</span>
-    <span class="n">Preprocessing</span><span class="o">.</span><span class="n">WHEELSPEEDS_TO_M_PER_S</span><span class="p">:</span> <span class="n">convert_wheelspeeds_to_m_per_s</span><span class="p">,</span>
-    <span class="n">Preprocessing</span><span class="o">.</span><span class="n">CORRECT_MOTOR_DATA</span><span class="p">:</span> <span class="n">correct_motor_data</span><span class="p">,</span>
-<span class="p">}</span>
+<div class="viewcode-block" id="CorrectSteeringAngleLambda">
+<a class="viewcode-back" href="../../../_autosummary/perda.utils.preprocessing.html#perda.utils.preprocessing.CorrectSteeringAngleLambda">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CorrectSteeringAngleLambda</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Callable preprocessing step for recomputing the steering angle to account for drift.</span>
+
+<span class="sd">    Fits a polynomial through the calibration points and</span>
+<span class="sd">    rewrites the angle channel in-place, preserving the original as</span>
+<span class="sd">    ``ludwig.steeringWheel.angle_original``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">calibration</span><span class="p">:</span> <span class="n">SteeringCalibration</span> <span class="o">=</span> <span class="n">DEFAULT_STEERING_CALIBRATION</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">pts</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">calibration</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">p</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">pts</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;calibration needs at least 2 (voltage, angle) points.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pts</span> <span class="o">=</span> <span class="n">pts</span>
+
+        <span class="n">volts</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">pts</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+        <span class="n">angles</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">pts</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">deg</span> <span class="o">=</span> <span class="mi">2</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">pts</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">3</span> <span class="k">else</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coeffs</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">polyfit</span><span class="p">(</span><span class="n">volts</span><span class="p">,</span> <span class="n">angles</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">deg</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">data_or_calibration</span><span class="p">:</span> <span class="n">SingleRunData</span> <span class="o">|</span> <span class="n">SteeringCalibration</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">SingleRunData</span><span class="p">,</span> <span class="s2">&quot;CorrectSteeringAngleLambda&quot;</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply to data, or return a reconfigured step when called with calibration.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data_or_calibration : SingleRunData or tuple of (voltage, angle) pairs</span>
+<span class="sd">            Pass ``SingleRunData`` to apply the step (normal pipeline use).</span>
+<span class="sd">            Pass a calibration tuple to return a new configured ``CorrectSteeringAngleLambda``.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        SingleRunData</span>
+<span class="sd">            When called with data (pipeline use).</span>
+<span class="sd">        CorrectSteeringAngleLambda</span>
+<span class="sd">            When called with calibration (partial-application use).</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        &gt;&gt;&gt; Analyzer(preprocessing=[correct_steering_angle])</span>
+<span class="sd">        &gt;&gt;&gt; Analyzer(preprocessing=[correct_steering_angle(calibration=((1.5, -90.0), (3.0, 0.0), (4.5, 90.0)))])</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data_or_calibration</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">CorrectSteeringAngleLambda</span><span class="p">(</span><span class="n">calibration</span><span class="o">=</span><span class="n">data_or_calibration</span><span class="p">)</span>
+
+        <span class="n">data</span><span class="p">:</span> <span class="n">SingleRunData</span> <span class="o">=</span> <span class="n">data_or_calibration</span>  <span class="c1"># type: ignore[assignment]</span>
+        <span class="k">if</span> <span class="n">STEERING_RAW</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;WARNING: correct_steering_angle skipped — missing variable: </span><span class="si">{</span><span class="n">STEERING_RAW</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">data</span>
+
+        <span class="n">raw_di</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">STEERING_RAW</span><span class="p">]</span>
+        <span class="n">raw_volts</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]</span> <span class="o">=</span> <span class="n">raw_di</span><span class="o">.</span><span class="n">value_np</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+        <span class="n">recomputed</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">polyval</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coeffs</span><span class="p">,</span> <span class="n">raw_volts</span><span class="p">)</span>
+
+        <span class="n">backup_name</span> <span class="o">=</span> <span class="n">STEERING_ANGLE</span> <span class="o">+</span> <span class="s2">&quot;_original&quot;</span>
+        <span class="k">if</span> <span class="n">STEERING_ANGLE</span> <span class="ow">in</span> <span class="n">data</span> <span class="ow">and</span> <span class="n">backup_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+            <span class="n">orig</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">STEERING_ANGLE</span><span class="p">]</span>
+            <span class="n">_add</span><span class="p">(</span>
+                <span class="n">data</span><span class="p">,</span>
+                <span class="n">backup_name</span><span class="p">,</span>
+                <span class="p">(</span><span class="n">orig</span><span class="o">.</span><span class="n">label</span> <span class="ow">or</span> <span class="n">STEERING_ANGLE</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; (original)&quot;</span><span class="p">,</span>
+                <span class="n">orig</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">,</span>
+                <span class="n">orig</span><span class="o">.</span><span class="n">value_np</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">STEERING_ANGLE</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+            <span class="n">_replace</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">STEERING_ANGLE</span><span class="p">,</span> <span class="n">recomputed</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">_add</span><span class="p">(</span>
+                <span class="n">data</span><span class="p">,</span>
+                <span class="n">STEERING_ANGLE</span><span class="p">,</span>
+                <span class="s2">&quot;Steering angle recomputed from raw voltage (deg)&quot;</span><span class="p">,</span>
+                <span class="n">raw_di</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">,</span>
+                <span class="n">recomputed</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="n">cal_str</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">v</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">V, </span><span class="si">{</span><span class="n">a</span><span class="si">:</span><span class="s2">+.1f</span><span class="si">}</span><span class="s2">°)&quot;</span> <span class="k">for</span> <span class="n">v</span><span class="p">,</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pts</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;correct_steering_angle: recomputed </span><span class="si">{</span><span class="n">STEERING_ANGLE</span><span class="si">}</span><span class="s2"> from </span><span class="si">{</span><span class="n">STEERING_RAW</span><span class="si">}</span><span class="s2"> &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;using deg-</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">deg</span><span class="si">}</span><span class="s2"> fit (</span><span class="si">{</span><span class="n">cal_str</span><span class="si">}</span><span class="s2">)</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">data</span></div>
+
+
+
+<span class="n">correct_steering_angle</span> <span class="o">=</span> <span class="n">CorrectSteeringAngleLambda</span><span class="p">()</span>
 
 
 <div class="viewcode-block" id="apply_preprocessing">
 <a class="viewcode-back" href="../../../_autosummary/perda.utils.preprocessing.html#perda.utils.preprocessing.apply_preprocessing">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">apply_preprocessing</span><span class="p">(</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">SingleRunData</span><span class="p">,</span>
-    <span class="n">corrections</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Preprocessing</span><span class="p">],</span>
+    <span class="n">steps</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">PreprocessingStep</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SingleRunData</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Run a sequence of preprocessing steps on a parsed SingleRunData instance.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Run a sequence of preprocessing steps on a SingleRunData instance.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    data : SingleRunData</span>
 <span class="sd">        Parsed run data to preprocess.</span>
-<span class="sd">    corrections : list[Preprocessing]</span>
-<span class="sd">        Ordered list of preprocessing steps to apply.</span>
+<span class="sd">    steps : list of PreprocessingStep</span>
+<span class="sd">        Ordered list of ``SingleRunData → SingleRunData`` callables to apply.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    SingleRunData</span>
 <span class="sd">        The same object, modified in-place and returned for chaining.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; apply_preprocessing(data, [correct_motor_data, convert_wheelspeeds_to_m_per_s])</span>
+<span class="sd">    &gt;&gt;&gt; apply_preprocessing(data, [</span>
+<span class="sd">    ...     correct_motor_data,</span>
+<span class="sd">    ...     correct_steering_angle(calibration=((1.5, -90.0), (3.0, 0.0), (4.5, 90.0))),</span>
+<span class="sd">    ... ])</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">for</span> <span class="n">correction</span> <span class="ow">in</span> <span class="n">corrections</span><span class="p">:</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="n">_PIPELINE</span><span class="p">[</span><span class="n">correction</span><span class="p">](</span><span class="n">data</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="n">steps</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">step</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">data</span></div>
 
 </pre></div>

@@ -364,6 +364,47 @@
 
 
 
+<div class="viewcode-block" id="SearchResult">
+<a class="viewcode-back" href="../../../_autosummary/perda.utils.search.html#perda.utils.search.SearchResult">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SearchResult</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A single ranked result returned by :func:`search`.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    rank : int</span>
+<span class="sd">        1-based position in the result list (1 = best match).</span>
+<span class="sd">    score : float</span>
+<span class="sd">        Relevance score (higher is better).</span>
+<span class="sd">    var_id : int</span>
+<span class="sd">        Internal variable ID.</span>
+<span class="sd">    cpp_name : str</span>
+<span class="sd">        C++ variable name used for data access.</span>
+<span class="sd">    descript : str</span>
+<span class="sd">        Human-readable variable description.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">rank</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">score</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">var_id</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">cpp_name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">descript</span><span class="p">:</span> <span class="nb">str</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">col_score</span><span class="p">,</span> <span class="n">col_id</span><span class="p">,</span> <span class="n">col_name</span><span class="p">,</span> <span class="n">col_desc</span> <span class="o">=</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">60</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cpp_name</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cpp_name</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">col_name</span>
+            <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">cpp_name</span><span class="p">[:</span> <span class="n">col_name</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;…&quot;</span>
+        <span class="p">)</span>
+        <span class="n">desc</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">descript</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">descript</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">col_desc</span>
+            <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">descript</span><span class="p">[:</span> <span class="n">col_desc</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;…&quot;</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">score</span><span class="si">:</span><span class="s2">&lt;</span><span class="si">{</span><span class="n">col_score</span><span class="si">}</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">  </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">var_id</span><span class="si">:</span><span class="s2">&lt;</span><span class="si">{</span><span class="n">col_id</span><span class="si">}}</span><span class="s2">  </span><span class="si">{</span><span class="n">name</span><span class="si">:</span><span class="s2">&lt;</span><span class="si">{</span><span class="n">col_name</span><span class="si">}}</span><span class="s2">  </span><span class="si">{</span><span class="n">desc</span><span class="si">:</span><span class="s2">&lt;</span><span class="si">{</span><span class="n">col_desc</span><span class="si">}}</span><span class="s2">&quot;</span></div>
+
+
+
 <div class="viewcode-block" id="install_encoder">
 <a class="viewcode-back" href="../../../_autosummary/perda.utils.search.html#perda.utils.search.install_encoder">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">install_encoder</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
@@ -407,8 +448,8 @@
 
 <div class="viewcode-block" id="search">
 <a class="viewcode-back" href="../../../_autosummary/perda.utils.search.html#perda.utils.search.search">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">search</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">SingleRunData</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Search telemetry variables and print the top matches.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">search</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">SingleRunData</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">top_n</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">SearchResult</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Search telemetry variables, print the top matches, and return them.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -416,6 +457,15 @@
 <span class="sd">        Parsed CSV telemetry data.</span>
 <span class="sd">    query : str</span>
 <span class="sd">        Free-text search query (e.g. &quot;bat wheel&quot;).</span>
+<span class="sd">    top_n : int</span>
+<span class="sd">        Maximum number of results to return and display (default 10).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list[SearchResult]</span>
+<span class="sd">        Top matches in descending relevance order (at most ``top_n`` entries).</span>
+<span class="sd">        Each entry exposes ``rank``, ``score``, ``var_id``, ``cpp_name``,</span>
+<span class="sd">        and ``descript`` for programmatic access.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -426,7 +476,15 @@
 
 <span class="sd">    Short queries lean on keyword matching; longer queries lean on semantic</span>
 <span class="sd">    ranking when the model is available.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; results = aly.search(&quot;front wheel speed&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; names = [r.cpp_name for r in results]</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">top_n</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;top_n must be a positive integer.&quot;</span><span class="p">)</span>
+
     <span class="n">semantic_ready</span> <span class="o">=</span> <span class="n">install_encoder</span><span class="p">()</span>
 
     <span class="n">query</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
@@ -470,30 +528,36 @@
             <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="n">_print_search_results</span><span class="p">(</span>
-        <span class="n">query</span><span class="p">,</span> <span class="p">[</span><span class="n">deck</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">ranked</span><span class="p">[:</span><span class="mi">10</span><span class="p">]],</span> <span class="p">[</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">ranked</span><span class="p">[:</span><span class="mi">10</span><span class="p">]]</span>
-    <span class="p">)</span></div>
+    <span class="n">top</span> <span class="o">=</span> <span class="n">ranked</span><span class="p">[:</span><span class="n">top_n</span><span class="p">]</span>
+
+    <span class="n">results</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">SearchResult</span><span class="p">(</span>
+            <span class="n">rank</span><span class="o">=</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="n">score</span><span class="o">=</span><span class="n">score</span><span class="p">,</span>
+            <span class="n">var_id</span><span class="o">=</span><span class="n">deck</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">var_id</span><span class="p">,</span>
+            <span class="n">cpp_name</span><span class="o">=</span><span class="n">deck</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">cpp_name</span><span class="p">,</span>
+            <span class="n">descript</span><span class="o">=</span><span class="n">deck</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">descript</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">score</span><span class="p">,</span> <span class="n">idx</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">top</span><span class="p">)</span>
+    <span class="p">]</span>
+
+    <span class="n">_print_search_results</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">results</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">results</span></div>
 
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_print_search_results</span><span class="p">(</span>
-    <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">entries</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">SearchEntry</span><span class="p">],</span> <span class="n">scores</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_print_search_results</span><span class="p">(</span><span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">results</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">SearchResult</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Print search results as a compact 4-column table.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    query : str</span>
 <span class="sd">        The original search query string.</span>
-<span class="sd">    entries : list[SearchEntry]</span>
-<span class="sd">        Ordered list of search entries to display.</span>
-<span class="sd">    scores : list[float]</span>
-<span class="sd">        Relevance scores corresponding to each entry.</span>
+<span class="sd">    results : list[SearchResult]</span>
+<span class="sd">        Ordered list of search results to display.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">col_score</span> <span class="o">=</span> <span class="mi">7</span>
-    <span class="n">col_id</span> <span class="o">=</span> <span class="mi">4</span>
-    <span class="n">col_name</span> <span class="o">=</span> <span class="mi">40</span>
-    <span class="n">col_desc</span> <span class="o">=</span> <span class="mi">60</span>
+    <span class="n">col_score</span><span class="p">,</span> <span class="n">col_id</span><span class="p">,</span> <span class="n">col_name</span><span class="p">,</span> <span class="n">col_desc</span> <span class="o">=</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">60</span>
 
     <span class="nb">print</span><span class="p">(</span><span class="n">title_block</span><span class="p">(</span><span class="s2">&quot;Search Results&quot;</span><span class="p">))</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Query: </span><span class="si">{</span><span class="n">query</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -501,20 +565,8 @@
         <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;Score&#39;</span><span class="si">:</span><span class="s2">&lt;</span><span class="si">{</span><span class="n">col_score</span><span class="si">}}</span><span class="s2">  </span><span class="si">{</span><span class="s1">&#39;ID&#39;</span><span class="si">:</span><span class="s2">&lt;</span><span class="si">{</span><span class="n">col_id</span><span class="si">}}</span><span class="s2">  </span><span class="si">{</span><span class="s1">&#39;C++ Name&#39;</span><span class="si">:</span><span class="s2">&lt;</span><span class="si">{</span><span class="n">col_name</span><span class="si">}}</span><span class="s2">  </span><span class="si">{</span><span class="s1">&#39;Description&#39;</span><span class="si">:</span><span class="s2">&lt;</span><span class="si">{</span><span class="n">col_desc</span><span class="si">}}</span><span class="s2">&quot;</span>
     <span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">DELIMITER</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">entry</span><span class="p">,</span> <span class="n">score</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">entries</span><span class="p">,</span> <span class="n">scores</span><span class="p">):</span>
-        <span class="n">name</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">entry</span><span class="o">.</span><span class="n">cpp_name</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">cpp_name</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">col_name</span>
-            <span class="k">else</span> <span class="n">entry</span><span class="o">.</span><span class="n">cpp_name</span><span class="p">[:</span> <span class="n">col_name</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;…&quot;</span>
-        <span class="p">)</span>
-        <span class="n">desc</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">entry</span><span class="o">.</span><span class="n">descript</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">descript</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">col_desc</span>
-            <span class="k">else</span> <span class="n">entry</span><span class="o">.</span><span class="n">descript</span><span class="p">[:</span> <span class="n">col_desc</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;…&quot;</span>
-        <span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">score</span><span class="si">:</span><span class="s2">&lt;</span><span class="si">{</span><span class="n">col_score</span><span class="si">}</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">  </span><span class="si">{</span><span class="n">entry</span><span class="o">.</span><span class="n">var_id</span><span class="si">:</span><span class="s2">&lt;</span><span class="si">{</span><span class="n">col_id</span><span class="si">}}</span><span class="s2">  </span><span class="si">{</span><span class="n">name</span><span class="si">:</span><span class="s2">&lt;</span><span class="si">{</span><span class="n">col_name</span><span class="si">}}</span><span class="s2">  </span><span class="si">{</span><span class="n">desc</span><span class="si">:</span><span class="s2">&lt;</span><span class="si">{</span><span class="n">col_desc</span><span class="si">}}</span><span class="s2">&quot;</span>
-        <span class="p">)</span>
+    <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="preprocess_query">

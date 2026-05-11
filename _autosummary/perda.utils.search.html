@@ -281,9 +281,11 @@
 <li class="toctree-l2 has-children"><a class="reference internal" href="perda.plotting.html">perda.plotting</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="perda.plotting.data_instance_plotter.html">perda.plotting.data_instance_plotter</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.plotting.diff_plotter.html">perda.plotting.diff_plotter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.plotting.fft_plotter.html">perda.plotting.fft_plotter</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.plotting.parametric_plot.html">perda.plotting.parametric_plot</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.plotting.plotting_constants.html">perda.plotting.plotting_constants</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.plotting.scatter_histogram_plotter.html">perda.plotting.scatter_histogram_plotter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.plotting.subplots.html">perda.plotting.subplots</a></li>
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="perda.server.html">perda.server</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -296,6 +298,7 @@
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.accel_calculator.html">perda.utils.accel_calculator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.data_summary.html">perda.utils.data_summary</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.diff.html">perda.utils.diff</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.utils.filtering.html">perda.utils.filtering</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.frequency_analysis.html">perda.utils.frequency_analysis</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.gps_analysis.html">perda.utils.gps_analysis</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.integrate.html">perda.utils.integrate</a></li>
@@ -406,6 +409,104 @@
 <dl class="py attribute pydantic_field">
 <dt class="sig sig-object py" id="perda.utils.search.SearchEntry.card">
 <em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">card</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></em><em class="property"> <span class="pre">[Required]</span></em><a class="headerlink" href="#perda.utils.search.SearchEntry.card" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class pydantic_model">
+<dt class="sig sig-object py" id="perda.utils.search.SearchResult">
+<em class="property"><span class="pre">pydantic</span> <span class="pre">model</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">perda.utils.search.</span></span><span class="sig-name descname"><span class="pre">SearchResult</span></span><a class="reference internal" href="../_modules/perda/utils/search.html#SearchResult"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.utils.search.SearchResult" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<p>A single ranked result returned by <a class="reference internal" href="#perda.utils.search.search" title="perda.utils.search.search"><code class="xref py py-func docutils literal notranslate"><span class="pre">search()</span></code></a>.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="perda.utils.search.SearchResult.rank">
+<span class="sig-name descname"><span class="pre">rank</span></span><a class="headerlink" href="#perda.utils.search.SearchResult.rank" title="Link to this definition">#</a></dt>
+<dd><p>1-based position in the result list (1 = best match).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="perda.utils.search.SearchResult.score">
+<span class="sig-name descname"><span class="pre">score</span></span><a class="headerlink" href="#perda.utils.search.SearchResult.score" title="Link to this definition">#</a></dt>
+<dd><p>Relevance score (higher is better).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="perda.utils.search.SearchResult.var_id">
+<span class="sig-name descname"><span class="pre">var_id</span></span><a class="headerlink" href="#perda.utils.search.SearchResult.var_id" title="Link to this definition">#</a></dt>
+<dd><p>Internal variable ID.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="perda.utils.search.SearchResult.cpp_name">
+<span class="sig-name descname"><span class="pre">cpp_name</span></span><a class="headerlink" href="#perda.utils.search.SearchResult.cpp_name" title="Link to this definition">#</a></dt>
+<dd><p>C++ variable name used for data access.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="perda.utils.search.SearchResult.descript">
+<span class="sig-name descname"><span class="pre">descript</span></span><a class="headerlink" href="#perda.utils.search.SearchResult.descript" title="Link to this definition">#</a></dt>
+<dd><p>Human-readable variable description.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="field-list simple">
+<dt class="field-odd">Fields<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><a class="reference internal" href="#id3" title="perda.utils.search.SearchResult.cpp_name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cpp_name</span> <span class="pre">(str)</span></code></a></p></li>
+<li><p><a class="reference internal" href="#id4" title="perda.utils.search.SearchResult.descript"><code class="xref py py-obj docutils literal notranslate"><span class="pre">descript</span> <span class="pre">(str)</span></code></a></p></li>
+<li><p><a class="reference internal" href="#id0" title="perda.utils.search.SearchResult.rank"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rank</span> <span class="pre">(int)</span></code></a></p></li>
+<li><p><a class="reference internal" href="#id1" title="perda.utils.search.SearchResult.score"><code class="xref py py-obj docutils literal notranslate"><span class="pre">score</span> <span class="pre">(float)</span></code></a></p></li>
+<li><p><a class="reference internal" href="#id2" title="perda.utils.search.SearchResult.var_id"><code class="xref py py-obj docutils literal notranslate"><span class="pre">var_id</span> <span class="pre">(int)</span></code></a></p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="id0">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">rank</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></em><em class="property"> <span class="pre">[Required]</span></em><a class="headerlink" href="#id0" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="id1">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">score</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></em><em class="property"> <span class="pre">[Required]</span></em><a class="headerlink" href="#id1" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="id2">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">var_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></em><em class="property"> <span class="pre">[Required]</span></em><a class="headerlink" href="#id2" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="id3">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cpp_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></em><em class="property"> <span class="pre">[Required]</span></em><a class="headerlink" href="#id3" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="id4">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">descript</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></em><em class="property"> <span class="pre">[Required]</span></em><a class="headerlink" href="#id4" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -532,17 +633,23 @@ prefixes, substrings, and minor typos naturally.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="perda.utils.search.search">
-<span class="sig-prename descclassname"><span class="pre">perda.utils.search.</span></span><span class="sig-name descname"><span class="pre">search</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/utils/search.html#search"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.utils.search.search" title="Link to this definition">#</a></dt>
-<dd><p>Search telemetry variables and print the top matches.</p>
+<span class="sig-prename descclassname"><span class="pre">perda.utils.search.</span></span><span class="sig-name descname"><span class="pre">search</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">top_n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/utils/search.html#search"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.utils.search.search" title="Link to this definition">#</a></dt>
+<dd><p>Search telemetry variables, print the top matches, and return them.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> (<a class="reference internal" href="perda.core_data_structures.single_run_data.html#perda.core_data_structures.single_run_data.SingleRunData" title="perda.core_data_structures.single_run_data.SingleRunData"><em>SingleRunData</em></a>) – Parsed CSV telemetry data.</p></li>
 <li><p><strong>query</strong> (<em>str</em>) – Free-text search query (e.g. “bat wheel”).</p></li>
+<li><p><strong>top_n</strong> (<em>int</em>) – Maximum number of results to return and display (default 10).</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Top matches in descending relevance order (at most <code class="docutils literal notranslate"><span class="pre">top_n</span></code> entries).
+Each entry exposes <code class="docutils literal notranslate"><span class="pre">rank</span></code>, <code class="docutils literal notranslate"><span class="pre">score</span></code>, <code class="docutils literal notranslate"><span class="pre">var_id</span></code>, <code class="docutils literal notranslate"><span class="pre">cpp_name</span></code>,
+and <code class="docutils literal notranslate"><span class="pre">descript</span></code> for programmatic access.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[<a class="reference internal" href="#perda.utils.search.SearchResult" title="perda.utils.search.SearchResult">SearchResult</a>]</p>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
@@ -552,6 +659,11 @@ rapidfuzz keyword score. Otherwise falls back to keyword-only scoring with
 no error raised.</p>
 <p>Short queries lean on keyword matching; longer queries lean on semantic
 ranking when the model is available.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">results</span> <span class="o">=</span> <span class="n">aly</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s2">&quot;front wheel speed&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span><span class="o">.</span><span class="n">cpp_name</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">results</span><span class="p">]</span>
+</pre></div>
+</div>
 </dd></dl>
 
 </section>
@@ -599,6 +711,19 @@ ranking when the model is available.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.utils.search.SearchEntry.cpp_name"><code class="docutils literal notranslate"><span class="pre">SearchEntry.cpp_name</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.utils.search.SearchEntry.descript"><code class="docutils literal notranslate"><span class="pre">SearchEntry.descript</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.utils.search.SearchEntry.card"><code class="docutils literal notranslate"><span class="pre">SearchEntry.card</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.utils.search.SearchResult"><code class="docutils literal notranslate"><span class="pre">SearchResult</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.utils.search.SearchResult.rank"><code class="docutils literal notranslate"><span class="pre">SearchResult.rank</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.utils.search.SearchResult.score"><code class="docutils literal notranslate"><span class="pre">SearchResult.score</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.utils.search.SearchResult.var_id"><code class="docutils literal notranslate"><span class="pre">SearchResult.var_id</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.utils.search.SearchResult.cpp_name"><code class="docutils literal notranslate"><span class="pre">SearchResult.cpp_name</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.utils.search.SearchResult.descript"><code class="docutils literal notranslate"><span class="pre">SearchResult.descript</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id0"><code class="docutils literal notranslate"><span class="pre">SearchResult.rank</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1"><code class="docutils literal notranslate"><span class="pre">SearchResult.score</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id2"><code class="docutils literal notranslate"><span class="pre">SearchResult.var_id</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id3"><code class="docutils literal notranslate"><span class="pre">SearchResult.cpp_name</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id4"><code class="docutils literal notranslate"><span class="pre">SearchResult.descript</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.utils.search.build_search_card"><code class="docutils literal notranslate"><span class="pre">build_search_card()</span></code></a></li>

@@ -16,6 +16,7 @@ perda.utils
    accel_calculator
    data_summary
    diff
+   filtering
    frequency_analysis
    gps_analysis
    integrate
