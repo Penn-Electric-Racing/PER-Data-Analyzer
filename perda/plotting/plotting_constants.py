@@ -35,7 +35,7 @@ class LayoutConfig(BaseModel):
 class DiffPlotConfig(BaseModel):
     """Configuration for diff bar chart visualization."""
 
-    bucket_size_ms: int = 1000
+    bucket_size_s: float = 1.0
     color_base_extra: str = "blue"
     color_incom_extra: str = "darkorange"
     color_value_mismatch: str = "crimson"

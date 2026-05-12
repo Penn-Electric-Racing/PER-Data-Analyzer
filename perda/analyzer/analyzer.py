@@ -345,9 +345,12 @@ class Analyzer:
     def diff(
         self,
         server_data: SingleRunData,
-        timestamp_tolerance_ms: int = 2,
+        timestamp_tolerance_s: float = 0.002,
         diff_rtol: float = 1e-3,
         diff_atol: float = 1e-3,
+        diff_plot_config: DiffPlotConfig = DEFAULT_DIFF_PLOT_CONFIG,
+        layout_config: LayoutConfig = DEFAULT_LAYOUT_CONFIG,
+        font_config: FontConfig = DEFAULT_FONT_CONFIG,
     ) -> go.Figure:
         """
         Compute the differences between the current data (assumed to be from RPI) and server data.
@@ -356,12 +359,16 @@ class Analyzer:
         ----------
         server_data : SingleRunData
             The server data to compare against.
-        timestamp_tolerance_ms : int, optional
-            Timestamp tolerance used to match points between streams.
+        timestamp_tolerance_s : float, optional
+            Timestamp tolerance in seconds used to match points between streams.
+            Defaults to 0.002 (2 ms).
         diff_rtol : float, optional
             Relative tolerance for value comparison (numpy.isclose).
         diff_atol : float, optional
             Absolute tolerance for value comparison (numpy.isclose).
+        diff_plot_config : DiffPlotConfig, optional
+        layout_config : LayoutConfig, optional
+        font_config : FontConfig, optional
 
         Examples
         --------
@@ -371,9 +378,12 @@ class Analyzer:
         return diff(
             self.data,
             server_data,
-            timestamp_tolerance_ms=timestamp_tolerance_ms,
+            timestamp_tolerance_s=timestamp_tolerance_s,
             diff_rtol=diff_rtol,
             diff_atol=diff_atol,
+            diff_plot_config=diff_plot_config,
+            layout_config=layout_config,
+            font_config=font_config,
         )
 
     def analyze_frequency(

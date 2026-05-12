@@ -8,6 +8,8 @@ from ..constants import DELIMITER, title_block
 from ..core_data_structures.data_instance import DataInstance
 from ..core_data_structures.single_run_data import SingleRunData
 from ..plotting.diff_plotter import plot_diff_bars
+from ..plotting.plotting_constants import *
+from ..units import _to_seconds
 
 
 def _pct(num: float, den: float) -> float:
@@ -15,33 +17,13 @@ def _pct(num: float, den: float) -> float:
     return 0.0 if den <= 0 else (num / den) * 100.0
 
 
-def aggregate_timestamps(
-    ts_list: list[npt.NDArray[np.int64]],
-) -> tuple[npt.NDArray[np.int64], npt.NDArray[np.int64]]:
-    """Concatenate timestamp arrays and count occurrences per unique timestamp.
-
-    Parameters
-    ----------
-    ts_list : list[npt.NDArray[np.int64]]
-        Each element is a 1-D int64 array of timestamps (one per event).
-
-    Returns
-    -------
-    tuple[npt.NDArray[np.int64], npt.NDArray[np.int64]]
-        (unique_timestamps, counts), both sorted by timestamp.
-    """
-    if not ts_list or all(a.size == 0 for a in ts_list):
-        return np.array([], dtype=np.int64), np.array([], dtype=np.int64)
-    return np.unique(np.concatenate(ts_list), return_counts=True)
-
-
 @numba.njit(cache=True)
 def _get_diff_timestamps_core(
-    ts_a: npt.NDArray[np.int64],
+    ts_a: npt.NDArray[np.float64],
     va: npt.NDArray[np.float64],
-    ts_b: npt.NDArray[np.int64],
+    ts_b: npt.NDArray[np.float64],
     vb: npt.NDArray[np.float64],
-    tol: np.int64,
+    tol: np.float64,
     diff_rtol: float,
     diff_atol: float,
 ) -> tuple[
@@ -53,10 +35,10 @@ def _get_diff_timestamps_core(
     int,
 ]:
     """JIT-compiled two-pointer core; returns typed lists and final (i, j) indices."""
-    rpi_extra = numba.typed.List.empty_list(numba.int64)
-    server_extra = numba.typed.List.empty_list(numba.int64)
-    diff_ts = numba.typed.List.empty_list(numba.int64)
-    matched_ts = numba.typed.List.empty_list(numba.int64)
+    rpi_extra = numba.typed.List.empty_list(numba.float64)
+    server_extra = numba.typed.List.empty_list(numba.float64)
+    diff_ts = numba.typed.List.empty_list(numba.float64)
+    matched_ts = numba.typed.List.empty_list(numba.float64)
 
     i = 0
     j = 0
@@ -94,38 +76,38 @@ def _get_diff_timestamps_core(
 
 
 def _get_diff_timestamps(
-    base_ts: npt.NDArray[np.int64],
+    base_ts: npt.NDArray[np.float64],
     base_vals: npt.NDArray[np.float64],
-    incom_ts: npt.NDArray[np.int64],
+    incom_ts: npt.NDArray[np.float64],
     incom_vals: npt.NDArray[np.float64],
-    timestamp_tolerance_ms: int = 2,
+    timestamp_tolerance_s: float = 0.002,
     diff_rtol: float = 1e-3,
     diff_atol: float = 1e-3,
 ) -> tuple[
-    npt.NDArray[np.int64],
-    npt.NDArray[np.int64],
-    npt.NDArray[np.int64],
-    npt.NDArray[np.int64],
+    npt.NDArray[np.float64],
+    npt.NDArray[np.float64],
+    npt.NDArray[np.float64],
+    npt.NDArray[np.float64],
 ]:
     """Compare two time-series point-by-point and classify each point.
 
     Uses a two-pointer walk over sorted timestamps. Points within
-    ``timestamp_tolerance_ms`` of each other are considered matched; their
+    ``timestamp_tolerance_s`` of each other are considered matched; their
     values are then compared with ``diff_rtol``/``diff_atol``. Points with no
     match in the other series are counted as extras.
 
     Parameters
     ----------
     base_ts:
-        Sorted int64 timestamp array for the base run (ms).
+        Sorted float64 timestamp array for the base run (seconds).
     base_vals:
         float64 value array aligned with ``base_ts``.
     incom_ts:
-        Sorted int64 timestamp array for the incoming run (ms).
+        Sorted float64 timestamp array for the incoming run (seconds).
     incom_vals:
         float64 value array aligned with ``incom_ts``.
-    timestamp_tolerance_ms:
-        Maximum timestamp difference (ms) to treat two points as matching.
+    timestamp_tolerance_s:
+        Maximum timestamp difference (seconds) to treat two points as matching.
     diff_rtol:
         Relative tolerance for value comparison.
     diff_atol:
@@ -133,29 +115,29 @@ def _get_diff_timestamps(
 
     Returns
     -------
-    tuple[npt.NDArray[np.int64], npt.NDArray[np.int64], npt.NDArray[np.int64], npt.NDArray[np.int64]]
+    tuple[npt.NDArray[np.float64], npt.NDArray[np.float64], npt.NDArray[np.float64], npt.NDArray[np.float64]]
         (base_extra_ts, incom_extra_ts, value_mismatch_ts, matched_ts)
     """
-    ts_a = base_ts.astype(np.int64, copy=False)
+    ts_a = base_ts.astype(np.float64, copy=False)
     va = base_vals.astype(np.float64, copy=False)
-    ts_b = incom_ts.astype(np.int64, copy=False)
+    ts_b = incom_ts.astype(np.float64, copy=False)
     vb = incom_vals.astype(np.float64, copy=False)
 
     # Fast exact match shortcut
     if np.array_equal(ts_a, ts_b) and np.array_equal(va, vb, equal_nan=True):
-        empty = np.array([], dtype=np.int64)
+        empty = np.array([], dtype=np.float64)
         return empty, empty, empty, ts_a.copy()
 
-    tol = np.int64(max(timestamp_tolerance_ms, 0))
+    tol = np.float64(max(timestamp_tolerance_s, 0.0))
 
     rpi_extra_list, server_extra_list, diff_ts_list, matched_ts_list, i, j = (
         _get_diff_timestamps_core(ts_a, va, ts_b, vb, tol, diff_rtol, diff_atol)
     )
 
-    rpi_extra = np.array(rpi_extra_list, dtype=np.int64)
-    server_extra = np.array(server_extra_list, dtype=np.int64)
-    diff_ts = np.array(diff_ts_list, dtype=np.int64)
-    matched_ts = np.array(matched_ts_list, dtype=np.int64)
+    rpi_extra = np.array(rpi_extra_list, dtype=np.float64)
+    server_extra = np.array(server_extra_list, dtype=np.float64)
+    diff_ts = np.array(diff_ts_list, dtype=np.float64)
+    matched_ts = np.array(matched_ts_list, dtype=np.float64)
 
     tail_a = ts_a[i:]
     tail_b = ts_b[j:]
@@ -170,9 +152,12 @@ def _get_diff_timestamps(
 def diff(
     rpi_data: SingleRunData,
     server_data: SingleRunData,
-    timestamp_tolerance_ms: int = 2,
+    timestamp_tolerance_s: float = 0.002,
     diff_rtol: float = 1e-3,
     diff_atol: float = 1e-3,
+    diff_plot_config: DiffPlotConfig = DEFAULT_DIFF_PLOT_CONFIG,
+    layout_config: LayoutConfig = DEFAULT_LAYOUT_CONFIG,
+    font_config: FontConfig = DEFAULT_FONT_CONFIG,
 ) -> go.Figure:
     """Compare two SingleRunData objects and report differences.
 
@@ -184,15 +169,19 @@ def diff(
     3. Summary + plot: prints a diff summary table and displays an interactive
        Plotly bar chart of per-bucket diff counts.
 
+    Timestamps from each run are converted to seconds using the run's
+    ``timestamp_unit`` metadata before comparison, so runs with different
+    logging units are handled correctly.
+
     Parameters
     ----------
     rpi_data:
         The reference (baseline) run.
     server_data:
         The incoming run to compare against the baseline.
-    timestamp_tolerance_ms:
-        Maximum timestamp delta (ms) to consider two points as matching.
-        Defaults to 2.
+    timestamp_tolerance_s:
+        Maximum timestamp delta (seconds) to consider two points as matching.
+        Defaults to 0.002 (2 ms).
     diff_rtol:
         Relative tolerance for value comparison via ``np.isclose``. Defaults to 1e-3.
     diff_atol:
@@ -238,16 +227,16 @@ def diff(
         print(title_block("All C++ names match") + "\n")
 
     # ===== Stage 2: Compare DataInstances =====
-    rpi_extra_ts_list: list[npt.NDArray[np.int64]] = []
-    server_extra_ts_list: list[npt.NDArray[np.int64]] = []
-    diff_ts_list: list[npt.NDArray[np.int64]] = []
-    matched_ts_list: list[npt.NDArray[np.int64]] = []
+    rpi_extra_ts_list: list[npt.NDArray[np.float64]] = []
+    server_extra_ts_list: list[npt.NDArray[np.float64]] = []
+    diff_ts_list: list[npt.NDArray[np.float64]] = []
+    matched_ts_list: list[npt.NDArray[np.float64]] = []
     total_rpi_entries = 0
     total_server_entries = 0
     total_rpi_extra_entries = 0
     total_server_extra_entries = 0
-    total_diff_entries = 0
     total_matched_entries = 0
+    total_diff_entries = 0
 
     timestamps_compared = 0
     pbar = tqdm(
@@ -257,13 +246,19 @@ def diff(
         total=len(shared_cpp_name_to_instances),
     )
     for _, (rpi_di, server_di) in pbar:
+        rpi_ts_s = _to_seconds(
+            rpi_di.timestamp_np.astype(np.float64), rpi_data.timestamp_unit
+        )
+        server_ts_s = _to_seconds(
+            server_di.timestamp_np.astype(np.float64), server_data.timestamp_unit
+        )
         rpi_extra_ts, server_extra_ts, var_diff_ts, var_matched_ts = (
             _get_diff_timestamps(
-                rpi_di.timestamp_np,
+                rpi_ts_s,
                 rpi_di.value_np,
-                server_di.timestamp_np,
+                server_ts_s,
                 server_di.value_np,
-                timestamp_tolerance_ms=timestamp_tolerance_ms,
+                timestamp_tolerance_s=timestamp_tolerance_s,
                 diff_rtol=diff_rtol,
                 diff_atol=diff_atol,
             )
@@ -276,20 +271,32 @@ def diff(
         total_server_entries += server_di.timestamp_np.size
         total_rpi_extra_entries += rpi_extra_ts.size
         total_server_extra_entries += server_extra_ts.size
+        total_matched_entries += var_matched_ts.size
         total_diff_entries += var_diff_ts.size
-        total_matched_entries = var_matched_ts.size
         timestamps_compared += rpi_di.timestamp_np.size + server_di.timestamp_np.size
         pbar.set_postfix({"timestamps": timestamps_compared})
     pbar.clear()
     pbar.close()
 
-    # Aggregate per-variable arrays into unique-timestamp arrays with counts
-    rpi_extra_agg, _ = aggregate_timestamps(rpi_extra_ts_list)
-    server_extra_agg, _ = aggregate_timestamps(server_extra_ts_list)
-    diff_agg, _ = aggregate_timestamps(diff_ts_list)
-    # Total present: union of all timestamps seen in either run
-    total_present_agg, _ = aggregate_timestamps(
-        rpi_extra_ts_list + server_extra_ts_list + matched_ts_list + diff_ts_list
+    rpi_extra_all = (
+        np.concatenate(rpi_extra_ts_list)
+        if rpi_extra_ts_list
+        else np.array([], dtype=np.float64)
+    )
+    server_extra_all = (
+        np.concatenate(server_extra_ts_list)
+        if server_extra_ts_list
+        else np.array([], dtype=np.float64)
+    )
+    diff_all = (
+        np.concatenate(diff_ts_list) if diff_ts_list else np.array([], dtype=np.float64)
+    )
+    total_present_all = (
+        np.concatenate(
+            rpi_extra_ts_list + server_extra_ts_list + matched_ts_list + diff_ts_list
+        )
+        if (rpi_extra_ts_list + server_extra_ts_list + matched_ts_list + diff_ts_list)
+        else np.array([], dtype=np.float64)
     )
 
     # ===== Stage 3: Summary + Plot =====
@@ -297,9 +304,10 @@ def diff(
         ("Matched variables:", str(len(shared_cpp_name_to_instances))),
         ("Total RPI entries:", str(total_rpi_entries)),
         ("Total server entries:", str(total_server_entries)),
+        ("Matched entries:", str(total_matched_entries)),
         ("RPI-only entries:", str(total_rpi_extra_entries)),
         ("Server-only entries:", str(total_server_extra_entries)),
-        ("Value-mismatch entries:", str(total_diff_entries)),
+        ("Value mismatch entries:", str(total_diff_entries)),
         (
             "RPI entries lost:",
             f"{_pct(total_rpi_extra_entries, total_rpi_entries):.3f}%",
@@ -307,10 +315,6 @@ def diff(
         (
             "Server entries lost:",
             f"{_pct(total_server_extra_entries, total_server_entries):.3f}%",
-        ),
-        (
-            "Timestamp-matched entries w/ diff. values:",
-            f"{_pct(total_diff_entries, total_matched_entries + total_diff_entries):.3f}%",
         ),
     ]
     col_width = max(len(label) for label, _ in rows) + 2
@@ -320,11 +324,14 @@ def diff(
     print(DELIMITER)
 
     fig = plot_diff_bars(
-        base_extra_ts=rpi_extra_agg,
-        incom_extra_ts=server_extra_agg,
-        value_mismatch_ts=diff_agg,
-        total_present_ts=total_present_agg,
+        base_extra_ts=rpi_extra_all,
+        incom_extra_ts=server_extra_all,
+        value_mismatch_ts=diff_all,
+        total_present_ts=total_present_all,
         title="Diff Counts Over Time",
+        diff_plot_config=diff_plot_config,
+        layout_config=layout_config,
+        font_config=font_config,
     )
 
     return fig
