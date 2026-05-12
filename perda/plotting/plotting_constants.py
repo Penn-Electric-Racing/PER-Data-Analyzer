@@ -61,7 +61,7 @@ class VLineConfig(BaseModel):
 
 
 class GpsMapConfig(BaseModel):
-    """Configuration for GPS map overlay plots.
+    """Configuration for GPS plotting and outlier filtering.
 
     Parameters
     ----------
@@ -70,17 +70,21 @@ class GpsMapConfig(BaseModel):
     mapbox_token : str
         Mapbox access token. Only needed for Mapbox-hosted styles.
     marker_size : int
-        Marker size on the map trace.
+        Marker size on GPS traces.
     line_width : int
         Line width on the map trace.
     line_color : str
         Color of the GPS trace line.
     zoom_padding : float
         Extra fraction added around the data extent when auto-zooming.
-    lat_range : tuple[float, float]
-        Valid latitude range. Points outside are filtered.
-    lon_range : tuple[float, float]
-        Valid longitude range. Points outside are filtered.
+    max_radius_m : float
+        Maximum allowed distance in metres from the centroid of all GPS points.
+        Points further than this are discarded as outliers.
+        Set to ``float("inf")`` to disable.
+    max_jump_m : float
+        Maximum allowed step distance in metres between consecutive points.
+        Points that jump further than this are discarded as outliers.
+        Set to ``float("inf")`` to disable.
     """
 
     mapbox_style: str = "carto-positron"
@@ -89,8 +93,8 @@ class GpsMapConfig(BaseModel):
     line_width: int = 2
     line_color: str = "red"
     zoom_padding: float = 0.4
-    lat_range: tuple[float, float] = (35.0, 50.0)
-    lon_range: tuple[float, float] = (-125.0, -66.0)
+    max_radius_m: float = 5_000.0
+    max_jump_m: float = 30.0
 
 
 class SubplotConfig(BaseModel):
@@ -142,6 +146,34 @@ class FFTPlotConfig(BaseModel):
     height_single: int = 500
 
 
+class MultiLogSubplotConfig(BaseModel):
+    """Configuration for multi-log variable comparison subplot figures.
+
+    Parameters
+    ----------
+    max_display_resolution : float | None
+        Maximum display sample rate in Hz. Traces are stride-downsampled to
+        approximately this rate before rendering.  ``None`` disables downsampling.
+    height_per_row : int
+        Pixel height allocated to each subplot row.
+    vertical_spacing : float
+        Vertical gap between subplot rows as a fraction of the total figure height.
+    width : int
+        Total figure width in pixels.
+    plot_bgcolor : str
+        Background color of each subplot panel.
+    margin : Dict[str, int]
+        Figure margins as a dict with keys ``l``, ``r``, ``t``, ``b``.
+    """
+
+    max_display_resolution: float | None = 50.0
+    height_per_row: int = 250
+    vertical_spacing: float = 0.05
+    width: int = 1200
+    plot_bgcolor: str = "white"
+    margin: Dict[str, int] = Field(default_factory=lambda: dict(l=70, r=50, t=90, b=70))
+
+
 # Default configuration instances
 DEFAULT_FONT_CONFIG = FontConfig()
 DEFAULT_LAYOUT_CONFIG = LayoutConfig()
@@ -151,3 +183,4 @@ DEFAULT_VLINE_CONFIG = VLineConfig()
 DEFAULT_GPS_MAP_CONFIG = GpsMapConfig()
 DEFAULT_SUBPLOT_CONFIG = SubplotConfig()
 DEFAULT_FFT_PLOT_CONFIG = FFTPlotConfig()
+DEFAULT_MULTI_LOG_SUBPLOT_CONFIG = MultiLogSubplotConfig()

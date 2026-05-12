@@ -66,6 +66,7 @@ class Analyzer:
         filepath: str,
         ts_offset: int = 0,
         parsing_errors_limit: int = 100,
+        verbose: int = 1,
         preprocessing: list[PreprocessingStep] | None = None,
     ) -> None:
         """
@@ -98,6 +99,7 @@ class Analyzer:
             filepath,
             ts_offset,
             parsing_errors_limit=parsing_errors_limit,
+            verbose=verbose,
         )
         if preprocessing:
             self.data = apply_preprocessing(self.data, preprocessing)

@@ -1,9 +1,12 @@
+from typing import List
+
 import ipywidgets as widgets
 import numpy as np
 import plotly.graph_objects as go
 from numpy import float64
 from numpy.typing import NDArray
 
+from ..constants import R_EARTH_M
 from ..core_data_structures.data_instance import DataInstance, left_join_data_instances
 from ..plotting.parametric_plot import (
     plot_parametric_curve_square,
@@ -81,32 +84,166 @@ def plot_gps_trimmer(
     )
 
 
-def _filter_gps_bounds(
+def gps_to_enu(
     lat: NDArray[float64],
     lon: NDArray[float64],
-    gps_map_config: GpsMapConfig,
+    lat_ref: float | None = None,
+    lon_ref: float | None = None,
 ) -> tuple[NDArray[float64], NDArray[float64]]:
     """
-    Remove GPS points outside valid lat/lon bounds.
+    Project lat/lon coordinates to a local East-North-Up (ENU) Cartesian frame.
+
+    Uses a flat-Earth approximation, accurate to within ~0.1 % for distances
+    up to ~10 km from the reference point.
 
     Parameters
     ----------
     lat : NDArray[float64]
-        Latitude values.
+        Latitude values in degrees.
     lon : NDArray[float64]
-        Longitude values.
-    gps_map_config : GpsMapConfig
-        Configuration containing lat_range and lon_range bounds.
+        Longitude values in degrees.
+    lat_ref : float | None, optional
+        Reference latitude in degrees.  Defaults to the median of ``lat``.
+    lon_ref : float | None, optional
+        Reference longitude in degrees.  Defaults to the median of ``lon``.
 
     Returns
     -------
     tuple[NDArray[float64], NDArray[float64]]
-        Filtered (lat, lon) arrays.
+        ``(east_m, north_m)`` arrays giving signed distance in metres from the
+        reference point along the East and North axes respectively.
+
+    Examples
+    --------
+    >>> east, north = gps_to_enu(lat_array, lon_array)
     """
-    lat_lo, lat_hi = gps_map_config.lat_range
-    lon_lo, lon_hi = gps_map_config.lon_range
-    mask = (lat >= lat_lo) & (lat <= lat_hi) & (lon >= lon_lo) & (lon <= lon_hi)
-    return lat[mask], lon[mask]
+    lat_ref_rad = np.radians(lat_ref if lat_ref is not None else np.median(lat))
+    lon_ref_rad = np.radians(lon_ref if lon_ref is not None else np.median(lon))
+    east_m = (np.radians(lon) - lon_ref_rad) * R_EARTH_M * np.cos(lat_ref_rad)
+    north_m = (np.radians(lat) - lat_ref_rad) * R_EARTH_M
+    return east_m.astype(np.float64), north_m.astype(np.float64)
+
+
+def filter_gps_cartesian(
+    lat: NDArray[float64],
+    lon: NDArray[float64],
+    gps_map_config: GpsMapConfig = DEFAULT_GPS_MAP_CONFIG,
+) -> NDArray[np.bool_]:
+    """
+    Build a boolean mask that removes Cartesian GPS outliers.
+
+    Two independent filters are applied and combined with logical-AND:
+
+    * **Radius filter** — discards points whose straight-line distance from the
+      centroid of all points exceeds ``gps_map_config.max_radius_m``.
+    * **Jump filter** — discards points where the step distance from the previous
+      point exceeds ``gps_map_config.max_jump_m``.
+
+    Parameters
+    ----------
+    lat : NDArray[float64]
+        Latitude values in degrees.
+    lon : NDArray[float64]
+        Longitude values in degrees.
+    gps_map_config : GpsMapConfig, optional
+
+    Returns
+    -------
+    NDArray[np.bool_]
+        Boolean mask; ``True`` where a point should be *kept*.
+
+    Examples
+    --------
+    >>> mask = filter_gps_cartesian(lat_array, lon_array)
+    >>> lat_clean, lon_clean = lat_array[mask], lon_array[mask]
+    """
+    east, north = gps_to_enu(lat, lon)
+    radius_mask = np.sqrt(east**2 + north**2) <= gps_map_config.max_radius_m
+    dx = np.diff(east, prepend=east[0])
+    dy = np.diff(north, prepend=north[0])
+    jump_mask = np.sqrt(dx**2 + dy**2) <= gps_map_config.max_jump_m
+    return (radius_mask & jump_mask).astype(np.bool_)
+
+
+def plot_gps_comparison(
+    runs: List[tuple[NDArray[float64], NDArray[float64], str]],
+    title: str | None = None,
+    gps_map_config: GpsMapConfig = DEFAULT_GPS_MAP_CONFIG,
+    layout_config: LayoutConfig = DEFAULT_LAYOUT_CONFIG,
+    font_config: FontConfig = DEFAULT_FONT_CONFIG,
+) -> go.Figure | None:
+    """
+    Overlay GPS tracks from multiple runs on a shared East/North Cartesian frame.
+
+    Each run is projected to ENU coordinates using a single shared reference
+    point (median of all points across all runs), then filtered with
+    :func:`filter_gps_cartesian` before plotting.
+
+    Parameters
+    ----------
+    runs : List[tuple[NDArray[float64], NDArray[float64], str]]
+        Each element is ``(lat_array, lon_array, label)`` for one run.
+        ``lat_array`` and ``lon_array`` must be the same length.
+    title : str | None, optional
+    gps_map_config : GpsMapConfig, optional
+        Controls Cartesian outlier thresholds (``max_radius_m``, ``max_jump_m``)
+        and marker appearance.
+    layout_config : LayoutConfig, optional
+    font_config : FontConfig, optional
+
+    Returns
+    -------
+    go.Figure
+        Plotly figure with one scatter trace per run
+
+    Examples
+    --------
+    >>> fig = plot_gps_comparison(
+    ...     [(lat1, lon1, "Run 1"), (lat2, lon2, "Run 2")],
+    ...     title="GPS Comparison",
+    ... )
+    >>> fig.show()
+    """
+
+    all_lat = np.concatenate([lat for lat, _, _ in runs])
+    all_lon = np.concatenate([lon for _, lon, _ in runs])
+    lat_ref = float(np.median(all_lat))
+    lon_ref = float(np.median(all_lon))
+
+    fig = go.Figure()
+
+    for lat, lon, label in runs:
+        east, north = gps_to_enu(lat, lon, lat_ref=lat_ref, lon_ref=lon_ref)
+        mask = filter_gps_cartesian(lat, lon, gps_map_config)
+        if not mask.any():
+            continue
+        fig.add_trace(
+            go.Scattergl(
+                x=east[mask],
+                y=north[mask],
+                mode="markers",
+                marker=dict(size=gps_map_config.marker_size),
+                name=label,
+            )
+        )
+
+    fig.update_layout(
+        title=dict(
+            text=title,
+            x=layout_config.title_x,
+            xanchor=layout_config.title_xanchor,
+            yanchor=layout_config.title_yanchor,
+            font=dict(size=font_config.large),
+        ),
+        xaxis_title=dict(text="East (m)", font=dict(size=font_config.medium)),
+        yaxis_title=dict(text="North (m)", font=dict(size=font_config.medium)),
+        yaxis=dict(scaleanchor="x", scaleratio=1),
+        width=layout_config.height,
+        height=layout_config.height,
+        margin=layout_config.margin,
+        legend=dict(font=dict(size=font_config.small)),
+    )
+    return fig
 
 
 def create_representative_gps_image(
@@ -122,8 +259,9 @@ def create_representative_gps_image(
     """
     Generate a GPS trace on an interactive map background.
 
-    Points outside the configured lat/lon bounds are filtered out.
-    Uses CARTO Positron tiles by default (free, no API key required).
+    Outliers (large radius from centroid or sudden jumps) are removed via
+    :func:`filter_gps_cartesian`.  Uses CARTO Positron tiles by default
+    (free, no API key required).
 
     Parameters
     ----------
@@ -140,7 +278,7 @@ def create_representative_gps_image(
     layout_config : LayoutConfig, optional
     font_config : FontConfig, optional
     gps_map_config : GpsMapConfig, optional
-        Map overlay and GPS filtering configuration.
+        Map overlay and outlier filtering configuration.
 
     Returns
     -------
@@ -155,6 +293,7 @@ def create_representative_gps_image(
     """
     lat_aligned, lon_aligned = left_join_data_instances(lat_raw, lon_raw)
 
+    # Trim to when the vehicle is moving if velocity data is provided, otherwise show all points
     if vel_raw is not None:
         _, vel_aligned = left_join_data_instances(lat_aligned, vel_raw)
 
@@ -172,12 +311,13 @@ def create_representative_gps_image(
         lon_trimmed = lon_aligned.value_np
         lat_trimmed = lat_aligned.value_np
 
-    lat_filtered, lon_filtered = _filter_gps_bounds(
-        lat_trimmed, lon_trimmed, gps_map_config
-    )
+    # Filter outliers
+    cartesian_mask = filter_gps_cartesian(lat_trimmed, lon_trimmed, gps_map_config)
+    lat_filtered = lat_trimmed[cartesian_mask]
+    lon_filtered = lon_trimmed[cartesian_mask]
 
     if len(lat_filtered) == 0:
-        print("No GPS points remain after bounds filtering, skip graphing")
+        print("No GPS points remain after outlier filtering, skip graphing")
         return None
 
     fig = go.Figure()
