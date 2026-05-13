@@ -6,21 +6,21 @@ from .plotting_constants import *
 
 
 def _bin_timestamps(
-    timestamps_ms: npt.NDArray[np.int64],
-    t_min: int,
-    bucket_size_ms: int,
+    timestamps_s: npt.NDArray[np.float64],
+    t_min: float,
+    bucket_size_s: float,
     n_buckets: int,
 ) -> npt.NDArray[np.int64]:
     """Count timestamps falling into each fixed-width time bucket.
 
     Parameters
     ----------
-    timestamps_ms : npt.NDArray[np.int64]
-        int64 array of event timestamps in milliseconds.
-    t_min : int
-        Start of the first bucket (ms).
-    bucket_size_ms : int
-        Width of each bucket (ms).
+    timestamps_s : npt.NDArray[np.float64]
+        float64 array of event timestamps in seconds.
+    t_min : float
+        Start of the first bucket (seconds).
+    bucket_size_s : float
+        Width of each bucket (seconds).
     n_buckets : int
         Total number of buckets.
 
@@ -28,17 +28,19 @@ def _bin_timestamps(
     -------
     int64 array of length ``n_buckets`` with per-bucket counts.
     """
-    if timestamps_ms.size == 0:
+    if timestamps_s.size == 0:
         return np.zeros(n_buckets, dtype=np.int64)
-    indices = ((timestamps_ms - t_min) // bucket_size_ms).clip(0, n_buckets - 1)
-    return np.bincount(indices.astype(np.intp), minlength=n_buckets).astype(np.int64)
+    indices = (
+        ((timestamps_s - t_min) / bucket_size_s).clip(0, n_buckets - 1).astype(np.intp)
+    )
+    return np.bincount(indices, minlength=n_buckets).astype(np.int64)
 
 
 def plot_diff_bars(
-    base_extra_ts: npt.NDArray[np.int64],
-    incom_extra_ts: npt.NDArray[np.int64],
-    value_mismatch_ts: npt.NDArray[np.int64],
-    total_present_ts: npt.NDArray[np.int64],
+    base_extra_ts: npt.NDArray[np.float64],
+    incom_extra_ts: npt.NDArray[np.float64],
+    value_mismatch_ts: npt.NDArray[np.float64],
+    total_present_ts: npt.NDArray[np.float64],
     title: str | None = "Diff Counts Over Time (bucketed)",
     y_axis_title: str | None = "Event Count",
     show_legend: bool = True,
@@ -55,13 +57,13 @@ def plot_diff_bars(
     Parameters
     ----------
     base_extra_ts:
-        Timestamps (ms) of datapoints present only in the base run.
+        Timestamps (seconds) of datapoints present only in the base run.
     incom_extra_ts:
-        Timestamps (ms) of datapoints present only in the incoming run.
+        Timestamps (seconds) of datapoints present only in the incoming run.
     value_mismatch_ts:
-        Timestamps (ms) of matched points whose values differ.
+        Timestamps (seconds) of matched points whose values differ.
     total_present_ts:
-        Timestamps (ms) of all datapoints seen in either run.
+        Timestamps (seconds) of all datapoints seen in either run.
     title:
         Plot title.
     y_axis_title:
@@ -83,21 +85,21 @@ def plot_diff_bars(
         print("No diff events to plot.")
         return go.Figure()
 
-    bucket_size_ms = diff_plot_config.bucket_size_ms
-    t_min = int(total_present_ts.min())
-    t_max = int(total_present_ts.max())
-    n_buckets = max((t_max - t_min) // bucket_size_ms + 1, 1)
+    bucket_size_s = diff_plot_config.bucket_size_s
+    t_min = float(total_present_ts.min())
+    t_max = float(total_present_ts.max())
+    n_buckets = max(int((t_max - t_min) / bucket_size_s) + 1, 1)
 
     midpoints_s = (
-        np.arange(n_buckets, dtype=np.float64) * bucket_size_ms
+        np.arange(n_buckets, dtype=np.float64) * bucket_size_s
         + t_min
-        + bucket_size_ms * 0.5
-    ) / 1000.0
+        + bucket_size_s * 0.5
+    )
 
-    total_counts = _bin_timestamps(total_present_ts, t_min, bucket_size_ms, n_buckets)
-    base_counts = _bin_timestamps(base_extra_ts, t_min, bucket_size_ms, n_buckets)
-    incom_counts = _bin_timestamps(incom_extra_ts, t_min, bucket_size_ms, n_buckets)
-    diff_counts = _bin_timestamps(value_mismatch_ts, t_min, bucket_size_ms, n_buckets)
+    total_counts = _bin_timestamps(total_present_ts, t_min, bucket_size_s, n_buckets)
+    base_counts = _bin_timestamps(base_extra_ts, t_min, bucket_size_s, n_buckets)
+    incom_counts = _bin_timestamps(incom_extra_ts, t_min, bucket_size_s, n_buckets)
+    diff_counts = _bin_timestamps(value_mismatch_ts, t_min, bucket_size_s, n_buckets)
 
     fig = go.Figure()
 

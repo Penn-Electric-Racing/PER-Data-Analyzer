@@ -11,6 +11,7 @@ def parse_csv(
     file_path: str,
     ts_offset: int = 0,
     parsing_errors_limit: int = 100,
+    verbose: int = 1,
 ) -> SingleRunData:
     """
     Parse CSV file and return SingleRunData model.
@@ -23,6 +24,8 @@ def parse_csv(
         Maximum number of parsing errors before stopping. -1 for no limit. Default is 100
     parse_unit : Timescale | str | None, optional
         Logging timestamp unit. If None, auto-detects using header suffix "v2.0" (us) or defaults to ms.
+    verbose : int, optional
+        Verbosity level. 0 for no output, 1 for basic output, 2 for detailed output. Default is 1.
 
     Returns
     -------
@@ -39,15 +42,18 @@ def parse_csv(
         parse_unit = (
             Timescale.US if header_line.rstrip().endswith("v2.0") else Timescale.MS
         )
-        print(f"Header: {header_line.rstrip()}")
-        print(f"Timestamp unit: {parse_unit.value}")
+        if verbose >= 1:
+            print(f"Header: {header_line.rstrip()}")
+            print(f"Timestamp unit: {parse_unit.value}")
 
         # Block 1: Variable ID/Name pairs
-        pbar = tqdm(desc="Reading variable ID mappings", unit=" lines", initial=2)
+        if verbose >= 2:
+            pbar = tqdm(desc="Reading variable ID mappings", unit=" lines", initial=2)
         skip_rows = 1  # header line
         line = f.readline()
         while line and line.startswith("Value "):
-            pbar.update(1)
+            if verbose >= 2:
+                pbar.update(1)
             skip_rows += 1
 
             # Remove "Value " prefix, separate into variable name and ID
@@ -75,20 +81,24 @@ def parse_csv(
 
                 # Store variable ID to name mapping
                 if var_id in id_to_cpp_name:
-                    print(
-                        f"Warning: Duplicate variable ID {var_id} at line {pbar.n}. Overwriting previous name."
-                    )
+                    if verbose >= 1:
+                        print(
+                            f"Warning: Duplicate variable ID {var_id} at line {pbar.n}. Overwriting previous name."
+                        )
                 id_to_cpp_name[var_id] = cpp_name
                 id_to_descript[var_id] = descript
 
             except Exception as e:
-                print(f"Error parsing variable ID/Name pair at line {pbar.n}: {e}")
+                if verbose >= 1:
+                    print(f"Error parsing variable ID/Name pair at line {pbar.n}: {e}")
 
             line = f.readline()
-        pbar.close()
+        if verbose >= 2:
+            pbar.close()
 
     # Block 2: Read data with Polars, Block 3: Sort — all in one step
-    print("Reading and sorting data...")
+    if verbose >= 1:
+        print("Reading and sorting data...")
     df = pl.read_csv(
         file_path,
         skip_rows=skip_rows,
@@ -131,7 +141,9 @@ def parse_csv(
     # Format data as DataInstances
     id_to_instance: dict[int, DataInstance] = {}
     cpp_name_to_id: dict[str, int] = {}
-    for var_id in tqdm(id_to_cpp_name, desc="Creating DataInstances"):
+    if verbose >= 2:
+        di_pbar = tqdm(desc="Creating DataInstances", total=len(id_to_cpp_name))
+    for var_id in id_to_cpp_name:
         name = id_to_cpp_name[var_id]
         descript = id_to_descript[var_id]
         cpp_name_to_id[name] = var_id
@@ -145,9 +157,14 @@ def parse_csv(
             var_id=var_id,
             cpp_name=name,
         )
+        if verbose >= 2:
+            di_pbar.update(1)
+    if verbose >= 2:
+        di_pbar.close()
 
     # Create and return SingleRunData model
-    print(f"CSV parsing complete with {parsing_errors} parsing errors.")
+    if verbose >= 1:
+        print(f"CSV parsing complete with {parsing_errors} parsing errors.")
     return SingleRunData(
         id_to_instance=id_to_instance,
         cpp_name_to_id=cpp_name_to_id,

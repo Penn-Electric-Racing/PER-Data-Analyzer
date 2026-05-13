@@ -1,6 +1,8 @@
 DELIMITER = "=" * 40
 TITLE_DELIM = "=" * 5
 
+R_EARTH_M = 6_371_000.0
+
 
 def title_block(title: str) -> str:
     """
