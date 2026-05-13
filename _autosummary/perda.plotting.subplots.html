@@ -377,7 +377,6 @@
                   
   <section id="module-perda.plotting.subplots">
 <span id="perda-plotting-subplots"></span><h1>perda.plotting.subplots<a class="headerlink" href="#module-perda.plotting.subplots" title="Link to this heading">#</a></h1>
-<p>Stacked subplot plotting for multiple DataInstance time-series.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="perda.plotting.subplots.data_instance_subplots">
 <span class="sig-prename descclassname"><span class="pre">perda.plotting.subplots.</span></span><span class="sig-name descname"><span class="pre">data_instance_subplots</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rows</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_y_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_legend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">font_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">FontConfig(large=20,</span> <span class="pre">medium=14,</span> <span class="pre">small=10)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subplot_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">SubplotConfig(height_per_row=250,</span> <span class="pre">vertical_spacing=0.04,</span> <span class="pre">width=1200,</span> <span class="pre">show_subplot_titles=True,</span> <span class="pre">plot_bgcolor='white',</span> <span class="pre">margin={'l':</span> <span class="pre">70,</span> <span class="pre">'r':</span> <span class="pre">50,</span> <span class="pre">'t':</span> <span class="pre">90,</span> <span class="pre">'b':</span> <span class="pre">70})</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Timescale.MS</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/plotting/subplots.html#data_instance_subplots"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.plotting.subplots.data_instance_subplots" title="Link to this definition">#</a></dt>
@@ -417,6 +416,64 @@ for x-axis display. Default is Timescale.MS.</p></li>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="perda.plotting.subplots.plot_multi_log_subplots">
+<span class="sig-prename descclassname"><span class="pre">perda.plotting.subplots.</span></span><span class="sig-name descname"><span class="pre">plot_multi_log_subplots</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var_names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_y_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">font_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">FontConfig(large=20,</span> <span class="pre">medium=14,</span> <span class="pre">small=10)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">MultiLogSubplotConfig(max_display_resolution=50.0,</span> <span class="pre">height_per_row=250,</span> <span class="pre">vertical_spacing=0.05,</span> <span class="pre">width=1200,</span> <span class="pre">plot_bgcolor='white',</span> <span class="pre">margin={'l':</span> <span class="pre">70,</span> <span class="pre">'r':</span> <span class="pre">50,</span> <span class="pre">'t':</span> <span class="pre">90,</span> <span class="pre">'b':</span> <span class="pre">70})</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Timescale.MS</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/plotting/subplots.html#plot_multi_log_subplots"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.plotting.subplots.plot_multi_log_subplots" title="Link to this definition">#</a></dt>
+<dd><p>Plot the same set of variables across multiple logs as stacked subplots, with each
+variable on one subplot.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>logs</strong> (<em>List</em><em>[</em><a class="reference internal" href="perda.core_data_structures.single_run_data.html#perda.core_data_structures.single_run_data.SingleRunData" title="perda.core_data_structures.single_run_data.SingleRunData"><em>SingleRunData</em></a><em>]</em>)</p></li>
+<li><p><strong>var_names</strong> (<em>List</em><em>[</em><em>str</em><em>]</em>) – Ordered list of variable names to plot, one per subplot row.  Variables
+absent from log are silently skipped.</p></li>
+<li><p><strong>row_y_labels</strong> (<em>List</em><em>[</em><em>str</em><em> | </em><em>None</em><em>] </em><em>| </em><em>None</em><em>, </em><em>optional</em>) – Y-axis label for each row. Must match the length of <code class="docutils literal notranslate"><span class="pre">var_names</span></code></p></li>
+<li><p><strong>title</strong> (<em>str</em><em> | </em><em>None</em><em>, </em><em>optional</em>) – Base figure title.  When multiple figures are produced a <code class="docutils literal notranslate"><span class="pre">(1/N)</span></code>
+suffix is appended automatically.</p></li>
+<li><p><strong>font_config</strong> (<a class="reference internal" href="perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.FontConfig" title="perda.plotting.plotting_constants.FontConfig"><em>FontConfig</em></a><em>, </em><em>optional</em>)</p></li>
+<li><p><strong>config</strong> (<a class="reference internal" href="perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.MultiLogSubplotConfig" title="perda.plotting.plotting_constants.MultiLogSubplotConfig"><em>MultiLogSubplotConfig</em></a><em>, </em><em>optional</em>)</p></li>
+<li><p><strong>timestamp_unit</strong> (<a class="reference internal" href="perda.units.html#perda.units.Timescale" title="perda.units.Timescale"><em>Timescale</em></a><em>, </em><em>optional</em>) – Timestamp unit of the underlying DataInstances. Default is Timescale.MS.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The combined figure with all subplots.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>go.Figure</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span> <span class="o">=</span> <span class="n">plot_multi_log_subplots</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">logs</span><span class="o">=</span><span class="p">[</span><span class="n">aly1</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">aly2</span><span class="o">.</span><span class="n">data</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">var_names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;pcm.&quot;</span><span class="n">pcm</span><span class="o">.</span><span class="n">wheelSpeeds</span><span class="o">.</span><span class="n">frontLeft</span><span class="s2">&quot;, &quot;</span><span class="n">ludwig</span><span class="o">.</span><span class="n">steeringWheel</span><span class="o">.</span><span class="n">angle</span><span class="s2">&quot;, &quot;</span><span class="n">pcm</span><span class="o">.</span><span class="n">pedals</span><span class="o">.</span><span class="n">brakePressure</span><span class="o">.</span><span class="n">front</span><span class="s2">&quot;],</span>
+<span class="gp">... </span>    <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Speed Comparison&quot;</span><span class="p">,</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="perda.plotting.subplots.stride_downsample">
+<span class="sig-prename descclassname"><span class="pre">perda.plotting.subplots.</span></span><span class="sig-name descname"><span class="pre">stride_downsample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timestamps_s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_display_resolution</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/plotting/subplots.html#stride_downsample"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.plotting.subplots.stride_downsample" title="Link to this definition">#</a></dt>
+<dd><p>Return stride-downsampled arrays capped at <em>max_display_resolution</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>timestamps_s</strong> (<em>np.ndarray</em>) – Time values in seconds.</p></li>
+<li><p><strong>values</strong> (<em>np.ndarray</em>) – Corresponding sample values.</p></li>
+<li><p><strong>max_display_resolution</strong> (<em>float</em>) – Target display sample rate.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Downsampled <code class="docutils literal notranslate"><span class="pre">(timestamps_s,</span> <span class="pre">values)</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tuple[np.ndarray, np.ndarray]</p>
+</dd>
+</dl>
 </dd></dl>
 
 </section>
@@ -469,6 +526,8 @@ for x-axis display. Default is Timescale.MS.</p></li>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.plotting.subplots.data_instance_subplots"><code class="docutils literal notranslate"><span class="pre">data_instance_subplots()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.plotting.subplots.plot_multi_log_subplots"><code class="docutils literal notranslate"><span class="pre">plot_multi_log_subplots()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.plotting.subplots.stride_downsample"><code class="docutils literal notranslate"><span class="pre">stride_downsample()</span></code></a></li>
 </ul>
   </nav></div>
 

@@ -378,25 +378,8 @@
   <section id="module-perda.utils.diff">
 <span id="perda-utils-diff"></span><h1>perda.utils.diff<a class="headerlink" href="#module-perda.utils.diff" title="Link to this heading">#</a></h1>
 <dl class="py function">
-<dt class="sig sig-object py" id="perda.utils.diff.aggregate_timestamps">
-<span class="sig-prename descclassname"><span class="pre">perda.utils.diff.</span></span><span class="sig-name descname"><span class="pre">aggregate_timestamps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts_list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/utils/diff.html#aggregate_timestamps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.utils.diff.aggregate_timestamps" title="Link to this definition">#</a></dt>
-<dd><p>Concatenate timestamp arrays and count occurrences per unique timestamp.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>ts_list</strong> (<em>list</em><em>[</em><em>npt.NDArray</em><em>[</em><em>np.int64</em><em>]</em><em>]</em>) – Each element is a 1-D int64 array of timestamps (one per event).</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>(unique_timestamps, counts), both sorted by timestamp.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>tuple[npt.NDArray[np.int64], npt.NDArray[np.int64]]</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
 <dt class="sig sig-object py" id="perda.utils.diff.diff">
-<span class="sig-prename descclassname"><span class="pre">perda.utils.diff.</span></span><span class="sig-name descname"><span class="pre">diff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rpi_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">server_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp_tolerance_ms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diff_rtol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diff_atol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/utils/diff.html#diff"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.utils.diff.diff" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">perda.utils.diff.</span></span><span class="sig-name descname"><span class="pre">diff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rpi_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">server_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp_tolerance_s</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.002</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diff_rtol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diff_atol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diff_plot_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">DiffPlotConfig(bucket_size_s=1.0,</span> <span class="pre">color_base_extra='blue',</span> <span class="pre">color_incom_extra='darkorange',</span> <span class="pre">color_value_mismatch='crimson',</span> <span class="pre">color_total='gray')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layout_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">LayoutConfig(width=1200,</span> <span class="pre">height=700,</span> <span class="pre">margin={'l':</span> <span class="pre">70,</span> <span class="pre">'r':</span> <span class="pre">50,</span> <span class="pre">'t':</span> <span class="pre">90,</span> <span class="pre">'b':</span> <span class="pre">70},</span> <span class="pre">plot_bgcolor='white',</span> <span class="pre">title_x=0.5,</span> <span class="pre">title_xanchor='center',</span> <span class="pre">title_yanchor='top')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">font_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">FontConfig(large=20,</span> <span class="pre">medium=14,</span> <span class="pre">small=10)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/utils/diff.html#diff"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.utils.diff.diff" title="Link to this definition">#</a></dt>
 <dd><p>Compare two SingleRunData objects and report differences.</p>
 <p>Performs a three-stage comparison:</p>
 <ol class="arabic simple">
@@ -406,15 +389,21 @@ as a base-only extra, incoming-only extra, value mismatch, or match.</p></li>
 <li><p>Summary + plot: prints a diff summary table and displays an interactive
 Plotly bar chart of per-bucket diff counts.</p></li>
 </ol>
+<p>Timestamps from each run are converted to seconds using the run’s
+<code class="docutils literal notranslate"><span class="pre">timestamp_unit</span></code> metadata before comparison, so runs with different
+logging units are handled correctly.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>rpi_data</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="perda.core_data_structures.single_run_data.html#perda.core_data_structures.single_run_data.SingleRunData" title="perda.core_data_structures.single_run_data.SingleRunData"><code class="xref py py-class docutils literal notranslate"><span class="pre">SingleRunData</span></code></a></span>) – The reference (baseline) run.</p></li>
 <li><p><strong>server_data</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="perda.core_data_structures.single_run_data.html#perda.core_data_structures.single_run_data.SingleRunData" title="perda.core_data_structures.single_run_data.SingleRunData"><code class="xref py py-class docutils literal notranslate"><span class="pre">SingleRunData</span></code></a></span>) – The incoming run to compare against the baseline.</p></li>
-<li><p><strong>timestamp_tolerance_ms</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span>) – Maximum timestamp delta (ms) to consider two points as matching.
-Defaults to 2.</p></li>
+<li><p><strong>timestamp_tolerance_s</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span>) – Maximum timestamp delta (seconds) to consider two points as matching.
+Defaults to 0.002 (2 ms).</p></li>
 <li><p><strong>diff_rtol</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span>) – Relative tolerance for value comparison via <code class="docutils literal notranslate"><span class="pre">np.isclose</span></code>. Defaults to 1e-3.</p></li>
 <li><p><strong>diff_atol</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span>) – Absolute tolerance for value comparison via <code class="docutils literal notranslate"><span class="pre">np.isclose</span></code>. Defaults to 1e-3.</p></li>
+<li><p><strong>diff_plot_config</strong> (<a class="reference internal" href="perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.DiffPlotConfig" title="perda.plotting.plotting_constants.DiffPlotConfig"><em>DiffPlotConfig</em></a>)</p></li>
+<li><p><strong>layout_config</strong> (<a class="reference internal" href="perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.LayoutConfig" title="perda.plotting.plotting_constants.LayoutConfig"><em>LayoutConfig</em></a>)</p></li>
+<li><p><strong>font_config</strong> (<a class="reference internal" href="perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.FontConfig" title="perda.plotting.plotting_constants.FontConfig"><em>FontConfig</em></a>)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
@@ -472,7 +461,6 @@ Defaults to 2.</p></li>
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.utils.diff.aggregate_timestamps"><code class="docutils literal notranslate"><span class="pre">aggregate_timestamps()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.utils.diff.diff"><code class="docutils literal notranslate"><span class="pre">diff()</span></code></a></li>
 </ul>
   </nav></div>

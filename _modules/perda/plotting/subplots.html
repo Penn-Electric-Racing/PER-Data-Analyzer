@@ -303,14 +303,15 @@
                 <article class="bd-article">
                   
   <h1>Source code for perda.plotting.subplots</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Stacked subplot plotting for multiple DataInstance time-series.&quot;&quot;&quot;</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span>
-
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy.typing</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">npt</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">plotly.graph_objects</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">go</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">plotly.subplots</span><span class="w"> </span><span class="kn">import</span> <span class="n">make_subplots</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">..core_data_structures.data_instance</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataInstance</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..core_data_structures.single_run_data</span><span class="w"> </span><span class="kn">import</span> <span class="n">SingleRunData</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..units</span><span class="w"> </span><span class="kn">import</span> <span class="n">Timescale</span><span class="p">,</span> <span class="n">_to_seconds</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.plotting_constants</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
 
@@ -447,6 +448,173 @@
         <span class="n">margin</span><span class="o">=</span><span class="n">subplot_config</span><span class="o">.</span><span class="n">margin</span><span class="p">,</span>
         <span class="n">plot_bgcolor</span><span class="o">=</span><span class="n">subplot_config</span><span class="o">.</span><span class="n">plot_bgcolor</span><span class="p">,</span>
         <span class="n">showlegend</span><span class="o">=</span><span class="n">show_legend</span><span class="p">,</span>
+        <span class="n">hovermode</span><span class="o">=</span><span class="s2">&quot;x unified&quot;</span><span class="p">,</span>
+        <span class="n">legend</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">font</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">font_config</span><span class="o">.</span><span class="n">small</span><span class="p">)),</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">fig</span></div>
+
+
+
+<div class="viewcode-block" id="stride_downsample">
+<a class="viewcode-back" href="../../../_autosummary/perda.plotting.subplots.html#perda.plotting.subplots.stride_downsample">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">stride_downsample</span><span class="p">(</span>
+    <span class="n">timestamps_s</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
+    <span class="n">values</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
+    <span class="n">max_display_resolution</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return stride-downsampled arrays capped at *max_display_resolution*.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    timestamps_s : np.ndarray</span>
+<span class="sd">        Time values in seconds.</span>
+<span class="sd">    values : np.ndarray</span>
+<span class="sd">        Corresponding sample values.</span>
+<span class="sd">    max_display_resolution : float</span>
+<span class="sd">        Target display sample rate.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Tuple[np.ndarray, np.ndarray]</span>
+<span class="sd">        Downsampled ``(timestamps_s, values)``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">timestamps_s</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">timestamps_s</span><span class="p">,</span> <span class="n">values</span>
+    <span class="n">duration_s</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">timestamps_s</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">timestamps_s</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">duration_s</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">timestamps_s</span><span class="p">,</span> <span class="n">values</span>
+    <span class="n">actual_hz</span> <span class="o">=</span> <span class="n">n</span> <span class="o">/</span> <span class="n">duration_s</span>
+    <span class="k">if</span> <span class="n">actual_hz</span> <span class="o">&lt;=</span> <span class="n">max_display_resolution</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="s2">&quot;Data resolution is below the max display resolution, skipping downsampling.&quot;</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">timestamps_s</span><span class="p">,</span> <span class="n">values</span>
+    <span class="n">step</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">actual_hz</span> <span class="o">/</span> <span class="n">max_display_resolution</span><span class="p">)))</span>
+    <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">step</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">timestamps_s</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">values</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="plot_multi_log_subplots">
+<a class="viewcode-back" href="../../../_autosummary/perda.plotting.subplots.html#perda.plotting.subplots.plot_multi_log_subplots">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_multi_log_subplots</span><span class="p">(</span>
+    <span class="n">logs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">SingleRunData</span><span class="p">],</span>
+    <span class="n">var_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="n">row_y_labels</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">font_config</span><span class="p">:</span> <span class="n">FontConfig</span> <span class="o">=</span> <span class="n">DEFAULT_FONT_CONFIG</span><span class="p">,</span>
+    <span class="n">config</span><span class="p">:</span> <span class="n">MultiLogSubplotConfig</span> <span class="o">=</span> <span class="n">DEFAULT_MULTI_LOG_SUBPLOT_CONFIG</span><span class="p">,</span>
+    <span class="n">timestamp_unit</span><span class="p">:</span> <span class="n">Timescale</span> <span class="o">=</span> <span class="n">Timescale</span><span class="o">.</span><span class="n">MS</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot the same set of variables across multiple logs as stacked subplots, with each</span>
+<span class="sd">    variable on one subplot.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    logs : List[SingleRunData]</span>
+<span class="sd">    var_names : List[str]</span>
+<span class="sd">        Ordered list of variable names to plot, one per subplot row.  Variables</span>
+<span class="sd">        absent from log are silently skipped.</span>
+<span class="sd">    row_y_labels : List[str | None] | None, optional</span>
+<span class="sd">        Y-axis label for each row. Must match the length of ``var_names``</span>
+<span class="sd">    title : str | None, optional</span>
+<span class="sd">        Base figure title.  When multiple figures are produced a ``(1/N)``</span>
+<span class="sd">        suffix is appended automatically.</span>
+<span class="sd">    font_config : FontConfig, optional</span>
+<span class="sd">    config : MultiLogSubplotConfig, optional</span>
+<span class="sd">    timestamp_unit : Timescale, optional</span>
+<span class="sd">        Timestamp unit of the underlying DataInstances. Default is Timescale.MS.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    go.Figure</span>
+<span class="sd">        The combined figure with all subplots.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; fig = plot_multi_log_subplots(</span>
+<span class="sd">    ...     logs=[aly1.data, aly2.data],</span>
+<span class="sd">    ...     var_names=[&quot;pcm.&quot;pcm.wheelSpeeds.frontLeft&quot;, &quot;ludwig.steeringWheel.angle&quot;, &quot;pcm.pedals.brakePressure.front&quot;],</span>
+<span class="sd">    ...     title=&quot;Speed Comparison&quot;,</span>
+<span class="sd">    ... )</span>
+<span class="sd">    &gt;&gt;&gt; fig.show()</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">logs</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">var_names</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No logs or variable names provided.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">()</span>
+
+    <span class="n">n_vars</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">var_names</span><span class="p">)</span>
+
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">make_subplots</span><span class="p">(</span>
+        <span class="n">rows</span><span class="o">=</span><span class="n">n_vars</span><span class="p">,</span>
+        <span class="n">cols</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">shared_xaxes</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">vertical_spacing</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">vertical_spacing</span><span class="p">,</span>
+        <span class="n">subplot_titles</span><span class="o">=</span><span class="n">var_names</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">var_idx</span><span class="p">,</span> <span class="n">var_name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">var_names</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="n">first_valid_log_idx</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">log_idx</span><span class="p">,</span> <span class="n">srd</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">logs</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">var_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">srd</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">srd</span><span class="p">[</span><span class="n">var_name</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">elif</span> <span class="n">first_valid_log_idx</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">first_valid_log_idx</span> <span class="o">=</span> <span class="n">log_idx</span>
+
+            <span class="n">di</span> <span class="o">=</span> <span class="n">srd</span><span class="p">[</span><span class="n">var_name</span><span class="p">]</span>
+            <span class="n">timestamps_s</span> <span class="o">=</span> <span class="n">_to_seconds</span><span class="p">(</span><span class="n">di</span><span class="o">.</span><span class="n">timestamp_np</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">),</span> <span class="n">timestamp_unit</span><span class="p">)</span>
+            <span class="n">values</span> <span class="o">=</span> <span class="n">di</span><span class="o">.</span><span class="n">value_np</span>
+            <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">max_display_resolution</span><span class="p">:</span>
+                <span class="n">timestamps_s</span><span class="p">,</span> <span class="n">values</span> <span class="o">=</span> <span class="n">stride_downsample</span><span class="p">(</span>
+                    <span class="n">timestamps_s</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">max_display_resolution</span>
+                <span class="p">)</span>
+
+            <span class="n">fig</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span>
+                <span class="n">go</span><span class="o">.</span><span class="n">Scattergl</span><span class="p">(</span>
+                    <span class="n">x</span><span class="o">=</span><span class="n">timestamps_s</span><span class="p">,</span>
+                    <span class="n">y</span><span class="o">=</span><span class="n">values</span><span class="p">,</span>
+                    <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;lines&quot;</span><span class="p">,</span>
+                    <span class="n">line</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+                    <span class="n">name</span><span class="o">=</span><span class="n">var_name</span><span class="p">,</span>
+                    <span class="n">legendgroup</span><span class="o">=</span><span class="s2">&quot;Log &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">log_idx</span><span class="p">),</span>
+                    <span class="n">showlegend</span><span class="o">=</span><span class="p">(</span><span class="n">log_idx</span> <span class="o">==</span> <span class="n">first_valid_log_idx</span><span class="p">),</span>
+                <span class="p">),</span>
+                <span class="n">row</span><span class="o">=</span><span class="n">var_idx</span><span class="p">,</span>
+                <span class="n">col</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">row_y_labels</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">row_y_labels</span><span class="p">)</span> <span class="o">==</span> <span class="n">n_vars</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">var_idx</span><span class="p">,</span> <span class="n">y_label</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">row_y_labels</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">update_yaxes</span><span class="p">(</span>
+                <span class="n">title_text</span><span class="o">=</span><span class="n">y_label</span><span class="p">,</span>
+                <span class="n">title_font</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">font_config</span><span class="o">.</span><span class="n">medium</span><span class="p">),</span>
+                <span class="n">tickfont</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">font_config</span><span class="o">.</span><span class="n">small</span><span class="p">),</span>
+                <span class="n">row</span><span class="o">=</span><span class="n">var_idx</span><span class="p">,</span>
+                <span class="n">col</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="p">)</span>
+
+    <span class="n">fig</span><span class="o">.</span><span class="n">update_xaxes</span><span class="p">(</span>
+        <span class="n">title_text</span><span class="o">=</span><span class="s2">&quot;Time (s)&quot;</span><span class="p">,</span>
+        <span class="n">title_font</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">font_config</span><span class="o">.</span><span class="n">medium</span><span class="p">),</span>
+        <span class="n">tickfont</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">font_config</span><span class="o">.</span><span class="n">small</span><span class="p">),</span>
+        <span class="n">row</span><span class="o">=</span><span class="n">n_vars</span><span class="p">,</span>
+        <span class="n">col</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span>
+        <span class="n">title</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
+            <span class="n">text</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
+            <span class="n">x</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+            <span class="n">xanchor</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span>
+            <span class="n">yanchor</span><span class="o">=</span><span class="s2">&quot;top&quot;</span><span class="p">,</span>
+            <span class="n">font</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">font_config</span><span class="o">.</span><span class="n">large</span><span class="p">),</span>
+        <span class="p">),</span>
+        <span class="n">height</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">height_per_row</span> <span class="o">*</span> <span class="n">n_vars</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">width</span><span class="p">,</span>
+        <span class="n">margin</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">margin</span><span class="p">,</span>
+        <span class="n">plot_bgcolor</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">plot_bgcolor</span><span class="p">,</span>
         <span class="n">hovermode</span><span class="o">=</span><span class="s2">&quot;x unified&quot;</span><span class="p">,</span>
         <span class="n">legend</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">font</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">font_config</span><span class="o">.</span><span class="n">small</span><span class="p">)),</span>
     <span class="p">)</span>

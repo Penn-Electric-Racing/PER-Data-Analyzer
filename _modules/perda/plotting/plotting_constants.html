@@ -348,7 +348,7 @@
 <span class="k">class</span><span class="w"> </span><span class="nc">DiffPlotConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Configuration for diff bar chart visualization.&quot;&quot;&quot;</span>
 
-    <span class="n">bucket_size_ms</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000</span>
+    <span class="n">bucket_size_s</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span>
     <span class="n">color_base_extra</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;blue&quot;</span>
     <span class="n">color_incom_extra</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;darkorange&quot;</span>
     <span class="n">color_value_mismatch</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;crimson&quot;</span>
@@ -383,7 +383,7 @@
 <div class="viewcode-block" id="GpsMapConfig">
 <a class="viewcode-back" href="../../../_autosummary/perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.GpsMapConfig">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">GpsMapConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Configuration for GPS map overlay plots.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Configuration for GPS plotting and outlier filtering.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -392,17 +392,21 @@
 <span class="sd">    mapbox_token : str</span>
 <span class="sd">        Mapbox access token. Only needed for Mapbox-hosted styles.</span>
 <span class="sd">    marker_size : int</span>
-<span class="sd">        Marker size on the map trace.</span>
+<span class="sd">        Marker size on GPS traces.</span>
 <span class="sd">    line_width : int</span>
 <span class="sd">        Line width on the map trace.</span>
 <span class="sd">    line_color : str</span>
 <span class="sd">        Color of the GPS trace line.</span>
 <span class="sd">    zoom_padding : float</span>
 <span class="sd">        Extra fraction added around the data extent when auto-zooming.</span>
-<span class="sd">    lat_range : tuple[float, float]</span>
-<span class="sd">        Valid latitude range. Points outside are filtered.</span>
-<span class="sd">    lon_range : tuple[float, float]</span>
-<span class="sd">        Valid longitude range. Points outside are filtered.</span>
+<span class="sd">    max_radius_m : float</span>
+<span class="sd">        Maximum allowed distance in metres from the centroid of all GPS points.</span>
+<span class="sd">        Points further than this are discarded as outliers.</span>
+<span class="sd">        Set to ``float(&quot;inf&quot;)`` to disable.</span>
+<span class="sd">    max_jump_m : float</span>
+<span class="sd">        Maximum allowed step distance in metres between consecutive points.</span>
+<span class="sd">        Points that jump further than this are discarded as outliers.</span>
+<span class="sd">        Set to ``float(&quot;inf&quot;)`` to disable.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">mapbox_style</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;carto-positron&quot;</span>
@@ -411,8 +415,8 @@
     <span class="n">line_width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span>
     <span class="n">line_color</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;red&quot;</span>
     <span class="n">zoom_padding</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.4</span>
-    <span class="n">lat_range</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mf">35.0</span><span class="p">,</span> <span class="mf">50.0</span><span class="p">)</span>
-    <span class="n">lon_range</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mf">125.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">66.0</span><span class="p">)</span></div>
+    <span class="n">max_radius_m</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">5_000.0</span>
+    <span class="n">max_jump_m</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">30.0</span></div>
 
 
 
@@ -471,6 +475,37 @@
 
 
 
+<div class="viewcode-block" id="MultiLogSubplotConfig">
+<a class="viewcode-back" href="../../../_autosummary/perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.MultiLogSubplotConfig">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MultiLogSubplotConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Configuration for multi-log variable comparison subplot figures.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    max_display_resolution : float | None</span>
+<span class="sd">        Maximum display sample rate in Hz. Traces are stride-downsampled to</span>
+<span class="sd">        approximately this rate before rendering.  ``None`` disables downsampling.</span>
+<span class="sd">    height_per_row : int</span>
+<span class="sd">        Pixel height allocated to each subplot row.</span>
+<span class="sd">    vertical_spacing : float</span>
+<span class="sd">        Vertical gap between subplot rows as a fraction of the total figure height.</span>
+<span class="sd">    width : int</span>
+<span class="sd">        Total figure width in pixels.</span>
+<span class="sd">    plot_bgcolor : str</span>
+<span class="sd">        Background color of each subplot panel.</span>
+<span class="sd">    margin : Dict[str, int]</span>
+<span class="sd">        Figure margins as a dict with keys ``l``, ``r``, ``t``, ``b``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">max_display_resolution</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="mf">50.0</span>
+    <span class="n">height_per_row</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">250</span>
+    <span class="n">vertical_spacing</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span>
+    <span class="n">width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1200</span>
+    <span class="n">plot_bgcolor</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;white&quot;</span>
+    <span class="n">margin</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span><span class="n">l</span><span class="o">=</span><span class="mi">70</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">70</span><span class="p">))</span></div>
+
+
+
 <span class="c1"># Default configuration instances</span>
 <span class="n">DEFAULT_FONT_CONFIG</span> <span class="o">=</span> <span class="n">FontConfig</span><span class="p">()</span>
 <span class="n">DEFAULT_LAYOUT_CONFIG</span> <span class="o">=</span> <span class="n">LayoutConfig</span><span class="p">()</span>
@@ -480,6 +515,7 @@
 <span class="n">DEFAULT_GPS_MAP_CONFIG</span> <span class="o">=</span> <span class="n">GpsMapConfig</span><span class="p">()</span>
 <span class="n">DEFAULT_SUBPLOT_CONFIG</span> <span class="o">=</span> <span class="n">SubplotConfig</span><span class="p">()</span>
 <span class="n">DEFAULT_FFT_PLOT_CONFIG</span> <span class="o">=</span> <span class="n">FFTPlotConfig</span><span class="p">()</span>
+<span class="n">DEFAULT_MULTI_LOG_SUBPLOT_CONFIG</span> <span class="o">=</span> <span class="n">MultiLogSubplotConfig</span><span class="p">()</span>
 </pre></div>
 
                 </article>

@@ -314,8 +314,6 @@
         <li><a href="_autosummary/perda.live.html#perda.live.CDPClient.ACCESS_STRING_SIZE">(perda.live.CDPClient attribute)</a>
 </li>
       </ul></li>
-      <li><a href="_autosummary/perda.utils.diff.html#perda.utils.diff.aggregate_timestamps">aggregate_timestamps() (in module perda.utils.diff)</a>
-</li>
       <li><a href="_autosummary/perda.utils.frequency_analysis.html#perda.utils.frequency_analysis.analyze_frequency">analyze_frequency() (in module perda.utils.frequency_analysis)</a>
 
       <ul>
@@ -370,7 +368,7 @@
 </li>
       <li><a href="_autosummary/perda.server.config.html#perda.server.config.S3Credentials.bucket_name">bucket_name (perda.server.config.S3Credentials attribute)</a>
 </li>
-      <li><a href="_autosummary/perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.DiffPlotConfig.bucket_size_ms">bucket_size_ms (perda.plotting.plotting_constants.DiffPlotConfig attribute)</a>
+      <li><a href="_autosummary/perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.DiffPlotConfig.bucket_size_s">bucket_size_s (perda.plotting.plotting_constants.DiffPlotConfig attribute)</a>
 </li>
       <li><a href="_autosummary/perda.utils.search.html#perda.utils.search.build_search_card">build_search_card() (in module perda.utils.search)</a>
 </li>
@@ -546,10 +544,12 @@
         <li><a href="_autosummary/perda.live.html#perda.live.LiveAnalyzer.fetch">(perda.live.LiveAnalyzer method)</a>
 </li>
       </ul></li>
-      <li><a href="_autosummary/perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.FilterOptions">FilterOptions (class in perda.core_data_structures.data_instance)</a>
+      <li><a href="_autosummary/perda.utils.gps_analysis.html#perda.utils.gps_analysis.filter_gps_cartesian">filter_gps_cartesian() (in module perda.utils.gps_analysis)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="_autosummary/perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.FilterOptions">FilterOptions (class in perda.core_data_structures.data_instance)</a>
+</li>
       <li><a href="_autosummary/perda.live.cdp_client.html#perda.live.cdp_client.CanType.Float">Float (perda.live.cdp_client.CanType attribute)</a>
 </li>
       <li><a href="_autosummary/perda.live.cdp_client.html#perda.live.cdp_client.ValueType.FLOAT">FLOAT (perda.live.cdp_client.ValueType attribute)</a>
@@ -610,6 +610,8 @@
         <li><a href="_autosummary/perda.live.cdp_client.html#perda.live.cdp_client.get_value">(in module perda.live.cdp_client)</a>
 </li>
       </ul></li>
+      <li><a href="_autosummary/perda.utils.gps_analysis.html#perda.utils.gps_analysis.gps_to_enu">gps_to_enu() (in module perda.utils.gps_analysis)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -618,8 +620,12 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="_autosummary/perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.LayoutConfig.height">height (perda.plotting.plotting_constants.LayoutConfig attribute)</a>
 </li>
-      <li><a href="_autosummary/perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.SubplotConfig.height_per_row">height_per_row (perda.plotting.plotting_constants.SubplotConfig attribute)</a>
+      <li><a href="_autosummary/perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.MultiLogSubplotConfig.height_per_row">height_per_row (perda.plotting.plotting_constants.MultiLogSubplotConfig attribute)</a>
+
+      <ul>
+        <li><a href="_autosummary/perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.SubplotConfig.height_per_row">(perda.plotting.plotting_constants.SubplotConfig attribute)</a>
 </li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="_autosummary/perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.FFTPlotConfig.height_single">height_single (perda.plotting.plotting_constants.FFTPlotConfig attribute)</a>
@@ -702,8 +708,6 @@
 </li>
       <li><a href="_autosummary/perda.server.config.html#perda.server.config.LogEntry.last_modified">last_modified (perda.server.config.LogEntry attribute)</a>
 </li>
-      <li><a href="_autosummary/perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.GpsMapConfig.lat_range">lat_range (perda.plotting.plotting_constants.GpsMapConfig attribute)</a>
-</li>
       <li><a href="_autosummary/perda.core_data_structures.joins.html#perda.core_data_structures.joins.left_join">left_join() (in module perda.core_data_structures.joins)</a>
 </li>
       <li><a href="_autosummary/perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.left_join_data_instances">left_join_data_instances() (in module perda.core_data_structures.data_instance)</a>
@@ -742,8 +746,6 @@
 </li>
       <li><a href="_autosummary/perda.server.client.html#perda.server.client.ServerClient.login">login() (perda.server.client.ServerClient method)</a>
 </li>
-      <li><a href="_autosummary/perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.GpsMapConfig.lon_range">lon_range (perda.plotting.plotting_constants.GpsMapConfig attribute)</a>
-</li>
       <li><a href="_autosummary/perda.utils.filtering.html#perda.utils.filtering.lowpass_filter">lowpass_filter() (in module perda.utils.filtering)</a>
 </li>
       <li><a href="_autosummary/perda.utils.filtering.html#perda.utils.filtering.lowpass_filter_by_distance">lowpass_filter_by_distance() (in module perda.utils.filtering)</a>
@@ -761,10 +763,18 @@
       <li><a href="_autosummary/perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.LayoutConfig.margin">margin (perda.plotting.plotting_constants.LayoutConfig attribute)</a>
 
       <ul>
+        <li><a href="_autosummary/perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.MultiLogSubplotConfig.margin">(perda.plotting.plotting_constants.MultiLogSubplotConfig attribute)</a>
+</li>
         <li><a href="_autosummary/perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.SubplotConfig.margin">(perda.plotting.plotting_constants.SubplotConfig attribute)</a>
 </li>
       </ul></li>
       <li><a href="_autosummary/perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.GpsMapConfig.marker_size">marker_size (perda.plotting.plotting_constants.GpsMapConfig attribute)</a>
+</li>
+      <li><a href="_autosummary/perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.MultiLogSubplotConfig.max_display_resolution">max_display_resolution (perda.plotting.plotting_constants.MultiLogSubplotConfig attribute)</a>
+</li>
+      <li><a href="_autosummary/perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.GpsMapConfig.max_jump_m">max_jump_m (perda.plotting.plotting_constants.GpsMapConfig attribute)</a>
+</li>
+      <li><a href="_autosummary/perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.GpsMapConfig.max_radius_m">max_radius_m (perda.plotting.plotting_constants.GpsMapConfig attribute)</a>
 </li>
       <li><a href="_autosummary/perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.FontConfig.medium">medium (perda.plotting.plotting_constants.FontConfig attribute)</a>
 </li>
@@ -1177,6 +1187,8 @@
       <li><a href="_autosummary/perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.LayoutConfig.plot_bgcolor">plot_bgcolor (perda.plotting.plotting_constants.LayoutConfig attribute)</a>
 
       <ul>
+        <li><a href="_autosummary/perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.MultiLogSubplotConfig.plot_bgcolor">(perda.plotting.plotting_constants.MultiLogSubplotConfig attribute)</a>
+</li>
         <li><a href="_autosummary/perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.SubplotConfig.plot_bgcolor">(perda.plotting.plotting_constants.SubplotConfig attribute)</a>
 </li>
       </ul></li>
@@ -1186,7 +1198,11 @@
 </li>
       <li><a href="_autosummary/perda.plotting.fft_plotter.html#perda.plotting.fft_plotter.plot_fft_spectrum">plot_fft_spectrum() (in module perda.plotting.fft_plotter)</a>
 </li>
+      <li><a href="_autosummary/perda.utils.gps_analysis.html#perda.utils.gps_analysis.plot_gps_comparison">plot_gps_comparison() (in module perda.utils.gps_analysis)</a>
+</li>
       <li><a href="_autosummary/perda.utils.gps_analysis.html#perda.utils.gps_analysis.plot_gps_trimmer">plot_gps_trimmer() (in module perda.utils.gps_analysis)</a>
+</li>
+      <li><a href="_autosummary/perda.plotting.subplots.html#perda.plotting.subplots.plot_multi_log_subplots">plot_multi_log_subplots() (in module perda.plotting.subplots)</a>
 </li>
       <li><a href="_autosummary/perda.plotting.parametric_plot.html#perda.plotting.parametric_plot.plot_parametric_curve">plot_parametric_curve() (in module perda.plotting.parametric_plot)</a>
 </li>
@@ -1288,6 +1304,8 @@
 </li>
       <li><a href="_autosummary/perda.utils.accel_calculator.html#perda.utils.accel_calculator.AccelSegmentResult.start_time">start_time (perda.utils.accel_calculator.AccelSegmentResult attribute)</a>
 </li>
+      <li><a href="_autosummary/perda.plotting.subplots.html#perda.plotting.subplots.stride_downsample">stride_downsample() (in module perda.plotting.subplots)</a>
+</li>
       <li><a href="_autosummary/perda.server.config.html#perda.server.config.LogEntry.string_metadata">string_metadata (perda.server.config.LogEntry attribute)</a>
 </li>
       <li><a href="_autosummary/perda.analyzer.analyzer.html#perda.analyzer.analyzer.Analyzer.subplots">subplots() (perda.analyzer.analyzer.Analyzer method)</a>
@@ -1376,8 +1394,12 @@
         <li><a href="_autosummary/perda.utils.search.html#id2">(perda.utils.search.SearchResult attribute)</a>, <a href="_autosummary/perda.utils.search.html#perda.utils.search.SearchResult.var_id">[1]</a>
 </li>
       </ul></li>
-      <li><a href="_autosummary/perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.SubplotConfig.vertical_spacing">vertical_spacing (perda.plotting.plotting_constants.SubplotConfig attribute)</a>
+      <li><a href="_autosummary/perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.MultiLogSubplotConfig.vertical_spacing">vertical_spacing (perda.plotting.plotting_constants.MultiLogSubplotConfig attribute)</a>
+
+      <ul>
+        <li><a href="_autosummary/perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.SubplotConfig.vertical_spacing">(perda.plotting.plotting_constants.SubplotConfig attribute)</a>
 </li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -1387,6 +1409,8 @@
       <li><a href="_autosummary/perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.LayoutConfig.width">width (perda.plotting.plotting_constants.LayoutConfig attribute)</a>
 
       <ul>
+        <li><a href="_autosummary/perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.MultiLogSubplotConfig.width">(perda.plotting.plotting_constants.MultiLogSubplotConfig attribute)</a>
+</li>
         <li><a href="_autosummary/perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.SubplotConfig.width">(perda.plotting.plotting_constants.SubplotConfig attribute)</a>
 </li>
         <li><a href="_autosummary/perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.VLineConfig.width">(perda.plotting.plotting_constants.VLineConfig attribute)</a>

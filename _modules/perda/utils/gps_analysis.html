@@ -303,12 +303,15 @@
                 <article class="bd-article">
                   
   <h1>Source code for perda.utils.gps_analysis</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ipywidgets</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">widgets</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">ipywidgets</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">widgets</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">plotly.graph_objects</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">go</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="kn">import</span> <span class="n">float64</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">numpy.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">NDArray</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">..constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">R_EARTH_M</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..core_data_structures.data_instance</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataInstance</span><span class="p">,</span> <span class="n">left_join_data_instances</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..plotting.parametric_plot</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">plot_parametric_curve_square</span><span class="p">,</span>
@@ -389,32 +392,175 @@
 
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_filter_gps_bounds</span><span class="p">(</span>
+<div class="viewcode-block" id="gps_to_enu">
+<a class="viewcode-back" href="../../../_autosummary/perda.utils.gps_analysis.html#perda.utils.gps_analysis.gps_to_enu">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">gps_to_enu</span><span class="p">(</span>
     <span class="n">lat</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">lon</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span>
-    <span class="n">gps_map_config</span><span class="p">:</span> <span class="n">GpsMapConfig</span><span class="p">,</span>
+    <span class="n">lat_ref</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">lon_ref</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Remove GPS points outside valid lat/lon bounds.</span>
+<span class="sd">    Project lat/lon coordinates to a local East-North-Up (ENU) Cartesian frame.</span>
+
+<span class="sd">    Uses a flat-Earth approximation, accurate to within ~0.1 % for distances</span>
+<span class="sd">    up to ~10 km from the reference point.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    lat : NDArray[float64]</span>
-<span class="sd">        Latitude values.</span>
+<span class="sd">        Latitude values in degrees.</span>
 <span class="sd">    lon : NDArray[float64]</span>
-<span class="sd">        Longitude values.</span>
-<span class="sd">    gps_map_config : GpsMapConfig</span>
-<span class="sd">        Configuration containing lat_range and lon_range bounds.</span>
+<span class="sd">        Longitude values in degrees.</span>
+<span class="sd">    lat_ref : float | None, optional</span>
+<span class="sd">        Reference latitude in degrees.  Defaults to the median of ``lat``.</span>
+<span class="sd">    lon_ref : float | None, optional</span>
+<span class="sd">        Reference longitude in degrees.  Defaults to the median of ``lon``.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    tuple[NDArray[float64], NDArray[float64]]</span>
-<span class="sd">        Filtered (lat, lon) arrays.</span>
+<span class="sd">        ``(east_m, north_m)`` arrays giving signed distance in metres from the</span>
+<span class="sd">        reference point along the East and North axes respectively.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; east, north = gps_to_enu(lat_array, lon_array)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">lat_lo</span><span class="p">,</span> <span class="n">lat_hi</span> <span class="o">=</span> <span class="n">gps_map_config</span><span class="o">.</span><span class="n">lat_range</span>
-    <span class="n">lon_lo</span><span class="p">,</span> <span class="n">lon_hi</span> <span class="o">=</span> <span class="n">gps_map_config</span><span class="o">.</span><span class="n">lon_range</span>
-    <span class="n">mask</span> <span class="o">=</span> <span class="p">(</span><span class="n">lat</span> <span class="o">&gt;=</span> <span class="n">lat_lo</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">lat</span> <span class="o">&lt;=</span> <span class="n">lat_hi</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">lon</span> <span class="o">&gt;=</span> <span class="n">lon_lo</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">lon</span> <span class="o">&lt;=</span> <span class="n">lon_hi</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">lat</span><span class="p">[</span><span class="n">mask</span><span class="p">],</span> <span class="n">lon</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span>
+    <span class="n">lat_ref_rad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">lat_ref</span> <span class="k">if</span> <span class="n">lat_ref</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">lat</span><span class="p">))</span>
+    <span class="n">lon_ref_rad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">lon_ref</span> <span class="k">if</span> <span class="n">lon_ref</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">lon</span><span class="p">))</span>
+    <span class="n">east_m</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">lon</span><span class="p">)</span> <span class="o">-</span> <span class="n">lon_ref_rad</span><span class="p">)</span> <span class="o">*</span> <span class="n">R_EARTH_M</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">lat_ref_rad</span><span class="p">)</span>
+    <span class="n">north_m</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">lat</span><span class="p">)</span> <span class="o">-</span> <span class="n">lat_ref_rad</span><span class="p">)</span> <span class="o">*</span> <span class="n">R_EARTH_M</span>
+    <span class="k">return</span> <span class="n">east_m</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span> <span class="n">north_m</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="filter_gps_cartesian">
+<a class="viewcode-back" href="../../../_autosummary/perda.utils.gps_analysis.html#perda.utils.gps_analysis.filter_gps_cartesian">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">filter_gps_cartesian</span><span class="p">(</span>
+    <span class="n">lat</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span>
+    <span class="n">lon</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span>
+    <span class="n">gps_map_config</span><span class="p">:</span> <span class="n">GpsMapConfig</span> <span class="o">=</span> <span class="n">DEFAULT_GPS_MAP_CONFIG</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Build a boolean mask that removes Cartesian GPS outliers.</span>
+
+<span class="sd">    Two independent filters are applied and combined with logical-AND:</span>
+
+<span class="sd">    * **Radius filter** — discards points whose straight-line distance from the</span>
+<span class="sd">      centroid of all points exceeds ``gps_map_config.max_radius_m``.</span>
+<span class="sd">    * **Jump filter** — discards points where the step distance from the previous</span>
+<span class="sd">      point exceeds ``gps_map_config.max_jump_m``.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    lat : NDArray[float64]</span>
+<span class="sd">        Latitude values in degrees.</span>
+<span class="sd">    lon : NDArray[float64]</span>
+<span class="sd">        Longitude values in degrees.</span>
+<span class="sd">    gps_map_config : GpsMapConfig, optional</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    NDArray[np.bool_]</span>
+<span class="sd">        Boolean mask; ``True`` where a point should be *kept*.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; mask = filter_gps_cartesian(lat_array, lon_array)</span>
+<span class="sd">    &gt;&gt;&gt; lat_clean, lon_clean = lat_array[mask], lon_array[mask]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">east</span><span class="p">,</span> <span class="n">north</span> <span class="o">=</span> <span class="n">gps_to_enu</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">)</span>
+    <span class="n">radius_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">east</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">north</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">gps_map_config</span><span class="o">.</span><span class="n">max_radius_m</span>
+    <span class="n">dx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">east</span><span class="p">,</span> <span class="n">prepend</span><span class="o">=</span><span class="n">east</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">dy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">north</span><span class="p">,</span> <span class="n">prepend</span><span class="o">=</span><span class="n">north</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">jump_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">dx</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">dy</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">gps_map_config</span><span class="o">.</span><span class="n">max_jump_m</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">radius_mask</span> <span class="o">&amp;</span> <span class="n">jump_mask</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="plot_gps_comparison">
+<a class="viewcode-back" href="../../../_autosummary/perda.utils.gps_analysis.html#perda.utils.gps_analysis.plot_gps_comparison">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_gps_comparison</span><span class="p">(</span>
+    <span class="n">runs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span> <span class="nb">str</span><span class="p">]],</span>
+    <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">gps_map_config</span><span class="p">:</span> <span class="n">GpsMapConfig</span> <span class="o">=</span> <span class="n">DEFAULT_GPS_MAP_CONFIG</span><span class="p">,</span>
+    <span class="n">layout_config</span><span class="p">:</span> <span class="n">LayoutConfig</span> <span class="o">=</span> <span class="n">DEFAULT_LAYOUT_CONFIG</span><span class="p">,</span>
+    <span class="n">font_config</span><span class="p">:</span> <span class="n">FontConfig</span> <span class="o">=</span> <span class="n">DEFAULT_FONT_CONFIG</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Overlay GPS tracks from multiple runs on a shared East/North Cartesian frame.</span>
+
+<span class="sd">    Each run is projected to ENU coordinates using a single shared reference</span>
+<span class="sd">    point (median of all points across all runs), then filtered with</span>
+<span class="sd">    :func:`filter_gps_cartesian` before plotting.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    runs : List[tuple[NDArray[float64], NDArray[float64], str]]</span>
+<span class="sd">        Each element is ``(lat_array, lon_array, label)`` for one run.</span>
+<span class="sd">        ``lat_array`` and ``lon_array`` must be the same length.</span>
+<span class="sd">    title : str | None, optional</span>
+<span class="sd">    gps_map_config : GpsMapConfig, optional</span>
+<span class="sd">        Controls Cartesian outlier thresholds (``max_radius_m``, ``max_jump_m``)</span>
+<span class="sd">        and marker appearance.</span>
+<span class="sd">    layout_config : LayoutConfig, optional</span>
+<span class="sd">    font_config : FontConfig, optional</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    go.Figure</span>
+<span class="sd">        Plotly figure with one scatter trace per run</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; fig = plot_gps_comparison(</span>
+<span class="sd">    ...     [(lat1, lon1, &quot;Run 1&quot;), (lat2, lon2, &quot;Run 2&quot;)],</span>
+<span class="sd">    ...     title=&quot;GPS Comparison&quot;,</span>
+<span class="sd">    ... )</span>
+<span class="sd">    &gt;&gt;&gt; fig.show()</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">all_lat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">lat</span> <span class="k">for</span> <span class="n">lat</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">runs</span><span class="p">])</span>
+    <span class="n">all_lon</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">lon</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">runs</span><span class="p">])</span>
+    <span class="n">lat_ref</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">all_lat</span><span class="p">))</span>
+    <span class="n">lon_ref</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">all_lon</span><span class="p">))</span>
+
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">runs</span><span class="p">:</span>
+        <span class="n">east</span><span class="p">,</span> <span class="n">north</span> <span class="o">=</span> <span class="n">gps_to_enu</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">lat_ref</span><span class="o">=</span><span class="n">lat_ref</span><span class="p">,</span> <span class="n">lon_ref</span><span class="o">=</span><span class="n">lon_ref</span><span class="p">)</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">filter_gps_cartesian</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">gps_map_config</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">mask</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+            <span class="k">continue</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span>
+            <span class="n">go</span><span class="o">.</span><span class="n">Scattergl</span><span class="p">(</span>
+                <span class="n">x</span><span class="o">=</span><span class="n">east</span><span class="p">[</span><span class="n">mask</span><span class="p">],</span>
+                <span class="n">y</span><span class="o">=</span><span class="n">north</span><span class="p">[</span><span class="n">mask</span><span class="p">],</span>
+                <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;markers&quot;</span><span class="p">,</span>
+                <span class="n">marker</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">gps_map_config</span><span class="o">.</span><span class="n">marker_size</span><span class="p">),</span>
+                <span class="n">name</span><span class="o">=</span><span class="n">label</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span>
+        <span class="n">title</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
+            <span class="n">text</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
+            <span class="n">x</span><span class="o">=</span><span class="n">layout_config</span><span class="o">.</span><span class="n">title_x</span><span class="p">,</span>
+            <span class="n">xanchor</span><span class="o">=</span><span class="n">layout_config</span><span class="o">.</span><span class="n">title_xanchor</span><span class="p">,</span>
+            <span class="n">yanchor</span><span class="o">=</span><span class="n">layout_config</span><span class="o">.</span><span class="n">title_yanchor</span><span class="p">,</span>
+            <span class="n">font</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">font_config</span><span class="o">.</span><span class="n">large</span><span class="p">),</span>
+        <span class="p">),</span>
+        <span class="n">xaxis_title</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;East (m)&quot;</span><span class="p">,</span> <span class="n">font</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">font_config</span><span class="o">.</span><span class="n">medium</span><span class="p">)),</span>
+        <span class="n">yaxis_title</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;North (m)&quot;</span><span class="p">,</span> <span class="n">font</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">font_config</span><span class="o">.</span><span class="n">medium</span><span class="p">)),</span>
+        <span class="n">yaxis</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">scaleanchor</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">scaleratio</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+        <span class="n">width</span><span class="o">=</span><span class="n">layout_config</span><span class="o">.</span><span class="n">height</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="n">layout_config</span><span class="o">.</span><span class="n">height</span><span class="p">,</span>
+        <span class="n">margin</span><span class="o">=</span><span class="n">layout_config</span><span class="o">.</span><span class="n">margin</span><span class="p">,</span>
+        <span class="n">legend</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">font</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">font_config</span><span class="o">.</span><span class="n">small</span><span class="p">)),</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">fig</span></div>
+
 
 
 <div class="viewcode-block" id="create_representative_gps_image">
@@ -432,8 +578,9 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generate a GPS trace on an interactive map background.</span>
 
-<span class="sd">    Points outside the configured lat/lon bounds are filtered out.</span>
-<span class="sd">    Uses CARTO Positron tiles by default (free, no API key required).</span>
+<span class="sd">    Outliers (large radius from centroid or sudden jumps) are removed via</span>
+<span class="sd">    :func:`filter_gps_cartesian`.  Uses CARTO Positron tiles by default</span>
+<span class="sd">    (free, no API key required).</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -450,7 +597,7 @@
 <span class="sd">    layout_config : LayoutConfig, optional</span>
 <span class="sd">    font_config : FontConfig, optional</span>
 <span class="sd">    gps_map_config : GpsMapConfig, optional</span>
-<span class="sd">        Map overlay and GPS filtering configuration.</span>
+<span class="sd">        Map overlay and outlier filtering configuration.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -465,6 +612,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">lat_aligned</span><span class="p">,</span> <span class="n">lon_aligned</span> <span class="o">=</span> <span class="n">left_join_data_instances</span><span class="p">(</span><span class="n">lat_raw</span><span class="p">,</span> <span class="n">lon_raw</span><span class="p">)</span>
 
+    <span class="c1"># Trim to when the vehicle is moving if velocity data is provided, otherwise show all points</span>
     <span class="k">if</span> <span class="n">vel_raw</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">_</span><span class="p">,</span> <span class="n">vel_aligned</span> <span class="o">=</span> <span class="n">left_join_data_instances</span><span class="p">(</span><span class="n">lat_aligned</span><span class="p">,</span> <span class="n">vel_raw</span><span class="p">)</span>
 
@@ -482,12 +630,13 @@
         <span class="n">lon_trimmed</span> <span class="o">=</span> <span class="n">lon_aligned</span><span class="o">.</span><span class="n">value_np</span>
         <span class="n">lat_trimmed</span> <span class="o">=</span> <span class="n">lat_aligned</span><span class="o">.</span><span class="n">value_np</span>
 
-    <span class="n">lat_filtered</span><span class="p">,</span> <span class="n">lon_filtered</span> <span class="o">=</span> <span class="n">_filter_gps_bounds</span><span class="p">(</span>
-        <span class="n">lat_trimmed</span><span class="p">,</span> <span class="n">lon_trimmed</span><span class="p">,</span> <span class="n">gps_map_config</span>
-    <span class="p">)</span>
+    <span class="c1"># Filter outliers</span>
+    <span class="n">cartesian_mask</span> <span class="o">=</span> <span class="n">filter_gps_cartesian</span><span class="p">(</span><span class="n">lat_trimmed</span><span class="p">,</span> <span class="n">lon_trimmed</span><span class="p">,</span> <span class="n">gps_map_config</span><span class="p">)</span>
+    <span class="n">lat_filtered</span> <span class="o">=</span> <span class="n">lat_trimmed</span><span class="p">[</span><span class="n">cartesian_mask</span><span class="p">]</span>
+    <span class="n">lon_filtered</span> <span class="o">=</span> <span class="n">lon_trimmed</span><span class="p">[</span><span class="n">cartesian_mask</span><span class="p">]</span>
 
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">lat_filtered</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No GPS points remain after bounds filtering, skip graphing&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No GPS points remain after outlier filtering, skip graphing&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">None</span>
 
     <span class="n">fig</span> <span class="o">=</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">()</span>

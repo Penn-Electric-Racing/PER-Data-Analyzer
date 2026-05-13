@@ -311,21 +311,21 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_bin_timestamps</span><span class="p">(</span>
-    <span class="n">timestamps_ms</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">],</span>
-    <span class="n">t_min</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-    <span class="n">bucket_size_ms</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">timestamps_s</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
+    <span class="n">t_min</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">bucket_size_s</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">n_buckets</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Count timestamps falling into each fixed-width time bucket.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    timestamps_ms : npt.NDArray[np.int64]</span>
-<span class="sd">        int64 array of event timestamps in milliseconds.</span>
-<span class="sd">    t_min : int</span>
-<span class="sd">        Start of the first bucket (ms).</span>
-<span class="sd">    bucket_size_ms : int</span>
-<span class="sd">        Width of each bucket (ms).</span>
+<span class="sd">    timestamps_s : npt.NDArray[np.float64]</span>
+<span class="sd">        float64 array of event timestamps in seconds.</span>
+<span class="sd">    t_min : float</span>
+<span class="sd">        Start of the first bucket (seconds).</span>
+<span class="sd">    bucket_size_s : float</span>
+<span class="sd">        Width of each bucket (seconds).</span>
 <span class="sd">    n_buckets : int</span>
 <span class="sd">        Total number of buckets.</span>
 
@@ -333,19 +333,21 @@
 <span class="sd">    -------</span>
 <span class="sd">    int64 array of length ``n_buckets`` with per-bucket counts.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">timestamps_ms</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">timestamps_s</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_buckets</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
-    <span class="n">indices</span> <span class="o">=</span> <span class="p">((</span><span class="n">timestamps_ms</span> <span class="o">-</span> <span class="n">t_min</span><span class="p">)</span> <span class="o">//</span> <span class="n">bucket_size_ms</span><span class="p">)</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_buckets</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">indices</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">intp</span><span class="p">),</span> <span class="n">minlength</span><span class="o">=</span><span class="n">n_buckets</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+    <span class="n">indices</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="p">((</span><span class="n">timestamps_s</span> <span class="o">-</span> <span class="n">t_min</span><span class="p">)</span> <span class="o">/</span> <span class="n">bucket_size_s</span><span class="p">)</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_buckets</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">intp</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">indices</span><span class="p">,</span> <span class="n">minlength</span><span class="o">=</span><span class="n">n_buckets</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="plot_diff_bars">
 <a class="viewcode-back" href="../../../_autosummary/perda.plotting.diff_plotter.html#perda.plotting.diff_plotter.plot_diff_bars">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">plot_diff_bars</span><span class="p">(</span>
-    <span class="n">base_extra_ts</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">],</span>
-    <span class="n">incom_extra_ts</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">],</span>
-    <span class="n">value_mismatch_ts</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">],</span>
-    <span class="n">total_present_ts</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">],</span>
+    <span class="n">base_extra_ts</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
+    <span class="n">incom_extra_ts</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
+    <span class="n">value_mismatch_ts</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
+    <span class="n">total_present_ts</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="s2">&quot;Diff Counts Over Time (bucketed)&quot;</span><span class="p">,</span>
     <span class="n">y_axis_title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="s2">&quot;Event Count&quot;</span><span class="p">,</span>
     <span class="n">show_legend</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
@@ -362,13 +364,13 @@
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    base_extra_ts:</span>
-<span class="sd">        Timestamps (ms) of datapoints present only in the base run.</span>
+<span class="sd">        Timestamps (seconds) of datapoints present only in the base run.</span>
 <span class="sd">    incom_extra_ts:</span>
-<span class="sd">        Timestamps (ms) of datapoints present only in the incoming run.</span>
+<span class="sd">        Timestamps (seconds) of datapoints present only in the incoming run.</span>
 <span class="sd">    value_mismatch_ts:</span>
-<span class="sd">        Timestamps (ms) of matched points whose values differ.</span>
+<span class="sd">        Timestamps (seconds) of matched points whose values differ.</span>
 <span class="sd">    total_present_ts:</span>
-<span class="sd">        Timestamps (ms) of all datapoints seen in either run.</span>
+<span class="sd">        Timestamps (seconds) of all datapoints seen in either run.</span>
 <span class="sd">    title:</span>
 <span class="sd">        Plot title.</span>
 <span class="sd">    y_axis_title:</span>
@@ -390,21 +392,21 @@
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No diff events to plot.&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">()</span>
 
-    <span class="n">bucket_size_ms</span> <span class="o">=</span> <span class="n">diff_plot_config</span><span class="o">.</span><span class="n">bucket_size_ms</span>
-    <span class="n">t_min</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">total_present_ts</span><span class="o">.</span><span class="n">min</span><span class="p">())</span>
-    <span class="n">t_max</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">total_present_ts</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>
-    <span class="n">n_buckets</span> <span class="o">=</span> <span class="nb">max</span><span class="p">((</span><span class="n">t_max</span> <span class="o">-</span> <span class="n">t_min</span><span class="p">)</span> <span class="o">//</span> <span class="n">bucket_size_ms</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">bucket_size_s</span> <span class="o">=</span> <span class="n">diff_plot_config</span><span class="o">.</span><span class="n">bucket_size_s</span>
+    <span class="n">t_min</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">total_present_ts</span><span class="o">.</span><span class="n">min</span><span class="p">())</span>
+    <span class="n">t_max</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">total_present_ts</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>
+    <span class="n">n_buckets</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">int</span><span class="p">((</span><span class="n">t_max</span> <span class="o">-</span> <span class="n">t_min</span><span class="p">)</span> <span class="o">/</span> <span class="n">bucket_size_s</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 
     <span class="n">midpoints_s</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n_buckets</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span> <span class="o">*</span> <span class="n">bucket_size_ms</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n_buckets</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span> <span class="o">*</span> <span class="n">bucket_size_s</span>
         <span class="o">+</span> <span class="n">t_min</span>
-        <span class="o">+</span> <span class="n">bucket_size_ms</span> <span class="o">*</span> <span class="mf">0.5</span>
-    <span class="p">)</span> <span class="o">/</span> <span class="mf">1000.0</span>
+        <span class="o">+</span> <span class="n">bucket_size_s</span> <span class="o">*</span> <span class="mf">0.5</span>
+    <span class="p">)</span>
 
-    <span class="n">total_counts</span> <span class="o">=</span> <span class="n">_bin_timestamps</span><span class="p">(</span><span class="n">total_present_ts</span><span class="p">,</span> <span class="n">t_min</span><span class="p">,</span> <span class="n">bucket_size_ms</span><span class="p">,</span> <span class="n">n_buckets</span><span class="p">)</span>
-    <span class="n">base_counts</span> <span class="o">=</span> <span class="n">_bin_timestamps</span><span class="p">(</span><span class="n">base_extra_ts</span><span class="p">,</span> <span class="n">t_min</span><span class="p">,</span> <span class="n">bucket_size_ms</span><span class="p">,</span> <span class="n">n_buckets</span><span class="p">)</span>
-    <span class="n">incom_counts</span> <span class="o">=</span> <span class="n">_bin_timestamps</span><span class="p">(</span><span class="n">incom_extra_ts</span><span class="p">,</span> <span class="n">t_min</span><span class="p">,</span> <span class="n">bucket_size_ms</span><span class="p">,</span> <span class="n">n_buckets</span><span class="p">)</span>
-    <span class="n">diff_counts</span> <span class="o">=</span> <span class="n">_bin_timestamps</span><span class="p">(</span><span class="n">value_mismatch_ts</span><span class="p">,</span> <span class="n">t_min</span><span class="p">,</span> <span class="n">bucket_size_ms</span><span class="p">,</span> <span class="n">n_buckets</span><span class="p">)</span>
+    <span class="n">total_counts</span> <span class="o">=</span> <span class="n">_bin_timestamps</span><span class="p">(</span><span class="n">total_present_ts</span><span class="p">,</span> <span class="n">t_min</span><span class="p">,</span> <span class="n">bucket_size_s</span><span class="p">,</span> <span class="n">n_buckets</span><span class="p">)</span>
+    <span class="n">base_counts</span> <span class="o">=</span> <span class="n">_bin_timestamps</span><span class="p">(</span><span class="n">base_extra_ts</span><span class="p">,</span> <span class="n">t_min</span><span class="p">,</span> <span class="n">bucket_size_s</span><span class="p">,</span> <span class="n">n_buckets</span><span class="p">)</span>
+    <span class="n">incom_counts</span> <span class="o">=</span> <span class="n">_bin_timestamps</span><span class="p">(</span><span class="n">incom_extra_ts</span><span class="p">,</span> <span class="n">t_min</span><span class="p">,</span> <span class="n">bucket_size_s</span><span class="p">,</span> <span class="n">n_buckets</span><span class="p">)</span>
+    <span class="n">diff_counts</span> <span class="o">=</span> <span class="n">_bin_timestamps</span><span class="p">(</span><span class="n">value_mismatch_ts</span><span class="p">,</span> <span class="n">t_min</span><span class="p">,</span> <span class="n">bucket_size_s</span><span class="p">,</span> <span class="n">n_buckets</span><span class="p">)</span>
 
     <span class="n">fig</span> <span class="o">=</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">()</span>
 
