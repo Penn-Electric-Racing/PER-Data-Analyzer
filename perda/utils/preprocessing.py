@@ -68,26 +68,23 @@ def patch_ned_velocity(data: SingleRunData) -> SingleRunData:
         [data[VECTORNAV_BODY_VEL_Y], data[VECTORNAV_BODY_VEL_Z], data[VECTORNAV_YAW]],
     )
 
-    vel_n = vel_n1.value_np
-    vel_e = vel_e1.value_np
-    vel_d = vel_d1.value_np
     yaw_rad = np.radians(yaw_deg.value_np)
 
     data["velN"] = DataInstance(
         timestamp_np=vel_n1.timestamp_np,
-        value_np=vel_n.copy(),
+        value_np=vel_n1.value_np.copy(),
         label="NED North velocity (raw)",
         cpp_name="velN",
     )
     data["velE"] = DataInstance(
         timestamp_np=vel_e1.timestamp_np,
-        value_np=vel_e.copy(),
+        value_np=vel_e1.value_np.copy(),
         label="NED East velocity (raw)",
         cpp_name="velE",
     )
     data["velD"] = DataInstance(
         timestamp_np=vel_d1.timestamp_np,
-        value_np=vel_d.copy(),
+        value_np=vel_d1.value_np.copy(),
         label="NED Down velocity (raw)",
         cpp_name="velD",
     )
@@ -96,20 +93,20 @@ def patch_ned_velocity(data: SingleRunData) -> SingleRunData:
     sin_y = np.sin(yaw_rad)
     data[VECTORNAV_BODY_VEL_X] = DataInstance(
         timestamp_np=vel_n1.timestamp_np,
-        value_np=vel_n * cos_y + vel_e * sin_y,
+        value_np=vel_n1.value_np * cos_y + vel_e1.value_np * sin_y,
         label=data[VECTORNAV_BODY_VEL_X].label,
         cpp_name=VECTORNAV_BODY_VEL_X,
     )  # forward
     data[VECTORNAV_BODY_VEL_Y] = DataInstance(
         timestamp_np=vel_e1.timestamp_np,
-        value_np=-vel_n * sin_y + vel_e * cos_y,
+        value_np=-vel_n1.value_np * sin_y + vel_e1.value_np * cos_y,
         label=data[VECTORNAV_BODY_VEL_Y].label,
         cpp_name=VECTORNAV_BODY_VEL_Y,
     )  # right
     # vel_z (down) is identical in NED and FRD — no change needed
 
     print(
-        f"patch_ned_velocity: preserved raw NED in velN/velE/velD, rotated {len(vel_n)} points to body frame"
+        f"patch_ned_velocity: preserved raw NED in velN/velE/velD, rotated {len(vel_n1)} points to body frame"
     )
     return data
 

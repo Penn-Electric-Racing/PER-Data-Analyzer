@@ -107,16 +107,18 @@ class SingleRunData(BaseModel):
         cpp_name : str
             C++ variable name key for the new variable.
         di : DataInstance
-            DataInstance to insert. Must have non-None ``label`` and ``cpp_name``.
+            DataInstance to insert.
         """
-        if di.label is None:
-            raise ValueError("DataInstance.label must be set before calling add().")
-        if di.cpp_name is None:
-            raise ValueError("DataInstance.cpp_name must be set before calling add().")
         if cpp_name in self:
             raise KeyError(f"'{cpp_name}' already exists; use replace() to overwrite.")
 
+        if di.cpp_name != cpp_name:
+            print(f"Warning: replacing DataInstance.cpp_name with {cpp_name}")
+
         synthetic_id = -(len(self.id_to_instance) + 1)
+        if di.var_id != synthetic_id:
+            print(f"Warning: replacing DataInstance.var_id with {synthetic_id}")
+
         stored = DataInstance(
             timestamp_np=di.timestamp_np,
             value_np=di.value_np,
@@ -127,7 +129,7 @@ class SingleRunData(BaseModel):
         self.id_to_instance[synthetic_id] = stored
         self.cpp_name_to_id[cpp_name] = synthetic_id
         self.id_to_cpp_name[synthetic_id] = cpp_name
-        self.id_to_descript[synthetic_id] = di.label
+        self.id_to_descript[synthetic_id] = di.label or ""
 
     def replace(self, cpp_name: str, di: DataInstance) -> None:
         """
@@ -138,15 +140,8 @@ class SingleRunData(BaseModel):
         cpp_name : str
             C++ variable name of the variable to replace.
         di : DataInstance
-            DataInstance whose ``value_np`` (and optionally updated timestamps) replaces the stored one.
-            Must have non-None ``label`` and ``cpp_name``.
+            DataInstance whose ``value_np`` that replaces the stored one.
         """
-        if di.label is None:
-            raise ValueError("DataInstance.label must be set before calling replace().")
-        if di.cpp_name is None:
-            raise ValueError(
-                "DataInstance.cpp_name must be set before calling replace()."
-            )
         if cpp_name not in self:
             raise KeyError(
                 f"'{cpp_name}' not found; use add() to insert a new variable."
@@ -154,6 +149,14 @@ class SingleRunData(BaseModel):
 
         var_id = self.cpp_name_to_id[cpp_name]
         old = self.id_to_instance[var_id]
+
+        if di.cpp_name != cpp_name:
+            print(f"Warning: retaining old DataInstance.cpp_name {cpp_name}")
+        if di.var_id != var_id:
+            print(f"Warning: retaining old DataInstance.var_id {var_id}")
+        if di.label != old.label:
+            print(f"Warning: retaining old DataInstance.label {old.label}")
+
         self.id_to_instance[var_id] = DataInstance(
             timestamp_np=di.timestamp_np,
             value_np=di.value_np,
