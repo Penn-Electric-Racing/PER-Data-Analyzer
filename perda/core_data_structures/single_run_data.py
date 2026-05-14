@@ -75,6 +75,93 @@ class SingleRunData(BaseModel):
         else:
             raise ValueError("Input must be a string, int, or DataInstance.")
 
+    def __setitem__(self, cpp_name: str, di: DataInstance) -> None:
+        """
+        Add or replace a variable using dictionary-style assignment.
+
+        Dispatches to ``replace`` if ``cpp_name`` already exists, else ``add``.
+
+        Parameters
+        ----------
+        cpp_name : str
+            C++ variable name to insert or overwrite.
+        di : DataInstance
+            DataInstance to store. Must have non-None ``label`` and ``cpp_name``.
+
+        Examples
+        --------
+        >>> data["my.new.var"] = DataInstance(timestamp_np=ts, value_np=vals, label="My var", cpp_name="my.new.var")
+        >>> data["my.existing.var"] = updated_di
+        """
+        if cpp_name in self:
+            self.replace(cpp_name, di)
+        else:
+            self.add(cpp_name, di)
+
+    def add(self, cpp_name: str, di: DataInstance) -> None:
+        """
+        Insert a new derived DataInstance using a synthetic negative ID.
+
+        Parameters
+        ----------
+        cpp_name : str
+            C++ variable name key for the new variable.
+        di : DataInstance
+            DataInstance to insert. Must have non-None ``label`` and ``cpp_name``.
+        """
+        if di.label is None:
+            raise ValueError("DataInstance.label must be set before calling add().")
+        if di.cpp_name is None:
+            raise ValueError("DataInstance.cpp_name must be set before calling add().")
+        if cpp_name in self:
+            raise KeyError(f"'{cpp_name}' already exists; use replace() to overwrite.")
+
+        synthetic_id = -(len(self.id_to_instance) + 1)
+        stored = DataInstance(
+            timestamp_np=di.timestamp_np,
+            value_np=di.value_np,
+            label=di.label,
+            var_id=synthetic_id,
+            cpp_name=cpp_name,
+        )
+        self.id_to_instance[synthetic_id] = stored
+        self.cpp_name_to_id[cpp_name] = synthetic_id
+        self.id_to_cpp_name[synthetic_id] = cpp_name
+        self.id_to_descript[synthetic_id] = di.label
+
+    def replace(self, cpp_name: str, di: DataInstance) -> None:
+        """
+        Overwrite the values of an existing variable in-place.
+
+        Parameters
+        ----------
+        cpp_name : str
+            C++ variable name of the variable to replace.
+        di : DataInstance
+            DataInstance whose ``value_np`` (and optionally updated timestamps) replaces the stored one.
+            Must have non-None ``label`` and ``cpp_name``.
+        """
+        if di.label is None:
+            raise ValueError("DataInstance.label must be set before calling replace().")
+        if di.cpp_name is None:
+            raise ValueError(
+                "DataInstance.cpp_name must be set before calling replace()."
+            )
+        if cpp_name not in self:
+            raise KeyError(
+                f"'{cpp_name}' not found; use add() to insert a new variable."
+            )
+
+        var_id = self.cpp_name_to_id[cpp_name]
+        old = self.id_to_instance[var_id]
+        self.id_to_instance[var_id] = DataInstance(
+            timestamp_np=di.timestamp_np,
+            value_np=di.value_np,
+            label=di.label,
+            var_id=old.var_id,
+            cpp_name=old.cpp_name,
+        )
+
     def __contains__(self, input_var_id_name: Union[str, int]) -> bool:
         """
         Check if variable ID or variable name exists in the data.
