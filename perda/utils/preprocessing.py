@@ -39,41 +39,6 @@ DEFAULT_STEERING_CALIBRATION: SteeringCalibration = (
 PreprocessingStep = Callable[[SingleRunData], SingleRunData]
 
 
-def _replace(data: SingleRunData, cpp_name: str, new_values: NDArray[float64]) -> None:
-    """Overwrite the value_np of an existing DataInstance in-place (mutates dict)."""
-    var_id = data.cpp_name_to_id[cpp_name]
-    old = data.id_to_instance[var_id]
-    data.id_to_instance[var_id] = DataInstance(
-        timestamp_np=old.timestamp_np,
-        value_np=new_values,
-        label=old.label,
-        var_id=old.var_id,
-        cpp_name=old.cpp_name,
-    )
-
-
-def _add(
-    data: SingleRunData,
-    cpp_name: str,
-    label: str,
-    timestamp_np: NDArray[float64],
-    value_np: NDArray[float64],
-) -> None:
-    """Insert a new derived DataInstance using a synthetic negative ID."""
-    synthetic_id = -(len(data.id_to_instance) + 1)
-    di = DataInstance(
-        timestamp_np=timestamp_np,
-        value_np=value_np,
-        label=label,
-        var_id=synthetic_id,
-        cpp_name=cpp_name,
-    )
-    data.id_to_instance[synthetic_id] = di
-    data.cpp_name_to_id[cpp_name] = synthetic_id
-    data.id_to_cpp_name[synthetic_id] = cpp_name
-    data.id_to_descript[synthetic_id] = label
-
-
 def patch_ned_velocity(data: SingleRunData) -> SingleRunData:
     """Correct a VectorNav bug where velocityBody.x/y/z contains NED instead of body-frame velocities.
 
@@ -103,23 +68,45 @@ def patch_ned_velocity(data: SingleRunData) -> SingleRunData:
         [data[VECTORNAV_BODY_VEL_Y], data[VECTORNAV_BODY_VEL_Z], data[VECTORNAV_YAW]],
     )
 
-    vel_n = vel_n1.value_np
-    vel_e = vel_e1.value_np
-    vel_d = vel_d1.value_np
     yaw_rad = np.radians(yaw_deg.value_np)
 
-    _add(data, "velN", "NED North velocity (raw)", vel_n1.timestamp_np, vel_n.copy())
-    _add(data, "velE", "NED East velocity (raw)", vel_e1.timestamp_np, vel_e.copy())
-    _add(data, "velD", "NED Down velocity (raw)", vel_d1.timestamp_np, vel_d.copy())
+    data["velN"] = DataInstance(
+        timestamp_np=vel_n1.timestamp_np,
+        value_np=vel_n1.value_np.copy(),
+        label="NED North velocity (raw)",
+        cpp_name="velN",
+    )
+    data["velE"] = DataInstance(
+        timestamp_np=vel_e1.timestamp_np,
+        value_np=vel_e1.value_np.copy(),
+        label="NED East velocity (raw)",
+        cpp_name="velE",
+    )
+    data["velD"] = DataInstance(
+        timestamp_np=vel_d1.timestamp_np,
+        value_np=vel_d1.value_np.copy(),
+        label="NED Down velocity (raw)",
+        cpp_name="velD",
+    )
 
     cos_y = np.cos(yaw_rad)
     sin_y = np.sin(yaw_rad)
-    _replace(data, VECTORNAV_BODY_VEL_X, vel_n * cos_y + vel_e * sin_y)  # forward
-    _replace(data, VECTORNAV_BODY_VEL_Y, -vel_n * sin_y + vel_e * cos_y)  # right
+    data[VECTORNAV_BODY_VEL_X] = DataInstance(
+        timestamp_np=vel_n1.timestamp_np,
+        value_np=vel_n1.value_np * cos_y + vel_e1.value_np * sin_y,
+        label=data[VECTORNAV_BODY_VEL_X].label,
+        cpp_name=VECTORNAV_BODY_VEL_X,
+    )  # forward
+    data[VECTORNAV_BODY_VEL_Y] = DataInstance(
+        timestamp_np=vel_e1.timestamp_np,
+        value_np=-vel_n1.value_np * sin_y + vel_e1.value_np * cos_y,
+        label=data[VECTORNAV_BODY_VEL_Y].label,
+        cpp_name=VECTORNAV_BODY_VEL_Y,
+    )  # right
     # vel_z (down) is identical in NED and FRD — no change needed
 
     print(
-        f"patch_ned_velocity: preserved raw NED in velN/velE/velD, rotated {len(vel_n)} points to body frame"
+        f"patch_ned_velocity: preserved raw NED in velN/velE/velD, rotated {len(vel_n1)} points to body frame"
     )
     return data
 
@@ -147,14 +134,18 @@ def convert_wheelspeeds_to_m_per_s(data: SingleRunData) -> SingleRunData:
         di = data[col]
         backup_name = col + "_mph"
         if backup_name not in data:
-            _add(
-                data,
-                backup_name,
-                (di.label or col) + " (mph backup)",
-                di.timestamp_np,
-                di.value_np.copy(),
+            data[backup_name] = DataInstance(
+                timestamp_np=di.timestamp_np,
+                value_np=di.value_np.copy(),
+                label=(di.label or col) + " (mph backup)",
+                cpp_name=backup_name,
             )
-        _replace(data, col, mph_to_m_per_s(di.value_np))
+        data[col] = DataInstance(
+            timestamp_np=di.timestamp_np,
+            value_np=mph_to_m_per_s(di.value_np),
+            label=di.label,
+            cpp_name=col,
+        )
 
     print(
         f"convert_wheelspeeds_to_m_per_s: converted {len(cols)} channels mph → m/s, backups in *_mph"
@@ -182,27 +173,30 @@ def correct_motor_data(data: SingleRunData) -> SingleRunData:
 
     backup_name = MOTOR_RPM + "_raw"
     if backup_name not in data:
-        _add(
-            data,
-            backup_name,
-            "Motor RPM raw (pre-flip)",
-            di.timestamp_np,
-            raw_rpm.copy(),
+        data[backup_name] = DataInstance(
+            timestamp_np=di.timestamp_np,
+            value_np=raw_rpm.copy(),
+            label="Motor RPM raw (pre-flip)",
+            cpp_name=backup_name,
         )
 
     flipped = -raw_rpm
-    _replace(data, MOTOR_RPM, flipped)
+    data[MOTOR_RPM] = DataInstance(
+        timestamp_np=di.timestamp_np,
+        value_np=flipped,
+        label=di.label,
+        cpp_name=MOTOR_RPM,
+    )
 
     tire_radius_m = in_to_m(TIRE_RADIUS_IN)
     wheel_speed: NDArray[float64] = (
         flipped * 2.0 * np.pi * tire_radius_m / (60.0 * GEAR_RATIO)
     )
-    _add(
-        data,
-        MOTOR_WHEELSPEED,
-        "Driven wheel speed from motor RPM (m/s)",
-        di.timestamp_np,
-        wheel_speed,
+    data[MOTOR_WHEELSPEED] = DataInstance(
+        timestamp_np=di.timestamp_np,
+        value_np=wheel_speed,
+        label="Driven wheel speed from motor RPM (m/s)",
+        cpp_name=MOTOR_WHEELSPEED,
     )
 
     print(
@@ -275,24 +269,19 @@ class CorrectSteeringAngleLambda:
         backup_name = STEERING_ANGLE + "_original"
         if STEERING_ANGLE in data and backup_name not in data:
             orig = data[STEERING_ANGLE]
-            _add(
-                data,
-                backup_name,
-                (orig.label or STEERING_ANGLE) + " (original)",
-                orig.timestamp_np,
-                orig.value_np.copy(),
+            data[backup_name] = DataInstance(
+                timestamp_np=orig.timestamp_np,
+                value_np=orig.value_np.copy(),
+                label=(orig.label or STEERING_ANGLE) + " (original)",
+                cpp_name=backup_name,
             )
 
-        if STEERING_ANGLE in data:
-            _replace(data, STEERING_ANGLE, recomputed)
-        else:
-            _add(
-                data,
-                STEERING_ANGLE,
-                "Steering angle recomputed from raw voltage (deg)",
-                raw_di.timestamp_np,
-                recomputed,
-            )
+        data[STEERING_ANGLE] = DataInstance(
+            timestamp_np=raw_di.timestamp_np,
+            value_np=recomputed,
+            label="Steering angle recomputed from raw voltage (deg)",
+            cpp_name=STEERING_ANGLE,
+        )
 
         cal_str = ", ".join(f"({v:.2f}V, {a:+.1f}°)" for v, a in self.pts)
         print(
@@ -302,6 +291,9 @@ class CorrectSteeringAngleLambda:
         return data
 
 
+# This is the global callable that should actually be used in the preprocessing pipeline.
+# Either pass it directly, or with a custom calibration correct_steering_angle(calibration=...)
+# This should be treated like a function that supports partial application.
 correct_steering_angle = CorrectSteeringAngleLambda()
 
 
