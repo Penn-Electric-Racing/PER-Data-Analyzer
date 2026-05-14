@@ -14,6 +14,9 @@ dynamic = ["dependencies"]
 semantic = [
     "sentence-transformers",
 ]
+mcp = [
+    "fastmcp",
+]
 notebook = [
     "anywidget",
     "ipykernel",
@@ -34,6 +37,7 @@ docs = [
     # the necessary version is inferred from these extensions
 ]
 full = [
+    "perda[mcp]",
     "perda[semantic]",
     "perda[notebook]",
     "perda[docs]",
