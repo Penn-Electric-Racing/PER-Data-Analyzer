@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>perda.core_data_structures.resampling &#8212; PERDA</title>
+    <title>perda.core_data_structures.split_helpers &#8212; PERDA</title>
   
   
   
@@ -48,11 +48,11 @@
     <script src="../_static/copybutton.js?v=f281be69"></script>
     <script src="../_static/design-tabs.js?v=f930bc37"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/perda.core_data_structures.resampling';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/perda.core_data_structures.split_helpers';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="perda.core_data_structures.single_run_data" href="perda.core_data_structures.single_run_data.html" />
-    <link rel="prev" title="perda.core_data_structures.joins" href="perda.core_data_structures.joins.html" />
+    <link rel="next" title="perda.live" href="perda.live.html" />
+    <link rel="prev" title="perda.core_data_structures.single_run_data" href="perda.core_data_structures.single_run_data.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
@@ -270,9 +270,9 @@
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.data_instance.html">perda.core_data_structures.data_instance</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.deduplication.html">perda.core_data_structures.deduplication</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.joins.html">perda.core_data_structures.joins</a></li>
-<li class="toctree-l3 current active"><a class="current reference internal" href="#">perda.core_data_structures.resampling</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.resampling.html">perda.core_data_structures.resampling</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.single_run_data.html">perda.core_data_structures.single_run_data</a></li>
-<li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.split_helpers.html">perda.core_data_structures.split_helpers</a></li>
+<li class="toctree-l3 current active"><a class="current reference internal" href="#">perda.core_data_structures.split_helpers</a></li>
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="perda.live.html">perda.live</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -359,7 +359,7 @@
     
     <li class="breadcrumb-item"><a href="perda.core_data_structures.html" class="nav-link">perda.core_data_structures</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">perda.core_data_structures.resampling</span></li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">perda.core_data_structures.split_helpers</span></li>
   </ul>
 </nav>
 </div>
@@ -376,58 +376,45 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="module-perda.core_data_structures.resampling">
-<span id="perda-core-data-structures-resampling"></span><h1>perda.core_data_structures.resampling<a class="headerlink" href="#module-perda.core_data_structures.resampling" title="Link to this heading">#</a></h1>
-<dl class="py class">
-<dt class="sig sig-object py" id="perda.core_data_structures.resampling.ResampleMethod">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">perda.core_data_structures.resampling.</span></span><span class="sig-name descname"><span class="pre">ResampleMethod</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/core_data_structures/resampling.html#ResampleMethod"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.core_data_structures.resampling.ResampleMethod" title="Link to this definition">#</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
-<p>Interpolation strategy used when aligning a series to a target timestamp grid.</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="perda.core_data_structures.resampling.ResampleMethod.CUBIC">
-<span class="sig-name descname"><span class="pre">CUBIC</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'cubic'</span></em><a class="headerlink" href="#perda.core_data_structures.resampling.ResampleMethod.CUBIC" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="perda.core_data_structures.resampling.ResampleMethod.LINEAR">
-<span class="sig-name descname"><span class="pre">LINEAR</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'linear'</span></em><a class="headerlink" href="#perda.core_data_structures.resampling.ResampleMethod.LINEAR" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="perda.core_data_structures.resampling.ResampleMethod.NEAREST">
-<span class="sig-name descname"><span class="pre">NEAREST</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'nearest'</span></em><a class="headerlink" href="#perda.core_data_structures.resampling.ResampleMethod.NEAREST" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="perda.core_data_structures.resampling.ResampleMethod.ZOH">
-<span class="sig-name descname"><span class="pre">ZOH</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'zoh'</span></em><a class="headerlink" href="#perda.core_data_structures.resampling.ResampleMethod.ZOH" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
+  <section id="module-perda.core_data_structures.split_helpers">
+<span id="perda-core-data-structures-split-helpers"></span><h1>perda.core_data_structures.split_helpers<a class="headerlink" href="#module-perda.core_data_structures.split_helpers" title="Link to this heading">#</a></h1>
 <dl class="py function">
-<dt class="sig sig-object py" id="perda.core_data_structures.resampling.resample_to_freq">
-<span class="sig-prename descclassname"><span class="pre">perda.core_data_structures.resampling.</span></span><span class="sig-name descname"><span class="pre">resample_to_freq</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">freq_hz</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp_divisor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">ResampleMethod.LINEAR</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/core_data_structures/resampling.html#resample_to_freq"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.core_data_structures.resampling.resample_to_freq" title="Link to this definition">#</a></dt>
-<dd><p>Resample a time series onto a uniform frequency grid.</p>
+<dt class="sig sig-object py" id="perda.core_data_structures.split_helpers.split_single_run_data">
+<span class="sig-prename descclassname"><span class="pre">perda.core_data_structures.split_helpers.</span></span><span class="sig-name descname"><span class="pre">split_single_run_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split_timestamps</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/core_data_structures/split_helpers.html#split_single_run_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.core_data_structures.split_helpers.split_single_run_data" title="Link to this definition">#</a></dt>
+<dd><p>Split a SingleRunData into segments defined by a list of boundary timestamps.</p>
+<p>Each consecutive pair of timestamps in <code class="docutils literal notranslate"><span class="pre">split_timestamps</span></code> defines one
+segment.  The result is keyed by 1-based segment number.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>ts</strong> (<em>NDArray</em>) – Source timestamps (int64)</p></li>
-<li><p><strong>val</strong> (<em>NDArray</em>) – Source values</p></li>
-<li><p><strong>freq_hz</strong> (<em>float</em>) – Target sampling frequency in Hz</p></li>
-<li><p><strong>timestamp_divisor</strong> (<em>float</em>) – Raw timestamp units per second (e.g. 1e6 for microseconds)</p></li>
-<li><p><strong>method</strong> (<a class="reference internal" href="#perda.core_data_structures.resampling.ResampleMethod" title="perda.core_data_structures.resampling.ResampleMethod"><em>ResampleMethod</em></a><em>, </em><em>optional</em>) – Interpolation method. Default is LINEAR.</p></li>
+<li><p><strong>data</strong> (<a class="reference internal" href="perda.core_data_structures.single_run_data.html#perda.core_data_structures.single_run_data.SingleRunData" title="perda.core_data_structures.single_run_data.SingleRunData"><em>SingleRunData</em></a>)</p></li>
+<li><p><strong>split_timestamps</strong> (<em>list</em><em>[</em><em>float</em><em>]</em>) – Ordered boundary timestamps in the same unit as data.timestamp_unit.
+Must contain at least 2 values.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">...</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">dtype</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code>(<code class="docutils literal notranslate"><span class="pre">_ScalarT</span></code>, bound= <code class="xref py py-class docutils literal notranslate"><span class="pre">generic</span></code>)]], <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">...</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">dtype</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code>(<code class="docutils literal notranslate"><span class="pre">_ScalarT</span></code>, bound= <code class="xref py py-class docutils literal notranslate"><span class="pre">generic</span></code>)]]]</span></p>
+<dd class="field-even"><p>List[<a class="reference internal" href="perda.core_data_structures.single_run_data.html#perda.core_data_structures.single_run_data.SingleRunData" title="perda.core_data_structures.single_run_data.SingleRunData">SingleRunData</a>]</p>
 </dd>
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p><ul class="simple">
-<li><p><strong>target_ts</strong> (<em>NDArray</em>) – Uniform timestamp grid (int64)</p></li>
-<li><p><strong>resampled_val</strong> (<em>NDArray</em>) – Values interpolated onto the uniform grid</p></li>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="perda.core_data_structures.split_helpers.trim_single_run_data">
+<span class="sig-prename descclassname"><span class="pre">perda.core_data_structures.split_helpers.</span></span><span class="sig-name descname"><span class="pre">trim_single_run_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts_start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts_end</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/core_data_structures/split_helpers.html#trim_single_run_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.core_data_structures.split_helpers.trim_single_run_data" title="Link to this definition">#</a></dt>
+<dd><p>Return a new SingleRunData with every variable trimmed to [ts_start, ts_end].</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<a class="reference internal" href="perda.core_data_structures.single_run_data.html#perda.core_data_structures.single_run_data.SingleRunData" title="perda.core_data_structures.single_run_data.SingleRunData"><em>SingleRunData</em></a>)</p></li>
+<li><p><strong>ts_start</strong> (<em>float</em>) – Timestamps in the same unit as data.timestamp_unit.</p></li>
+<li><p><strong>ts_end</strong> (<em>float</em>) – Timestamps in the same unit as data.timestamp_unit.</p></li>
 </ul>
-</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Fresh object; the original is not mutated.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="perda.core_data_structures.single_run_data.html#perda.core_data_structures.single_run_data.SingleRunData" title="perda.core_data_structures.single_run_data.SingleRunData">SingleRunData</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -445,20 +432,20 @@
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="perda.core_data_structures.joins.html"
+       href="perda.core_data_structures.single_run_data.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">perda.core_data_structures.joins</p>
+        <p class="prev-next-title">perda.core_data_structures.single_run_data</p>
       </div>
     </a>
     <a class="right-next"
-       href="perda.core_data_structures.single_run_data.html"
+       href="perda.live.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">perda.core_data_structures.single_run_data</p>
+        <p class="prev-next-title">perda.live</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -481,14 +468,8 @@
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.core_data_structures.resampling.ResampleMethod"><code class="docutils literal notranslate"><span class="pre">ResampleMethod</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.core_data_structures.resampling.ResampleMethod.CUBIC"><code class="docutils literal notranslate"><span class="pre">ResampleMethod.CUBIC</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.core_data_structures.resampling.ResampleMethod.LINEAR"><code class="docutils literal notranslate"><span class="pre">ResampleMethod.LINEAR</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.core_data_structures.resampling.ResampleMethod.NEAREST"><code class="docutils literal notranslate"><span class="pre">ResampleMethod.NEAREST</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.core_data_structures.resampling.ResampleMethod.ZOH"><code class="docutils literal notranslate"><span class="pre">ResampleMethod.ZOH</span></code></a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.core_data_structures.resampling.resample_to_freq"><code class="docutils literal notranslate"><span class="pre">resample_to_freq()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.core_data_structures.split_helpers.split_single_run_data"><code class="docutils literal notranslate"><span class="pre">split_single_run_data()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.core_data_structures.split_helpers.trim_single_run_data"><code class="docutils literal notranslate"><span class="pre">trim_single_run_data()</span></code></a></li>
 </ul>
   </nav></div>
 
@@ -496,7 +477,7 @@
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="../_sources/_autosummary/perda.core_data_structures.resampling.rst.txt"
+      <li><a href="../_sources/_autosummary/perda.core_data_structures.split_helpers.rst.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div></div>

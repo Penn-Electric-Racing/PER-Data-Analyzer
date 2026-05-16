@@ -18,3 +18,4 @@ perda.core\_data\_structures
    joins
    resampling
    single_run_data
+   split_helpers

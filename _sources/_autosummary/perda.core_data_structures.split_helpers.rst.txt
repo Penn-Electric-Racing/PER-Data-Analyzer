@@ -1,0 +1,8 @@
+perda.core\_data\_structures.split\_helpers
+===========================================
+
+.. automodule:: perda.core_data_structures.split_helpers
+   :members:
+   :undoc-members:
+   :show-inheritance:
+

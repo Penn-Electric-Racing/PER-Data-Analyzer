@@ -332,7 +332,7 @@
 <span class="n">STEERING_RAW</span> <span class="o">=</span> <span class="s2">&quot;ludwig.steeringWheel.raw&quot;</span>
 <span class="n">STEERING_ANGLE</span> <span class="o">=</span> <span class="s2">&quot;ludwig.steeringWheel.angle&quot;</span>
 
-<span class="c1"># Default 3-point voltage→angle calibration for the steering pot.</span>
+<span class="c1"># Default 3-point voltage-&gt;angle calibration for the steering pot.</span>
 <span class="n">SteeringCalibration</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="o">...</span><span class="p">]</span>
 <span class="n">DEFAULT_STEERING_CALIBRATION</span><span class="p">:</span> <span class="n">SteeringCalibration</span> <span class="o">=</span> <span class="p">(</span>
     <span class="p">(</span><span class="mf">1.86</span><span class="p">,</span> <span class="o">-</span><span class="mf">97.0</span><span class="p">),</span>  <span class="c1"># max left</span>
@@ -458,7 +458,7 @@
         <span class="p">)</span>
 
     <span class="nb">print</span><span class="p">(</span>
-        <span class="sa">f</span><span class="s2">&quot;convert_wheelspeeds_to_m_per_s: converted </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span><span class="si">}</span><span class="s2"> channels mph → m/s, backups in *_mph&quot;</span>
+        <span class="sa">f</span><span class="s2">&quot;convert_wheelspeeds_to_m_per_s: converted </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span><span class="si">}</span><span class="s2"> channels mph -&gt; m/s, backups in *_mph&quot;</span>
     <span class="p">)</span>
     <span class="k">return</span> <span class="n">data</span></div>
 
@@ -627,7 +627,7 @@
 <span class="sd">    data : SingleRunData</span>
 <span class="sd">        Parsed run data to preprocess.</span>
 <span class="sd">    steps : list of PreprocessingStep</span>
-<span class="sd">        Ordered list of ``SingleRunData → SingleRunData`` callables to apply.</span>
+<span class="sd">        Ordered list of ``SingleRunData -&gt; SingleRunData`` callables to apply.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>

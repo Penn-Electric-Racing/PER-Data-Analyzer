@@ -272,6 +272,7 @@
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.joins.html">perda.core_data_structures.joins</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.resampling.html">perda.core_data_structures.resampling</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.single_run_data.html">perda.core_data_structures.single_run_data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.split_helpers.html">perda.core_data_structures.split_helpers</a></li>
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="perda.live.html">perda.live</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -400,7 +401,7 @@ rewrites the angle channel in-place, preserving the original as
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> (<a class="reference internal" href="perda.core_data_structures.single_run_data.html#perda.core_data_structures.single_run_data.SingleRunData" title="perda.core_data_structures.single_run_data.SingleRunData"><em>SingleRunData</em></a>) – Parsed run data to preprocess.</p></li>
-<li><p><strong>steps</strong> (<em>list</em><em> of </em><em>PreprocessingStep</em>) – Ordered list of <code class="docutils literal notranslate"><span class="pre">SingleRunData</span> <span class="pre">→</span> <span class="pre">SingleRunData</span></code> callables to apply.</p></li>
+<li><p><strong>steps</strong> (<em>list</em><em> of </em><em>PreprocessingStep</em>) – Ordered list of <code class="docutils literal notranslate"><span class="pre">SingleRunData</span> <span class="pre">-&gt;</span> <span class="pre">SingleRunData</span></code> callables to apply.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>

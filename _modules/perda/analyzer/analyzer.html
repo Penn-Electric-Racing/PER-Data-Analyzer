@@ -389,7 +389,7 @@
 <span class="sd">            Maximum number of parsing errors before stopping. Default is 100.</span>
 <span class="sd">        preprocessing : list[PreprocessingStep] | None, optional</span>
 <span class="sd">            Ordered list of post-parse preprocessing steps to apply. Each step</span>
-<span class="sd">            is a ``SingleRunData → SingleRunData`` callable. Steps are skipped</span>
+<span class="sd">            is a ``SingleRunData -&gt; SingleRunData`` callable. Steps are skipped</span>
 <span class="sd">            with a warning if required variables are absent. Default is None.</span>
 
 <span class="sd">        Examples</span>
@@ -525,7 +525,7 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">concat_boundaries</span><span class="p">:</span>
             <span class="n">vlines</span> <span class="o">=</span> <span class="p">[</span><span class="n">_to_seconds</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">unit</span><span class="p">)</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">concat_boundaries</span><span class="p">]</span>
 
-        <span class="c1"># Apply time range filter if specified (convert seconds → raw units for trim)</span>
+        <span class="c1"># Apply time range filter if specified (convert seconds -&gt; raw units for trim)</span>
         <span class="k">if</span> <span class="n">ts_start</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">ts_end</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">start_raw</span> <span class="o">=</span> <span class="n">_from_seconds</span><span class="p">(</span><span class="n">ts_start</span><span class="p">,</span> <span class="n">unit</span><span class="p">)</span> <span class="k">if</span> <span class="n">ts_start</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
             <span class="n">end_raw</span> <span class="o">=</span> <span class="n">_from_seconds</span><span class="p">(</span><span class="n">ts_end</span><span class="p">,</span> <span class="n">unit</span><span class="p">)</span> <span class="k">if</span> <span class="n">ts_end</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
