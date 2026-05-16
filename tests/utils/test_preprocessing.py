@@ -10,14 +10,14 @@ from perda.utils.preprocessing import *
 
 
 def test_ned_velocity_rotation_at_zero_yaw(ned_srd):
-    # First point: velN=1, velE=0, yaw=0 → vx=1, vy=0
+    # First point: velN=1, velE=0, yaw=0 -> vx=1, vy=0
     result = apply_preprocessing(ned_srd, [patch_ned_velocity])
     np.testing.assert_almost_equal(result["pcm.vnav.velocityBody.x"].value_np[0], 1.0)
     np.testing.assert_almost_equal(result["pcm.vnav.velocityBody.y"].value_np[0], 0.0)
 
 
 def test_ned_velocity_rotation_at_90_yaw(ned_srd):
-    # Second point: velN=0, velE=1, yaw=90 → vx=1, vy=0
+    # Second point: velN=0, velE=1, yaw=90 -> vx=1, vy=0
     result = apply_preprocessing(ned_srd, [patch_ned_velocity])
     np.testing.assert_almost_equal(result["pcm.vnav.velocityBody.x"].value_np[1], 1.0)
     np.testing.assert_almost_equal(result["pcm.vnav.velocityBody.y"].value_np[1], 0.0)

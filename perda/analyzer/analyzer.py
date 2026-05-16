@@ -82,7 +82,7 @@ class Analyzer:
             Maximum number of parsing errors before stopping. Default is 100.
         preprocessing : list[PreprocessingStep] | None, optional
             Ordered list of post-parse preprocessing steps to apply. Each step
-            is a ``SingleRunData → SingleRunData`` callable. Steps are skipped
+            is a ``SingleRunData -> SingleRunData`` callable. Steps are skipped
             with a warning if required variables are absent. Default is None.
 
         Examples
@@ -213,7 +213,7 @@ class Analyzer:
         if self.data.concat_boundaries:
             vlines = [_to_seconds(b, unit) for b in self.data.concat_boundaries]
 
-        # Apply time range filter if specified (convert seconds → raw units for trim)
+        # Apply time range filter if specified (convert seconds -> raw units for trim)
         if ts_start is not None or ts_end is not None:
             start_raw = _from_seconds(ts_start, unit) if ts_start is not None else None
             end_raw = _from_seconds(ts_end, unit) if ts_end is not None else None

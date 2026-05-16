@@ -29,7 +29,7 @@ def test_apply_sos_filter_preserves_nan_positions():
 
 def test_apply_sos_filter_returns_none_when_too_few_samples():
     sos = butter(4, 0.1, btype="low", output="sos")
-    # order=4 → min_samples = 3*(2*4+1) = 27; use only 2 valid points
+    # order=4 -> min_samples = 3*(2*4+1) = 27; use only 2 valid points
     signal = np.full(5, np.nan, dtype=np.float64)
     signal[0] = 1.0
     signal[1] = 1.0
@@ -87,7 +87,7 @@ def test_lowpass_list_input_returns_list(sine_di_factory):
 def test_lowpass_skips_when_cutoff_above_nyquist(sine_di_factory, capsys):
     """When cutoff >= Nyquist the original DataInstance is returned unchanged."""
     di = sine_di_factory(freq_hz=5.0)
-    # Default fs=200 Hz → Nyquist=100 Hz; use 150 Hz cutoff
+    # Default fs=200 Hz -> Nyquist=100 Hz; use 150 Hz cutoff
     result = lowpass_filter(di, cutoff_hz=150.0)
     assert isinstance(result, DataInstance)
     np.testing.assert_array_equal(result.value_np, di.value_np)

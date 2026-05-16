@@ -131,7 +131,7 @@ def accel_scenario():
     """One clear acceleration event that covers 75+ m.
 
     200-point grid; signal active from index 10 onwards (no drop).
-    Distance goes 0→200 m over the full range, so starting at index 10
+    Distance goes 0->200 m over the full range, so starting at index 10
     (~10 m) the remaining distance (190 m) exceeds the 75 m target.
     """
     n = 200
