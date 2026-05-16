@@ -27,7 +27,7 @@ MOTOR_WHEELSPEED = "pcm.moc.motor.wheelSpeed"
 STEERING_RAW = "ludwig.steeringWheel.raw"
 STEERING_ANGLE = "ludwig.steeringWheel.angle"
 
-# Default 3-point voltage→angle calibration for the steering pot.
+# Default 3-point voltage->angle calibration for the steering pot.
 SteeringCalibration = tuple[tuple[float, float], ...]
 DEFAULT_STEERING_CALIBRATION: SteeringCalibration = (
     (1.86, -97.0),  # max left
@@ -148,7 +148,7 @@ def convert_wheelspeeds_to_m_per_s(data: SingleRunData) -> SingleRunData:
         )
 
     print(
-        f"convert_wheelspeeds_to_m_per_s: converted {len(cols)} channels mph → m/s, backups in *_mph"
+        f"convert_wheelspeeds_to_m_per_s: converted {len(cols)} channels mph -> m/s, backups in *_mph"
     )
     return data
 
@@ -308,7 +308,7 @@ def apply_preprocessing(
     data : SingleRunData
         Parsed run data to preprocess.
     steps : list of PreprocessingStep
-        Ordered list of ``SingleRunData → SingleRunData`` callables to apply.
+        Ordered list of ``SingleRunData -> SingleRunData`` callables to apply.
 
     Returns
     -------

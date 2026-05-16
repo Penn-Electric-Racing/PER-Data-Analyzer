@@ -17,3 +17,8 @@ perda/models/stsb-cross-encoder/
 docs/build/
 docs/build_md/
 docs/source/_autosummary/
+
+# Ignore test artifacts
+.coverage
+.pytest_cache/
+htmlcov/
