@@ -14,3 +14,14 @@ cd docs
 sphinx-build -b html source build  # HTML
 sphinx-build -M markdown source build_md  # Markdown
 ```
+
+## Testing
+
+We use `pytest` for testing. In the root directory, run the following 
+
+```bash
+pytest
+
+# Generates coverage report in htmlcov/index.html
+pytest --cov=perda --cov-report=html
+```

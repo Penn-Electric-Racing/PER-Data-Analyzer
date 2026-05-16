@@ -1,4 +1,4 @@
-from single_run_data import DataInstance, SingleRunData
+from .single_run_data import DataInstance, SingleRunData
 
 
 def trim_single_run_data(
