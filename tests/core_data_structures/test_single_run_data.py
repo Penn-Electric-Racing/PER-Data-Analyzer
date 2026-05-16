@@ -4,10 +4,6 @@ import pytest
 from perda.core_data_structures.data_instance import DataInstance
 from perda.core_data_structures.single_run_data import SingleRunData
 
-# ---------------------------------------------------------------------------
-# __getitem__
-# ---------------------------------------------------------------------------
-
 
 @pytest.mark.parametrize(
     "key, expected_values",
@@ -46,11 +42,6 @@ def test_getitem_invalid_raises(srd_basic, bad_key, exc_type):
         srd_basic[bad_key]
 
 
-# ---------------------------------------------------------------------------
-# __contains__
-# ---------------------------------------------------------------------------
-
-
 @pytest.mark.parametrize("key", [1, 2, "cpp.var_a", "cpp.var_b"])
 def test_contains_present(srd_basic, key):
     assert key in srd_basic
@@ -64,11 +55,6 @@ def test_contains_absent(srd_basic, key):
 def test_contains_does_not_raise_on_missing(srd_basic):
     result = 42 in srd_basic
     assert result is False
-
-
-# ---------------------------------------------------------------------------
-# Consistency between lookups
-# ---------------------------------------------------------------------------
 
 
 def test_getitem_int_and_string_return_same_instance(srd_basic):

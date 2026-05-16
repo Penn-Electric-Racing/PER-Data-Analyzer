@@ -9,10 +9,6 @@ from perda.core_data_structures.split_helpers import (
 )
 from perda.units import Timescale
 
-# ---------------------------------------------------------------------------
-# trim_single_run_data
-# ---------------------------------------------------------------------------
-
 
 def test_trim_single_run_data_clips_all_variables(srd_basic):
     result = trim_single_run_data(srd_basic, ts_start=1, ts_end=2)
@@ -53,11 +49,6 @@ def test_trim_single_run_data_total_data_points_updated(srd_basic):
 def test_trim_single_run_data_resets_concat_boundaries(srd_basic):
     result = trim_single_run_data(srd_basic, ts_start=0, ts_end=2)
     assert result.concat_boundaries == []
-
-
-# ---------------------------------------------------------------------------
-# split_single_run_data
-# ---------------------------------------------------------------------------
 
 
 def test_split_single_run_data_returns_correct_segment_count(srd_basic):

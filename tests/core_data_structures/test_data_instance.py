@@ -13,10 +13,6 @@ from perda.core_data_structures.data_instance import (
     apply_ufunc_outer_join,
 )
 
-# ---------------------------------------------------------------------------
-# Validation
-# ---------------------------------------------------------------------------
-
 
 @pytest.mark.parametrize(
     "kwargs",
@@ -94,11 +90,6 @@ def test_len_returns_array_length(di_simple):
     assert len(di_simple) == 4
 
 
-# ---------------------------------------------------------------------------
-# Scalar arithmetic
-# ---------------------------------------------------------------------------
-
-
 @pytest.mark.parametrize(
     "op, scalar, expected",
     [
@@ -143,11 +134,6 @@ def test_neg_negates_all_values(di_simple):
 def test_scalar_op_invalid_type_raises(di_simple, op, bad_value):
     with pytest.raises(TypeError):
         op(di_simple, bad_value)
-
-
-# ---------------------------------------------------------------------------
-# DataInstance x DataInstance (left-join semantics)
-# ---------------------------------------------------------------------------
 
 
 @pytest.mark.parametrize(
@@ -210,11 +196,6 @@ def test_binary_op_preserves_left_metadata(di_simple, di_sparse, op):
     assert result.var_id == di_simple.var_id
 
 
-# ---------------------------------------------------------------------------
-# trim
-# ---------------------------------------------------------------------------
-
-
 def test_trim_both_bounds(di_simple):
     result = di_simple.trim(ts_start=1, ts_end=2)
     np.testing.assert_array_equal(result.timestamp_np, [1, 2])
@@ -253,11 +234,6 @@ def test_trim_preserves_metadata(di_with_metadata):
 def test_trim_returns_new_instance(di_simple):
     result = di_simple.trim(ts_start=1, ts_end=2)
     assert result is not di_simple
-
-
-# ---------------------------------------------------------------------------
-# apply_ufunc_filter / FilterOptions
-# ---------------------------------------------------------------------------
 
 
 def test_filter_values_keeps_matching_rows(di_simple):
@@ -306,11 +282,6 @@ def test_filter_values_default_apply_to(di_simple):
     assert result.value_np[0] == 0.0
 
 
-# ---------------------------------------------------------------------------
-# apply_ufunc_left_join
-# ---------------------------------------------------------------------------
-
-
 def test_apply_ufunc_left_join_add_matches_operator(di_simple, di_sparse):
     result_ufunc = apply_ufunc_left_join(di_simple, di_sparse, np.add)
     result_op = di_simple + di_sparse
@@ -321,11 +292,6 @@ def test_apply_ufunc_left_join_add_matches_operator(di_simple, di_sparse):
 def test_apply_ufunc_left_join_timestamps_equal_left(di_simple, di_sparse):
     result = apply_ufunc_left_join(di_simple, di_sparse, np.add)
     np.testing.assert_array_equal(result.timestamp_np, di_simple.timestamp_np)
-
-
-# ---------------------------------------------------------------------------
-# apply_ufunc_outer_join
-# ---------------------------------------------------------------------------
 
 
 def test_apply_ufunc_outer_join_timestamps_are_union():
@@ -359,11 +325,6 @@ def test_apply_ufunc_outer_join_drop_nan_false_uses_fill():
     )
     result = apply_ufunc_outer_join(a, b, np.add, drop_nan=False, fill=0.0)
     assert not np.any(np.isnan(result.value_np))
-
-
-# ---------------------------------------------------------------------------
-# apply_ufunc_inner_join
-# ---------------------------------------------------------------------------
 
 
 def test_apply_ufunc_inner_join_tolerance_zero_exact_only():

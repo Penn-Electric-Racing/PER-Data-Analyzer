@@ -6,10 +6,6 @@ from perda.core_data_structures.single_run_data import SingleRunData
 from perda.units import Timescale
 from perda.utils.data_summary import data_instance_summary, single_run_summary
 
-# ---------------------------------------------------------------------------
-# data_instance_summary — smoke tests (output is print-only)
-# ---------------------------------------------------------------------------
-
 
 def test_data_instance_summary_runs_without_error(capsys):
     di = DataInstance(
@@ -48,7 +44,6 @@ def test_data_instance_summary_us_to_s(capsys):
         di, source_time_unit=Timescale.US, target_time_unit=Timescale.S
     )
     out = capsys.readouterr().out
-    # should show 1.0000 s as last_ts
     assert "1.0000" in out
 
 
@@ -70,11 +65,6 @@ def test_data_instance_summary_min_max_reported(
     out = capsys.readouterr().out
     assert f"{expected_min:.4f}" in out
     assert f"{expected_max:.4f}" in out
-
-
-# ---------------------------------------------------------------------------
-# single_run_summary — smoke tests
-# ---------------------------------------------------------------------------
 
 
 def test_single_run_summary_runs_without_error(srd_basic, capsys):

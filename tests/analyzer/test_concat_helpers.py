@@ -39,11 +39,6 @@ def _make_srd(names_vals, ts_unit=Timescale.MS, start=0, end=None):
     )
 
 
-# ---------------------------------------------------------------------------
-# _upscale_to_us
-# ---------------------------------------------------------------------------
-
-
 def test_upscale_to_us_multiplies_timestamps_by_1000():
     srd = _make_srd({"a.b": ([0, 1, 2], [1.0, 2.0, 3.0])}, ts_unit=Timescale.MS)
     result = _upscale_to_us(srd)
@@ -67,11 +62,6 @@ def test_upscale_to_us_preserves_values():
     srd = _make_srd({"v": ([0, 1], [42.0, 43.0])}, ts_unit=Timescale.MS)
     result = _upscale_to_us(srd)
     np.testing.assert_allclose(result["v"].value_np, [42.0, 43.0])
-
-
-# ---------------------------------------------------------------------------
-# _concat_single_run_data — basic structure
-# ---------------------------------------------------------------------------
 
 
 def test_concat_second_timestamps_shifted_after_first():
@@ -137,11 +127,6 @@ def test_concat_carries_existing_boundaries():
     second = _make_srd({"a": ([0, 5], [3.0, 4.0])})
     result = _concat_single_run_data(first, second, gap=1)
     assert 3 in result.concat_boundaries
-
-
-# ---------------------------------------------------------------------------
-# _concat_single_run_data — unit reconciliation
-# ---------------------------------------------------------------------------
 
 
 def test_concat_ms_and_us_result_is_us():

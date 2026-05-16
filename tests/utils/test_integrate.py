@@ -48,7 +48,6 @@ def test_integrate_zero_length_returns_zero():
         timestamp_np=np.array([0, 1, 2], dtype=np.int64),
         value_np=np.array([1.0, 1.0, 1.0], dtype=np.float64),
     )
-    # start == end -> 0
     result = integrate_over_time_range(di, start_time=1, end_time=1)
     assert result == 0.0
 
@@ -110,11 +109,6 @@ def test_integrate_parametrized(ts, vals, start, end, expected):
     assert result == pytest.approx(expected, abs=1e-9)
 
 
-# ---------------------------------------------------------------------------
-# average_over_time_range
-# ---------------------------------------------------------------------------
-
-
 def test_average_constant_signal():
     di = DataInstance(
         timestamp_np=np.array([0, 1000], dtype=np.int64),
@@ -154,11 +148,6 @@ def test_average_zero_time_range_returns_zero():
     )
     avg = average_over_time_range(di, start_time=5, end_time=5)
     assert avg == 0.0
-
-
-# ---------------------------------------------------------------------------
-# get_data_slice_by_timestamp
-# ---------------------------------------------------------------------------
 
 
 def test_slice_start_only():

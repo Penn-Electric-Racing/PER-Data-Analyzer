@@ -12,10 +12,6 @@ from perda.core_data_structures.data_instance import (
 from perda.core_data_structures.joins import inner_join, left_join, outer_join
 from perda.core_data_structures.resampling import ResampleMethod, resample_to_freq
 
-# ---------------------------------------------------------------------------
-# left_join — interpolation methods
-# ---------------------------------------------------------------------------
-
 
 @pytest.mark.parametrize(
     "method, right_ts, right_vals, query_ts, expected_rv",
@@ -114,11 +110,6 @@ def test_left_join_right_wider_than_left_no_clamping():
     np.testing.assert_allclose(rv, [2.0, 3.0, 4.0])
 
 
-# ---------------------------------------------------------------------------
-# Empty-input raises — left / outer / inner
-# ---------------------------------------------------------------------------
-
-
 @pytest.mark.parametrize(
     "join_fn, kwargs",
     [
@@ -189,11 +180,6 @@ def test_join_empty_input_raises(join_fn, kwargs):
         join_fn(**kwargs)
 
 
-# ---------------------------------------------------------------------------
-# outer_join
-# ---------------------------------------------------------------------------
-
-
 def test_outer_join_timestamps_are_union():
     left_ts = np.array([0, 2, 4], dtype=np.int64)
     right_ts = np.array([1, 3, 5], dtype=np.int64)
@@ -237,11 +223,6 @@ def test_outer_join_values_interpolated_at_union_points():
     )
     idx2 = np.where(ts == 2)[0][0]
     np.testing.assert_allclose(lv[idx2], 2.0)
-
-
-# ---------------------------------------------------------------------------
-# inner_join
-# ---------------------------------------------------------------------------
 
 
 def test_inner_join_zero_tolerance_exact_matches_only():
@@ -300,11 +281,6 @@ def test_inner_join_right_values_interpolated_not_snapped():
     np.testing.assert_allclose(rv[1], 5.0)
 
 
-# ---------------------------------------------------------------------------
-# resample_to_freq
-# ---------------------------------------------------------------------------
-
-
 def test_resample_to_freq_produces_correct_spacing():
     ts_src = np.array([0, 1_000_000], dtype=np.int64)
     val_src = np.array([0.0, 1.0])
@@ -343,43 +319,27 @@ def test_resample_to_freq_microseconds_100hz():
     np.testing.assert_allclose(diffs, 10_000)
 
 
-# ---------------------------------------------------------------------------
-# left_join_data_instances
-# ---------------------------------------------------------------------------
-
-
 def test_left_join_data_instances_single_right_returns_two(di_simple, di_sparse):
     result = left_join_data_instances(di_simple, di_sparse)
     assert len(result) == 2
 
 
-def test_left_join_data_instances_list_right_returns_n_plus_one(di_simple, di_sparse):
-    di_two_points = DataInstance(
-        timestamp_np=np.array([0, 10], dtype=np.int64),
-        value_np=np.array([0.0, 10.0]),
-        label="two_pts",
-        var_id=6,
-        cpp_name="test.two_pts",
-    )
+def test_left_join_data_instances_list_right_returns_n_plus_one(
+    di_simple, di_sparse, di_two_points
+):
     result = left_join_data_instances(di_simple, [di_sparse, di_two_points])
     assert len(result) == 3
 
 
-def test_left_join_data_instances_all_share_timestamps(di_simple, di_sparse):
-    di_two_points = DataInstance(
-        timestamp_np=np.array([0, 10], dtype=np.int64),
-        value_np=np.array([0.0, 10.0]),
-    )
+def test_left_join_data_instances_all_share_timestamps(
+    di_simple, di_sparse, di_two_points
+):
     la, rb, rc = left_join_data_instances(di_simple, [di_sparse, di_two_points])
     np.testing.assert_array_equal(la.timestamp_np, rb.timestamp_np)
     np.testing.assert_array_equal(la.timestamp_np, rc.timestamp_np)
 
 
-def test_left_join_data_instances_method_forwarded(di_simple):
-    di_two_points = DataInstance(
-        timestamp_np=np.array([0, 10], dtype=np.int64),
-        value_np=np.array([0.0, 10.0]),
-    )
+def test_left_join_data_instances_method_forwarded(di_simple, di_two_points):
     _, rb_zoh = left_join_data_instances(
         di_simple, di_two_points, method=ResampleMethod.ZOH
     )
@@ -387,11 +347,6 @@ def test_left_join_data_instances_method_forwarded(di_simple):
         di_simple, di_two_points, method=ResampleMethod.LINEAR
     )
     assert not np.allclose(rb_zoh.value_np, rb_lin.value_np)
-
-
-# ---------------------------------------------------------------------------
-# *_join_data_instances — shared-timestamp and label invariants
-# ---------------------------------------------------------------------------
 
 
 @pytest.mark.parametrize(
@@ -430,11 +385,6 @@ def test_outer_join_data_instances_union_timestamps(di_simple, di_sparse):
     left, right = outer_join_data_instances(di_simple, di_sparse)
     for ts in np.intersect1d(di_simple.timestamp_np, di_sparse.timestamp_np):
         assert ts in left.timestamp_np
-
-
-# ---------------------------------------------------------------------------
-# Operator default: left join
-# ---------------------------------------------------------------------------
 
 
 @pytest.mark.parametrize(

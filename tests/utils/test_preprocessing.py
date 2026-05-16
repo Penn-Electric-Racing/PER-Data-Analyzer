@@ -4,10 +4,6 @@ import pytest
 from perda.units import in_to_m, mph_to_m_per_s
 from perda.utils.preprocessing import *
 
-# ---------------------------------------------------------------------------
-# patch_ned_velocity
-# ---------------------------------------------------------------------------
-
 
 def test_ned_velocity_rotation_at_zero_yaw(ned_srd):
     # First point: velN=1, velE=0, yaw=0 -> vx=1, vy=0
@@ -28,11 +24,6 @@ def test_ned_velocity_skips_and_warns_when_missing(empty_srd, capsys):
     assert "velN" not in result
     captured = capsys.readouterr()
     assert "patch_ned_velocity skipped" in captured.out
-
-
-# ---------------------------------------------------------------------------
-# convert_wheelspeeds_to_m_per_s
-# ---------------------------------------------------------------------------
 
 
 def test_wheelspeeds_converted_correctly(ws_srd):
@@ -64,11 +55,6 @@ def test_wheelspeeds_skips_and_warns_when_missing(empty_srd, capsys):
     assert "pcm.wheelSpeeds.frontRight_mph" not in result
     captured = capsys.readouterr()
     assert "convert_wheelspeeds_to_m_per_s skipped" in captured.out
-
-
-# ---------------------------------------------------------------------------
-# correct_motor_data
-# ---------------------------------------------------------------------------
 
 
 def test_motor_data_flips_rpm_sign(motor_srd):
@@ -144,7 +130,6 @@ def test_steering_angle_correctness_at_calibration_points(
 def test_steering_angle_overwrites_existing_angle(steering_srd):
     result = correct_steering_angle(steering_srd)
 
-    # Angle channel should now match the calibration fit, not the stale values
     np.testing.assert_almost_equal(
         result["ludwig.steeringWheel.angle"].value_np[0], -97.0, decimal=6
     )

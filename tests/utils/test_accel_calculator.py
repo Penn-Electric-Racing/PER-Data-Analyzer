@@ -9,25 +9,9 @@ from perda.utils.accel_calculator import (
     detect_accel_event,
 )
 
-# ---------------------------------------------------------------------------
-# detect_accel_event
-# ---------------------------------------------------------------------------
 
-
-def test_detect_accel_event_returns_binary_signal():
-    torque = DataInstance(
-        timestamp_np=np.array([0, 1, 2, 3, 4], dtype=np.int64),
-        value_np=np.array([0.0, 200.0, 200.0, 200.0, 0.0], dtype=np.float64),
-        label="x",
-        var_id=1,
-    )
-    speed = DataInstance(
-        timestamp_np=np.array([0, 1, 2, 3, 4], dtype=np.int64),
-        value_np=np.array([0.0, 1.0, 2.0, 3.0, 0.3], dtype=np.float64),
-        label="x",
-        var_id=1,
-    )
-    result = detect_accel_event(torque, speed)
+def test_detect_accel_event_returns_binary_signal(accel_torque, accel_speed):
+    result = detect_accel_event(accel_torque, accel_speed)
     unique_vals = set(result.value_np.tolist())
     assert unique_vals.issubset({0.0, 1.0})
 
@@ -36,14 +20,14 @@ def test_detect_accel_event_no_torque_no_event():
     torque = DataInstance(
         timestamp_np=np.array([0, 1, 2], dtype=np.int64),
         value_np=np.array([0.0, 0.0, 0.0], dtype=np.float64),
-        label="x",
+        label="torque",
         var_id=1,
     )
     speed = DataInstance(
         timestamp_np=np.array([0, 1, 2], dtype=np.int64),
         value_np=np.array([0.0, 5.0, 10.0], dtype=np.float64),
-        label="x",
-        var_id=1,
+        label="speed",
+        var_id=2,
     )
     result = detect_accel_event(torque, speed, torque_threshold=100)
     np.testing.assert_array_equal(result.value_np, [0.0, 0.0, 0.0])
@@ -53,14 +37,14 @@ def test_detect_accel_event_no_speed_no_event():
     torque = DataInstance(
         timestamp_np=np.array([0, 1, 2], dtype=np.int64),
         value_np=np.array([200.0, 200.0, 200.0], dtype=np.float64),
-        label="x",
+        label="torque",
         var_id=1,
     )
     speed = DataInstance(
         timestamp_np=np.array([0, 1, 2], dtype=np.int64),
         value_np=np.array([0.0, 0.0, 0.0], dtype=np.float64),
-        label="x",
-        var_id=1,
+        label="speed",
+        var_id=2,
     )
     result = detect_accel_event(torque, speed, speed_threshold=0.5)
     np.testing.assert_array_equal(result.value_np, [0.0, 0.0, 0.0])
@@ -70,79 +54,41 @@ def test_detect_accel_event_output_aligned_to_speed_timestamps():
     torque = DataInstance(
         timestamp_np=np.array([0, 10, 20], dtype=np.int64),
         value_np=np.array([200.0, 200.0, 0.0], dtype=np.float64),
-        label="x",
+        label="torque",
         var_id=1,
     )
     speed = DataInstance(
         timestamp_np=np.array([0, 5, 10, 15, 20], dtype=np.int64),
         value_np=np.array([0.0, 1.0, 2.0, 3.0, 0.0], dtype=np.float64),
-        label="x",
-        var_id=1,
+        label="speed",
+        var_id=2,
     )
     result = detect_accel_event(torque, speed)
     np.testing.assert_array_equal(result.timestamp_np, speed.timestamp_np)
 
 
 def test_detect_accel_event_event_ends_when_speed_drops():
-    # torque high throughout; speed drops to 0 at t=3
     torque = DataInstance(
         timestamp_np=np.array([0, 1, 2, 3, 4], dtype=np.int64),
         value_np=np.array([200.0, 200.0, 200.0, 200.0, 200.0], dtype=np.float64),
-        label="x",
+        label="torque",
         var_id=1,
     )
     speed = DataInstance(
         timestamp_np=np.array([0, 1, 2, 3, 4], dtype=np.int64),
         value_np=np.array([0.0, 1.0, 2.0, 0.0, 1.0], dtype=np.float64),
-        label="x",
-        var_id=1,
+        label="speed",
+        var_id=2,
     )
     result = detect_accel_event(
         torque, speed, torque_threshold=100, speed_threshold=0.5
     )
-    # After event ends at t=3, t=4 can start a new one only if torque > threshold and speed > threshold
     assert result.value_np[3] == 0.0
 
 
-def test_detect_accel_event_label():
-    torque = DataInstance(
-        timestamp_np=np.array([0, 1], dtype=np.int64),
-        value_np=np.array([0.0, 0.0], dtype=np.float64),
-        label="x",
-        var_id=1,
-    )
-    speed = DataInstance(
-        timestamp_np=np.array([0, 1], dtype=np.int64),
-        value_np=np.array([0.0, 0.0], dtype=np.float64),
-        label="x",
-        var_id=1,
-    )
-    result = detect_accel_event(torque, speed)
+def test_detect_accel_event_label(accel_torque, accel_speed):
+    result = detect_accel_event(accel_torque, accel_speed)
     assert result.label == "Accel Event"
-
-
-# ---------------------------------------------------------------------------
-# compute_accel_results
-# ---------------------------------------------------------------------------
-
-
-@pytest.fixture
-def accel_scenario():
-    """One clear acceleration event that covers 75+ m.
-
-    200-point grid; signal active from index 10 onwards (no drop).
-    Distance goes 0->200 m over the full range, so starting at index 10
-    (~10 m) the remaining distance (190 m) exceeds the 75 m target.
-    """
-    n = 200
-    ts = np.arange(n, dtype=np.int64)  # 0..199 ms
-    signal_vals = np.zeros(n)
-    signal_vals[10:] = 1.0  # active from t=10 onward, never drops to 0
-    signal_di = DataInstance(timestamp_np=ts, value_np=signal_vals, label="sig")
-    dist_di = DataInstance(
-        timestamp_np=ts, value_np=np.linspace(0, 200, n), label="dist"
-    )
-    return signal_di, dist_di
 
 
 def test_compute_accel_results_returns_list(accel_scenario):
@@ -179,7 +125,6 @@ def test_compute_accel_results_no_event_when_signal_all_zero():
 
 
 def test_compute_accel_results_skips_segment_shorter_than_target():
-    # Signal active for only 10 m worth of distance; target is 75 m
     n = 20
     ts = np.arange(n, dtype=np.int64) * 10
     signal_vals = np.zeros(n)

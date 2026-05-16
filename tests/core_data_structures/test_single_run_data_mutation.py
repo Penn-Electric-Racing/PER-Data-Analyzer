@@ -5,10 +5,6 @@ from perda.core_data_structures.data_instance import DataInstance
 from perda.core_data_structures.single_run_data import SingleRunData
 from perda.units import Timescale
 
-# ---------------------------------------------------------------------------
-# __setitem__ / add / replace dispatch
-# ---------------------------------------------------------------------------
-
 
 def test_setitem_add_inserts_new_variable(srd_basic):
     di = DataInstance(
@@ -32,11 +28,6 @@ def test_setitem_replace_overwrites_existing_variable(srd_basic):
     )
     srd_basic["cpp.var_a"] = di
     np.testing.assert_allclose(srd_basic["cpp.var_a"].value_np, [99.0, 99.0, 99.0])
-
-
-# ---------------------------------------------------------------------------
-# add
-# ---------------------------------------------------------------------------
 
 
 def test_add_assigns_synthetic_negative_id(srd_basic):
@@ -90,11 +81,6 @@ def test_add_populates_all_dicts(srd_basic):
     assert srd_basic.id_to_cpp_name[new_id] == "cpp.new"
     assert new_id in srd_basic.id_to_instance
     assert new_id in srd_basic.id_to_descript
-
-
-# ---------------------------------------------------------------------------
-# replace
-# ---------------------------------------------------------------------------
 
 
 def test_replace_overwrites_values(srd_basic):
