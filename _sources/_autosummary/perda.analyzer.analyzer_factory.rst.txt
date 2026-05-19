@@ -1,0 +1,8 @@
+perda.analyzer.analyzer\_factory
+================================
+
+.. automodule:: perda.analyzer.analyzer_factory
+   :members:
+   :undoc-members:
+   :show-inheritance:
+

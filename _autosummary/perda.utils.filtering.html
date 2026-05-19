@@ -261,6 +261,7 @@
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="perda.html">perda</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2 has-children"><a class="reference internal" href="perda.analyzer.html">perda.analyzer</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="perda.analyzer.analyzer.html">perda.analyzer.analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.analyzer.analyzer_factory.html">perda.analyzer.analyzer_factory</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.analyzer.concat_helpers.html">perda.analyzer.concat_helpers</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.analyzer.csv.html">perda.analyzer.csv</a></li>
 </ul>
@@ -507,7 +508,7 @@ original signal timestamp grid.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="perda.utils.filtering.zscore_filter">
-<span class="sig-prename descclassname"><span class="pre">perda.utils.filtering.</span></span><span class="sig-name descname"><span class="pre">zscore_filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">di</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window_s</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4.8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_time_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Timescale.MS</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/utils/filtering.html#zscore_filter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.utils.filtering.zscore_filter" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">perda.utils.filtering.</span></span><span class="sig-name descname"><span class="pre">zscore_filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">di</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window_s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_time_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Timescale.MS</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/utils/filtering.html#zscore_filter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.utils.filtering.zscore_filter" title="Link to this definition">#</a></dt>
 <dd><p>Remove outliers using a rolling-window z-score and interpolate gaps.</p>
 <p>For each sample, a z-score is computed relative to the local rolling
 mean and standard deviation.  Samples with <code class="docutils literal notranslate"><span class="pre">|z|</span> <span class="pre">&gt;</span> <span class="pre">threshold</span></code> are
@@ -516,8 +517,8 @@ replaced with <code class="docutils literal notranslate"><span class="pre">NaN</
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>di</strong> (<a class="reference internal" href="perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance"><em>DataInstance</em></a><em> | </em><em>list</em><em>[</em><a class="reference internal" href="perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance"><em>DataInstance</em></a><em>]</em>) – Input signal(s).</p></li>
-<li><p><strong>window_s</strong> (<em>float</em><em>, </em><em>optional</em>) – Rolling window size in seconds. Default is 2.0.</p></li>
-<li><p><strong>threshold</strong> (<em>float</em><em>, </em><em>optional</em>) – Z-score threshold; samples exceeding this are masked. Default is 4.8.</p></li>
+<li><p><strong>window_s</strong> (<em>float</em>) – Rolling window size in seconds</p></li>
+<li><p><strong>threshold</strong> (<em>float</em>) – Z-score threshold; samples exceeding this are masked.</p></li>
 <li><p><strong>source_time_unit</strong> (<a class="reference internal" href="perda.units.html#perda.units.Timescale" title="perda.units.Timescale"><em>Timescale</em></a><em>, </em><em>optional</em>) – Timestamp unit. Default is <code class="docutils literal notranslate"><span class="pre">Timescale.MS</span></code>.</p></li>
 </ul>
 </dd>

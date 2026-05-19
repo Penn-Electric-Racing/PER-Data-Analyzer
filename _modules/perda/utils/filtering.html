@@ -529,8 +529,8 @@
 <a class="viewcode-back" href="../../../_autosummary/perda.utils.filtering.html#perda.utils.filtering.zscore_filter">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">zscore_filter</span><span class="p">(</span>
     <span class="n">di</span><span class="p">:</span> <span class="n">DataInstance</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="n">DataInstance</span><span class="p">],</span>
-    <span class="n">window_s</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">,</span>
-    <span class="n">threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">4.8</span><span class="p">,</span>
+    <span class="n">window_s</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">threshold</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">source_time_unit</span><span class="p">:</span> <span class="n">Timescale</span> <span class="o">=</span> <span class="n">Timescale</span><span class="o">.</span><span class="n">MS</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataInstance</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="n">DataInstance</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Remove outliers using a rolling-window z-score and interpolate gaps.</span>
@@ -543,10 +543,10 @@
 <span class="sd">    ----------</span>
 <span class="sd">    di : DataInstance | list[DataInstance]</span>
 <span class="sd">        Input signal(s).</span>
-<span class="sd">    window_s : float, optional</span>
-<span class="sd">        Rolling window size in seconds. Default is 2.0.</span>
-<span class="sd">    threshold : float, optional</span>
-<span class="sd">        Z-score threshold; samples exceeding this are masked. Default is 4.8.</span>
+<span class="sd">    window_s : float</span>
+<span class="sd">        Rolling window size in seconds</span>
+<span class="sd">    threshold : float</span>
+<span class="sd">        Z-score threshold; samples exceeding this are masked.</span>
 <span class="sd">    source_time_unit : Timescale, optional</span>
 <span class="sd">        Timestamp unit. Default is ``Timescale.MS``.</span>
 
