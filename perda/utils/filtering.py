@@ -213,8 +213,8 @@ def lowpass_filter_by_distance(
 
 def zscore_filter(
     di: DataInstance | list[DataInstance],
-    window_s: float = 2.0,
-    threshold: float = 4.8,
+    window_s: float,
+    threshold: float,
     source_time_unit: Timescale = Timescale.MS,
 ) -> DataInstance | list[DataInstance]:
     """Remove outliers using a rolling-window z-score and interpolate gaps.
@@ -227,10 +227,10 @@ def zscore_filter(
     ----------
     di : DataInstance | list[DataInstance]
         Input signal(s).
-    window_s : float, optional
-        Rolling window size in seconds. Default is 2.0.
-    threshold : float, optional
-        Z-score threshold; samples exceeding this are masked. Default is 4.8.
+    window_s : float
+        Rolling window size in seconds
+    threshold : float
+        Z-score threshold; samples exceeding this are masked.
     source_time_unit : Timescale, optional
         Timestamp unit. Default is ``Timescale.MS``.
 
