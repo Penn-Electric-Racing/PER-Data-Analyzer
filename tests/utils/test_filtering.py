@@ -39,7 +39,7 @@ def test_apply_sos_filter_returns_none_when_too_few_samples():
 
 @pytest.mark.parametrize("cutoff_hz", [5.0, 10.0, 20.0])
 def test_lowpass_attenuates_high_frequency(cutoff_hz: float, sine_di_factory):
-    """A signal at 4× cutoff should be substantially attenuated in steady-state."""
+    """A signal at 4x cutoff should be substantially attenuated in steady-state."""
     di = sine_di_factory(freq_hz=cutoff_hz * 4, n=2000)
     result = lowpass_filter(di, cutoff_hz=cutoff_hz)
     assert isinstance(result, DataInstance)
@@ -153,7 +153,9 @@ def test_zscore_removes_multiple_spikes(n_spikes: int, uniform_di):
 
 
 def test_zscore_preserves_timestamps(uniform_di):
-    result = zscore_filter(uniform_di)
+    result = zscore_filter(
+        uniform_di, window_s=2.0, threshold=4.8, source_time_unit=Timescale.MS
+    )
     np.testing.assert_array_equal(result.timestamp_np, uniform_di.timestamp_np)
 
 
@@ -170,7 +172,9 @@ def test_zscore_list_input_returns_list(uniform_di):
         label="b",
         var_id=2,
     )
-    results = zscore_filter([di_a, di_b])
+    results = zscore_filter(
+        [di_a, di_b], window_s=2.0, threshold=4.8, source_time_unit=Timescale.MS
+    )
     assert isinstance(results, list)
     assert len(results) == 2
 
@@ -212,3 +216,146 @@ def test_compute_fft_dc_suppressed(uniform_di):
     freqs, mags = compute_fft(uniform_di, source_time_unit=Timescale.MS)
     dc_idx = np.argmin(np.abs(freqs))
     assert mags[dc_idx] < 1e-6
+
+
+def test_lowpass_by_distance_attenuates_high_spatial_freq(spatial_signal_factory):
+    """Spatial lowpass should attenuate a sinusoid at 4x the cutoff frequency.
+
+    dx=0.1 m -> fs=10 1/m, Nyquist=5 1/m.
+    Signal at 2.0 1/m is 4x the cutoff (0.5 1/m) below Nyquist.
+    """
+    signal_di, distance_di = spatial_signal_factory(freq_per_m=2.0, n=600, dx=0.1)
+    result = lowpass_filter_by_distance(
+        signal_di, distance_di, cutoff_freq_per_meter=0.5
+    )
+    assert isinstance(result, DataInstance)
+    mid = slice(len(result.value_np) // 4, 3 * len(result.value_np) // 4)
+    rms_in = np.sqrt(np.mean(signal_di.value_np[mid] ** 2))
+    rms_out = np.sqrt(np.mean(result.value_np[mid] ** 2))
+    assert rms_out < rms_in * 0.1
+
+
+def test_lowpass_by_distance_preserves_timestamps(spatial_signal_factory):
+    signal_di, distance_di = spatial_signal_factory(freq_per_m=0.5)
+    result = lowpass_filter_by_distance(
+        signal_di, distance_di, cutoff_freq_per_meter=0.5
+    )
+    assert isinstance(result, DataInstance)
+    np.testing.assert_array_equal(result.timestamp_np, signal_di.timestamp_np)
+
+
+def test_lowpass_by_distance_with_stationary_segments():
+    """Duplicate distance points (stationary car) must not corrupt dx_median."""
+    n = 300
+    ts = np.arange(n, dtype=np.int64)
+    dist = np.concatenate([np.zeros(100), np.arange(1, 201, dtype=np.float64) * 0.1])
+    signal = np.sin(2 * np.pi * 2.0 * dist).astype(np.float64)
+    signal_di = DataInstance(timestamp_np=ts, value_np=signal, label="sig", var_id=1)
+    distance_di = DataInstance(timestamp_np=ts, value_np=dist, label="dist", var_id=2)
+
+    result = lowpass_filter_by_distance(
+        signal_di, distance_di, cutoff_freq_per_meter=1.0
+    )
+    assert isinstance(result, DataInstance)
+    assert len(result) == n
+    np.testing.assert_array_equal(result.timestamp_np, ts)
+
+
+def test_lowpass_by_distance_stationary_segment_gets_constant_output():
+    """Stationary region (all-duplicate distances) should map to a single repeated value."""
+    n = 300
+    ts = np.arange(n, dtype=np.int64)
+    dist = np.concatenate([np.zeros(100), np.arange(1, 201, dtype=np.float64) * 0.1])
+    signal = np.ones(n, dtype=np.float64)
+    signal_di = DataInstance(timestamp_np=ts, value_np=signal, label="sig", var_id=1)
+    distance_di = DataInstance(timestamp_np=ts, value_np=dist, label="dist", var_id=2)
+
+    result = lowpass_filter_by_distance(
+        signal_di, distance_di, cutoff_freq_per_meter=1.0
+    )
+    assert isinstance(result, DataInstance)
+    assert np.all(result.value_np[:100] == result.value_np[0])
+
+
+def test_lowpass_by_distance_all_stationary_raises():
+    """All-zero distance steps should raise ValueError."""
+    n = 100
+    ts = np.arange(n, dtype=np.int64)
+    signal_di = DataInstance(
+        timestamp_np=ts, value_np=np.ones(n, dtype=np.float64), label="sig", var_id=1
+    )
+    distance_di = DataInstance(
+        timestamp_np=ts, value_np=np.zeros(n, dtype=np.float64), label="dist", var_id=2
+    )
+
+    with pytest.raises(ValueError, match="No positive distance steps"):
+        lowpass_filter_by_distance(signal_di, distance_di, cutoff_freq_per_meter=0.5)
+
+
+def test_lowpass_by_distance_skips_when_cutoff_above_nyquist(
+    spatial_signal_factory, capsys
+):
+    # dx=0.1 m -> fs=10 1/m -> Nyquist=5 1/m; use cutoff=6 1/m to trigger skip
+    signal_di, distance_di = spatial_signal_factory(freq_per_m=0.5, n=300, dx=0.1)
+    result = lowpass_filter_by_distance(
+        signal_di, distance_di, cutoff_freq_per_meter=6.0
+    )
+    assert isinstance(result, DataInstance)
+    np.testing.assert_array_equal(result.value_np, signal_di.value_np)
+    assert "Nyquist" in capsys.readouterr().out
+
+
+def test_lowpass_by_distance_list_input_returns_list(spatial_signal_factory):
+    signal_di, distance_di = spatial_signal_factory(freq_per_m=0.5)
+    di_b = DataInstance(
+        timestamp_np=signal_di.timestamp_np,
+        value_np=signal_di.value_np.copy(),
+        label="b",
+        var_id=2,
+    )
+    results = lowpass_filter_by_distance(
+        [signal_di, di_b], distance_di, cutoff_freq_per_meter=0.5
+    )
+    assert isinstance(results, list)
+    assert len(results) == 2
+
+
+def test_compute_fft_spatial_peak_at_correct_frequency(spatial_signal_factory):
+    """Spatial FFT peak should land at the injected spatial frequency."""
+    target_freq = 2.0
+    signal_di, distance_di = spatial_signal_factory(
+        freq_per_m=target_freq, n=1000, dx=0.05
+    )
+    freqs, mags = compute_fft(signal_di, distance_di=distance_di)
+    peak_freq = freqs[np.argmax(mags)]
+    assert abs(peak_freq - target_freq) < 0.2
+
+
+def test_compute_fft_spatial_with_duplicate_distances():
+    """Duplicate distance points must not corrupt the dx estimate in spatial FFT."""
+    n = 600
+    ts = np.arange(n, dtype=np.int64)
+    dist = np.concatenate([np.zeros(200), np.arange(1, 401, dtype=np.float64) * 0.05])
+    target_freq = 1.0
+    signal = np.sin(2 * np.pi * target_freq * dist).astype(np.float64)
+    di = DataInstance(timestamp_np=ts, value_np=signal, label="sig", var_id=1)
+    distance_di = DataInstance(timestamp_np=ts, value_np=dist, label="dist", var_id=2)
+
+    freqs, mags = compute_fft(di, distance_di=distance_di)
+    peak_freq = freqs[np.argmax(mags)]
+    assert abs(peak_freq - target_freq) < 0.2
+
+
+def test_compute_fft_spatial_all_stationary_raises():
+    """All-zero distance steps should raise ValueError in spatial FFT mode."""
+    n = 100
+    ts = np.arange(n, dtype=np.int64)
+    di = DataInstance(
+        timestamp_np=ts, value_np=np.ones(n, dtype=np.float64), label="sig", var_id=1
+    )
+    distance_di = DataInstance(
+        timestamp_np=ts, value_np=np.zeros(n, dtype=np.float64), label="dist", var_id=2
+    )
+
+    with pytest.raises(ValueError, match="No positive distance steps"):
+        compute_fft(di, distance_di=distance_di)
