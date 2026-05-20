@@ -581,8 +581,8 @@
         <span class="n">ts_start</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">ts_end</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">show_legend</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">layout_config</span><span class="p">:</span> <span class="n">LayoutConfig</span> <span class="o">=</span> <span class="n">DEFAULT_LAYOUT_CONFIG</span><span class="p">,</span>
         <span class="n">font_config</span><span class="p">:</span> <span class="n">FontConfig</span> <span class="o">=</span> <span class="n">DEFAULT_FONT_CONFIG</span><span class="p">,</span>
-        <span class="n">subplot_config</span><span class="p">:</span> <span class="n">SubplotConfig</span> <span class="o">=</span> <span class="n">DEFAULT_SUBPLOT_CONFIG</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Plot multiple variables as stacked subplots on a shared time axis.</span>
@@ -611,10 +611,10 @@
 <span class="sd">            excluded from all rows. Default is None (no upper bound).</span>
 <span class="sd">        show_legend : bool, optional</span>
 <span class="sd">            Whether to show the figure legend. Default is True.</span>
+<span class="sd">        layout_config : LayoutConfig, optional</span>
+<span class="sd">            Figure dimensions and spacing.</span>
 <span class="sd">        font_config : FontConfig, optional</span>
 <span class="sd">            Font sizes for plot elements.</span>
-<span class="sd">        subplot_config : SubplotConfig, optional</span>
-<span class="sd">            Row height, spacing, width, and style.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -652,8 +652,8 @@
             <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
             <span class="n">row_y_labels</span><span class="o">=</span><span class="n">row_y_labels</span><span class="p">,</span>
             <span class="n">show_legend</span><span class="o">=</span><span class="n">show_legend</span><span class="p">,</span>
+            <span class="n">layout_config</span><span class="o">=</span><span class="n">layout_config</span><span class="p">,</span>
             <span class="n">font_config</span><span class="o">=</span><span class="n">font_config</span><span class="p">,</span>
-            <span class="n">subplot_config</span><span class="o">=</span><span class="n">subplot_config</span><span class="p">,</span>
             <span class="n">timestamp_unit</span><span class="o">=</span><span class="n">unit</span><span class="p">,</span>
         <span class="p">)</span></div>
 

@@ -484,14 +484,21 @@
         <span class="c1"># Align distance onto the signal&#39;s timestamp grid</span>
         <span class="n">_</span><span class="p">,</span> <span class="n">distance_aligned</span> <span class="o">=</span> <span class="n">left_join_data_instances</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="n">distance_di</span><span class="p">)</span>
         <span class="n">dist_values</span> <span class="o">=</span> <span class="n">distance_aligned</span><span class="o">.</span><span class="n">value_np</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+        <span class="n">signal</span> <span class="o">=</span> <span class="n">instance</span><span class="o">.</span><span class="n">value_np</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
 
-        <span class="n">dx_median</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">dist_values</span><span class="p">)))</span>
-        <span class="k">if</span> <span class="n">dx_median</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="c1"># Remove duplicate-distance samples (car stationary) before spatial filtering.</span>
+        <span class="n">diffs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">dist_values</span><span class="p">)</span>
+        <span class="n">moving</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(([</span><span class="kc">True</span><span class="p">],</span> <span class="n">diffs</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">))</span>
+        <span class="n">dist_dedup</span> <span class="o">=</span> <span class="n">dist_values</span><span class="p">[</span><span class="n">moving</span><span class="p">]</span>
+        <span class="n">signal_dedup</span> <span class="o">=</span> <span class="n">signal</span><span class="p">[</span><span class="n">moving</span><span class="p">]</span>
+
+        <span class="n">positive_diffs</span> <span class="o">=</span> <span class="n">diffs</span><span class="p">[</span><span class="n">diffs</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">positive_diffs</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Non-positive median distance step &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">dx_median</span><span class="si">:</span><span class="s2">.6f</span><span class="si">}</span><span class="s2"> m). Cannot determine spatial sample rate.&quot;</span>
+                <span class="s2">&quot;No positive distance steps found. Cannot determine spatial sample rate.&quot;</span>
             <span class="p">)</span>
 
+        <span class="n">dx_median</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">positive_diffs</span><span class="p">))</span>
         <span class="n">fs</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">dx_median</span>
         <span class="n">nyq</span> <span class="o">=</span> <span class="n">fs</span> <span class="o">/</span> <span class="mf">2.0</span>
 
@@ -504,12 +511,14 @@
             <span class="k">continue</span>
 
         <span class="n">sos</span> <span class="o">=</span> <span class="n">butter</span><span class="p">(</span><span class="n">order</span><span class="p">,</span> <span class="n">cutoff_freq_per_meter</span> <span class="o">/</span> <span class="n">nyq</span><span class="p">,</span> <span class="n">btype</span><span class="o">=</span><span class="s2">&quot;low&quot;</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="s2">&quot;sos&quot;</span><span class="p">)</span>
-        <span class="n">signal</span> <span class="o">=</span> <span class="n">instance</span><span class="o">.</span><span class="n">value_np</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
-        <span class="n">filtered</span> <span class="o">=</span> <span class="n">apply_sos_filter</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span> <span class="n">sos</span><span class="p">,</span> <span class="n">order</span><span class="p">)</span>
+        <span class="n">filtered_dedup</span> <span class="o">=</span> <span class="n">apply_sos_filter</span><span class="p">(</span><span class="n">signal_dedup</span><span class="p">,</span> <span class="n">sos</span><span class="p">,</span> <span class="n">order</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">filtered</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">filtered_dedup</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">instance</span><span class="p">)</span>
             <span class="k">continue</span>
+
+        <span class="c1"># Interpolate filtered values back onto the original distance grid</span>
+        <span class="n">filtered</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">dist_values</span><span class="p">,</span> <span class="n">dist_dedup</span><span class="p">,</span> <span class="n">filtered_dedup</span><span class="p">)</span>
 
         <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
             <span class="n">DataInstance</span><span class="p">(</span>
@@ -662,11 +671,13 @@
     <span class="k">if</span> <span class="n">distance_di</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">_</span><span class="p">,</span> <span class="n">distance_aligned</span> <span class="o">=</span> <span class="n">left_join_data_instances</span><span class="p">(</span><span class="n">di</span><span class="p">,</span> <span class="n">distance_di</span><span class="p">)</span>
         <span class="n">dist_values</span> <span class="o">=</span> <span class="n">distance_aligned</span><span class="o">.</span><span class="n">value_np</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)[</span><span class="n">valid</span><span class="p">]</span>
-        <span class="n">dx</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">dist_values</span><span class="p">)))</span>
-        <span class="k">if</span> <span class="n">dx</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">dx</span><span class="p">):</span>
+        <span class="n">positive_diffs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">dist_values</span><span class="p">)</span>
+        <span class="n">positive_diffs</span> <span class="o">=</span> <span class="n">positive_diffs</span><span class="p">[</span><span class="n">positive_diffs</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">positive_diffs</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">positive_diffs</span><span class="p">)):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;Non-positive median distance step; cannot compute spatial FFT.&quot;</span>
+                <span class="s2">&quot;No positive distance steps found; cannot compute spatial FFT.&quot;</span>
             <span class="p">)</span>
+        <span class="n">dx</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">positive_diffs</span><span class="p">))</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">ts_s</span> <span class="o">=</span> <span class="n">_to_seconds</span><span class="p">(</span><span class="n">di</span><span class="o">.</span><span class="n">timestamp_np</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span> <span class="n">source_time_unit</span><span class="p">)</span>
         <span class="n">dt</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">ts_s</span><span class="p">)))</span>

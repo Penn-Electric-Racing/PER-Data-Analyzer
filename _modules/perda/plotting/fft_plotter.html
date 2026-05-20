@@ -313,10 +313,10 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">.plotting_constants</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">DEFAULT_FFT_PLOT_CONFIG</span><span class="p">,</span>
     <span class="n">DEFAULT_FONT_CONFIG</span><span class="p">,</span>
-    <span class="n">DEFAULT_SUBPLOT_CONFIG</span><span class="p">,</span>
+    <span class="n">DEFAULT_LAYOUT_CONFIG</span><span class="p">,</span>
     <span class="n">FFTPlotConfig</span><span class="p">,</span>
     <span class="n">FontConfig</span><span class="p">,</span>
-    <span class="n">SubplotConfig</span><span class="p">,</span>
+    <span class="n">LayoutConfig</span><span class="p">,</span>
 <span class="p">)</span>
 
 
@@ -330,8 +330,8 @@
     <span class="n">x_label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Frequency (Hz)&quot;</span><span class="p">,</span>
     <span class="n">y_label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Magnitude&quot;</span><span class="p">,</span>
     <span class="n">stacked</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">layout_config</span><span class="p">:</span> <span class="n">LayoutConfig</span> <span class="o">=</span> <span class="n">DEFAULT_LAYOUT_CONFIG</span><span class="p">,</span>
     <span class="n">font_config</span><span class="p">:</span> <span class="n">FontConfig</span> <span class="o">=</span> <span class="n">DEFAULT_FONT_CONFIG</span><span class="p">,</span>
-    <span class="n">subplot_config</span><span class="p">:</span> <span class="n">SubplotConfig</span> <span class="o">=</span> <span class="n">DEFAULT_SUBPLOT_CONFIG</span><span class="p">,</span>
     <span class="n">fft_config</span><span class="p">:</span> <span class="n">FFTPlotConfig</span> <span class="o">=</span> <span class="n">DEFAULT_FFT_PLOT_CONFIG</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot one or more pre-computed FFT magnitude spectra.</span>
@@ -351,10 +351,10 @@
 <span class="sd">    stacked : bool, optional</span>
 <span class="sd">        If ``True``, render one subplot per series sharing the x-axis.</span>
 <span class="sd">        If ``False``, overlay all series on a single plot. Default is True.</span>
+<span class="sd">    layout_config : LayoutConfig, optional</span>
+<span class="sd">        Figure dimensions and spacing.</span>
 <span class="sd">    font_config : FontConfig, optional</span>
 <span class="sd">        Font sizes for plot elements.</span>
-<span class="sd">    subplot_config : SubplotConfig, optional</span>
-<span class="sd">        Row height and spacing used when ``stacked=True``</span>
 <span class="sd">    fft_config : FFTPlotConfig, optional</span>
 <span class="sd">        Axis scaling, trace color</span>
 
@@ -378,15 +378,12 @@
     <span class="n">y_axis_type</span> <span class="o">=</span> <span class="s2">&quot;log&quot;</span> <span class="k">if</span> <span class="n">fft_config</span><span class="o">.</span><span class="n">log_y</span> <span class="k">else</span> <span class="s2">&quot;linear&quot;</span>
 
     <span class="k">if</span> <span class="n">stacked</span><span class="p">:</span>
-        <span class="n">subplot_titles</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;FFT: </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">series_names</span><span class="p">]</span>
         <span class="n">fig</span> <span class="o">=</span> <span class="n">make_subplots</span><span class="p">(</span>
             <span class="n">rows</span><span class="o">=</span><span class="n">n</span><span class="p">,</span>
             <span class="n">cols</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
             <span class="n">shared_xaxes</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-            <span class="n">subplot_titles</span><span class="o">=</span><span class="p">(</span>
-                <span class="n">subplot_titles</span> <span class="k">if</span> <span class="n">subplot_config</span><span class="o">.</span><span class="n">show_subplot_titles</span> <span class="k">else</span> <span class="kc">None</span>
-            <span class="p">),</span>
-            <span class="n">vertical_spacing</span><span class="o">=</span><span class="n">subplot_config</span><span class="o">.</span><span class="n">vertical_spacing</span><span class="p">,</span>
+            <span class="n">subplot_titles</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;FFT: </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">series_names</span><span class="p">],</span>
+            <span class="n">vertical_spacing</span><span class="o">=</span><span class="n">layout_config</span><span class="o">.</span><span class="n">grid_vertical_spacing</span><span class="p">,</span>
         <span class="p">)</span>
 
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">xf</span><span class="p">,</span> <span class="n">yf</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span>
@@ -431,10 +428,10 @@
                 <span class="n">yanchor</span><span class="o">=</span><span class="s2">&quot;top&quot;</span><span class="p">,</span>
                 <span class="n">font</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">font_config</span><span class="o">.</span><span class="n">large</span><span class="p">),</span>
             <span class="p">),</span>
-            <span class="n">height</span><span class="o">=</span><span class="n">subplot_config</span><span class="o">.</span><span class="n">height_per_row</span> <span class="o">*</span> <span class="n">n</span><span class="p">,</span>
-            <span class="n">width</span><span class="o">=</span><span class="n">subplot_config</span><span class="o">.</span><span class="n">width</span><span class="p">,</span>
-            <span class="n">margin</span><span class="o">=</span><span class="n">subplot_config</span><span class="o">.</span><span class="n">margin</span><span class="p">,</span>
-            <span class="n">plot_bgcolor</span><span class="o">=</span><span class="n">subplot_config</span><span class="o">.</span><span class="n">plot_bgcolor</span><span class="p">,</span>
+            <span class="n">height</span><span class="o">=</span><span class="n">layout_config</span><span class="o">.</span><span class="n">grid_height_per_row</span> <span class="o">*</span> <span class="n">n</span><span class="p">,</span>
+            <span class="n">width</span><span class="o">=</span><span class="n">layout_config</span><span class="o">.</span><span class="n">width</span><span class="p">,</span>
+            <span class="n">margin</span><span class="o">=</span><span class="n">layout_config</span><span class="o">.</span><span class="n">margin</span><span class="p">,</span>
+            <span class="n">plot_bgcolor</span><span class="o">=</span><span class="n">layout_config</span><span class="o">.</span><span class="n">plot_bgcolor</span><span class="p">,</span>
             <span class="n">showlegend</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
@@ -466,7 +463,8 @@
                 <span class="n">tickfont</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">font_config</span><span class="o">.</span><span class="n">small</span><span class="p">),</span>
                 <span class="nb">type</span><span class="o">=</span><span class="n">y_axis_type</span><span class="p">,</span>
             <span class="p">),</span>
-            <span class="n">height</span><span class="o">=</span><span class="n">fft_config</span><span class="o">.</span><span class="n">height_single</span><span class="p">,</span>
+            <span class="n">height</span><span class="o">=</span><span class="n">layout_config</span><span class="o">.</span><span class="n">height</span><span class="p">,</span>
+            <span class="n">width</span><span class="o">=</span><span class="n">layout_config</span><span class="o">.</span><span class="n">width</span><span class="p">,</span>
             <span class="n">plot_bgcolor</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">,</span>
             <span class="n">showlegend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="n">legend</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">font</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">font_config</span><span class="o">.</span><span class="n">small</span><span class="p">)),</span>
