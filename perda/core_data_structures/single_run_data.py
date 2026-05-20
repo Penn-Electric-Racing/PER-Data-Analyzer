@@ -112,12 +112,12 @@ class SingleRunData(BaseModel):
         if cpp_name in self:
             raise KeyError(f"'{cpp_name}' already exists; use replace() to overwrite.")
 
-        if di.cpp_name != cpp_name:
-            print(f"Warning: replacing DataInstance.cpp_name with {cpp_name}")
+        if di.cpp_name is not None and di.cpp_name != cpp_name:
+            print(f"Using {cpp_name} as DataInstance.cpp_name")
 
         synthetic_id = -(len(self.id_to_instance) + 1)
-        if di.var_id != synthetic_id:
-            print(f"Warning: replacing DataInstance.var_id with {synthetic_id}")
+        if di.var_id is not None and di.var_id != synthetic_id:
+            print(f"Inserting DataInstance with new var_id {synthetic_id}")
 
         stored = DataInstance(
             timestamp_np=di.timestamp_np,
@@ -150,12 +150,12 @@ class SingleRunData(BaseModel):
         var_id = self.cpp_name_to_id[cpp_name]
         old = self.id_to_instance[var_id]
 
-        if di.cpp_name != cpp_name:
-            print(f"Warning: retaining old DataInstance.cpp_name {cpp_name}")
-        if di.var_id != var_id:
-            print(f"Warning: retaining old DataInstance.var_id {var_id}")
-        if di.label != old.label:
-            print(f"Warning: retaining old DataInstance.label {old.label}")
+        if di.cpp_name is not None and di.cpp_name != cpp_name:
+            print(f"Retaining old DataInstance.cpp_name {cpp_name}")
+        if di.var_id is not None and di.var_id != var_id:
+            print(f"Retaining old DataInstance.var_id {var_id}")
+        if di.label is not None and di.label != old.label:
+            print(f"Retaining old DataInstance.label {old.label}")
 
         self.id_to_instance[var_id] = DataInstance(
             timestamp_np=di.timestamp_np,
