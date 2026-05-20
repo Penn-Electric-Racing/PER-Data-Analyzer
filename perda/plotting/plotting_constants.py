@@ -31,6 +31,13 @@ class LayoutConfig(BaseModel):
     title_xanchor: str = "center"
     title_yanchor: str = "top"
 
+    grid_width_per_col: int = 400
+    grid_height_per_row: int = 350
+    grid_horizontal_spacing: float = 0.08
+    grid_vertical_spacing: float = 0.12
+
+    max_display_resolution: int = 50
+
 
 class DiffPlotConfig(BaseModel):
     """Configuration for diff bar chart visualization."""
@@ -97,33 +104,6 @@ class GpsMapConfig(BaseModel):
     max_jump_m: float = 30.0
 
 
-class SubplotConfig(BaseModel):
-    """Layout configuration for stacked subplot figures.
-
-    Parameters
-    ----------
-    height_per_row : int
-        Pixel height allocated to each subplot row.
-    vertical_spacing : float
-        Vertical gap between subplot rows as a fraction of the total figure height.
-    width : int
-        Total figure width in pixels.
-    show_subplot_titles : bool
-        If True, each row receives a subtitle taken from the DataInstance label.
-    plot_bgcolor : str
-        Background color of each subplot panel.
-    margin : Dict[str, int]
-        Figure margins as a dict with keys ``l``, ``r``, ``t``, ``b``.
-    """
-
-    height_per_row: int = 250
-    vertical_spacing: float = 0.04
-    width: int = 1200
-    show_subplot_titles: bool = True
-    plot_bgcolor: str = "white"
-    margin: Dict[str, int] = Field(default_factory=lambda: dict(l=70, r=50, t=90, b=70))
-
-
 class FFTPlotConfig(BaseModel):
     """Configuration for FFT magnitude spectrum plots.
 
@@ -146,34 +126,6 @@ class FFTPlotConfig(BaseModel):
     height_single: int = 500
 
 
-class MultiLogSubplotConfig(BaseModel):
-    """Configuration for multi-log variable comparison subplot figures.
-
-    Parameters
-    ----------
-    max_display_resolution : float | None
-        Maximum display sample rate in Hz. Traces are stride-downsampled to
-        approximately this rate before rendering.  ``None`` disables downsampling.
-    height_per_row : int
-        Pixel height allocated to each subplot row.
-    vertical_spacing : float
-        Vertical gap between subplot rows as a fraction of the total figure height.
-    width : int
-        Total figure width in pixels.
-    plot_bgcolor : str
-        Background color of each subplot panel.
-    margin : Dict[str, int]
-        Figure margins as a dict with keys ``l``, ``r``, ``t``, ``b``.
-    """
-
-    max_display_resolution: float | None = 50.0
-    height_per_row: int = 250
-    vertical_spacing: float = 0.05
-    width: int = 1200
-    plot_bgcolor: str = "white"
-    margin: Dict[str, int] = Field(default_factory=lambda: dict(l=70, r=50, t=90, b=70))
-
-
 # Default configuration instances
 DEFAULT_FONT_CONFIG = FontConfig()
 DEFAULT_LAYOUT_CONFIG = LayoutConfig()
@@ -181,6 +133,4 @@ DEFAULT_DIFF_PLOT_CONFIG = DiffPlotConfig()
 DEFAULT_SCATTER_HISTOGRAM_PLOT_CONFIG = ScatterHistogramPlotConfig()
 DEFAULT_VLINE_CONFIG = VLineConfig()
 DEFAULT_GPS_MAP_CONFIG = GpsMapConfig()
-DEFAULT_SUBPLOT_CONFIG = SubplotConfig()
 DEFAULT_FFT_PLOT_CONFIG = FFTPlotConfig()
-DEFAULT_MULTI_LOG_SUBPLOT_CONFIG = MultiLogSubplotConfig()

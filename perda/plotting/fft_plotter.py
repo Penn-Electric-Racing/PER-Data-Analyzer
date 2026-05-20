@@ -8,10 +8,10 @@ from plotly.subplots import make_subplots
 from .plotting_constants import (
     DEFAULT_FFT_PLOT_CONFIG,
     DEFAULT_FONT_CONFIG,
-    DEFAULT_SUBPLOT_CONFIG,
+    DEFAULT_LAYOUT_CONFIG,
     FFTPlotConfig,
     FontConfig,
-    SubplotConfig,
+    LayoutConfig,
 )
 
 
@@ -23,8 +23,8 @@ def plot_fft_spectrum(
     x_label: str = "Frequency (Hz)",
     y_label: str = "Magnitude",
     stacked: bool = True,
+    layout_config: LayoutConfig = DEFAULT_LAYOUT_CONFIG,
     font_config: FontConfig = DEFAULT_FONT_CONFIG,
-    subplot_config: SubplotConfig = DEFAULT_SUBPLOT_CONFIG,
     fft_config: FFTPlotConfig = DEFAULT_FFT_PLOT_CONFIG,
 ) -> go.Figure:
     """Plot one or more pre-computed FFT magnitude spectra.
@@ -44,10 +44,10 @@ def plot_fft_spectrum(
     stacked : bool, optional
         If ``True``, render one subplot per series sharing the x-axis.
         If ``False``, overlay all series on a single plot. Default is True.
+    layout_config : LayoutConfig, optional
+        Figure dimensions and spacing.
     font_config : FontConfig, optional
         Font sizes for plot elements.
-    subplot_config : SubplotConfig, optional
-        Row height and spacing used when ``stacked=True``
     fft_config : FFTPlotConfig, optional
         Axis scaling, trace color
 
@@ -71,15 +71,12 @@ def plot_fft_spectrum(
     y_axis_type = "log" if fft_config.log_y else "linear"
 
     if stacked:
-        subplot_titles = [f"FFT: {name}" for name in series_names]
         fig = make_subplots(
             rows=n,
             cols=1,
             shared_xaxes=True,
-            subplot_titles=(
-                subplot_titles if subplot_config.show_subplot_titles else None
-            ),
-            vertical_spacing=subplot_config.vertical_spacing,
+            subplot_titles=[f"FFT: {name}" for name in series_names],
+            vertical_spacing=layout_config.grid_vertical_spacing,
         )
 
         for i, (xf, yf, name) in enumerate(
@@ -124,10 +121,10 @@ def plot_fft_spectrum(
                 yanchor="top",
                 font=dict(size=font_config.large),
             ),
-            height=subplot_config.height_per_row * n,
-            width=subplot_config.width,
-            margin=subplot_config.margin,
-            plot_bgcolor=subplot_config.plot_bgcolor,
+            height=layout_config.grid_height_per_row * n,
+            width=layout_config.width,
+            margin=layout_config.margin,
+            plot_bgcolor=layout_config.plot_bgcolor,
             showlegend=False,
         )
     else:
@@ -159,7 +156,8 @@ def plot_fft_spectrum(
                 tickfont=dict(size=font_config.small),
                 type=y_axis_type,
             ),
-            height=fft_config.height_single,
+            height=layout_config.height,
+            width=layout_config.width,
             plot_bgcolor="white",
             showlegend=True,
             legend=dict(font=dict(size=font_config.small)),

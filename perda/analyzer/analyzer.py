@@ -266,8 +266,8 @@ class Analyzer:
         ts_start: float | None = None,
         ts_end: float | None = None,
         show_legend: bool = True,
+        layout_config: LayoutConfig = DEFAULT_LAYOUT_CONFIG,
         font_config: FontConfig = DEFAULT_FONT_CONFIG,
-        subplot_config: SubplotConfig = DEFAULT_SUBPLOT_CONFIG,
     ) -> go.Figure:
         """
         Plot multiple variables as stacked subplots on a shared time axis.
@@ -296,10 +296,10 @@ class Analyzer:
             excluded from all rows. Default is None (no upper bound).
         show_legend : bool, optional
             Whether to show the figure legend. Default is True.
+        layout_config : LayoutConfig, optional
+            Figure dimensions and spacing.
         font_config : FontConfig, optional
             Font sizes for plot elements.
-        subplot_config : SubplotConfig, optional
-            Row height, spacing, width, and style.
 
         Returns
         -------
@@ -337,8 +337,8 @@ class Analyzer:
             title=title,
             row_y_labels=row_y_labels,
             show_legend=show_legend,
+            layout_config=layout_config,
             font_config=font_config,
-            subplot_config=subplot_config,
             timestamp_unit=unit,
         )
 

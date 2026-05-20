@@ -16,8 +16,8 @@ def data_instance_subplots(
     title: str | None = None,
     row_y_labels: List[str | None] | None = None,
     show_legend: bool = True,
+    layout_config: LayoutConfig = DEFAULT_LAYOUT_CONFIG,
     font_config: FontConfig = DEFAULT_FONT_CONFIG,
-    subplot_config: SubplotConfig = DEFAULT_SUBPLOT_CONFIG,
     timestamp_unit: Timescale = Timescale.MS,
 ) -> go.Figure:
     """Plot groups of DataInstances as stacked subplots on a shared time axis.
@@ -39,10 +39,10 @@ def data_instance_subplots(
         DataInstance labels in that row. Default is None (all rows auto-label).
     show_legend : bool, optional
         Whether to show the figure legend. Default is True.
+    layout_config : LayoutConfig, optional
+        Dimensions, spacing, and style for the subplot grid.
     font_config : FontConfig, optional
         Font sizes for title, axis labels, tick labels, and legend.
-    subplot_config : SubplotConfig, optional
-        Dimensions, spacing, and style for the subplot grid.
     timestamp_unit : Timescale, optional
         Timestamp unit of the underlying DataInstances. Converted to seconds
         for x-axis display. Default is Timescale.MS.
@@ -67,21 +67,19 @@ def data_instance_subplots(
 
     n = len(rows)
 
-    subplot_titles: List[str] | None = None
-    if subplot_config.show_subplot_titles:
-        subplot_titles = []
-        for i, row_dis in enumerate(rows):
-            if row_y_labels and i < len(row_y_labels) and row_y_labels[i] is not None:
-                subplot_titles.append(row_y_labels[i])  # type: ignore[arg-type]
-            else:
-                labels = [di.label for di in row_dis if di.label]
-                subplot_titles.append(", ".join(labels) if labels else "")
+    subplot_titles = []
+    for i, row_dis in enumerate(rows):
+        if row_y_labels and i < len(row_y_labels) and row_y_labels[i] is not None:
+            subplot_titles.append(row_y_labels[i])  # type: ignore[arg-type]
+        else:
+            labels = [di.label for di in row_dis if di.label]
+            subplot_titles.append(", ".join(labels) if labels else "")
 
     fig = make_subplots(
         rows=n,
         cols=1,
         shared_xaxes=True,
-        vertical_spacing=subplot_config.vertical_spacing,
+        vertical_spacing=layout_config.grid_vertical_spacing,
         subplot_titles=subplot_titles,
     )
 
@@ -136,10 +134,10 @@ def data_instance_subplots(
             yanchor="top",
             font=dict(size=font_config.large),
         ),
-        height=subplot_config.height_per_row * n,
-        width=subplot_config.width,
-        margin=subplot_config.margin,
-        plot_bgcolor=subplot_config.plot_bgcolor,
+        height=layout_config.grid_height_per_row * n,
+        width=layout_config.width,
+        margin=layout_config.margin,
+        plot_bgcolor=layout_config.plot_bgcolor,
         showlegend=show_legend,
         hovermode="x unified",
         legend=dict(font=dict(size=font_config.small)),
@@ -191,8 +189,8 @@ def plot_multi_log_subplots(
     var_names: List[str],
     row_y_labels: List[str | None] | None = None,
     title: str | None = None,
+    layout_config: LayoutConfig = DEFAULT_LAYOUT_CONFIG,
     font_config: FontConfig = DEFAULT_FONT_CONFIG,
-    config: MultiLogSubplotConfig = DEFAULT_MULTI_LOG_SUBPLOT_CONFIG,
     timestamp_unit: Timescale = Timescale.MS,
 ) -> go.Figure:
     """Plot the same set of variables across multiple logs as stacked subplots, with each
@@ -209,8 +207,8 @@ def plot_multi_log_subplots(
     title : str | None, optional
         Base figure title.  When multiple figures are produced a ``(1/N)``
         suffix is appended automatically.
+    layout_config : LayoutConfig, optional
     font_config : FontConfig, optional
-    config : MultiLogSubplotConfig, optional
     timestamp_unit : Timescale, optional
         Timestamp unit of the underlying DataInstances. Default is Timescale.MS.
 
@@ -238,7 +236,7 @@ def plot_multi_log_subplots(
         rows=n_vars,
         cols=1,
         shared_xaxes=True,
-        vertical_spacing=config.vertical_spacing,
+        vertical_spacing=layout_config.grid_vertical_spacing,
         subplot_titles=var_names,
     )
 
@@ -253,9 +251,9 @@ def plot_multi_log_subplots(
             di = srd[var_name]
             timestamps_s = _to_seconds(di.timestamp_np.astype(float), timestamp_unit)
             values = di.value_np
-            if config.max_display_resolution:
+            if layout_config.max_display_resolution:
                 timestamps_s, values = stride_downsample(
-                    timestamps_s, values, config.max_display_resolution
+                    timestamps_s, values, layout_config.max_display_resolution
                 )
 
             fig.add_trace(
@@ -298,10 +296,10 @@ def plot_multi_log_subplots(
             yanchor="top",
             font=dict(size=font_config.large),
         ),
-        height=config.height_per_row * n_vars,
-        width=config.width,
-        margin=config.margin,
-        plot_bgcolor=config.plot_bgcolor,
+        height=layout_config.grid_height_per_row * n_vars,
+        width=layout_config.width,
+        margin=layout_config.margin,
+        plot_bgcolor=layout_config.plot_bgcolor,
         hovermode="x unified",
         legend=dict(font=dict(size=font_config.small)),
     )

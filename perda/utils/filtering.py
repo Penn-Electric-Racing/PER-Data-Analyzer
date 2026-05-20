@@ -171,14 +171,21 @@ def lowpass_filter_by_distance(
         # Align distance onto the signal's timestamp grid
         _, distance_aligned = left_join_data_instances(instance, distance_di)
         dist_values = distance_aligned.value_np.astype(np.float64)
+        signal = instance.value_np.astype(np.float64)
 
-        dx_median = float(np.median(np.diff(dist_values)))
-        if dx_median <= 0:
+        # Remove duplicate-distance samples (car stationary) before spatial filtering.
+        diffs = np.diff(dist_values)
+        moving = np.concatenate(([True], diffs > 0))
+        dist_dedup = dist_values[moving]
+        signal_dedup = signal[moving]
+
+        positive_diffs = diffs[diffs > 0]
+        if positive_diffs.size == 0:
             raise ValueError(
-                f"Non-positive median distance step "
-                f"({dx_median:.6f} m). Cannot determine spatial sample rate."
+                "No positive distance steps found. Cannot determine spatial sample rate."
             )
 
+        dx_median = float(np.median(positive_diffs))
         fs = 1.0 / dx_median
         nyq = fs / 2.0
 
@@ -191,12 +198,14 @@ def lowpass_filter_by_distance(
             continue
 
         sos = butter(order, cutoff_freq_per_meter / nyq, btype="low", output="sos")
-        signal = instance.value_np.astype(np.float64)
-        filtered = apply_sos_filter(signal, sos, order)
+        filtered_dedup = apply_sos_filter(signal_dedup, sos, order)
 
-        if filtered is None:
+        if filtered_dedup is None:
             results.append(instance)
             continue
+
+        # Interpolate filtered values back onto the original distance grid
+        filtered = np.interp(dist_values, dist_dedup, filtered_dedup)
 
         results.append(
             DataInstance(
@@ -343,11 +352,13 @@ def compute_fft(
     if distance_di is not None:
         _, distance_aligned = left_join_data_instances(di, distance_di)
         dist_values = distance_aligned.value_np.astype(np.float64)[valid]
-        dx = float(np.median(np.diff(dist_values)))
-        if dx <= 0 or not np.isfinite(dx):
+        positive_diffs = np.diff(dist_values)
+        positive_diffs = positive_diffs[positive_diffs > 0]
+        if positive_diffs.size == 0 or not np.all(np.isfinite(positive_diffs)):
             raise ValueError(
-                "Non-positive median distance step; cannot compute spatial FFT."
+                "No positive distance steps found; cannot compute spatial FFT."
             )
+        dx = float(np.median(positive_diffs))
     else:
         ts_s = _to_seconds(di.timestamp_np.astype(np.float64), source_time_unit)
         dt = float(np.median(np.diff(ts_s)))

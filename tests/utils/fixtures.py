@@ -80,6 +80,38 @@ def uniform_di():
 
 
 @pytest.fixture
+def spatial_signal_factory():
+    """Factory that builds a (signal_di, distance_di) pair on a uniform spatial grid.
+
+    Parameters (keyword-only after freq_per_m):
+        freq_per_m : float — spatial frequency of the sine wave in cycles/meter
+        n          : int   — number of samples (default 500)
+        dx         : float — spatial step size in meters (default 0.1)
+        label      : str   — label for the signal DataInstance (default "spatial_signal")
+    """
+
+    def _factory(
+        freq_per_m: float,
+        *,
+        n: int = 500,
+        dx: float = 0.1,
+        label: str = "spatial_signal",
+    ) -> tuple:
+        ts = np.arange(n, dtype=np.int64)
+        dist = np.arange(n, dtype=np.float64) * dx
+        signal = np.sin(2 * np.pi * freq_per_m * dist).astype(np.float64)
+        signal_di = DataInstance(
+            timestamp_np=ts, value_np=signal, label=label, var_id=1
+        )
+        distance_di = DataInstance(
+            timestamp_np=ts, value_np=dist, label="distance", var_id=2
+        )
+        return signal_di, distance_di
+
+    return _factory
+
+
+@pytest.fixture
 def empty_srd():
     """SingleRunData with no variables — used for missing-variable tests."""
     return SingleRunData(
