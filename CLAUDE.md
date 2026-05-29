@@ -30,7 +30,6 @@ The library has four layers:
    - `data_instance_plotter.py` — Plotly-based interactive visualization, supports single and dual y-axis.
    - `parametric_plot.py` — Generic 2D parametric curve plotting (neither axis needs to be a function of the other)
       - `plot_parametric_curve` — Static Plotly figure of a 2D parametric curve
-      - `plot_parametric_curve_square` — Same, but with equal axes and a square aspect ratio
       - `plot_parametric_trimmer` — Interactive trimmer widget for a parametric curve, with optional timestamp labels
    - `plotting_constants.py` — All config objects that can be used to configure our plotting functions, as well as sensible defaults
 

@@ -2,7 +2,7 @@ import re
 from pathlib import Path
 from typing import Any
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from rapidfuzz import fuzz
 
 from ..constants import DELIMITER, title_block
@@ -50,34 +50,22 @@ ABBREVIATIONS: dict[str, str] = {
 class SearchEntry(BaseModel):
     """One entry in the search deck, holding raw variable data alongside its search card."""
 
-    var_id: int
-    cpp_name: str
-    descript: str
-    card: str
+    var_id: int = Field(description="Internal variable ID.")
+    cpp_name: str = Field(description="C++ variable name used for data access.")
+    descript: str = Field(description="Human-readable variable description.")
+    card: str = Field(description="Space-separated search card text for scoring.")
 
 
 class SearchResult(BaseModel):
-    """A single ranked result returned by :func:`search`.
+    """A single ranked result returned by :func:`search`."""
 
-    Attributes
-    ----------
-    rank : int
-        1-based position in the result list (1 = best match).
-    score : float
-        Relevance score (higher is better).
-    var_id : int
-        Internal variable ID.
-    cpp_name : str
-        C++ variable name used for data access.
-    descript : str
-        Human-readable variable description.
-    """
-
-    rank: int
-    score: float
-    var_id: int
-    cpp_name: str
-    descript: str
+    rank: int = Field(
+        description="1-based position in the result list (1 = best match)."
+    )
+    score: float = Field(description="Relevance score (higher is better).")
+    var_id: int = Field(description="Internal variable ID.")
+    cpp_name: str = Field(description="C++ variable name used for data access.")
+    descript: str = Field(description="Human-readable variable description.")
 
     def __str__(self) -> str:
         col_score, col_id, col_name, col_desc = 7, 4, 40, 60
