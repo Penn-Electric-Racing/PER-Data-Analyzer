@@ -21,8 +21,8 @@ DEFAULT_VECTORNAV_NED_VEL_D = "velD"
 
 DEFAULT_WHEELSPEED_FR = "pcm.wheelSpeeds.frontRight"
 DEFAULT_WHEELSPEED_FL = "pcm.wheelSpeeds.frontLeft"
-DEFAULT_WHEELSPEED_RR = "pcm.wheelSpeeds.rearRight"
-DEFAULT_WHEELSPEED_RL = "pcm.wheelSpeeds.rearLeft"
+DEFAULT_WHEELSPEED_RR = "pcm.wheelSpeeds.backRight"
+DEFAULT_WHEELSPEED_RL = "pcm.wheelSpeeds.backLeft"
 
 DEFAULT_MOTOR_RPM = "pcm.moc.motor.angularSpeed"
 DEFAULT_MOTOR_WHEELSPEED = "pcm.moc.motor.wheelSpeed"
