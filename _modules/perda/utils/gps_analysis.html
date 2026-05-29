@@ -308,15 +308,11 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">ipywidgets</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">widgets</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">plotly.graph_objects</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">go</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="kn">import</span> <span class="n">float64</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">numpy.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">NDArray</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">..constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">R_EARTH_M</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..core_data_structures.data_instance</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataInstance</span><span class="p">,</span> <span class="n">left_join_data_instances</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">..plotting.parametric_plot</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">plot_parametric_curve_square</span><span class="p">,</span>
-    <span class="n">plot_parametric_trimmer</span><span class="p">,</span>
-<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..plotting.parametric_plot</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_parametric_trimmer</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..plotting.plotting_constants</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">DEFAULT_FONT_CONFIG</span><span class="p">,</span>
     <span class="n">DEFAULT_GPS_MAP_CONFIG</span><span class="p">,</span>
@@ -395,11 +391,11 @@
 <div class="viewcode-block" id="gps_to_enu">
 <a class="viewcode-back" href="../../../_autosummary/perda.utils.gps_analysis.html#perda.utils.gps_analysis.gps_to_enu">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">gps_to_enu</span><span class="p">(</span>
-    <span class="n">lat</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span>
-    <span class="n">lon</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span>
+    <span class="n">lat</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
+    <span class="n">lon</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">lat_ref</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">lon_ref</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]]:</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Project lat/lon coordinates to a local East-North-Up (ENU) Cartesian frame.</span>
 
@@ -408,9 +404,9 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    lat : NDArray[float64]</span>
+<span class="sd">    lat : NDArray[np.float64]</span>
 <span class="sd">        Latitude values in degrees.</span>
-<span class="sd">    lon : NDArray[float64]</span>
+<span class="sd">    lon : NDArray[np.float64]</span>
 <span class="sd">        Longitude values in degrees.</span>
 <span class="sd">    lat_ref : float | None, optional</span>
 <span class="sd">        Reference latitude in degrees.  Defaults to the median of ``lat``.</span>
@@ -419,7 +415,7 @@
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    tuple[NDArray[float64], NDArray[float64]]</span>
+<span class="sd">    tuple[NDArray[np.float64], NDArray[np.float64]]</span>
 <span class="sd">        ``(east_m, north_m)`` arrays giving signed distance in metres from the</span>
 <span class="sd">        reference point along the East and North axes respectively.</span>
 
@@ -438,8 +434,8 @@
 <div class="viewcode-block" id="filter_gps_cartesian">
 <a class="viewcode-back" href="../../../_autosummary/perda.utils.gps_analysis.html#perda.utils.gps_analysis.filter_gps_cartesian">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">filter_gps_cartesian</span><span class="p">(</span>
-    <span class="n">lat</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span>
-    <span class="n">lon</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span>
+    <span class="n">lat</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
+    <span class="n">lon</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">gps_map_config</span><span class="p">:</span> <span class="n">GpsMapConfig</span> <span class="o">=</span> <span class="n">DEFAULT_GPS_MAP_CONFIG</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -454,15 +450,15 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    lat : NDArray[float64]</span>
+<span class="sd">    lat : NDArray[np.float64]</span>
 <span class="sd">        Latitude values in degrees.</span>
-<span class="sd">    lon : NDArray[float64]</span>
+<span class="sd">    lon : NDArray[np.float64]</span>
 <span class="sd">        Longitude values in degrees.</span>
 <span class="sd">    gps_map_config : GpsMapConfig, optional</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    NDArray[np.bool_]</span>
+<span class="sd">    NDArray[``np.bool_``]</span>
 <span class="sd">        Boolean mask; ``True`` where a point should be *kept*.</span>
 
 <span class="sd">    Examples</span>
@@ -482,7 +478,7 @@
 <div class="viewcode-block" id="plot_gps_comparison">
 <a class="viewcode-back" href="../../../_autosummary/perda.utils.gps_analysis.html#perda.utils.gps_analysis.plot_gps_comparison">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">plot_gps_comparison</span><span class="p">(</span>
-    <span class="n">runs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span> <span class="nb">str</span><span class="p">]],</span>
+    <span class="n">runs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="nb">str</span><span class="p">]],</span>
     <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">gps_map_config</span><span class="p">:</span> <span class="n">GpsMapConfig</span> <span class="o">=</span> <span class="n">DEFAULT_GPS_MAP_CONFIG</span><span class="p">,</span>
     <span class="n">layout_config</span><span class="p">:</span> <span class="n">LayoutConfig</span> <span class="o">=</span> <span class="n">DEFAULT_LAYOUT_CONFIG</span><span class="p">,</span>
@@ -497,7 +493,7 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    runs : List[tuple[NDArray[float64], NDArray[float64], str]]</span>
+<span class="sd">    runs : List[tuple[NDArray[np.float64], NDArray[np.float64], str]]</span>
 <span class="sd">        Each element is ``(lat_array, lon_array, label)`` for one run.</span>
 <span class="sd">        ``lat_array`` and ``lon_array`` must be the same length.</span>
 <span class="sd">    title : str | None, optional</span>

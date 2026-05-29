@@ -428,8 +428,8 @@ point exceeds <code class="docutils literal notranslate"><span class="pre">gps_m
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>lat</strong> (<em>NDArray</em><em>[</em><em>float64</em><em>]</em>) – Latitude values in degrees.</p></li>
-<li><p><strong>lon</strong> (<em>NDArray</em><em>[</em><em>float64</em><em>]</em>) – Longitude values in degrees.</p></li>
+<li><p><strong>lat</strong> (<em>NDArray</em><em>[</em><em>np.float64</em><em>]</em>) – Latitude values in degrees.</p></li>
+<li><p><strong>lon</strong> (<em>NDArray</em><em>[</em><em>np.float64</em><em>]</em>) – Longitude values in degrees.</p></li>
 <li><p><strong>gps_map_config</strong> (<a class="reference internal" href="perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.GpsMapConfig" title="perda.plotting.plotting_constants.GpsMapConfig"><em>GpsMapConfig</em></a><em>, </em><em>optional</em>)</p></li>
 </ul>
 </dd>
@@ -437,7 +437,7 @@ point exceeds <code class="docutils literal notranslate"><span class="pre">gps_m
 <dd class="field-even"><p>Boolean mask; <code class="docutils literal notranslate"><span class="pre">True</span></code> where a point should be <em>kept</em>.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>NDArray[<a href="#id1"><span class="problematic" id="id2">np.bool_</span></a>]</p>
+<dd class="field-odd"><p>NDArray[<code class="docutils literal notranslate"><span class="pre">np.bool_</span></code>]</p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
@@ -456,8 +456,8 @@ up to ~10 km from the reference point.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>lat</strong> (<em>NDArray</em><em>[</em><em>float64</em><em>]</em>) – Latitude values in degrees.</p></li>
-<li><p><strong>lon</strong> (<em>NDArray</em><em>[</em><em>float64</em><em>]</em>) – Longitude values in degrees.</p></li>
+<li><p><strong>lat</strong> (<em>NDArray</em><em>[</em><em>np.float64</em><em>]</em>) – Latitude values in degrees.</p></li>
+<li><p><strong>lon</strong> (<em>NDArray</em><em>[</em><em>np.float64</em><em>]</em>) – Longitude values in degrees.</p></li>
 <li><p><strong>lat_ref</strong> (<em>float</em><em> | </em><em>None</em><em>, </em><em>optional</em>) – Reference latitude in degrees.  Defaults to the median of <code class="docutils literal notranslate"><span class="pre">lat</span></code>.</p></li>
 <li><p><strong>lon_ref</strong> (<em>float</em><em> | </em><em>None</em><em>, </em><em>optional</em>) – Reference longitude in degrees.  Defaults to the median of <code class="docutils literal notranslate"><span class="pre">lon</span></code>.</p></li>
 </ul>
@@ -467,7 +467,7 @@ up to ~10 km from the reference point.</p>
 reference point along the East and North axes respectively.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>tuple[NDArray[float64], NDArray[float64]]</p>
+<dd class="field-odd"><p>tuple[NDArray[np.float64], NDArray[np.float64]]</p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
@@ -486,7 +486,7 @@ point (median of all points across all runs), then filtered with
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>runs</strong> (<em>List</em><em>[</em><em>tuple</em><em>[</em><em>NDArray</em><em>[</em><em>float64</em><em>]</em><em>, </em><em>NDArray</em><em>[</em><em>float64</em><em>]</em><em>, </em><em>str</em><em>]</em><em>]</em>) – Each element is <code class="docutils literal notranslate"><span class="pre">(lat_array,</span> <span class="pre">lon_array,</span> <span class="pre">label)</span></code> for one run.
+<li><p><strong>runs</strong> (<em>List</em><em>[</em><em>tuple</em><em>[</em><em>NDArray</em><em>[</em><em>np.float64</em><em>]</em><em>, </em><em>NDArray</em><em>[</em><em>np.float64</em><em>]</em><em>, </em><em>str</em><em>]</em><em>]</em>) – Each element is <code class="docutils literal notranslate"><span class="pre">(lat_array,</span> <span class="pre">lon_array,</span> <span class="pre">label)</span></code> for one run.
 <code class="docutils literal notranslate"><span class="pre">lat_array</span></code> and <code class="docutils literal notranslate"><span class="pre">lon_array</span></code> must be the same length.</p></li>
 <li><p><strong>title</strong> (<em>str</em><em> | </em><em>None</em><em>, </em><em>optional</em>)</p></li>
 <li><p><strong>gps_map_config</strong> (<a class="reference internal" href="perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.GpsMapConfig" title="perda.plotting.plotting_constants.GpsMapConfig"><em>GpsMapConfig</em></a><em>, </em><em>optional</em>) – Controls Cartesian outlier thresholds (<code class="docutils literal notranslate"><span class="pre">max_radius_m</span></code>, <code class="docutils literal notranslate"><span class="pre">max_jump_m</span></code>)

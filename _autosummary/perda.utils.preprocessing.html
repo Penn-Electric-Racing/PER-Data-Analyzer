@@ -380,16 +380,73 @@
   <section id="module-perda.utils.preprocessing">
 <span id="perda-utils-preprocessing"></span><h1>perda.utils.preprocessing<a class="headerlink" href="#module-perda.utils.preprocessing" title="Link to this heading">#</a></h1>
 <dl class="py class">
-<dt class="sig sig-object py" id="perda.utils.preprocessing.CorrectSteeringAngleLambda">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">perda.utils.preprocessing.</span></span><span class="sig-name descname"><span class="pre">CorrectSteeringAngleLambda</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">calibration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">((1.86,</span> <span class="pre">-97.0),</span> <span class="pre">(2.93,</span> <span class="pre">0.0),</span> <span class="pre">(3.96,</span> <span class="pre">97.0))</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/utils/preprocessing.html#CorrectSteeringAngleLambda"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.utils.preprocessing.CorrectSteeringAngleLambda" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="perda.utils.preprocessing.ConvertWheelspeedsToMPerSLambda">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">perda.utils.preprocessing.</span></span><span class="sig-name descname"><span class="pre">ConvertWheelspeedsToMPerSLambda</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wheelspeed_fr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pcm.wheelSpeeds.frontRight'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wheelspeed_fl</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pcm.wheelSpeeds.frontLeft'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wheelspeed_rr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pcm.wheelSpeeds.rearRight'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wheelspeed_rl</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pcm.wheelSpeeds.rearLeft'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/utils/preprocessing.html#ConvertWheelspeedsToMPerSLambda"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.utils.preprocessing.ConvertWheelspeedsToMPerSLambda" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Callable preprocessing step for recomputing the steering angle to account for drift.</p>
-<p>Fits a polynomial through the calibration points and
-rewrites the angle channel in-place, preserving the original as
-<code class="docutils literal notranslate"><span class="pre">ludwig.steeringWheel.angle_original</span></code>.</p>
+<p>Backing class for the <code class="docutils literal notranslate"><span class="pre">convert_wheelspeeds_to_m_per_s</span></code> preprocessing step.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>calibration</strong> (<em>tuple</em><em>[</em><em>tuple</em><em>[</em><em>float</em><em>, </em><em>float</em><em>]</em><em>, </em><em>...</em><em>]</em>)</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>wheelspeed_fr</strong> (<em>str</em>)</p></li>
+<li><p><strong>wheelspeed_fl</strong> (<em>str</em>)</p></li>
+<li><p><strong>wheelspeed_rr</strong> (<em>str</em>)</p></li>
+<li><p><strong>wheelspeed_rl</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="perda.utils.preprocessing.CorrectMotorDataLambda">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">perda.utils.preprocessing.</span></span><span class="sig-name descname"><span class="pre">CorrectMotorDataLambda</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gear_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5.6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tire_radius_in</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">7.85</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">motor_rpm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pcm.moc.motor.angularSpeed'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">motor_wheelspeed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pcm.moc.motor.wheelSpeed'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/utils/preprocessing.html#CorrectMotorDataLambda"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.utils.preprocessing.CorrectMotorDataLambda" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Backing class for the <code class="docutils literal notranslate"><span class="pre">correct_motor_data</span></code> preprocessing step.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>gear_ratio</strong> (<em>float</em>)</p></li>
+<li><p><strong>tire_radius_in</strong> (<em>float</em>)</p></li>
+<li><p><strong>motor_rpm</strong> (<em>str</em>)</p></li>
+<li><p><strong>motor_wheelspeed</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="perda.utils.preprocessing.CorrectSteeringAngleLambda">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">perda.utils.preprocessing.</span></span><span class="sig-name descname"><span class="pre">CorrectSteeringAngleLambda</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">calibration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">((1.86,</span> <span class="pre">-97.0),</span> <span class="pre">(2.93,</span> <span class="pre">0.0),</span> <span class="pre">(3.96,</span> <span class="pre">97.0))</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steering_raw</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ludwig.steeringWheel.raw'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steering_angle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ludwig.steeringWheel.angle'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/utils/preprocessing.html#CorrectSteeringAngleLambda"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.utils.preprocessing.CorrectSteeringAngleLambda" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Backing class for the <code class="docutils literal notranslate"><span class="pre">correct_steering_angle</span></code> preprocessing step.</p>
+<p>Fits a polynomial through <code class="docutils literal notranslate"><span class="pre">calibration</span></code> points (voltage, angle) at construction time,
+then rewrites the angle channel from the raw voltage channel on each call.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>calibration</strong> (<em>tuple</em><em>[</em><em>tuple</em><em>[</em><em>float</em><em>, </em><em>float</em><em>]</em><em>, </em><em>...</em><em>]</em>)</p></li>
+<li><p><strong>steering_raw</strong> (<em>str</em>)</p></li>
+<li><p><strong>steering_angle</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="perda.utils.preprocessing.PatchNedVelocityLambda">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">perda.utils.preprocessing.</span></span><span class="sig-name descname"><span class="pre">PatchNedVelocityLambda</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">body_vel_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pcm.vnav.velocityBody.x'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">body_vel_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pcm.vnav.velocityBody.y'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">body_vel_z</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pcm.vnav.velocityBody.z'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yaw</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pcm.vnav.yawPitchRoll.yaw'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ned_vel_n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'velN'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ned_vel_e</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'velE'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ned_vel_d</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'velD'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/utils/preprocessing.html#PatchNedVelocityLambda"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.utils.preprocessing.PatchNedVelocityLambda" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Backing class for the <code class="docutils literal notranslate"><span class="pre">patch_ned_velocity</span></code> preprocessing step.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>body_vel_x</strong> (<em>str</em>)</p></li>
+<li><p><strong>body_vel_y</strong> (<em>str</em>)</p></li>
+<li><p><strong>body_vel_z</strong> (<em>str</em>)</p></li>
+<li><p><strong>yaw</strong> (<em>str</em>)</p></li>
+<li><p><strong>ned_vel_n</strong> (<em>str</em>)</p></li>
+<li><p><strong>ned_vel_e</strong> (<em>str</em>)</p></li>
+<li><p><strong>ned_vel_d</strong> (<em>str</em>)</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -415,52 +472,152 @@ rewrites the angle channel in-place, preserving the original as
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">apply_preprocessing</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="p">[</span><span class="n">correct_motor_data</span><span class="p">,</span> <span class="n">convert_wheelspeeds_to_m_per_s</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">apply_preprocessing</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="p">[</span>
-<span class="gp">... </span>    <span class="n">correct_motor_data</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">correct_steering_angle</span><span class="p">(</span><span class="n">calibration</span><span class="o">=</span><span class="p">((</span><span class="mf">1.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">90.0</span><span class="p">),</span> <span class="p">(</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span> <span class="p">(</span><span class="mf">4.5</span><span class="p">,</span> <span class="mf">90.0</span><span class="p">))),</span>
+<span class="gp">... </span>    <span class="n">correct_motor_data</span><span class="p">(</span><span class="n">gear_ratio</span><span class="o">=</span><span class="mf">6.2</span><span class="p">,</span> <span class="n">tire_radius_in</span><span class="o">=</span><span class="mf">8.0</span><span class="p">),</span>
+<span class="gp">... </span>    <span class="n">correct_steering_angle</span><span class="p">(((</span><span class="mf">1.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">90.0</span><span class="p">),</span> <span class="p">(</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span> <span class="p">(</span><span class="mf">4.5</span><span class="p">,</span> <span class="mf">90.0</span><span class="p">))),</span>
 <span class="gp">... </span><span class="p">])</span>
 </pre></div>
 </div>
 </dd></dl>
 
-<dl class="py function">
+<dl class="py data">
 <dt class="sig sig-object py" id="perda.utils.preprocessing.convert_wheelspeeds_to_m_per_s">
-<span class="sig-prename descclassname"><span class="pre">perda.utils.preprocessing.</span></span><span class="sig-name descname"><span class="pre">convert_wheelspeeds_to_m_per_s</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/utils/preprocessing.html#convert_wheelspeeds_to_m_per_s"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.utils.preprocessing.convert_wheelspeeds_to_m_per_s" title="Link to this definition">#</a></dt>
-<dd><p>Convert wheel speed channels from mph to m/s, preserving originals as <a href="#id1"><span class="problematic" id="id2">*</span></a>_mph.</p>
+<span class="sig-prename descclassname"><span class="pre">perda.utils.preprocessing.</span></span><span class="sig-name descname"><span class="pre">convert_wheelspeeds_to_m_per_s</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;perda.utils.preprocessing.ConvertWheelspeedsToMPerSLambda</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#perda.utils.preprocessing.convert_wheelspeeds_to_m_per_s" title="Link to this definition">#</a></dt>
+<dd><p>convert all four wheel speed channels from mph to m/s.</p>
+<p>Each channel is converted in-place; the original mph values are preserved as
+<code class="docutils literal notranslate"><span class="pre">&lt;channel_name&gt;_mph</span></code> backup channels (only created once — idempotent on repeated calls).</p>
+<p>Use directly in a preprocessing pipeline, or call with keyword arguments to get a reconfigured
+copy that operates on non-default variable names.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Analyzer</span><span class="p">(</span><span class="n">preprocessing</span><span class="o">=</span><span class="p">[</span><span class="n">convert_wheelspeeds_to_m_per_s</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Analyzer</span><span class="p">(</span><span class="n">preprocessing</span><span class="o">=</span><span class="p">[</span><span class="n">convert_wheelspeeds_to_m_per_s</span><span class="p">(</span><span class="n">wheelspeed_fr</span><span class="o">=</span><span class="s2">&quot;my.ws.fr&quot;</span><span class="p">)])</span>
+</pre></div>
+</div>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>data</strong> (<a class="reference internal" href="perda.core_data_structures.single_run_data.html#perda.core_data_structures.single_run_data.SingleRunData" title="perda.core_data_structures.single_run_data.SingleRunData"><em>SingleRunData</em></a>)</p>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Preprocessing step</p>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference internal" href="perda.core_data_structures.single_run_data.html#perda.core_data_structures.single_run_data.SingleRunData" title="perda.core_data_structures.single_run_data.SingleRunData">SingleRunData</a></p>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>data</strong> (<a class="reference internal" href="perda.core_data_structures.single_run_data.html#perda.core_data_structures.single_run_data.SingleRunData" title="perda.core_data_structures.single_run_data.SingleRunData"><em>SingleRunData</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>wheelspeed_fr</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>wheelspeed_fl</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>wheelspeed_rr</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>wheelspeed_rl</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="perda.core_data_structures.single_run_data.html#perda.core_data_structures.single_run_data.SingleRunData" title="perda.core_data_structures.single_run_data.SingleRunData"><em>SingleRunData</em></a> | <a class="reference internal" href="#perda.utils.preprocessing.ConvertWheelspeedsToMPerSLambda" title="perda.utils.preprocessing.ConvertWheelspeedsToMPerSLambda">ConvertWheelspeedsToMPerSLambda</a></p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="py function">
+<dl class="py data">
 <dt class="sig sig-object py" id="perda.utils.preprocessing.correct_motor_data">
-<span class="sig-prename descclassname"><span class="pre">perda.utils.preprocessing.</span></span><span class="sig-name descname"><span class="pre">correct_motor_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/utils/preprocessing.html#correct_motor_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.utils.preprocessing.correct_motor_data" title="Link to this definition">#</a></dt>
-<dd><p>Flip the motor RPM sign and derive driven wheel speed.</p>
+<span class="sig-prename descclassname"><span class="pre">perda.utils.preprocessing.</span></span><span class="sig-name descname"><span class="pre">correct_motor_data</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;perda.utils.preprocessing.CorrectMotorDataLambda</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#perda.utils.preprocessing.correct_motor_data" title="Link to this definition">#</a></dt>
+<dd><p>flip motor RPM sign and derive driven wheel speed.</p>
+<p>The motor reports RPM with the sign inverted (negative when driving forward). This step:</p>
+<ol class="arabic simple">
+<li><p>Preserves the original RPM as <code class="docutils literal notranslate"><span class="pre">&lt;motor_rpm&gt;_raw</span></code>.</p></li>
+<li><p>Flips the sign of the RPM channel in-place.</p></li>
+<li><p>Derives a driven wheel linear speed (m/s) from RPM, gear ratio, and tire radius,
+and writes it to <code class="docutils literal notranslate"><span class="pre">motor_wheelspeed</span></code>.</p></li>
+</ol>
+<p>Use directly in a preprocessing pipeline, or call with keyword arguments to get a reconfigured
+copy with different physical constants or variable names.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Analyzer</span><span class="p">(</span><span class="n">preprocessing</span><span class="o">=</span><span class="p">[</span><span class="n">correct_motor_data</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Analyzer</span><span class="p">(</span><span class="n">preprocessing</span><span class="o">=</span><span class="p">[</span><span class="n">correct_motor_data</span><span class="p">(</span><span class="n">gear_ratio</span><span class="o">=</span><span class="mf">6.2</span><span class="p">,</span> <span class="n">tire_radius_in</span><span class="o">=</span><span class="mf">8.0</span><span class="p">)])</span>
+</pre></div>
+</div>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>data</strong> (<a class="reference internal" href="perda.core_data_structures.single_run_data.html#perda.core_data_structures.single_run_data.SingleRunData" title="perda.core_data_structures.single_run_data.SingleRunData"><em>SingleRunData</em></a>)</p>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Preprocessing step</p>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference internal" href="perda.core_data_structures.single_run_data.html#perda.core_data_structures.single_run_data.SingleRunData" title="perda.core_data_structures.single_run_data.SingleRunData">SingleRunData</a></p>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>data</strong> (<a class="reference internal" href="perda.core_data_structures.single_run_data.html#perda.core_data_structures.single_run_data.SingleRunData" title="perda.core_data_structures.single_run_data.SingleRunData"><em>SingleRunData</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>gear_ratio</strong> (<em>float</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>tire_radius_in</strong> (<em>float</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>motor_rpm</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>motor_wheelspeed</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="perda.core_data_structures.single_run_data.html#perda.core_data_structures.single_run_data.SingleRunData" title="perda.core_data_structures.single_run_data.SingleRunData"><em>SingleRunData</em></a> | <a class="reference internal" href="#perda.utils.preprocessing.CorrectMotorDataLambda" title="perda.utils.preprocessing.CorrectMotorDataLambda">CorrectMotorDataLambda</a></p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="py function">
-<dt class="sig sig-object py" id="perda.utils.preprocessing.patch_ned_velocity">
-<span class="sig-prename descclassname"><span class="pre">perda.utils.preprocessing.</span></span><span class="sig-name descname"><span class="pre">patch_ned_velocity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/utils/preprocessing.html#patch_ned_velocity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.utils.preprocessing.patch_ned_velocity" title="Link to this definition">#</a></dt>
-<dd><p>Correct a VectorNav bug where velocityBody.x/y/z contains NED instead of body-frame velocities.</p>
-<p>Copies the raw NED values to velN/velE/velD, then rotates into true body-frame (FRD) using yaw.</p>
+<dl class="py data">
+<dt class="sig sig-object py" id="perda.utils.preprocessing.correct_steering_angle">
+<span class="sig-prename descclassname"><span class="pre">perda.utils.preprocessing.</span></span><span class="sig-name descname"><span class="pre">correct_steering_angle</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;perda.utils.preprocessing.CorrectSteeringAngleLambda</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#perda.utils.preprocessing.correct_steering_angle" title="Link to this definition">#</a></dt>
+<dd><p>recompute steering angle from raw potentiometer voltage.</p>
+<p>Fits a polynomial through a set of <code class="docutils literal notranslate"><span class="pre">(voltage,</span> <span class="pre">angle_deg)</span></code> calibration points, then evaluates
+it on the raw voltage channel to produce a corrected angle. This corrects for sensor drift
+relative to the previously stored angle channel.</p>
+<p>If the angle channel already exists, the old values are preserved as <code class="docutils literal notranslate"><span class="pre">&lt;steering_angle&gt;_original</span></code>
+before being overwritten. The backup is only created once — idempotent on repeated calls.</p>
+<p>Use directly in a preprocessing pipeline, or call with keyword arguments to get a reconfigured
+copy.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Analyzer</span><span class="p">(</span><span class="n">preprocessing</span><span class="o">=</span><span class="p">[</span><span class="n">correct_steering_angle</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Analyzer</span><span class="p">(</span><span class="n">preprocessing</span><span class="o">=</span><span class="p">[</span><span class="n">correct_steering_angle</span><span class="p">(</span><span class="n">calibration</span><span class="o">=</span><span class="p">((</span><span class="mf">1.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">90.0</span><span class="p">),</span> <span class="p">(</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span> <span class="p">(</span><span class="mf">4.5</span><span class="p">,</span> <span class="mf">90.0</span><span class="p">)))])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Analyzer</span><span class="p">(</span><span class="n">preprocessing</span><span class="o">=</span><span class="p">[</span><span class="n">correct_steering_angle</span><span class="p">(</span><span class="n">steering_raw</span><span class="o">=</span><span class="s2">&quot;my.raw&quot;</span><span class="p">)])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Analyzer</span><span class="p">(</span><span class="n">preprocessing</span><span class="o">=</span><span class="p">[</span><span class="n">correct_steering_angle</span><span class="p">(</span><span class="n">calibration</span><span class="o">=</span><span class="n">my_cal</span><span class="p">,</span> <span class="n">steering_angle</span><span class="o">=</span><span class="s2">&quot;my.angle&quot;</span><span class="p">)])</span>
+</pre></div>
+</div>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>data</strong> (<a class="reference internal" href="perda.core_data_structures.single_run_data.html#perda.core_data_structures.single_run_data.SingleRunData" title="perda.core_data_structures.single_run_data.SingleRunData"><em>SingleRunData</em></a>)</p>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Preprocessing step</p>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference internal" href="perda.core_data_structures.single_run_data.html#perda.core_data_structures.single_run_data.SingleRunData" title="perda.core_data_structures.single_run_data.SingleRunData">SingleRunData</a></p>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>data</strong> (<a class="reference internal" href="perda.core_data_structures.single_run_data.html#perda.core_data_structures.single_run_data.SingleRunData" title="perda.core_data_structures.single_run_data.SingleRunData"><em>SingleRunData</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>calibration</strong> (<em>tuple</em><em>[</em><em>tuple</em><em>[</em><em>float</em><em>, </em><em>float</em><em>]</em><em>, </em><em>...</em><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>steering_raw</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>steering_angle</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="perda.core_data_structures.single_run_data.html#perda.core_data_structures.single_run_data.SingleRunData" title="perda.core_data_structures.single_run_data.SingleRunData"><em>SingleRunData</em></a> | <a class="reference internal" href="#perda.utils.preprocessing.CorrectSteeringAngleLambda" title="perda.utils.preprocessing.CorrectSteeringAngleLambda">CorrectSteeringAngleLambda</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="perda.utils.preprocessing.patch_ned_velocity">
+<span class="sig-prename descclassname"><span class="pre">perda.utils.preprocessing.</span></span><span class="sig-name descname"><span class="pre">patch_ned_velocity</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;perda.utils.preprocessing.PatchNedVelocityLambda</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#perda.utils.preprocessing.patch_ned_velocity" title="Link to this definition">#</a></dt>
+<dd><p>fix VectorNav NED-in-body-frame bug.</p>
+<p>Corrects a firmware bug where <code class="docutils literal notranslate"><span class="pre">velocityBody.x/y/z</span></code> contains NED-frame velocities instead of
+body-frame (FRD) velocities. The raw NED values are preserved as new channels (<code class="docutils literal notranslate"><span class="pre">velN</span></code>,
+<code class="docutils literal notranslate"><span class="pre">velE</span></code>, <code class="docutils literal notranslate"><span class="pre">velD</span></code>), and the body velocity channels are overwritten with the correctly rotated
+values using the yaw angle.</p>
+<p>Use directly in a preprocessing pipeline, or call with keyword arguments to get a reconfigured
+copy that operates on non-default variable names.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Analyzer</span><span class="p">(</span><span class="n">preprocessing</span><span class="o">=</span><span class="p">[</span><span class="n">patch_ned_velocity</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Analyzer</span><span class="p">(</span><span class="n">preprocessing</span><span class="o">=</span><span class="p">[</span><span class="n">patch_ned_velocity</span><span class="p">(</span><span class="n">yaw</span><span class="o">=</span><span class="s2">&quot;my.custom.yaw&quot;</span><span class="p">)])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Analyzer</span><span class="p">(</span><span class="n">preprocessing</span><span class="o">=</span><span class="p">[</span><span class="n">patch_ned_velocity</span><span class="p">(</span><span class="n">body_vel_x</span><span class="o">=</span><span class="s2">&quot;my.vel.x&quot;</span><span class="p">,</span> <span class="n">ned_vel_n</span><span class="o">=</span><span class="s2">&quot;my.ned.n&quot;</span><span class="p">)])</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Preprocessing step</p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>data</strong> (<a class="reference internal" href="perda.core_data_structures.single_run_data.html#perda.core_data_structures.single_run_data.SingleRunData" title="perda.core_data_structures.single_run_data.SingleRunData"><em>SingleRunData</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>body_vel_x</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>body_vel_y</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>body_vel_z</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>yaw</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>ned_vel_n</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>ned_vel_e</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>ned_vel_d</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="perda.core_data_structures.single_run_data.html#perda.core_data_structures.single_run_data.SingleRunData" title="perda.core_data_structures.single_run_data.SingleRunData"><em>SingleRunData</em></a> | <a class="reference internal" href="#perda.utils.preprocessing.PatchNedVelocityLambda" title="perda.utils.preprocessing.PatchNedVelocityLambda">PatchNedVelocityLambda</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -514,11 +671,15 @@ rewrites the angle channel in-place, preserving the original as
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.utils.preprocessing.ConvertWheelspeedsToMPerSLambda"><code class="docutils literal notranslate"><span class="pre">ConvertWheelspeedsToMPerSLambda</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.utils.preprocessing.CorrectMotorDataLambda"><code class="docutils literal notranslate"><span class="pre">CorrectMotorDataLambda</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.utils.preprocessing.CorrectSteeringAngleLambda"><code class="docutils literal notranslate"><span class="pre">CorrectSteeringAngleLambda</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.utils.preprocessing.PatchNedVelocityLambda"><code class="docutils literal notranslate"><span class="pre">PatchNedVelocityLambda</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.utils.preprocessing.apply_preprocessing"><code class="docutils literal notranslate"><span class="pre">apply_preprocessing()</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.utils.preprocessing.convert_wheelspeeds_to_m_per_s"><code class="docutils literal notranslate"><span class="pre">convert_wheelspeeds_to_m_per_s()</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.utils.preprocessing.correct_motor_data"><code class="docutils literal notranslate"><span class="pre">correct_motor_data()</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.utils.preprocessing.patch_ned_velocity"><code class="docutils literal notranslate"><span class="pre">patch_ned_velocity()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.utils.preprocessing.convert_wheelspeeds_to_m_per_s"><code class="docutils literal notranslate"><span class="pre">convert_wheelspeeds_to_m_per_s</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.utils.preprocessing.correct_motor_data"><code class="docutils literal notranslate"><span class="pre">correct_motor_data</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.utils.preprocessing.correct_steering_angle"><code class="docutils literal notranslate"><span class="pre">correct_steering_angle</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.utils.preprocessing.patch_ned_velocity"><code class="docutils literal notranslate"><span class="pre">patch_ned_velocity</span></code></a></li>
 </ul>
   </nav></div>
 

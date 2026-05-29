@@ -307,7 +307,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">Field</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">rapidfuzz</span><span class="w"> </span><span class="kn">import</span> <span class="n">fuzz</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">..constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">DELIMITER</span><span class="p">,</span> <span class="n">title_block</span>
@@ -357,37 +357,25 @@
 <span class="k">class</span><span class="w"> </span><span class="nc">SearchEntry</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;One entry in the search deck, holding raw variable data alongside its search card.&quot;&quot;&quot;</span>
 
-    <span class="n">var_id</span><span class="p">:</span> <span class="nb">int</span>
-    <span class="n">cpp_name</span><span class="p">:</span> <span class="nb">str</span>
-    <span class="n">descript</span><span class="p">:</span> <span class="nb">str</span>
-    <span class="n">card</span><span class="p">:</span> <span class="nb">str</span></div>
+    <span class="n">var_id</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Internal variable ID.&quot;</span><span class="p">)</span>
+    <span class="n">cpp_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;C++ variable name used for data access.&quot;</span><span class="p">)</span>
+    <span class="n">descript</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Human-readable variable description.&quot;</span><span class="p">)</span>
+    <span class="n">card</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Space-separated search card text for scoring.&quot;</span><span class="p">)</span></div>
 
 
 
 <div class="viewcode-block" id="SearchResult">
 <a class="viewcode-back" href="../../../_autosummary/perda.utils.search.html#perda.utils.search.SearchResult">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">SearchResult</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;A single ranked result returned by :func:`search`.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A single ranked result returned by :func:`search`.&quot;&quot;&quot;</span>
 
-<span class="sd">    Attributes</span>
-<span class="sd">    ----------</span>
-<span class="sd">    rank : int</span>
-<span class="sd">        1-based position in the result list (1 = best match).</span>
-<span class="sd">    score : float</span>
-<span class="sd">        Relevance score (higher is better).</span>
-<span class="sd">    var_id : int</span>
-<span class="sd">        Internal variable ID.</span>
-<span class="sd">    cpp_name : str</span>
-<span class="sd">        C++ variable name used for data access.</span>
-<span class="sd">    descript : str</span>
-<span class="sd">        Human-readable variable description.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="n">rank</span><span class="p">:</span> <span class="nb">int</span>
-    <span class="n">score</span><span class="p">:</span> <span class="nb">float</span>
-    <span class="n">var_id</span><span class="p">:</span> <span class="nb">int</span>
-    <span class="n">cpp_name</span><span class="p">:</span> <span class="nb">str</span>
-    <span class="n">descript</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">rank</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;1-based position in the result list (1 = best match).&quot;</span>
+    <span class="p">)</span>
+    <span class="n">score</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Relevance score (higher is better).&quot;</span><span class="p">)</span>
+    <span class="n">var_id</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Internal variable ID.&quot;</span><span class="p">)</span>
+    <span class="n">cpp_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;C++ variable name used for data access.&quot;</span><span class="p">)</span>
+    <span class="n">descript</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Human-readable variable description.&quot;</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="n">col_score</span><span class="p">,</span> <span class="n">col_id</span><span class="p">,</span> <span class="n">col_name</span><span class="p">,</span> <span class="n">col_desc</span> <span class="o">=</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">60</span>

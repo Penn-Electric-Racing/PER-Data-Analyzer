@@ -388,65 +388,6 @@
 
 
 
-<div class="viewcode-block" id="plot_parametric_curve_square">
-<a class="viewcode-back" href="../../../_autosummary/perda.plotting.parametric_plot.html#perda.plotting.parametric_plot.plot_parametric_curve_square">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">plot_parametric_curve_square</span><span class="p">(</span>
-    <span class="n">x</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span>
-    <span class="n">y</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span>
-    <span class="n">x_label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;X&quot;</span><span class="p">,</span>
-    <span class="n">y_label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Y&quot;</span><span class="p">,</span>
-    <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">layout_config</span><span class="p">:</span> <span class="n">LayoutConfig</span> <span class="o">=</span> <span class="n">DEFAULT_LAYOUT_CONFIG</span><span class="p">,</span>
-    <span class="n">font_config</span><span class="p">:</span> <span class="n">FontConfig</span> <span class="o">=</span> <span class="n">DEFAULT_FONT_CONFIG</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Plot a 2D parametric curve with equal axes and a square aspect ratio.</span>
-
-<span class="sd">    Automatically computes axis ranges so both axes span the same interval,</span>
-<span class="sd">    centered on the data midpoint. Useful for curves where the spatial</span>
-<span class="sd">    relationship between x and y must be preserved (e.g. GPS tracks).</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    x : NDArray[float64]</span>
-<span class="sd">        X-axis values.</span>
-<span class="sd">    y : NDArray[float64]</span>
-<span class="sd">        Y-axis values. Must have the same length as `x`.</span>
-<span class="sd">    x_label : str, optional</span>
-<span class="sd">        X-axis label.</span>
-<span class="sd">    y_label : str, optional</span>
-<span class="sd">        Y-axis label.</span>
-<span class="sd">    title : str | None, optional</span>
-<span class="sd">        Plot title.</span>
-<span class="sd">    layout_config : LayoutConfig, optional</span>
-<span class="sd">    font_config : FontConfig, optional</span>
-
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    go.Figure</span>
-
-<span class="sd">    Examples</span>
-<span class="sd">    --------</span>
-<span class="sd">    &gt;&gt;&gt; fig = plot_parametric_curve_square(lon_arr, lat_arr, x_label=&quot;Longitude&quot;, y_label=&quot;Latitude&quot;)</span>
-<span class="sd">    &gt;&gt;&gt; fig.show()</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">xmid</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="o">+</span> <span class="n">x</span><span class="o">.</span><span class="n">max</span><span class="p">())</span> <span class="o">/</span> <span class="mi">2</span>
-    <span class="n">ymid</span> <span class="o">=</span> <span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="o">+</span> <span class="n">y</span><span class="o">.</span><span class="n">max</span><span class="p">())</span> <span class="o">/</span> <span class="mi">2</span>
-    <span class="n">half</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">-</span> <span class="n">x</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">y</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">-</span> <span class="n">y</span><span class="o">.</span><span class="n">min</span><span class="p">())</span> <span class="o">*</span> <span class="mf">1.1</span> <span class="o">/</span> <span class="mi">2</span>
-
-    <span class="n">fig</span> <span class="o">=</span> <span class="n">plot_parametric_curve</span><span class="p">(</span>
-        <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x_label</span><span class="p">,</span> <span class="n">y_label</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">layout_config</span><span class="p">,</span> <span class="n">font_config</span>
-    <span class="p">)</span>
-    <span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span>
-        <span class="n">width</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">layout_config</span><span class="o">.</span><span class="n">height</span><span class="p">),</span>  <span class="c1"># square: use height for both</span>
-        <span class="n">height</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">layout_config</span><span class="o">.</span><span class="n">height</span><span class="p">),</span>
-    <span class="p">)</span>
-    <span class="n">fig</span><span class="o">.</span><span class="n">update_xaxes</span><span class="p">(</span><span class="nb">range</span><span class="o">=</span><span class="p">[</span><span class="n">xmid</span> <span class="o">-</span> <span class="n">half</span><span class="p">,</span> <span class="n">xmid</span> <span class="o">+</span> <span class="n">half</span><span class="p">])</span>
-    <span class="n">fig</span><span class="o">.</span><span class="n">update_yaxes</span><span class="p">(</span><span class="nb">range</span><span class="o">=</span><span class="p">[</span><span class="n">ymid</span> <span class="o">-</span> <span class="n">half</span><span class="p">,</span> <span class="n">ymid</span> <span class="o">+</span> <span class="n">half</span><span class="p">])</span>
-    <span class="k">return</span> <span class="n">fig</span></div>
-
-
-
 <div class="viewcode-block" id="plot_parametric_trimmer">
 <a class="viewcode-back" href="../../../_autosummary/perda.plotting.parametric_plot.html#perda.plotting.parametric_plot.plot_parametric_trimmer">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">plot_parametric_trimmer</span><span class="p">(</span>
