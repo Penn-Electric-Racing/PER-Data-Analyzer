@@ -3,15 +3,11 @@ from typing import List
 import ipywidgets as widgets
 import numpy as np
 import plotly.graph_objects as go
-from numpy import float64
 from numpy.typing import NDArray
 
 from ..constants import R_EARTH_M
 from ..core_data_structures.data_instance import DataInstance, left_join_data_instances
-from ..plotting.parametric_plot import (
-    plot_parametric_curve_square,
-    plot_parametric_trimmer,
-)
+from ..plotting.parametric_plot import plot_parametric_trimmer
 from ..plotting.plotting_constants import (
     DEFAULT_FONT_CONFIG,
     DEFAULT_GPS_MAP_CONFIG,
@@ -85,11 +81,11 @@ def plot_gps_trimmer(
 
 
 def gps_to_enu(
-    lat: NDArray[float64],
-    lon: NDArray[float64],
+    lat: NDArray[np.float64],
+    lon: NDArray[np.float64],
     lat_ref: float | None = None,
     lon_ref: float | None = None,
-) -> tuple[NDArray[float64], NDArray[float64]]:
+) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
     """
     Project lat/lon coordinates to a local East-North-Up (ENU) Cartesian frame.
 
@@ -98,9 +94,9 @@ def gps_to_enu(
 
     Parameters
     ----------
-    lat : NDArray[float64]
+    lat : NDArray[np.float64]
         Latitude values in degrees.
-    lon : NDArray[float64]
+    lon : NDArray[np.float64]
         Longitude values in degrees.
     lat_ref : float | None, optional
         Reference latitude in degrees.  Defaults to the median of ``lat``.
@@ -109,7 +105,7 @@ def gps_to_enu(
 
     Returns
     -------
-    tuple[NDArray[float64], NDArray[float64]]
+    tuple[NDArray[np.float64], NDArray[np.float64]]
         ``(east_m, north_m)`` arrays giving signed distance in metres from the
         reference point along the East and North axes respectively.
 
@@ -125,8 +121,8 @@ def gps_to_enu(
 
 
 def filter_gps_cartesian(
-    lat: NDArray[float64],
-    lon: NDArray[float64],
+    lat: NDArray[np.float64],
+    lon: NDArray[np.float64],
     gps_map_config: GpsMapConfig = DEFAULT_GPS_MAP_CONFIG,
 ) -> NDArray[np.bool_]:
     """
@@ -141,15 +137,15 @@ def filter_gps_cartesian(
 
     Parameters
     ----------
-    lat : NDArray[float64]
+    lat : NDArray[np.float64]
         Latitude values in degrees.
-    lon : NDArray[float64]
+    lon : NDArray[np.float64]
         Longitude values in degrees.
     gps_map_config : GpsMapConfig, optional
 
     Returns
     -------
-    NDArray[np.bool_]
+    NDArray[``np.bool_``]
         Boolean mask; ``True`` where a point should be *kept*.
 
     Examples
@@ -166,7 +162,7 @@ def filter_gps_cartesian(
 
 
 def plot_gps_comparison(
-    runs: List[tuple[NDArray[float64], NDArray[float64], str]],
+    runs: List[tuple[NDArray[np.float64], NDArray[np.float64], str]],
     title: str | None = None,
     gps_map_config: GpsMapConfig = DEFAULT_GPS_MAP_CONFIG,
     layout_config: LayoutConfig = DEFAULT_LAYOUT_CONFIG,
@@ -181,7 +177,7 @@ def plot_gps_comparison(
 
     Parameters
     ----------
-    runs : List[tuple[NDArray[float64], NDArray[float64], str]]
+    runs : List[tuple[NDArray[np.float64], NDArray[np.float64], str]]
         Each element is ``(lat_array, lon_array, label)`` for one run.
         ``lat_array`` and ``lon_array`` must be the same length.
     title : str | None, optional

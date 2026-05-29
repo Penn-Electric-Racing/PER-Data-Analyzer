@@ -112,7 +112,7 @@ library in external environments like Google Colab.
 	You can embed the above command in a Google Colab notebook to automatically install when you run the notebook.
 	Append an exclamation mark and leave it in a normal code cell like below:
 
-	.. code-block:: python
+	.. code-block:: none
 
 		!pip install "perda[notebook] @ git+https://github.com/Penn-Electric-Racing/PER-Data-Analyzer.git@main"
 
@@ -124,7 +124,7 @@ The default installation supports keyword-based search. To also enable semantic 
 install the ``full`` extra instead. This pulls in ``sentence-transformers`` and its dependencies
 (including PyTorch), so expect a larger download.
 
-.. code-block:: python
+.. code-block:: none
 
 	!pip install "perda[full] @ git+https://github.com/Penn-Electric-Racing/PER-Data-Analyzer.git@main"
 

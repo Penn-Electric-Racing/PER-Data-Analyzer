@@ -80,62 +80,6 @@ def plot_parametric_curve(
     return fig
 
 
-def plot_parametric_curve_square(
-    x: NDArray[float64],
-    y: NDArray[float64],
-    x_label: str = "X",
-    y_label: str = "Y",
-    title: str | None = None,
-    layout_config: LayoutConfig = DEFAULT_LAYOUT_CONFIG,
-    font_config: FontConfig = DEFAULT_FONT_CONFIG,
-) -> go.Figure:
-    """
-    Plot a 2D parametric curve with equal axes and a square aspect ratio.
-
-    Automatically computes axis ranges so both axes span the same interval,
-    centered on the data midpoint. Useful for curves where the spatial
-    relationship between x and y must be preserved (e.g. GPS tracks).
-
-    Parameters
-    ----------
-    x : NDArray[float64]
-        X-axis values.
-    y : NDArray[float64]
-        Y-axis values. Must have the same length as `x`.
-    x_label : str, optional
-        X-axis label.
-    y_label : str, optional
-        Y-axis label.
-    title : str | None, optional
-        Plot title.
-    layout_config : LayoutConfig, optional
-    font_config : FontConfig, optional
-
-    Returns
-    -------
-    go.Figure
-
-    Examples
-    --------
-    >>> fig = plot_parametric_curve_square(lon_arr, lat_arr, x_label="Longitude", y_label="Latitude")
-    >>> fig.show()
-    """
-    xmid = (x.min() + x.max()) / 2
-    ymid = (y.min() + y.max()) / 2
-    half = max(x.max() - x.min(), y.max() - y.min()) * 1.1 / 2
-
-    fig = plot_parametric_curve(
-        x, y, x_label, y_label, title, layout_config, font_config
-    )
-    fig.update_layout(
-        width=int(layout_config.height),  # square: use height for both
-        height=int(layout_config.height),
-    )
-    fig.update_xaxes(range=[xmid - half, xmid + half])
-    fig.update_yaxes(range=[ymid - half, ymid + half])
-    return fig
-
-
 def plot_parametric_trimmer(
     x: NDArray[float64],
     y: NDArray[float64],
