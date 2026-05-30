@@ -275,8 +275,9 @@ def zscore_filter(
         # Guard against floating-point negatives inside sqrt
         roll_std = np.sqrt(np.maximum(roll_sq_mean - roll_mean**2, 0.0))
 
-        with np.errstate(invalid="ignore"):
-            z = np.where(roll_std > 0, np.abs((signal - roll_mean) / roll_std), 0.0)
+        z = np.zeros_like(signal, dtype=np.float64)
+        mask = roll_std > 0
+        z[mask] = np.abs((signal[mask] - roll_mean[mask]) / roll_std[mask])
 
         outlier_mask = z > threshold
         n_masked = int(outlier_mask.sum())
