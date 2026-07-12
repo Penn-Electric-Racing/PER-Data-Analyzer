@@ -3,7 +3,7 @@ from typing import Tuple
 import numpy as np
 from numpy.typing import NDArray
 
-from .resampling import ResampleMethod, _interpolate
+from .resampling_helpers import ResampleMethod, _interpolate
 
 
 def left_join(

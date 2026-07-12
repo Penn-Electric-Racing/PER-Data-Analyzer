@@ -1,11 +1,9 @@
 import numpy as np
 import pytest
 
-from perda.core_data_structures.resampling import (
-    ResampleMethod,
-    _interpolate,
-    resample_to_freq,
-)
+from perda.core_data_structures.data_instance import DataInstance
+from perda.core_data_structures.resampling_helpers import ResampleMethod, _interpolate
+from perda.utils.resampling import resample_to_freq
 
 _ALL_METHODS = [
     ResampleMethod.LINEAR,
@@ -103,49 +101,75 @@ def test_interpolate_cubic_interior_smooth():
     ],
 )
 def test_resample_to_freq_output_shape(freq_hz, expected_len, expected_spacing):
-    ts_src = np.array([0, 1_000_000], dtype=np.int64)
-    val_src = np.array([0.0, 1.0])
-    ts, _ = resample_to_freq(ts_src, val_src, freq_hz=freq_hz, timestamp_divisor=1e6)
-    assert len(ts) == expected_len
-    if expected_spacing is not None and len(ts) > 1:
+    di = DataInstance(
+        timestamp_np=np.array([0, 1_000_000], dtype=np.int64),
+        value_np=np.array([0.0, 1.0]),
+    )
+    result = resample_to_freq(di, freq_hz=freq_hz, timestamp_divisor=1e6)
+    assert len(result.timestamp_np) == expected_len
+    if expected_spacing is not None and len(result.timestamp_np) > 1:
         np.testing.assert_allclose(
-            np.diff(ts.astype(np.float64)), expected_spacing, rtol=1e-6
+            np.diff(result.timestamp_np.astype(np.float64)),
+            expected_spacing,
+            rtol=1e-6,
         )
 
 
 def test_resample_to_freq_starts_at_first_input_timestamp():
-    ts_src = np.array([1000, 2000], dtype=np.int64)
-    val_src = np.array([0.0, 1.0])
-    ts, _ = resample_to_freq(ts_src, val_src, freq_hz=1.0, timestamp_divisor=1e3)
-    assert ts[0] == 1000
+    di = DataInstance(
+        timestamp_np=np.array([1000, 2000], dtype=np.int64),
+        value_np=np.array([0.0, 1.0]),
+    )
+    result = resample_to_freq(di, freq_hz=1.0, timestamp_divisor=1e3)
+    assert result.timestamp_np[0] == 1000
 
 
 def test_resample_to_freq_does_not_include_last_timestamp():
-    ts_src = np.array([0, 1_000_000], dtype=np.int64)
-    val_src = np.array([0.0, 1.0])
-    ts, _ = resample_to_freq(ts_src, val_src, freq_hz=1.0, timestamp_divisor=1e6)
-    assert ts[-1] < ts_src[-1]
+    di = DataInstance(
+        timestamp_np=np.array([0, 1_000_000], dtype=np.int64),
+        value_np=np.array([0.0, 1.0]),
+    )
+    result = resample_to_freq(di, freq_hz=1.0, timestamp_divisor=1e6)
+    assert result.timestamp_np[-1] < di.timestamp_np[-1]
 
 
 def test_resample_to_freq_value_correctness_linear():
-    ts_src = np.array([0, 1_000_000], dtype=np.int64)
-    val_src = np.array([0.0, 10.0])
-    ts, val = resample_to_freq(ts_src, val_src, freq_hz=2.0, timestamp_divisor=1e6)
-    np.testing.assert_allclose(val, [0.0, 5.0])
+    di = DataInstance(
+        timestamp_np=np.array([0, 1_000_000], dtype=np.int64),
+        value_np=np.array([0.0, 10.0]),
+    )
+    result = resample_to_freq(di, freq_hz=2.0, timestamp_divisor=1e6)
+    np.testing.assert_allclose(result.value_np, [0.0, 5.0])
 
 
 def test_resample_to_freq_single_output_point():
-    ts_src = np.array([0, 500_000], dtype=np.int64)
-    val_src = np.array([0.0, 5.0])
-    ts, _ = resample_to_freq(ts_src, val_src, freq_hz=1.0, timestamp_divisor=1e6)
-    assert len(ts) == 1
-    assert ts[0] == 0
+    di = DataInstance(
+        timestamp_np=np.array([0, 500_000], dtype=np.int64),
+        value_np=np.array([0.0, 5.0]),
+    )
+    result = resample_to_freq(di, freq_hz=1.0, timestamp_divisor=1e6)
+    assert len(result.timestamp_np) == 1
+    assert result.timestamp_np[0] == 0
 
 
 def test_resample_to_freq_zoh_method():
-    ts_src = np.array([0, 1_000_000], dtype=np.int64)
-    val_src = np.array([5.0, 10.0])
-    ts, val = resample_to_freq(
-        ts_src, val_src, freq_hz=4.0, timestamp_divisor=1e6, method=ResampleMethod.ZOH
+    di = DataInstance(
+        timestamp_np=np.array([0, 1_000_000], dtype=np.int64),
+        value_np=np.array([5.0, 10.0]),
     )
-    np.testing.assert_allclose(val, [5.0, 5.0, 5.0, 5.0])
+    result = resample_to_freq(
+        di, freq_hz=4.0, timestamp_divisor=1e6, method=ResampleMethod.ZOH
+    )
+    np.testing.assert_allclose(result.value_np, [5.0, 5.0, 5.0, 5.0])
+
+
+def test_resample_to_freq_preserves_label_and_var_id():
+    di = DataInstance(
+        timestamp_np=np.array([0, 1_000_000], dtype=np.int64),
+        value_np=np.array([0.0, 10.0]),
+        label="speed",
+        var_id=7,
+    )
+    result = resample_to_freq(di, freq_hz=2.0, timestamp_divisor=1e6)
+    assert result.label == "speed"
+    assert result.var_id == 7

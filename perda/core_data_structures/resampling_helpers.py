@@ -1,5 +1,4 @@
 from enum import Enum
-from typing import Tuple
 
 import numpy as np
 from numpy.typing import NDArray
@@ -73,41 +72,3 @@ def _interpolate(
         return f(target)
     else:
         raise ValueError(f"Unknown resample method '{method}'")
-
-
-def resample_to_freq(
-    ts: NDArray,
-    val: NDArray,
-    freq_hz: float,
-    timestamp_divisor: float,
-    method: ResampleMethod = ResampleMethod.LINEAR,
-) -> Tuple[NDArray, NDArray]:
-    """
-    Resample a time series onto a uniform frequency grid.
-
-    Parameters
-    ----------
-    ts : NDArray
-        Source timestamps (int64)
-    val : NDArray
-        Source values
-    freq_hz : float
-        Target sampling frequency in Hz
-    timestamp_divisor : float
-        Raw timestamp units per second (e.g. 1e6 for microseconds)
-    method : ResampleMethod, optional
-        Interpolation method. Default is LINEAR.
-
-    Returns
-    -------
-    target_ts : NDArray
-        Uniform timestamp grid (int64)
-    resampled_val : NDArray
-        Values interpolated onto the uniform grid
-    """
-    dt = timestamp_divisor / freq_hz
-    target_ts = np.arange(ts[0], ts[-1], dt, dtype=np.float64).astype(np.int64)
-    resampled_val = _interpolate(
-        target_ts.astype(np.float64), ts.astype(np.float64), val, method
-    )
-    return target_ts, resampled_val
