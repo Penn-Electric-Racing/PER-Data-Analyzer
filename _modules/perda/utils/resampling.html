@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>perda.core_data_structures.resampling &#8212; PERDA</title>
+    <title>perda.utils.resampling &#8212; PERDA</title>
   
   
   
@@ -47,7 +47,7 @@
     <script src="../../../_static/copybutton.js?v=f281be69"></script>
     <script src="../../../_static/design-tabs.js?v=f930bc37"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/perda/core_data_structures/resampling';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/perda/utils/resampling';</script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
@@ -285,7 +285,7 @@
     
     <li class="breadcrumb-item"><a href="../../index.html" class="nav-link">Module code</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">perda.core_data_structures.resampling</span></li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">perda.utils.resampling</span></li>
   </ul>
 </nav>
 </div>
@@ -302,105 +302,97 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <h1>Source code for perda.core_data_structures.resampling</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tuple</span>
-
-<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+  <h1>Source code for perda.utils.resampling</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">numpy.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">NDArray</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.interpolate</span><span class="w"> </span><span class="kn">import</span> <span class="n">interp1d</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">..core_data_structures.data_instance</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataInstance</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..core_data_structures.resampling_helpers</span><span class="w"> </span><span class="kn">import</span> <span class="n">ResampleMethod</span><span class="p">,</span> <span class="n">_interpolate</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..units</span><span class="w"> </span><span class="kn">import</span> <span class="n">Timescale</span><span class="p">,</span> <span class="n">_to_seconds</span>
 
 
-<div class="viewcode-block" id="ResampleMethod">
-<a class="viewcode-back" href="../../../_autosummary/perda.core_data_structures.resampling.html#perda.core_data_structures.resampling.ResampleMethod">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">ResampleMethod</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Interpolation strategy used when aligning a series to a target timestamp grid.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="apply_time_offset">
+<a class="viewcode-back" href="../../../_autosummary/perda.utils.resampling.html#perda.utils.resampling.apply_time_offset">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">apply_time_offset</span><span class="p">(</span>
+    <span class="n">di</span><span class="p">:</span> <span class="n">DataInstance</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="n">DataInstance</span><span class="p">],</span>
+    <span class="n">offset_s</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">source_time_unit</span><span class="p">:</span> <span class="n">Timescale</span> <span class="o">=</span> <span class="n">Timescale</span><span class="o">.</span><span class="n">MS</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataInstance</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="n">DataInstance</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Shift signals in time by a fixed offset, but keeping the same timestamp list.</span>
 
-    <span class="n">LINEAR</span> <span class="o">=</span> <span class="s2">&quot;linear&quot;</span>
-    <span class="n">ZOH</span> <span class="o">=</span> <span class="s2">&quot;zoh&quot;</span>
-    <span class="n">NEAREST</span> <span class="o">=</span> <span class="s2">&quot;nearest&quot;</span>
-    <span class="n">CUBIC</span> <span class="o">=</span> <span class="s2">&quot;cubic&quot;</span></div>
-
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">_interpolate</span><span class="p">(</span>
-    <span class="n">target</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">,</span>
-    <span class="n">src_t</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">,</span>
-    <span class="n">src_v</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">,</span>
-    <span class="n">method</span><span class="p">:</span> <span class="n">ResampleMethod</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Interpolate src_v (sampled at src_t) onto target timestamps.</span>
+<span class="sd">    Shifts the values, not the timestamps. Create a new time series with the same values offset_s away,</span>
+<span class="sd">    then re-interpolate the original timestamps onto this series.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    target : NDArray</span>
-<span class="sd">        Target timestamps (float64)</span>
-<span class="sd">    src_t : NDArray</span>
-<span class="sd">        Source timestamps (float64)</span>
-<span class="sd">    src_v : NDArray</span>
-<span class="sd">        Source values</span>
-<span class="sd">    method : ResampleMethod</span>
-<span class="sd">        Interpolation strategy</span>
+<span class="sd">    di : DataInstance | list[DataInstance]</span>
+<span class="sd">        Input signal(s). Lists are processed independently.</span>
+<span class="sd">    offset_s : float</span>
+<span class="sd">        Time shift in seconds (positive shifts the signal later).</span>
+<span class="sd">    source_time_unit : Timescale, optional</span>
+<span class="sd">        Timestamp unit of ``di.timestamp_np``. Default is ``Timescale.MS``.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    NDArray</span>
-<span class="sd">        Interpolated values at target timestamps</span>
+<span class="sd">    DataInstance | list[DataInstance]</span>
+<span class="sd">        New DataInstance(s) with time-shifted ``value_np`` on the original timestamp grid.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; di_aligned = apply_time_offset(gps_speed_di, offset_s=-0.08)</span>
+<span class="sd">    &gt;&gt;&gt; a, b = apply_time_offset([di_a, di_b], offset_s=0.05)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="n">ResampleMethod</span><span class="o">.</span><span class="n">LINEAR</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">src_t</span><span class="p">,</span> <span class="n">src_v</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="n">ResampleMethod</span><span class="o">.</span><span class="n">ZOH</span><span class="p">:</span>
-        <span class="n">f</span> <span class="o">=</span> <span class="n">interp1d</span><span class="p">(</span>
-            <span class="n">src_t</span><span class="p">,</span>
-            <span class="n">src_v</span><span class="p">,</span>
-            <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;previous&quot;</span><span class="p">,</span>
-            <span class="n">bounds_error</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-            <span class="n">fill_value</span><span class="o">=</span><span class="p">(</span><span class="n">src_v</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">src_v</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]),</span>
+    <span class="n">di_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">di</span><span class="p">]</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">di</span><span class="p">,</span> <span class="n">DataInstance</span><span class="p">)</span> <span class="k">else</span> <span class="n">di</span>
+
+    <span class="n">results</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">DataInstance</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">instance</span> <span class="ow">in</span> <span class="n">di_list</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">offset_s</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
+            <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">instance</span><span class="p">)</span>
+            <span class="k">continue</span>
+
+        <span class="n">t_s</span><span class="p">:</span> <span class="n">NDArray</span> <span class="o">=</span> <span class="n">_to_seconds</span><span class="p">(</span>
+            <span class="n">instance</span><span class="o">.</span><span class="n">timestamp_np</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span> <span class="n">source_time_unit</span>
         <span class="p">)</span>
-        <span class="k">return</span> <span class="n">f</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="n">ResampleMethod</span><span class="o">.</span><span class="n">NEAREST</span><span class="p">:</span>
-        <span class="n">f</span> <span class="o">=</span> <span class="n">interp1d</span><span class="p">(</span>
-            <span class="n">src_t</span><span class="p">,</span>
-            <span class="n">src_v</span><span class="p">,</span>
-            <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;nearest&quot;</span><span class="p">,</span>
-            <span class="n">bounds_error</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-            <span class="n">fill_value</span><span class="o">=</span><span class="p">(</span><span class="n">src_v</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">src_v</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]),</span>
+        <span class="n">signal</span> <span class="o">=</span> <span class="n">instance</span><span class="o">.</span><span class="n">value_np</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+        <span class="n">valid</span> <span class="o">=</span> <span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">signal</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">valid</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Too few valid points to interpolate, skipping time offset&quot;</span><span class="p">)</span>
+            <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">instance</span><span class="p">)</span>
+            <span class="k">continue</span>
+
+        <span class="n">src_t</span><span class="p">:</span> <span class="n">NDArray</span> <span class="o">=</span> <span class="n">t_s</span><span class="p">[</span><span class="n">valid</span><span class="p">]</span> <span class="o">+</span> <span class="n">offset_s</span>
+        <span class="n">src_v</span><span class="p">:</span> <span class="n">NDArray</span> <span class="o">=</span> <span class="n">signal</span><span class="p">[</span><span class="n">valid</span><span class="p">]</span>
+        <span class="n">shifted</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">t_s</span><span class="p">,</span> <span class="n">src_t</span><span class="p">,</span> <span class="n">src_v</span><span class="p">,</span> <span class="n">left</span><span class="o">=</span><span class="n">src_v</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">right</span><span class="o">=</span><span class="n">src_v</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="n">DataInstance</span><span class="p">(</span>
+                <span class="n">timestamp_np</span><span class="o">=</span><span class="n">instance</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">,</span>
+                <span class="n">value_np</span><span class="o">=</span><span class="n">shifted</span><span class="p">,</span>
+                <span class="n">label</span><span class="o">=</span><span class="n">instance</span><span class="o">.</span><span class="n">label</span> <span class="ow">or</span> <span class="sa">f</span><span class="s2">&quot;var_id=</span><span class="si">{</span><span class="n">instance</span><span class="o">.</span><span class="n">var_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="n">var_id</span><span class="o">=</span><span class="n">instance</span><span class="o">.</span><span class="n">var_id</span><span class="p">,</span>
+                <span class="n">cpp_name</span><span class="o">=</span><span class="n">instance</span><span class="o">.</span><span class="n">cpp_name</span><span class="p">,</span>
+            <span class="p">)</span>
         <span class="p">)</span>
-        <span class="k">return</span> <span class="n">f</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="n">ResampleMethod</span><span class="o">.</span><span class="n">CUBIC</span><span class="p">:</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">src_t</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">4</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">src_t</span><span class="p">,</span> <span class="n">src_v</span><span class="p">)</span>
-        <span class="n">f</span> <span class="o">=</span> <span class="n">interp1d</span><span class="p">(</span>
-            <span class="n">src_t</span><span class="p">,</span>
-            <span class="n">src_v</span><span class="p">,</span>
-            <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;cubic&quot;</span><span class="p">,</span>
-            <span class="n">bounds_error</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-            <span class="n">fill_value</span><span class="o">=</span><span class="p">(</span><span class="n">src_v</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">src_v</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]),</span>
-        <span class="p">)</span>
-        <span class="k">return</span> <span class="n">f</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown resample method &#39;</span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">results</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">results</span></div>
+
 
 
 <div class="viewcode-block" id="resample_to_freq">
-<a class="viewcode-back" href="../../../_autosummary/perda.core_data_structures.resampling.html#perda.core_data_structures.resampling.resample_to_freq">[docs]</a>
+<a class="viewcode-back" href="../../../_autosummary/perda.utils.resampling.html#perda.utils.resampling.resample_to_freq">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">resample_to_freq</span><span class="p">(</span>
-    <span class="n">ts</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">,</span>
-    <span class="n">val</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">,</span>
+    <span class="n">di</span><span class="p">:</span> <span class="n">DataInstance</span><span class="p">,</span>
     <span class="n">freq_hz</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">timestamp_divisor</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">method</span><span class="p">:</span> <span class="n">ResampleMethod</span> <span class="o">=</span> <span class="n">ResampleMethod</span><span class="o">.</span><span class="n">LINEAR</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">NDArray</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">]:</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataInstance</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Resample a time series onto a uniform frequency grid.</span>
+<span class="sd">    Resample a DataInstance onto a uniform frequency grid.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    ts : NDArray</span>
-<span class="sd">        Source timestamps (int64)</span>
-<span class="sd">    val : NDArray</span>
-<span class="sd">        Source values</span>
+<span class="sd">    di : DataInstance</span>
+<span class="sd">        Source DataInstance</span>
 <span class="sd">    freq_hz : float</span>
 <span class="sd">        Target sampling frequency in Hz</span>
 <span class="sd">    timestamp_divisor : float</span>
@@ -410,17 +402,27 @@
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    target_ts : NDArray</span>
-<span class="sd">        Uniform timestamp grid (int64)</span>
-<span class="sd">    resampled_val : NDArray</span>
-<span class="sd">        Values interpolated onto the uniform grid</span>
+<span class="sd">    DataInstance</span>
+<span class="sd">        New DataInstance with values resampled onto a uniform timestamp grid</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">dt</span> <span class="o">=</span> <span class="n">timestamp_divisor</span> <span class="o">/</span> <span class="n">freq_hz</span>
-    <span class="n">target_ts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">ts</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ts</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">dt</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+    <span class="n">target_ts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span>
+        <span class="n">di</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">di</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">dt</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
     <span class="n">resampled_val</span> <span class="o">=</span> <span class="n">_interpolate</span><span class="p">(</span>
-        <span class="n">target_ts</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span> <span class="n">ts</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span> <span class="n">val</span><span class="p">,</span> <span class="n">method</span>
+        <span class="n">target_ts</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span>
+        <span class="n">di</span><span class="o">.</span><span class="n">timestamp_np</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span>
+        <span class="n">di</span><span class="o">.</span><span class="n">value_np</span><span class="p">,</span>
+        <span class="n">method</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="k">return</span> <span class="n">target_ts</span><span class="p">,</span> <span class="n">resampled_val</span></div>
+
+    <span class="k">return</span> <span class="n">DataInstance</span><span class="p">(</span>
+        <span class="n">timestamp_np</span><span class="o">=</span><span class="n">target_ts</span><span class="p">,</span>
+        <span class="n">value_np</span><span class="o">=</span><span class="n">resampled_val</span><span class="p">,</span>
+        <span class="n">label</span><span class="o">=</span><span class="n">di</span><span class="o">.</span><span class="n">label</span><span class="p">,</span>
+        <span class="n">var_id</span><span class="o">=</span><span class="n">di</span><span class="o">.</span><span class="n">var_id</span><span class="p">,</span>
+        <span class="n">cpp_name</span><span class="o">=</span><span class="n">di</span><span class="o">.</span><span class="n">cpp_name</span><span class="p">,</span>
+    <span class="p">)</span></div>
 
 </pre></div>
 

@@ -21,4 +21,5 @@ perda.utils
    gps_analysis
    integrate
    preprocessing
+   resampling
    search

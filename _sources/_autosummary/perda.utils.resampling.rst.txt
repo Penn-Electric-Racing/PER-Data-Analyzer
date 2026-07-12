@@ -1,0 +1,8 @@
+perda.utils.resampling
+======================
+
+.. automodule:: perda.utils.resampling
+   :members:
+   :undoc-members:
+   :show-inheritance:
+

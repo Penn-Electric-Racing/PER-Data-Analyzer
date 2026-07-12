@@ -16,6 +16,6 @@ perda.core\_data\_structures
    data_instance
    deduplication
    joins
-   resampling
+   resampling_helpers
    single_run_data
    split_helpers

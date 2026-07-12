@@ -334,6 +334,8 @@
 </li>
       <li><a href="_autosummary/perda.utils.filtering.html#perda.utils.filtering.apply_sos_filter">apply_sos_filter() (in module perda.utils.filtering)</a>
 </li>
+      <li><a href="_autosummary/perda.utils.resampling.html#perda.utils.resampling.apply_time_offset">apply_time_offset() (in module perda.utils.resampling)</a>
+</li>
       <li><a href="_autosummary/perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.apply_ufunc_filter">apply_ufunc_filter() (in module perda.core_data_structures.data_instance)</a>
 </li>
       <li><a href="_autosummary/perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.apply_ufunc_inner_join">apply_ufunc_inner_join() (in module perda.core_data_structures.data_instance)</a>
@@ -464,7 +466,7 @@
 </li>
       <li><a href="_autosummary/perda.utils.gps_analysis.html#perda.utils.gps_analysis.create_representative_gps_image">create_representative_gps_image() (in module perda.utils.gps_analysis)</a>
 </li>
-      <li><a href="_autosummary/perda.core_data_structures.resampling.html#perda.core_data_structures.resampling.ResampleMethod.CUBIC">CUBIC (perda.core_data_structures.resampling.ResampleMethod attribute)</a>
+      <li><a href="_autosummary/perda.core_data_structures.resampling_helpers.html#perda.core_data_structures.resampling_helpers.ResampleMethod.CUBIC">CUBIC (perda.core_data_structures.resampling_helpers.ResampleMethod attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -732,7 +734,7 @@
       </ul></li>
       <li><a href="_autosummary/perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.GpsMapConfig.line_width">line_width (perda.plotting.plotting_constants.GpsMapConfig attribute)</a>
 </li>
-      <li><a href="_autosummary/perda.core_data_structures.resampling.html#perda.core_data_structures.resampling.ResampleMethod.LINEAR">LINEAR (perda.core_data_structures.resampling.ResampleMethod attribute)</a>
+      <li><a href="_autosummary/perda.core_data_structures.resampling_helpers.html#perda.core_data_structures.resampling_helpers.ResampleMethod.LINEAR">LINEAR (perda.core_data_structures.resampling_helpers.ResampleMethod attribute)</a>
 </li>
       <li><a href="_autosummary/perda.server.client.html#perda.server.client.ServerClient.list_logs">list_logs() (perda.server.client.ServerClient method)</a>
 </li>
@@ -812,7 +814,7 @@
 </li>
         <li><a href="_autosummary/perda.core_data_structures.joins.html#module-perda.core_data_structures.joins">perda.core_data_structures.joins</a>
 </li>
-        <li><a href="_autosummary/perda.core_data_structures.resampling.html#module-perda.core_data_structures.resampling">perda.core_data_structures.resampling</a>
+        <li><a href="_autosummary/perda.core_data_structures.resampling_helpers.html#module-perda.core_data_structures.resampling_helpers">perda.core_data_structures.resampling_helpers</a>
 </li>
         <li><a href="_autosummary/perda.core_data_structures.single_run_data.html#module-perda.core_data_structures.single_run_data">perda.core_data_structures.single_run_data</a>
 </li>
@@ -866,6 +868,8 @@
 </li>
         <li><a href="_autosummary/perda.utils.preprocessing.html#module-perda.utils.preprocessing">perda.utils.preprocessing</a>
 </li>
+        <li><a href="_autosummary/perda.utils.resampling.html#module-perda.utils.resampling">perda.utils.resampling</a>
+</li>
         <li><a href="_autosummary/perda.utils.search.html#module-perda.utils.search">perda.utils.search</a>
 </li>
       </ul></li>
@@ -883,7 +887,7 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="_autosummary/perda.server.config.html#perda.server.config.LogEntry.name">name (perda.server.config.LogEntry attribute)</a>
 </li>
-      <li><a href="_autosummary/perda.core_data_structures.resampling.html#perda.core_data_structures.resampling.ResampleMethod.NEAREST">NEAREST (perda.core_data_structures.resampling.ResampleMethod attribute)</a>
+      <li><a href="_autosummary/perda.core_data_structures.resampling_helpers.html#perda.core_data_structures.resampling_helpers.ResampleMethod.NEAREST">NEAREST (perda.core_data_structures.resampling_helpers.ResampleMethod attribute)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -1005,10 +1009,10 @@
 </li>
       </ul></li>
       <li>
-    perda.core_data_structures.resampling
+    perda.core_data_structures.resampling_helpers
 
       <ul>
-        <li><a href="_autosummary/perda.core_data_structures.resampling.html#module-perda.core_data_structures.resampling">module</a>
+        <li><a href="_autosummary/perda.core_data_structures.resampling_helpers.html#module-perda.core_data_structures.resampling_helpers">module</a>
 </li>
       </ul></li>
       <li>
@@ -1081,8 +1085,6 @@
         <li><a href="_autosummary/perda.plotting.parametric_plot.html#module-perda.plotting.parametric_plot">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     perda.plotting.plotting_constants
 
@@ -1090,6 +1092,8 @@
         <li><a href="_autosummary/perda.plotting.plotting_constants.html#module-perda.plotting.plotting_constants">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     perda.plotting.scatter_histogram_plotter
 
@@ -1196,6 +1200,13 @@
 </li>
       </ul></li>
       <li>
+    perda.utils.resampling
+
+      <ul>
+        <li><a href="_autosummary/perda.utils.resampling.html#module-perda.utils.resampling">module</a>
+</li>
+      </ul></li>
+      <li>
     perda.utils.search
 
       <ul>
@@ -1254,9 +1265,9 @@
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="_autosummary/perda.core_data_structures.resampling.html#perda.core_data_structures.resampling.resample_to_freq">resample_to_freq() (in module perda.core_data_structures.resampling)</a>
+      <li><a href="_autosummary/perda.utils.resampling.html#perda.utils.resampling.resample_to_freq">resample_to_freq() (in module perda.utils.resampling)</a>
 </li>
-      <li><a href="_autosummary/perda.core_data_structures.resampling.html#perda.core_data_structures.resampling.ResampleMethod">ResampleMethod (class in perda.core_data_structures.resampling)</a>
+      <li><a href="_autosummary/perda.core_data_structures.resampling_helpers.html#perda.core_data_structures.resampling_helpers.ResampleMethod">ResampleMethod (class in perda.core_data_structures.resampling_helpers)</a>
 </li>
       <li><a href="_autosummary/perda.live.html#perda.live.ResponseStatus">ResponseStatus (class in perda.live)</a>
 
@@ -1434,7 +1445,7 @@
 <h2 id="Z">Z</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="_autosummary/perda.core_data_structures.resampling.html#perda.core_data_structures.resampling.ResampleMethod.ZOH">ZOH (perda.core_data_structures.resampling.ResampleMethod attribute)</a>
+      <li><a href="_autosummary/perda.core_data_structures.resampling_helpers.html#perda.core_data_structures.resampling_helpers.ResampleMethod.ZOH">ZOH (perda.core_data_structures.resampling_helpers.ResampleMethod attribute)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>

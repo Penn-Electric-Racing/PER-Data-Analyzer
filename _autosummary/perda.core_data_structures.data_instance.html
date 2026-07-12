@@ -271,7 +271,7 @@
 <li class="toctree-l3 current active"><a class="current reference internal" href="#">perda.core_data_structures.data_instance</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.deduplication.html">perda.core_data_structures.deduplication</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.joins.html">perda.core_data_structures.joins</a></li>
-<li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.resampling.html">perda.core_data_structures.resampling</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.resampling_helpers.html">perda.core_data_structures.resampling_helpers</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.single_run_data.html">perda.core_data_structures.single_run_data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.split_helpers.html">perda.core_data_structures.split_helpers</a></li>
 </ul>
@@ -306,6 +306,7 @@
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.gps_analysis.html">perda.utils.gps_analysis</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.integrate.html">perda.utils.integrate</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.preprocessing.html">perda.utils.preprocessing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.utils.resampling.html">perda.utils.resampling</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.search.html">perda.utils.search</a></li>
 </ul>
 </details></li>
@@ -639,7 +640,7 @@ Default is True.</p></li>
 <li><p><strong>right</strong> (<a class="reference internal" href="#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance"><em>DataInstance</em></a>) – Right DataInstance</p></li>
 <li><p><strong>tolerance</strong> (<em>float</em>) – Maximum allowed distance between left and right timestamps for a match.
 Timestamps with distance &gt; tolerance are dropped.</p></li>
-<li><p><strong>method</strong> (<a class="reference internal" href="perda.core_data_structures.resampling.html#perda.core_data_structures.resampling.ResampleMethod" title="perda.core_data_structures.resampling.ResampleMethod"><em>ResampleMethod</em></a><em>, </em><em>optional</em>) – Interpolation method for right values. Default is LINEAR.</p></li>
+<li><p><strong>method</strong> (<a class="reference internal" href="perda.core_data_structures.resampling_helpers.html#perda.core_data_structures.resampling_helpers.ResampleMethod" title="perda.core_data_structures.resampling_helpers.ResampleMethod"><em>ResampleMethod</em></a><em>, </em><em>optional</em>) – Interpolation method for right values. Default is LINEAR.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
@@ -667,7 +668,7 @@ To resample onto a uniform frequency grid first, call
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>left</strong> (<a class="reference internal" href="#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance"><em>DataInstance</em></a>) – Left DataInstance (defines the target timestamp grid)</p></li>
 <li><p><strong>right</strong> (<a class="reference internal" href="#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance"><em>DataInstance</em></a><em> or </em><em>list</em><em> of </em><a class="reference internal" href="#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance"><em>DataInstance</em></a>) – One or more right DataInstances to align to the left grid</p></li>
-<li><p><strong>method</strong> (<a class="reference internal" href="perda.core_data_structures.resampling.html#perda.core_data_structures.resampling.ResampleMethod" title="perda.core_data_structures.resampling.ResampleMethod"><em>ResampleMethod</em></a><em>, </em><em>optional</em>) – Interpolation method. Default is LINEAR.</p></li>
+<li><p><strong>method</strong> (<a class="reference internal" href="perda.core_data_structures.resampling_helpers.html#perda.core_data_structures.resampling_helpers.ResampleMethod" title="perda.core_data_structures.resampling_helpers.ResampleMethod"><em>ResampleMethod</em></a><em>, </em><em>optional</em>) – Interpolation method. Default is LINEAR.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
