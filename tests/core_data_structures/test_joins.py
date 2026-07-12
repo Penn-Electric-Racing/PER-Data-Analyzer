@@ -10,7 +10,7 @@ from perda.core_data_structures.data_instance import (
     outer_join_data_instances,
 )
 from perda.core_data_structures.joins import inner_join, left_join, outer_join
-from perda.core_data_structures.resampling import ResampleMethod, resample_to_freq
+from perda.core_data_structures.resampling_helpers import ResampleMethod
 
 
 @pytest.mark.parametrize(
@@ -279,44 +279,6 @@ def test_inner_join_right_values_interpolated_not_snapped():
         left_ts, np.ones(3), right_ts, np.array([0.0, 10.0]), tolerance=5
     )
     np.testing.assert_allclose(rv[1], 5.0)
-
-
-def test_resample_to_freq_produces_correct_spacing():
-    ts_src = np.array([0, 1_000_000], dtype=np.int64)
-    val_src = np.array([0.0, 1.0])
-    ts, val = resample_to_freq(ts_src, val_src, freq_hz=2.0, timestamp_divisor=1e6)
-    assert len(ts) == 2
-    assert ts[0] == 0
-    assert ts[1] == 500_000
-
-
-def test_resample_to_freq_linear_values():
-    ts_src = np.array([0, 1_000_000], dtype=np.int64)
-    val_src = np.array([0.0, 10.0])
-    ts, val = resample_to_freq(ts_src, val_src, freq_hz=2.0, timestamp_divisor=1e6)
-    np.testing.assert_allclose(val, [0.0, 5.0])
-
-
-def test_resample_to_freq_starts_at_first_timestamp():
-    ts_src = np.array([500, 1_000_500], dtype=np.int64)
-    val_src = np.array([0.0, 1.0])
-    ts, _ = resample_to_freq(ts_src, val_src, freq_hz=1.0, timestamp_divisor=1e3)
-    assert ts[0] == 500
-
-
-def test_resample_to_freq_does_not_include_last_timestamp():
-    ts_src = np.array([0, 1_000_000], dtype=np.int64)
-    val_src = np.array([0.0, 1.0])
-    ts, _ = resample_to_freq(ts_src, val_src, freq_hz=1.0, timestamp_divisor=1e6)
-    assert ts[-1] < ts_src[-1]
-
-
-def test_resample_to_freq_microseconds_100hz():
-    ts_src = np.array([0, 100_000], dtype=np.int64)
-    val_src = np.array([0.0, 10.0])
-    ts, _ = resample_to_freq(ts_src, val_src, freq_hz=100.0, timestamp_divisor=1e6)
-    diffs = np.diff(ts)
-    np.testing.assert_allclose(diffs, 10_000)
 
 
 def test_left_join_data_instances_single_right_returns_two(di_simple, di_sparse):

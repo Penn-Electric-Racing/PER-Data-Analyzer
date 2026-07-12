@@ -6,7 +6,7 @@ from numpy.typing import NDArray
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from .joins import inner_join, left_join, outer_join
-from .resampling import ResampleMethod, _interpolate
+from .resampling_helpers import ResampleMethod, _interpolate
 
 
 class DataInstance(BaseModel):

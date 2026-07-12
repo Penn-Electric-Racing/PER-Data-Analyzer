@@ -40,8 +40,8 @@ def test_wheelspeeds_backups_created(ws_srd):
     result = apply_preprocessing(ws_srd, [convert_wheelspeeds_to_m_per_s])
     assert "pcm.wheelSpeeds.frontRight_mph" in result
     assert "pcm.wheelSpeeds.frontLeft_mph" in result
-    assert "pcm.wheelSpeeds.rearRight_mph" in result
-    assert "pcm.wheelSpeeds.rearLeft_mph" in result
+    assert "pcm.wheelSpeeds.backRight_mph" in result
+    assert "pcm.wheelSpeeds.backLeft_mph" in result
 
 
 def test_wheelspeeds_backup_values_are_original_mph(ws_srd):

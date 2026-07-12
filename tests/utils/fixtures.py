@@ -189,8 +189,8 @@ def ws_srd():
     names = [
         "pcm.wheelSpeeds.frontRight",
         "pcm.wheelSpeeds.frontLeft",
-        "pcm.wheelSpeeds.rearRight",
-        "pcm.wheelSpeeds.rearLeft",
+        "pcm.wheelSpeeds.backRight",
+        "pcm.wheelSpeeds.backLeft",
     ]
     instances = {
         i
