@@ -45,6 +45,7 @@ def plot_single_axis(
     timestamp_unit: Timescale = Timescale.MS,
     vlines: List[float] | None = None,
     vline_config: "VLineConfig" = DEFAULT_VLINE_CONFIG,
+    max_points: int | None = None,
 ) -> go.Figure:
     """
     Plot one or more DataInstances on a single y-axis using Plotly.
@@ -67,6 +68,8 @@ def plot_single_axis(
         X-axis positions (in seconds) where vertical lines are drawn. Default is None.
     vline_config : VLineConfig, optional
         Visual configuration for the vertical lines.
+    max_points : int | None, optional
+        Maximum number of data points to plot per trace (enables zero-copy step downsampling). Default is None (full fidelity).
 
     Returns
     -------
@@ -88,13 +91,20 @@ def plot_single_axis(
             print(f"Warning: No data points in DataInstance for {di.label}")
             continue
 
-        # Convert timestamps from the log unit to seconds for plotting.
-        timestamps_s = _to_seconds(di.timestamp_np.astype(float), timestamp_unit)
+        # Convert timestamps from the log unit to seconds for plotting with optional downsampling.
+        n_points = len(di)
+        if max_points is not None and n_points > max_points and max_points > 0:
+            step = n_points // max_points
+            timestamps_s = _to_seconds(di.timestamp_np[::step], timestamp_unit)
+            values_np = di.value_np[::step]
+        else:
+            timestamps_s = _to_seconds(di.timestamp_np, timestamp_unit)
+            values_np = di.value_np
 
         fig.add_trace(
             go.Scattergl(
                 x=timestamps_s,
-                y=di.value_np,
+                y=values_np,
                 mode="lines",
                 name=di.label,
             )
@@ -139,6 +149,7 @@ def plot_dual_axis(
     timestamp_unit: Timescale = Timescale.MS,
     vlines: List[float] | None = None,
     vline_config: VLineConfig = DEFAULT_VLINE_CONFIG,
+    max_points: int | None = None,
 ) -> go.Figure:
     """
     Plot DataInstances on dual y-axes using Plotly.
@@ -167,6 +178,8 @@ def plot_dual_axis(
         X-axis positions (in seconds) where vertical lines are drawn. Default is None.
     vline_config : VLineConfig, optional
         Visual configuration for the vertical lines.
+    max_points : int | None, optional
+        Maximum number of data points to plot per trace (enables zero-copy step downsampling). Default is None (full fidelity).
 
     Returns
     -------
@@ -190,13 +203,20 @@ def plot_dual_axis(
             print(f"Warning: No data points in DataInstance for {di.label}")
             continue
 
-        # Convert timestamps from the log unit to seconds for plotting.
-        timestamps_s = _to_seconds(di.timestamp_np.astype(float), timestamp_unit)
+        # Convert timestamps from the log unit to seconds for plotting with optional downsampling.
+        n_points = len(di)
+        if max_points is not None and n_points > max_points and max_points > 0:
+            step = n_points // max_points
+            timestamps_s = _to_seconds(di.timestamp_np[::step], timestamp_unit)
+            values_np = di.value_np[::step]
+        else:
+            timestamps_s = _to_seconds(di.timestamp_np, timestamp_unit)
+            values_np = di.value_np
 
         fig.add_trace(
             go.Scattergl(
                 x=timestamps_s,
-                y=di.value_np,
+                y=values_np,
                 mode="lines",
                 name=di.label,
             ),
@@ -209,13 +229,20 @@ def plot_dual_axis(
             print(f"Warning: No data points in DataInstance for {di.label}")
             continue
 
-        # Convert timestamps from the log unit to seconds for plotting.
-        timestamps_s = _to_seconds(di.timestamp_np.astype(float), timestamp_unit)
+        # Convert timestamps from the log unit to seconds for plotting with optional downsampling.
+        n_points = len(di)
+        if max_points is not None and n_points > max_points and max_points > 0:
+            step = n_points // max_points
+            timestamps_s = _to_seconds(di.timestamp_np[::step], timestamp_unit)
+            values_np = di.value_np[::step]
+        else:
+            timestamps_s = _to_seconds(di.timestamp_np, timestamp_unit)
+            values_np = di.value_np
 
         fig.add_trace(
             go.Scattergl(
                 x=timestamps_s,
-                y=di.value_np,
+                y=values_np,
                 mode="lines",
                 name=di.label,
                 line=dict(dash="dash"),
