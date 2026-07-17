@@ -9,29 +9,7 @@ from ..core_data_structures.data_instance import DataInstance
 from ..core_data_structures.single_run_data import SingleRunData
 from ..units import Timescale
 
-
-def _find_contiguous_slices(var_ids: np.ndarray) -> dict[int, tuple[int, int]]:
-    """Find contiguous slice boundary index pairs (start, end) for a sorted 1D array.
-
-    Avoids np.unique sorting overhead by performing a single-pass O(N) diff.
-    """
-    if len(var_ids) == 0:
-        return {}
-
-    diff_mask = var_ids[:-1] != var_ids[1:]
-    change_indices = np.flatnonzero(diff_mask) + 1
-
-    start_indices = np.empty(len(change_indices) + 1, dtype=np.int64)
-    start_indices[0] = 0
-    start_indices[1:] = change_indices
-
-    end_indices = np.append(start_indices[1:], len(var_ids))
-    unique_ids = var_ids[start_indices]
-
-    return {
-        int(uid): (start, end)
-        for uid, start, end in zip(unique_ids, start_indices, end_indices)
-    }
+from ..utils.csv_utils import _find_contiguous_slices
 
 
 def parse_csv(
@@ -177,6 +155,7 @@ def parse_csv(
 
     # Fast O(N) boundary scan using helper function
     slices = _find_contiguous_slices(var_ids)
+    slice_map = slices.slices
 
     # Format data as DataInstances (zero-copy slicing views)
     id_to_instance: dict[int, DataInstance] = {}
@@ -188,10 +167,10 @@ def parse_csv(
         descript = id_to_descript[var_id]
         cpp_name_to_id[name] = var_id
 
-        if var_id in slices:
-            start, end = slices[var_id]
-            timestamps_np = timestamps_all[start:end]
-            values_np = values_all[start:end]
+        if var_id in slice_map:
+            slice_bounds = slice_map[var_id]
+            timestamps_np = timestamps_all[slice_bounds.start : slice_bounds.end]
+            values_np = values_all[slice_bounds.start : slice_bounds.end]
         else:
             timestamps_np = np.array([], dtype=np.int64)
             values_np = np.array([], dtype=np.float64)

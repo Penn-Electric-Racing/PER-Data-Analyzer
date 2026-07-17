@@ -61,7 +61,7 @@ def test_run_collection_sorting_and_filtering(tmp_path):
     p2.write_text(content2)
 
     # Load with order p2, p1 to ensure sorting works
-    col = RunCollection.from_paths([str(p2), str(p1)])
+    col = RunCollection([str(p2), str(p1)])
 
     # Check chronological ordering: old (10:00) should be first
     assert len(col) == 2
@@ -99,8 +99,24 @@ def test_run_collection_check_any(tmp_path):
     p2 = tmp_path / "log2.csv"
     p2.write_text(content2)
 
-    col = RunCollection.from_paths([str(p1), str(p2)])
+    col = RunCollection([str(p1), str(p2)])
 
     # Query if voltage ever exceeded 10.0
     matching = col.check_any("ams.pack.voltage", lambda val: (val > 10.0).any())
     assert matching == ["log2.csv"]
+
+
+def test_run_collection_direct_init(tmp_path):
+    content = textwrap.dedent(
+        """\
+        PER Log: Thu Jun 11 10:00:00 2026 v2.0
+        Value voltage (ams.pack.voltage): 1
+        0,1,12.5
+    """
+    )
+    p = tmp_path / "log.csv"
+    p.write_text(content)
+
+    col = RunCollection(str(p))
+    assert len(col) == 1
+    assert col.runs[0].data.creation_time == datetime(2026, 6, 11, 10, 0, 0)
