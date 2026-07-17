@@ -1,5 +1,6 @@
 from typing import cast
-
+from datetime import datetime
+import re
 import numpy as np
 import polars as pl
 from tqdm import tqdm
@@ -7,6 +8,30 @@ from tqdm import tqdm
 from ..core_data_structures.data_instance import DataInstance
 from ..core_data_structures.single_run_data import SingleRunData
 from ..units import Timescale
+
+
+def _find_contiguous_slices(var_ids: np.ndarray) -> dict[int, tuple[int, int]]:
+    """Find contiguous slice boundary index pairs (start, end) for a sorted 1D array.
+
+    Avoids np.unique sorting overhead by performing a single-pass O(N) diff.
+    """
+    if len(var_ids) == 0:
+        return {}
+
+    diff_mask = var_ids[:-1] != var_ids[1:]
+    change_indices = np.flatnonzero(diff_mask) + 1
+
+    start_indices = np.empty(len(change_indices) + 1, dtype=np.int64)
+    start_indices[0] = 0
+    start_indices[1:] = change_indices
+
+    end_indices = np.append(start_indices[1:], len(var_ids))
+    unique_ids = var_ids[start_indices]
+
+    return {
+        int(uid): (start, end)
+        for uid, start, end in zip(unique_ids, start_indices, end_indices)
+    }
 
 
 def parse_csv(
@@ -44,9 +69,22 @@ def parse_csv(
         parse_unit = (
             Timescale.US if header_line.rstrip().endswith("v2.0") else Timescale.MS
         )
+
+        creation_time = None
+        try:
+            match = re.search(r"PER Log:\s*(.*?)(?:\s+v\d+\.\d+)?$", header_line)
+            if match:
+                date_str = match.group(1).strip()
+                # Parse format: Thu Jun 11 17:06:37 2026
+                creation_time = datetime.strptime(date_str, "%a %b %d %H:%M:%S %Y")
+        except Exception:
+            pass
+
         if verbose >= 1:
             print(f"Header: {header_line.rstrip()}")
             print(f"Timestamp unit: {parse_unit.value}")
+            if creation_time:
+                print(f"Log recorded on: {creation_time}")
 
         # Block 1: Variable ID/Name pairs
         if verbose >= 2:
@@ -132,15 +170,15 @@ def parse_csv(
     data_start_time = int(cast(int, df["timestamp"].min()))
     data_end_time = int(cast(int, df["timestamp"].max()))
 
-    # Build per-variable numpy arrays from grouped Polars data
-    var_arrays: dict[int, tuple] = {}
-    for (var_id,), group in df.group_by(["var_id"], maintain_order=True):
-        var_arrays[int(var_id)] = (
-            group["timestamp"].to_numpy(),
-            group["value"].to_numpy(),
-        )
+    # Extract sorted columns to main numpy arrays
+    var_ids = df["var_id"].to_numpy()
+    timestamps_all = df["timestamp"].to_numpy()
+    values_all = df["value"].to_numpy()
 
-    # Format data as DataInstances
+    # Fast O(N) boundary scan using helper function
+    slices = _find_contiguous_slices(var_ids)
+
+    # Format data as DataInstances (zero-copy slicing views)
     id_to_instance: dict[int, DataInstance] = {}
     cpp_name_to_id: dict[str, int] = {}
     if verbose >= 2:
@@ -149,9 +187,15 @@ def parse_csv(
         name = id_to_cpp_name[var_id]
         descript = id_to_descript[var_id]
         cpp_name_to_id[name] = var_id
-        timestamps_np, values_np = var_arrays.get(
-            var_id, (np.array([], dtype=np.int64), np.array([], dtype=np.float64))
-        )
+
+        if var_id in slices:
+            start, end = slices[var_id]
+            timestamps_np = timestamps_all[start:end]
+            values_np = values_all[start:end]
+        else:
+            timestamps_np = np.array([], dtype=np.int64)
+            values_np = np.array([], dtype=np.float64)
+
         id_to_instance[var_id] = DataInstance(
             timestamp_np=timestamps_np,
             value_np=values_np,
@@ -172,6 +216,7 @@ def parse_csv(
         cpp_name_to_id=cpp_name_to_id,
         id_to_cpp_name=id_to_cpp_name,
         id_to_descript=id_to_descript,
+        creation_time=creation_time,
         total_data_points=total_data_points,
         data_start_time=data_start_time,
         data_end_time=data_end_time,
