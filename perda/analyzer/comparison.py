@@ -47,7 +47,7 @@ def plot_comparison(
         # Downsample coordinates if data points exceed the limit
         n_points = len(di)
         if max_points is not None and n_points > max_points and max_points > 0:
-            step = n_points // max_points
+            step = (n_points + max_points - 1) // max_points
             timestamps_s = _to_seconds(rel_timestamps_raw[::step], aly.data.timestamp_unit)
             values_np = di.value_np[::step]
         else:

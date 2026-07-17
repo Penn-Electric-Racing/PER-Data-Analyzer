@@ -94,7 +94,7 @@ def plot_single_axis(
         # Convert timestamps from the log unit to seconds for plotting with optional downsampling.
         n_points = len(di)
         if max_points is not None and n_points > max_points and max_points > 0:
-            step = n_points // max_points
+            step = (n_points + max_points - 1) // max_points
             timestamps_s = _to_seconds(di.timestamp_np[::step], timestamp_unit)
             values_np = di.value_np[::step]
         else:
@@ -206,7 +206,7 @@ def plot_dual_axis(
         # Convert timestamps from the log unit to seconds for plotting with optional downsampling.
         n_points = len(di)
         if max_points is not None and n_points > max_points and max_points > 0:
-            step = n_points // max_points
+            step = (n_points + max_points - 1) // max_points
             timestamps_s = _to_seconds(di.timestamp_np[::step], timestamp_unit)
             values_np = di.value_np[::step]
         else:
@@ -232,7 +232,7 @@ def plot_dual_axis(
         # Convert timestamps from the log unit to seconds for plotting with optional downsampling.
         n_points = len(di)
         if max_points is not None and n_points > max_points and max_points > 0:
-            step = n_points // max_points
+            step = (n_points + max_points - 1) // max_points
             timestamps_s = _to_seconds(di.timestamp_np[::step], timestamp_unit)
             values_np = di.value_np[::step]
         else:
