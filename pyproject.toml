@@ -43,6 +43,9 @@ full = [
 where = ["."]
 include = ["perda*"]
 
+[tool.setuptools.package-data]
+perda = ["py.typed"]
+
 [tool.setuptools.dynamic]
 dependencies = {file = ["requirements.txt"]}
 
