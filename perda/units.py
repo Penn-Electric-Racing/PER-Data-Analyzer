@@ -1,6 +1,10 @@
 from enum import Enum
+from typing import TypeVar, overload
 
-import numpy.typing as npt
+from numpy import float64
+from numpy.typing import NDArray
+
+Numeric = TypeVar("Numeric", float, NDArray[float64])
 
 
 class Timescale(Enum):
@@ -11,21 +15,19 @@ class Timescale(Enum):
     S = "s"
 
 
-def _to_seconds(
-    timestamp: float | npt.NDArray, source_time_unit: Timescale
-) -> float | npt.NDArray:
+def _to_seconds(timestamp: Numeric, source_time_unit: Timescale) -> Numeric:
     """Convert a timestamp from the given unit to seconds.
 
     Parameters
     ----------
-    timestamp : float | NDArray
+    timestamp : float | NDArray[Float64]
         Timestamp(s) to convert.
     source_time_unit : Timescale
         Unit of the input timestamp.
 
     Returns
     -------
-    float | NDArray
+    float | NDArray[Float64]
         Timestamp(s) in seconds.
     """
     if source_time_unit == Timescale.US:
@@ -35,21 +37,19 @@ def _to_seconds(
     return timestamp
 
 
-def _from_seconds(
-    timestamp_s: float | npt.NDArray, target_time_unit: Timescale
-) -> float | npt.NDArray:
+def _from_seconds(timestamp_s: Numeric, target_time_unit: Timescale) -> Numeric:
     """Convert a timestamp from seconds to the given unit.
 
     Parameters
     ----------
-    timestamp_s : float | NDArray
+    timestamp_s : float | NDArray[Float64]
         Timestamp(s) in seconds.
     target_time_unit : Timescale
         Desired output unit.
 
     Returns
     -------
-    float | NDArray
+    float | NDArray[Float64]
         Timestamp(s) in the target unit.
     """
     if target_time_unit == Timescale.US:
@@ -59,16 +59,26 @@ def _from_seconds(
     return timestamp_s
 
 
+@overload
 def convert_time(
-    timestamp: float | npt.NDArray,
+    timestamp: float, source_time_unit: Timescale, target_time_unit: Timescale
+) -> float: ...
+@overload
+def convert_time(
+    timestamp: NDArray[float64],
     source_time_unit: Timescale,
     target_time_unit: Timescale,
-) -> float | npt.NDArray:
+) -> NDArray[float64]: ...
+def convert_time(
+    timestamp: Numeric,
+    source_time_unit: Timescale,
+    target_time_unit: Timescale,
+) -> Numeric:
     """Convert a timestamp between two timescale units.
 
     Parameters
     ----------
-    timestamp : float | NDArray
+    timestamp : float | NDArray[Float64]
         Timestamp(s) to convert.
     source_time_unit : Timescale
         Unit of the input timestamp.
@@ -77,7 +87,7 @@ def convert_time(
 
     Returns
     -------
-    float | NDArray
+    float | NDArray[Float64]
         Timestamp(s) in the target unit.
 
     Examples
@@ -88,17 +98,21 @@ def convert_time(
     return _from_seconds(_to_seconds(timestamp, source_time_unit), target_time_unit)
 
 
-def mph_to_m_per_s(value: float | npt.NDArray) -> float | npt.NDArray:
+@overload
+def mph_to_m_per_s(value: float) -> float: ...
+@overload
+def mph_to_m_per_s(value: NDArray[float64]) -> NDArray[float64]: ...
+def mph_to_m_per_s(value: Numeric) -> Numeric:
     """Convert a speed value from miles per hour to meters per second.
 
     Parameters
     ----------
-    value : float | NDArray
+    value : float | NDArray[Float64]
         Speed in mph.
 
     Returns
     -------
-    float | NDArray
+    float | NDArray[Float64]
         Speed in m/s.
 
     Examples
@@ -109,17 +123,21 @@ def mph_to_m_per_s(value: float | npt.NDArray) -> float | npt.NDArray:
     return value / 3600 * 1609.34
 
 
-def in_to_m(value: float | npt.NDArray) -> float | npt.NDArray:
+@overload
+def in_to_m(value: float) -> float: ...
+@overload
+def in_to_m(value: NDArray[float64]) -> NDArray[float64]: ...
+def in_to_m(value: Numeric) -> Numeric:
     """Convert a length value from inches to meters.
 
     Parameters
     ----------
-    value : float | NDArray
+    value : float | NDArray[Float64]
         Length in inches.
 
     Returns
     -------
-    float | NDArray
+    float | NDArray[Float64]
         Length in meters.
 
     Examples

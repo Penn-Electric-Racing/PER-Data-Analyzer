@@ -3,9 +3,5 @@
 
 # Development tooling
 pre-commit
-black
-black[jupyter]
-isort
-mypy
 pytest
 pytest-cov

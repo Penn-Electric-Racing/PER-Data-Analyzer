@@ -2,7 +2,7 @@ import numpy as np
 from pydantic import BaseModel, Field
 
 from ..core_data_structures.data_instance import DataInstance
-from ..units import *
+from ..units import Timescale, convert_time
 
 
 class AccelSegmentResult(BaseModel):
@@ -120,16 +120,16 @@ def compute_accel_results(
 
     results = []
     for start_idx in start_indices:
-        t_start = time[start_idx]
+        t_start = float(time[start_idx])
 
         future_ends = end_indices[end_indices > start_idx]
-        t_end_signal = time[future_ends[0]] if len(future_ends) > 0 else time[-1]
+        t_end_signal = float(time[future_ends[0]] if len(future_ends) > 0 else time[-1])
 
-        dist_at_start = np.interp(
-            t_start, distance_obj.timestamp_np, distance_obj.value_np
+        dist_at_start = float(
+            np.interp(t_start, distance_obj.timestamp_np, distance_obj.value_np)
         )
-        dist_at_signal_end = np.interp(
-            t_end_signal, distance_obj.timestamp_np, distance_obj.value_np
+        dist_at_signal_end = float(
+            np.interp(t_end_signal, distance_obj.timestamp_np, distance_obj.value_np)
         )
 
         if dist_at_signal_end - dist_at_start < target_dist:
@@ -141,7 +141,7 @@ def compute_accel_results(
         future_d = distance_obj.value_np[mask]
 
         if future_d[-1] >= target_absolute_dist:
-            t_target_hit = np.interp(target_absolute_dist, future_d, future_t)
+            t_target_hit = float(np.interp(target_absolute_dist, future_d, future_t))
             results.append(
                 AccelSegmentResult(
                     start_time=convert_time(

@@ -8,7 +8,12 @@ from plotly.subplots import make_subplots
 from ..core_data_structures.data_instance import DataInstance
 from ..core_data_structures.single_run_data import SingleRunData
 from ..units import Timescale, _to_seconds
-from .plotting_constants import *
+from .plotting_constants import (
+    DEFAULT_FONT_CONFIG,
+    DEFAULT_LAYOUT_CONFIG,
+    FontConfig,
+    LayoutConfig,
+)
 
 
 def data_instance_subplots(
@@ -89,7 +94,9 @@ def data_instance_subplots(
                 print(f"Warning: No data points in DataInstance for {di.label}")
                 continue
 
-            timestamps_s = _to_seconds(di.timestamp_np.astype(float), timestamp_unit)
+            timestamps_s = _to_seconds(
+                di.timestamp_np.astype(np.float64), timestamp_unit
+            )
 
             fig.add_trace(
                 go.Scattergl(
@@ -249,7 +256,9 @@ def plot_multi_log_subplots(
                 first_valid_log_idx = log_idx
 
             di = srd[var_name]
-            timestamps_s = _to_seconds(di.timestamp_np.astype(float), timestamp_unit)
+            timestamps_s = _to_seconds(
+                di.timestamp_np.astype(np.float64), timestamp_unit
+            )
             values = di.value_np
             if layout_config.max_display_resolution:
                 timestamps_s, values = stride_downsample(
