@@ -39,8 +39,6 @@ autodoc_pydantic_model_member_order = "bysource"
 
 
 extensions = [
-    "nbsphinx",
-    "nbsphinx_link",
     "sphinx.ext.napoleon",  # For numpy/google style docstrings
     "sphinx.ext.autodoc",  # Auto-generate docs from docstrings
     "sphinx.ext.autosummary",
@@ -50,7 +48,7 @@ extensions = [
     "sphinx.ext.viewcode",  # Add links to source code
     "sphinx_copybutton",  # For copy buttons on code blocks
     "sphinx_design",  # For better CSS
-    "sphinx_markdown_builder"  # For MCP Markdown file
+    "sphinx_markdown_builder",  # For MCP Markdown file
 ]
 
 # Configure autodoc-typehints to work with pydantic
@@ -59,8 +57,6 @@ typehints_use_signature = False
 
 templates_path = ["_templates"]
 exclude_patterns: list[str] = []
-nbsphinx_allow_errors = True
-nbsphinx_execute = "never"
 
 highlight_language = "python"
 

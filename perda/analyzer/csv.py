@@ -1,3 +1,5 @@
+from typing import cast
+
 import numpy as np
 import polars as pl
 from tqdm import tqdm
@@ -127,8 +129,8 @@ def parse_csv(
         raise Exception("No valid data points found after parsing.")
 
     total_data_points = len(df)
-    data_start_time = int(df["timestamp"].min())
-    data_end_time = int(df["timestamp"].max())
+    data_start_time = int(cast(int, df["timestamp"].min()))
+    data_end_time = int(cast(int, df["timestamp"].max()))
 
     # Build per-variable numpy arrays from grouped Polars data
     var_arrays: dict[int, tuple] = {}

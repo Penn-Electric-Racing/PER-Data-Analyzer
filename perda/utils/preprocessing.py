@@ -444,7 +444,9 @@ class CorrectSteeringAngleLambda:
 
         raw_di = data[self.steering_raw]
         raw_volts: NDArray[float64] = raw_di.value_np.astype(np.float64)
-        recomputed: NDArray[float64] = np.polyval(self.coeffs, raw_volts)
+        recomputed: NDArray[float64] = np.polyval(self.coeffs, raw_volts).astype(
+            np.float64
+        )
 
         backup_name = self.steering_angle + "_original"
         if self.steering_angle in data and backup_name not in data:
