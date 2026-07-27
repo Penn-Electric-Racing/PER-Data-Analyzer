@@ -46,7 +46,6 @@
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../../_static/copybutton.js?v=f281be69"></script>
     <script src="../../../_static/design-tabs.js?v=f930bc37"></script>
-    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/perda/plotting/subplots';</script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
@@ -313,7 +312,12 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">..core_data_structures.data_instance</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataInstance</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..core_data_structures.single_run_data</span><span class="w"> </span><span class="kn">import</span> <span class="n">SingleRunData</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..units</span><span class="w"> </span><span class="kn">import</span> <span class="n">Timescale</span><span class="p">,</span> <span class="n">_to_seconds</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">.plotting_constants</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.plotting_constants</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">DEFAULT_FONT_CONFIG</span><span class="p">,</span>
+    <span class="n">DEFAULT_LAYOUT_CONFIG</span><span class="p">,</span>
+    <span class="n">FontConfig</span><span class="p">,</span>
+    <span class="n">LayoutConfig</span><span class="p">,</span>
+<span class="p">)</span>
 
 
 <div class="viewcode-block" id="data_instance_subplots">
@@ -396,7 +400,9 @@
                 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Warning: No data points in DataInstance for </span><span class="si">{</span><span class="n">di</span><span class="o">.</span><span class="n">label</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
                 <span class="k">continue</span>
 
-            <span class="n">timestamps_s</span> <span class="o">=</span> <span class="n">_to_seconds</span><span class="p">(</span><span class="n">di</span><span class="o">.</span><span class="n">timestamp_np</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">),</span> <span class="n">timestamp_unit</span><span class="p">)</span>
+            <span class="n">timestamps_s</span> <span class="o">=</span> <span class="n">_to_seconds</span><span class="p">(</span>
+                <span class="n">di</span><span class="o">.</span><span class="n">timestamp_np</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span> <span class="n">timestamp_unit</span>
+            <span class="p">)</span>
 
             <span class="n">fig</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span>
                 <span class="n">go</span><span class="o">.</span><span class="n">Scattergl</span><span class="p">(</span>
@@ -562,7 +568,9 @@
                 <span class="n">first_valid_log_idx</span> <span class="o">=</span> <span class="n">log_idx</span>
 
             <span class="n">di</span> <span class="o">=</span> <span class="n">srd</span><span class="p">[</span><span class="n">var_name</span><span class="p">]</span>
-            <span class="n">timestamps_s</span> <span class="o">=</span> <span class="n">_to_seconds</span><span class="p">(</span><span class="n">di</span><span class="o">.</span><span class="n">timestamp_np</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">),</span> <span class="n">timestamp_unit</span><span class="p">)</span>
+            <span class="n">timestamps_s</span> <span class="o">=</span> <span class="n">_to_seconds</span><span class="p">(</span>
+                <span class="n">di</span><span class="o">.</span><span class="n">timestamp_np</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span> <span class="n">timestamp_unit</span>
+            <span class="p">)</span>
             <span class="n">values</span> <span class="o">=</span> <span class="n">di</span><span class="o">.</span><span class="n">value_np</span>
             <span class="k">if</span> <span class="n">layout_config</span><span class="o">.</span><span class="n">max_display_resolution</span><span class="p">:</span>
                 <span class="n">timestamps_s</span><span class="p">,</span> <span class="n">values</span> <span class="o">=</span> <span class="n">stride_downsample</span><span class="p">(</span>

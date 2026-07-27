@@ -46,7 +46,6 @@
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../_static/copybutton.js?v=f281be69"></script>
     <script src="../../_static/design-tabs.js?v=f930bc37"></script>
-    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/perda/units';</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -304,8 +303,12 @@
                   
   <h1>Source code for perda.units</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">overload</span>
 
-<span class="kn">import</span><span class="w"> </span><span class="nn">numpy.typing</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">npt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="kn">import</span> <span class="n">float64</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">numpy.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">NDArray</span>
+
+<span class="n">Numeric</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;Numeric&quot;</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">])</span>
 
 
 <div class="viewcode-block" id="Timescale">
@@ -319,21 +322,19 @@
 
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_to_seconds</span><span class="p">(</span>
-    <span class="n">timestamp</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">,</span> <span class="n">source_time_unit</span><span class="p">:</span> <span class="n">Timescale</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_to_seconds</span><span class="p">(</span><span class="n">timestamp</span><span class="p">:</span> <span class="n">Numeric</span><span class="p">,</span> <span class="n">source_time_unit</span><span class="p">:</span> <span class="n">Timescale</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Numeric</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert a timestamp from the given unit to seconds.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    timestamp : float | NDArray</span>
+<span class="sd">    timestamp : float | NDArray[Float64]</span>
 <span class="sd">        Timestamp(s) to convert.</span>
 <span class="sd">    source_time_unit : Timescale</span>
 <span class="sd">        Unit of the input timestamp.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    float | NDArray</span>
+<span class="sd">    float | NDArray[Float64]</span>
 <span class="sd">        Timestamp(s) in seconds.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">source_time_unit</span> <span class="o">==</span> <span class="n">Timescale</span><span class="o">.</span><span class="n">US</span><span class="p">:</span>
@@ -343,21 +344,19 @@
     <span class="k">return</span> <span class="n">timestamp</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_from_seconds</span><span class="p">(</span>
-    <span class="n">timestamp_s</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">,</span> <span class="n">target_time_unit</span><span class="p">:</span> <span class="n">Timescale</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_from_seconds</span><span class="p">(</span><span class="n">timestamp_s</span><span class="p">:</span> <span class="n">Numeric</span><span class="p">,</span> <span class="n">target_time_unit</span><span class="p">:</span> <span class="n">Timescale</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Numeric</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert a timestamp from seconds to the given unit.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    timestamp_s : float | NDArray</span>
+<span class="sd">    timestamp_s : float | NDArray[Float64]</span>
 <span class="sd">        Timestamp(s) in seconds.</span>
 <span class="sd">    target_time_unit : Timescale</span>
 <span class="sd">        Desired output unit.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    float | NDArray</span>
+<span class="sd">    float | NDArray[Float64]</span>
 <span class="sd">        Timestamp(s) in the target unit.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">target_time_unit</span> <span class="o">==</span> <span class="n">Timescale</span><span class="o">.</span><span class="n">US</span><span class="p">:</span>
@@ -367,18 +366,28 @@
     <span class="k">return</span> <span class="n">timestamp_s</span>
 
 
+<span class="nd">@overload</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">convert_time</span><span class="p">(</span>
+    <span class="n">timestamp</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">source_time_unit</span><span class="p">:</span> <span class="n">Timescale</span><span class="p">,</span> <span class="n">target_time_unit</span><span class="p">:</span> <span class="n">Timescale</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span> <span class="o">...</span>
+<span class="nd">@overload</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">convert_time</span><span class="p">(</span>
+    <span class="n">timestamp</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span>
+    <span class="n">source_time_unit</span><span class="p">:</span> <span class="n">Timescale</span><span class="p">,</span>
+    <span class="n">target_time_unit</span><span class="p">:</span> <span class="n">Timescale</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]:</span> <span class="o">...</span>
 <div class="viewcode-block" id="convert_time">
 <a class="viewcode-back" href="../../_autosummary/perda.units.html#perda.units.convert_time">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">convert_time</span><span class="p">(</span>
-    <span class="n">timestamp</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">,</span>
+    <span class="n">timestamp</span><span class="p">:</span> <span class="n">Numeric</span><span class="p">,</span>
     <span class="n">source_time_unit</span><span class="p">:</span> <span class="n">Timescale</span><span class="p">,</span>
     <span class="n">target_time_unit</span><span class="p">:</span> <span class="n">Timescale</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">:</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Numeric</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert a timestamp between two timescale units.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    timestamp : float | NDArray</span>
+<span class="sd">    timestamp : float | NDArray[Float64]</span>
 <span class="sd">        Timestamp(s) to convert.</span>
 <span class="sd">    source_time_unit : Timescale</span>
 <span class="sd">        Unit of the input timestamp.</span>
@@ -387,7 +396,7 @@
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    float | NDArray</span>
+<span class="sd">    float | NDArray[Float64]</span>
 <span class="sd">        Timestamp(s) in the target unit.</span>
 
 <span class="sd">    Examples</span>
@@ -399,19 +408,23 @@
 
 
 
+<span class="nd">@overload</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">mph_to_m_per_s</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span> <span class="o">...</span>
+<span class="nd">@overload</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">mph_to_m_per_s</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]:</span> <span class="o">...</span>
 <div class="viewcode-block" id="mph_to_m_per_s">
 <a class="viewcode-back" href="../../_autosummary/perda.units.html#perda.units.mph_to_m_per_s">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">mph_to_m_per_s</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">mph_to_m_per_s</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">Numeric</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Numeric</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert a speed value from miles per hour to meters per second.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    value : float | NDArray</span>
+<span class="sd">    value : float | NDArray[Float64]</span>
 <span class="sd">        Speed in mph.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    float | NDArray</span>
+<span class="sd">    float | NDArray[Float64]</span>
 <span class="sd">        Speed in m/s.</span>
 
 <span class="sd">    Examples</span>
@@ -423,19 +436,23 @@
 
 
 
+<span class="nd">@overload</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">in_to_m</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span> <span class="o">...</span>
+<span class="nd">@overload</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">in_to_m</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]:</span> <span class="o">...</span>
 <div class="viewcode-block" id="in_to_m">
 <a class="viewcode-back" href="../../_autosummary/perda.units.html#perda.units.in_to_m">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">in_to_m</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">in_to_m</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">Numeric</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Numeric</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert a length value from inches to meters.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    value : float | NDArray</span>
+<span class="sd">    value : float | NDArray[Float64]</span>
 <span class="sd">        Length in inches.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    float | NDArray</span>
+<span class="sd">    float | NDArray[Float64]</span>
 <span class="sd">        Length in meters.</span>
 
 <span class="sd">    Examples</span>

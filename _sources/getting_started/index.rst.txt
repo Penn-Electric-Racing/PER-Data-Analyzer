@@ -86,14 +86,6 @@ in the commands below.
    the installation instructions above.
 
 
-.. toctree::
-   :maxdepth: 1
-
-   notebook.nblink
-   notebook_advanced.nblink
-   
-
-
 Option 2: Standard Installation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

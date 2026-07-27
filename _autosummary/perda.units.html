@@ -47,7 +47,6 @@
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=f281be69"></script>
     <script src="../_static/design-tabs.js?v=f930bc37"></script>
-    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/perda.units';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -406,7 +405,7 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>timestamp</strong> (<em>float</em><em> | </em><em>NDArray</em>) – Timestamp(s) to convert.</p></li>
+<li><p><strong>timestamp</strong> (<em>float</em><em> | </em><em>NDArray</em><em>[</em><em>Float64</em><em>]</em>) – Timestamp(s) to convert.</p></li>
 <li><p><strong>source_time_unit</strong> (<a class="reference internal" href="#perda.units.Timescale" title="perda.units.Timescale"><em>Timescale</em></a>) – Unit of the input timestamp.</p></li>
 <li><p><strong>target_time_unit</strong> (<a class="reference internal" href="#perda.units.Timescale" title="perda.units.Timescale"><em>Timescale</em></a>) – Desired output unit.</p></li>
 </ul>
@@ -415,7 +414,7 @@
 <dd class="field-even"><p>Timestamp(s) in the target unit.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>float | NDArray</p>
+<dd class="field-odd"><p>float | NDArray[Float64]</p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
@@ -431,13 +430,13 @@
 <dd><p>Convert a length value from inches to meters.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>value</strong> (<em>float</em><em> | </em><em>NDArray</em>) – Length in inches.</p>
+<dd class="field-odd"><p><strong>value</strong> (<em>float</em><em> | </em><em>NDArray</em><em>[</em><em>Float64</em><em>]</em>) – Length in inches.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Length in meters.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>float | NDArray</p>
+<dd class="field-odd"><p>float | NDArray[Float64]</p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
@@ -453,13 +452,13 @@
 <dd><p>Convert a speed value from miles per hour to meters per second.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>value</strong> (<em>float</em><em> | </em><em>NDArray</em>) – Speed in mph.</p>
+<dd class="field-odd"><p><strong>value</strong> (<em>float</em><em> | </em><em>NDArray</em><em>[</em><em>Float64</em><em>]</em>) – Speed in mph.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Speed in m/s.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>float | NDArray</p>
+<dd class="field-odd"><p>float | NDArray[Float64]</p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
