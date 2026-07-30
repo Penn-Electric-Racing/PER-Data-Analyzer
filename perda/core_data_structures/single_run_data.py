@@ -1,6 +1,7 @@
-from typing import Dict, List, Union
+from datetime import datetime
+from typing import Dict, List, Optional, Union
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, PrivateAttr
 
 from ..units import Timescale
 from .data_instance import DataInstance
@@ -10,6 +11,10 @@ class SingleRunData(BaseModel):
     """Pydantic model to store parsed CSV data with dictionary-like lookup."""
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
+
+    # Private caches (excluded from Pydantic serialization)
+    _search_deck: Optional[list] = PrivateAttr(default=None)
+    _search_embeddings: Optional[object] = PrivateAttr(default=None)
 
     # Core data storage
     id_to_instance: Dict[int, DataInstance] = Field(
@@ -26,6 +31,10 @@ class SingleRunData(BaseModel):
     )
 
     # Metadata
+    creation_time: Optional[datetime] = Field(
+        default=None,
+        description="Timestamp when this run log was recorded",
+    )
     total_data_points: int = Field(
         description="Total number of data points across all variables"
     )
@@ -130,6 +139,8 @@ class SingleRunData(BaseModel):
         self.cpp_name_to_id[cpp_name] = synthetic_id
         self.id_to_cpp_name[synthetic_id] = cpp_name
         self.id_to_descript[synthetic_id] = di.label or ""
+        self._search_deck = None
+        self._search_embeddings = None
 
     def replace(self, cpp_name: str, di: DataInstance) -> None:
         """
@@ -138,9 +149,9 @@ class SingleRunData(BaseModel):
         Parameters
         ----------
         cpp_name : str
-            C++ variable name of the variable to replace.
+          C++ variable name of the variable to replace.
         di : DataInstance
-            DataInstance whose ``value_np`` that replaces the stored one.
+          DataInstance whose ``value_np`` that replaces the stored one.
         """
         if cpp_name not in self:
             raise KeyError(
@@ -164,6 +175,8 @@ class SingleRunData(BaseModel):
             var_id=old.var_id,
             cpp_name=old.cpp_name,
         )
+        self._search_deck = None
+        self._search_embeddings = None
 
     def __contains__(self, input_var_id_name: Union[str, int]) -> bool:
         """
