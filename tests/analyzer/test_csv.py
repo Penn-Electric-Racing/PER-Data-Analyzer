@@ -1,9 +1,10 @@
 import textwrap
+from datetime import datetime
 
 import numpy as np
 import pytest
 
-from perda.analyzer.csv import parse_csv
+from perda.analyzer.csv import parse_csv, parse_header_creation_time
 from perda.units import Timescale
 
 
@@ -95,3 +96,35 @@ def test_parse_csv_verbose_prints_header(ms_csv, capsys):
     parse_csv(ms_csv, verbose=1)
     out = capsys.readouterr().out
     assert "Header" in out or "Timestamp" in out
+
+
+@pytest.mark.parametrize(
+    "header, expected",
+    [
+        pytest.param(
+            "PER Log: Thu Jun 11 17:06:37 2026 v2.0",
+            datetime(2026, 6, 11, 17, 6, 37),
+            id="with_version_suffix",
+        ),
+        pytest.param(
+            "PER Log: Thu Jun 11 17:06:37 2026",
+            datetime(2026, 6, 11, 17, 6, 37),
+            id="without_version_suffix",
+        ),
+        pytest.param("Generic Header With No Date", None, id="no_per_prefix"),
+        pytest.param("PER Log: not a real date", None, id="unparseable_date"),
+    ],
+)
+def test_parse_header_creation_time(header, expected):
+    assert parse_header_creation_time(header) == expected
+
+
+def test_parse_csv_sets_creation_time(write_log):
+    path = write_log("dated.csv", "PER Log: Thu Jun 11 17:06:37 2026 v2.0")
+    srd = parse_csv(str(path), verbose=0)
+    assert srd.creation_time == datetime(2026, 6, 11, 17, 6, 37)
+
+
+def test_parse_csv_no_date_header_graceful_fallback(write_log):
+    path = write_log("undated.csv", "Standard Generic Log File Header With No Date")
+    assert parse_csv(str(path), verbose=0).creation_time is None
