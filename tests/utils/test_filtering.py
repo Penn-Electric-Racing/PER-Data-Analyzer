@@ -4,7 +4,13 @@ from scipy.signal import butter
 
 from perda.core_data_structures.data_instance import DataInstance
 from perda.units import Timescale
-from perda.utils.filtering import *
+from perda.utils.filtering import (
+    apply_sos_filter,
+    compute_fft,
+    lowpass_filter,
+    lowpass_filter_by_distance,
+    zscore_filter,
+)
 
 
 def test_apply_sos_filter_basic():

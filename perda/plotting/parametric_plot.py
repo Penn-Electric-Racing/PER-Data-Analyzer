@@ -1,5 +1,4 @@
 import ipywidgets as widgets
-import numpy as np
 import plotly.graph_objects as go
 from numpy import float64
 from numpy.typing import NDArray

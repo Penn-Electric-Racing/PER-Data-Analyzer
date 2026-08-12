@@ -2,13 +2,12 @@ import re
 from pathlib import Path
 from typing import Any
 
+import numpy as np
 from pydantic import BaseModel, Field
 from rapidfuzz import fuzz
 
 from ..constants import DELIMITER, title_block
 from ..core_data_structures.single_run_data import SingleRunData
-
-import numpy as np
 
 _MODEL_DIR = Path(__file__).resolve().parents[1] / "models" / "all-MiniLM-L6-v2"
 _HF_MODEL_ID = "sentence-transformers/all-MiniLM-L6-v2"
@@ -90,7 +89,9 @@ def install_encoder() -> bool:
     try:
         from sentence_transformers import SentenceTransformer
     except ImportError:
-        print("Warning: sentence-transformers is not installed. Falling back to keyword-only search.")
+        print(
+            "Warning: sentence-transformers is not installed. Falling back to keyword-only search."
+        )
         return False
 
     try:
@@ -166,7 +167,7 @@ def search(
                 norms = np.linalg.norm(card_embeddings, axis=1, keepdims=True)
                 norms[norms == 0.0] = 1.0
                 data._search_embeddings = card_embeddings / norms
-            
+
             embeddings = data._search_embeddings
 
             # Encode query and project
@@ -199,7 +200,9 @@ def search(
                 reverse=True,
             )
         except Exception as e:
-            print(f"Warning: Semantic search failed ({e}). Falling back to keyword search.")
+            print(
+                f"Warning: Semantic search failed ({e}). Falling back to keyword search."
+            )
             semantic_ready = False
 
     if not semantic_ready or _model is None:

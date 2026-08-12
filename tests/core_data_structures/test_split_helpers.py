@@ -1,13 +1,9 @@
-import numpy as np
 import pytest
 
-from perda.core_data_structures.data_instance import DataInstance
-from perda.core_data_structures.single_run_data import SingleRunData
 from perda.core_data_structures.split_helpers import (
     split_single_run_data,
     trim_single_run_data,
 )
-from perda.units import Timescale
 
 
 def test_trim_single_run_data_clips_all_variables(srd_basic):

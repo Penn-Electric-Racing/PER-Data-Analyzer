@@ -1,11 +1,12 @@
 import textwrap
-import numpy as np
-import pytest
 from unittest.mock import patch
 
+import numpy as np
+
 from perda.analyzer.csv import parse_csv
-from perda.utils.search import search
 from perda.core_data_structures.data_instance import DataInstance
+from perda.utils.search import search
+
 
 def test_search_semantic_fallback(tmp_path):
     content = textwrap.dedent(
@@ -20,7 +21,10 @@ def test_search_semantic_fallback(tmp_path):
     srd = parse_csv(str(p), verbose=0)
 
     # Mock SentenceTransformer constructor to fail
-    with patch("sentence_transformers.SentenceTransformer", side_effect=RuntimeError("Mocked transformer loading failure")):
+    with patch(
+        "sentence_transformers.SentenceTransformer",
+        side_effect=RuntimeError("Mocked transformer loading failure"),
+    ):
         # Semantic search should fail gracefully, issue warning, and fall back to keyword search
         results = search(srd, "voltage", semantic=True)
         assert len(results) > 0
@@ -44,7 +48,11 @@ def test_search_cache_invalidation(tmp_path):
     assert srd._search_deck is not None
 
     # Mutate SingleRunData by adding a new variable
-    new_di = DataInstance(timestamp_np=np.array([0]), value_np=np.array([1.0]), label="New custom variable")
+    new_di = DataInstance(
+        timestamp_np=np.array([0]),
+        value_np=np.array([1.0]),
+        label="New custom variable",
+    )
     srd.add("test.new_var", new_di)
 
     # Assert caches are cleared

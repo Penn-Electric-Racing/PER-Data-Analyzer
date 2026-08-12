@@ -3,9 +3,16 @@ from numpy import float64
 from numpy.typing import NDArray
 from plotly import graph_objects as go
 
-from ..constants import DELIMITER, title_block
+from ..constants import DELIMITER
 from ..core_data_structures.data_instance import DataInstance
-from ..plotting.plotting_constants import *
+from ..plotting.plotting_constants import (
+    DEFAULT_FONT_CONFIG,
+    DEFAULT_LAYOUT_CONFIG,
+    DEFAULT_SCATTER_HISTOGRAM_PLOT_CONFIG,
+    FontConfig,
+    LayoutConfig,
+    ScatterHistogramPlotConfig,
+)
 from ..plotting.scatter_histogram_plotter import plot_scatter_and_histogram
 from ..units import Timescale
 

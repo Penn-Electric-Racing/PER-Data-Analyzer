@@ -2,7 +2,14 @@ import numpy as np
 import numpy.typing as npt
 import plotly.graph_objects as go
 
-from .plotting_constants import *
+from .plotting_constants import (
+    DEFAULT_DIFF_PLOT_CONFIG,
+    DEFAULT_FONT_CONFIG,
+    DEFAULT_LAYOUT_CONFIG,
+    DiffPlotConfig,
+    FontConfig,
+    LayoutConfig,
+)
 
 
 def _bin_timestamps(

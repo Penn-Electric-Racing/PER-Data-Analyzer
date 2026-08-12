@@ -2,7 +2,6 @@ import numpy as np
 import pytest
 
 from perda.core_data_structures.data_instance import DataInstance
-from perda.core_data_structures.single_run_data import SingleRunData
 
 
 @pytest.mark.parametrize(

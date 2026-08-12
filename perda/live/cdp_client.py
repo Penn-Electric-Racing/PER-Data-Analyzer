@@ -72,13 +72,9 @@ class ResponseStatus(Enum):
 class CDPException(Exception):
     """Base exception for CDP client errors."""
 
-    pass
-
 
 class CDPProtocolError(CDPException):
     """Raised when there's a protocol-level error."""
-
-    pass
 
 
 class CDPServerError(CDPException):

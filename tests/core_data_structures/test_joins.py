@@ -4,7 +4,6 @@ import numpy as np
 import pytest
 
 from perda.core_data_structures.data_instance import (
-    DataInstance,
     inner_join_data_instances,
     left_join_data_instances,
     outer_join_data_instances,

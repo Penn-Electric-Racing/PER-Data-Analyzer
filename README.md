@@ -17,7 +17,7 @@ sphinx-build -M markdown source build_md  # Markdown
 
 ## Testing
 
-We use `pytest` for testing. In the root directory, run the following 
+We use `pytest` for testing. In the root directory, run the following
 
 ```bash
 pytest

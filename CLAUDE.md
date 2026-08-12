@@ -71,13 +71,13 @@ The library has four layers:
    - Optional Notes section only used in very special cases with important implementation details or caveats
    - Optional Examples section for user-facing API functions, with simple code snippets demonstrating usage
 
-- Code style should be checked with 
+- Code style should be checked with
    - `pre-commit run --all-files` will automatically format and lint
    - Pre-commit will raise `mypy` errors, but they need to be fixed manually
    - All numpy typing must be precise (e.g. `np.ndarray` is not allowed; use `NDArray[Float64]` instead). Use `numpy.typing` for this purpose.
 
-- DO NOT use scoped imports, only use imports at the top of the file. When you have many imports, use asterisk to avoid long import lists
+- DO NOT use scoped imports, only use imports at the top of the file.
 
-- Whenever possible, control print() statement spacing with python format specifiers and alignment options. For large groups of print statements, refactor spacing constants out into a local variable, for easier readability and maintainability. 
+- Whenever possible, control print() statement spacing with python format specifiers and alignment options. For large groups of print statements, refactor spacing constants out into a local variable, for easier readability and maintainability.
 
 - Whenever possible, create and leverage __str__ representations of objects instead of manually writing a string representation, to avoid duplicate code.

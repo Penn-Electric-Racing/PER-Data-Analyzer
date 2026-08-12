@@ -5,7 +5,14 @@ from plotly.subplots import make_subplots
 
 from ..core_data_structures.data_instance import DataInstance
 from ..units import Timescale, _to_seconds
-from .plotting_constants import *
+from .plotting_constants import (
+    DEFAULT_FONT_CONFIG,
+    DEFAULT_LAYOUT_CONFIG,
+    DEFAULT_VLINE_CONFIG,
+    FontConfig,
+    LayoutConfig,
+    VLineConfig,
+)
 
 
 def _add_vlines(
