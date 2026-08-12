@@ -7,44 +7,52 @@ from perda.units import Timescale
 from perda.utils.data_summary import data_instance_summary, single_run_summary
 
 
-def test_data_instance_summary_runs_without_error(capsys):
+def test_data_instance_summary_reports_stats():
     di = DataInstance(
         timestamp_np=np.array([0, 500, 1000], dtype=np.int64),
         value_np=np.array([1.0, 2.0, 3.0], dtype=np.float64),
         label="test",
     )
-    data_instance_summary(
+    summary = data_instance_summary(
         di, source_time_unit=Timescale.MS, target_time_unit=Timescale.S
     )
-    out = capsys.readouterr().out
-    assert "Count" in out
-    assert "Min" in out
-    assert "Max" in out
-    assert "Average" in out
+    assert summary.count == 3
+    assert summary.min_value == 1.0
+    assert summary.max_value == 3.0
+    assert summary.first_timestamp == 0.0
+    assert summary.last_timestamp == 1.0
 
 
-def test_data_instance_summary_empty_prints_empty_message(capsys):
+def test_data_instance_summary_prints_nothing(capsys):
+    di = DataInstance(
+        timestamp_np=np.array([0, 500], dtype=np.int64),
+        value_np=np.array([1.0, 2.0], dtype=np.float64),
+    )
+    data_instance_summary(di)
+    assert capsys.readouterr().out == ""
+
+
+def test_data_instance_summary_empty():
     di = DataInstance(
         timestamp_np=np.array([], dtype=np.int64),
         value_np=np.array([], dtype=np.float64),
         label="empty",
     )
-    data_instance_summary(di)
-    out = capsys.readouterr().out
-    assert "Empty" in out
+    summary = data_instance_summary(di)
+    assert summary.count == 0
+    assert "Empty" in str(summary)
 
 
-def test_data_instance_summary_us_to_s(capsys):
+def test_data_instance_summary_us_to_s():
     di = DataInstance(
         timestamp_np=np.array([0, 1_000_000], dtype=np.int64),
         value_np=np.array([0.0, 10.0], dtype=np.float64),
         label="us_sig",
     )
-    data_instance_summary(
+    summary = data_instance_summary(
         di, source_time_unit=Timescale.US, target_time_unit=Timescale.S
     )
-    out = capsys.readouterr().out
-    assert "1.0000" in out
+    assert summary.last_timestamp == 1.0
 
 
 @pytest.mark.parametrize(
@@ -54,17 +62,16 @@ def test_data_instance_summary_us_to_s(capsys):
         pytest.param([5.0, 5.0, 5.0], 5.0, 5.0, id="constant"),
     ],
 )
-def test_data_instance_summary_min_max_reported(
-    capsys, vals, expected_min, expected_max
-):
+def test_data_instance_summary_min_max_reported(vals, expected_min, expected_max):
     di = DataInstance(
         timestamp_np=np.arange(len(vals), dtype=np.int64),
         value_np=np.array(vals, dtype=np.float64),
     )
-    data_instance_summary(di)
-    out = capsys.readouterr().out
-    assert f"{expected_min:.4f}" in out
-    assert f"{expected_max:.4f}" in out
+    summary = data_instance_summary(di)
+    assert summary.min_value == expected_min
+    assert summary.max_value == expected_max
+    assert f"{expected_min:.4f}" in str(summary)
+    assert f"{expected_max:.4f}" in str(summary)
 
 
 def test_single_run_summary_runs_without_error(srd_basic, capsys):

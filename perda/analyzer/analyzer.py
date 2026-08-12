@@ -55,10 +55,12 @@ class Analyzer:
     >>> results = aly.search("front wheel speed")   # prints + returns list[SearchResult]
     >>> di = aly.data[results[0].cpp_name]
 
-    Enumerate all variables with summary stats
-    ------------------------------------------
-    >>> summaries = aly.variable_summary()          # list[VariableSummary], sorted by name
-    >>> [v.cpp_name for v in summaries]
+    Summary stats for one variable
+    ------------------------------
+    >>> from perda.utils import data_instance_summary
+    >>> summary = data_instance_summary(aly.data["pcm.wheelSpeeds.frontRight"])
+    >>> print(summary)          # formatted block
+    >>> summary.max_value       # or read the fields directly
     """
 
     def __init__(
@@ -101,7 +103,6 @@ class Analyzer:
             parsing_errors_limit=parsing_errors_limit,
             verbose=verbose,
         )
-        self.file_path = filepath
         if preprocessing:
             self.data = apply_preprocessing(self.data, preprocessing)
 
