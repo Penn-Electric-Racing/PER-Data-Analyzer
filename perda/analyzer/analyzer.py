@@ -55,10 +55,12 @@ class Analyzer:
     >>> results = aly.search("front wheel speed")   # prints + returns list[SearchResult]
     >>> di = aly.data[results[0].cpp_name]
 
-    Enumerate all variables with summary stats
-    ------------------------------------------
-    >>> summaries = aly.variable_summary()          # list[VariableSummary], sorted by name
-    >>> [v.cpp_name for v in summaries]
+    Summary stats for one variable
+    ------------------------------
+    >>> from perda.utils import data_instance_summary
+    >>> summary = data_instance_summary(aly.data["pcm.wheelSpeeds.frontRight"])
+    >>> print(summary)          # formatted block
+    >>> summary.max_value       # or read the fields directly
     """
 
     def __init__(
@@ -120,7 +122,9 @@ class Analyzer:
 
         return output
 
-    def search(self, query: str, top_n: int = 10) -> list[SearchResult]:
+    def search(
+        self, query: str, top_n: int = 10, semantic: bool = False
+    ) -> list[SearchResult]:
         """
         Natural language search for available variables in the parsed data.
 
@@ -132,6 +136,8 @@ class Analyzer:
             Free-text search query (e.g. "front wheel speed").
         top_n : int
             Maximum number of results to return and display (default 10).
+        semantic : bool
+            Whether to use semantic search embeddings (default False).
 
         Returns
         -------
@@ -143,10 +149,10 @@ class Analyzer:
         Examples
         --------
         >>> results = aly.search("front wheel speed")
-        >>> results = aly.search("front wheel speed", top_n=5)
+        >>> results = aly.search("front wheel speed", top_n=5, semantic=True)
         >>> names = [r.cpp_name for r in results]
         """
-        return search(self.data, query, top_n)
+        return search(self.data, query, top_n, semantic)
 
     def plot(
         self,
@@ -163,6 +169,7 @@ class Analyzer:
         font_config: FontConfig = DEFAULT_FONT_CONFIG,
         layout_config: LayoutConfig = DEFAULT_LAYOUT_CONFIG,
         vline_config: VLineConfig = DEFAULT_VLINE_CONFIG,
+        max_points: int | None = None,
     ) -> go.Figure:
         """
         Display variables from the parsed data on an interactive Plotly plot.
@@ -192,6 +199,8 @@ class Analyzer:
             Layout configuration for plot dimensions.
         vline_config : VLineConfig, optional
             Visual configuration for concat boundary lines.
+        max_points : int | None, optional
+            Maximum number of data points to plot per trace (enables zero-copy step downsampling). Default is None (full fidelity).
 
         Examples
         --------
@@ -237,6 +246,7 @@ class Analyzer:
                 timestamp_unit=self.data.timestamp_unit,
                 vlines=vlines,
                 vline_config=vline_config,
+                max_points=max_points,
             )
         else:
             return plot_single_axis(
@@ -249,6 +259,7 @@ class Analyzer:
                 timestamp_unit=self.data.timestamp_unit,
                 vlines=vlines,
                 vline_config=vline_config,
+                max_points=max_points,
             )
 
     def subplots(

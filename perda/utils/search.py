@@ -2,23 +2,17 @@ import re
 from pathlib import Path
 from typing import Any
 
+import numpy as np
 from pydantic import BaseModel, Field
 from rapidfuzz import fuzz
 
 from ..constants import DELIMITER, title_block
 from ..core_data_structures.single_run_data import SingleRunData
 
-try:
-    from sentence_transformers.cross_encoder import CrossEncoder
+_MODEL_DIR = Path(__file__).resolve().parents[1] / "models" / "all-MiniLM-L6-v2"
+_HF_MODEL_ID = "sentence-transformers/all-MiniLM-L6-v2"
 
-    _SEMANTIC_AVAILABLE: bool = True
-except ImportError:
-    _SEMANTIC_AVAILABLE = False
-
-_MODEL_DIR = Path(__file__).resolve().parents[1] / "models" / "stsb-cross-encoder"
-_HF_MODEL_ID = "cross-encoder/stsb-distilroberta-base"
-
-# CrossEncoder instance when loaded, else None
+# SentenceTransformer instance when loaded, else None
 _model: Any = None
 
 ABBREVIATIONS: dict[str, str] = {
@@ -83,44 +77,44 @@ class SearchResult(BaseModel):
 
 
 def install_encoder() -> bool:
-    """Download and save the cross-encoder model for semantic search.
+    """Download and save the SentenceTransformer model for semantic search.
 
     Returns
     -------
     bool
         True if the model loaded successfully, False otherwise.
-
-    Notes
-    -----
-    Returns False immediately if ``sentence-transformers`` is not installed
-    (i.e. ``perda[semantic]`` extra was not requested).
-    Any download or filesystem error is caught and printed; the function
-    returns False so callers fall back to keyword-only search.
     """
     global _model
 
-    if not _SEMANTIC_AVAILABLE:
+    try:
+        from sentence_transformers import SentenceTransformer
+    except ImportError:
+        print(
+            "Warning: sentence-transformers is not installed. Falling back to keyword-only search."
+        )
         return False
 
     try:
         if not _MODEL_DIR.exists():
-            print("Downloading cross-encoder model (one-time setup)...")
-            _model = CrossEncoder(_HF_MODEL_ID)
+            print("Downloading SentenceTransformer model (one-time setup)...")
+            _model = SentenceTransformer(_HF_MODEL_ID)
             _MODEL_DIR.parent.mkdir(parents=True, exist_ok=True)
             _model.save(str(_MODEL_DIR))
             print(f"Model saved to: {_MODEL_DIR}")
         else:
-            _model = CrossEncoder(str(_MODEL_DIR))
+            _model = SentenceTransformer(str(_MODEL_DIR))
         return True
     except Exception as e:
         print(
-            f"Warning: cross-encoder model unavailable ({e}). Falling back to keyword-only search."
+            f"Warning: SentenceTransformer model unavailable ({e}). Falling back to keyword-only search."
         )
         _model = None
         return False
 
 
-def search(data: SingleRunData, query: str, top_n: int = 10) -> list[SearchResult]:
+def search(
+    data: SingleRunData, query: str, top_n: int = 10, semantic: bool = False
+) -> list[SearchResult]:
     """Search telemetry variables, print the top matches, and return them.
 
     Parameters
@@ -131,6 +125,9 @@ def search(data: SingleRunData, query: str, top_n: int = 10) -> list[SearchResul
         Free-text search query (e.g. "bat wheel").
     top_n : int
         Maximum number of results to return and display (default 10).
+    semantic : bool
+        If True, runs a hybrid search with sentence-transformer embeddings.
+        If False, uses fast keyword-only rapidfuzz search (default).
 
     Returns
     -------
@@ -138,26 +135,9 @@ def search(data: SingleRunData, query: str, top_n: int = 10) -> list[SearchResul
         Top matches in descending relevance order (at most ``top_n`` entries).
         Each entry exposes ``rank``, ``score``, ``var_id``, ``cpp_name``,
         and ``descript`` for programmatic access.
-
-    Notes
-    -----
-    When ``perda[semantic]`` is installed and the cross-encoder model loads
-    successfully, results are ranked by a weighted blend of semantic score and
-    rapidfuzz keyword score. Otherwise falls back to keyword-only scoring with
-    no error raised.
-
-    Short queries lean on keyword matching; longer queries lean on semantic
-    ranking when the model is available.
-
-    Examples
-    --------
-    >>> results = aly.search("front wheel speed")
-    >>> names = [r.cpp_name for r in results]
     """
     if top_n <= 0:
         raise ValueError("top_n must be a positive integer.")
-
-    semantic_ready = install_encoder()
 
     query = query.strip()
     if not query:
@@ -167,31 +147,65 @@ def search(data: SingleRunData, query: str, top_n: int = 10) -> list[SearchResul
     if not keyword_query:
         raise ValueError("Search query must contain letters or numbers.")
 
-    deck = build_search_deck(data)
+    # Lazy-build search deck
+    if getattr(data, "_search_deck", None) is None:
+        data._search_deck = build_search_deck(data)
+    deck = data._search_deck
+
+    if not deck:
+        return []
+
     num_terms = len(keyword_query)
+    semantic_ready = install_encoder() if semantic else False
 
     if semantic_ready and _model is not None:
-        semantic_query = preprocess_query(query)
-        # rank() returns dicts with "corpus_id" (index into deck) and "score"
-        semantic_scores = {
-            int(r["corpus_id"]): float(r["score"])
-            for r in _model.rank(semantic_query, [e.card for e in deck])
-        }
-        ranked = sorted(
-            (
+        try:
+            # Lazy-build card embeddings
+            if getattr(data, "_search_embeddings", None) is None:
+                cards = [e.card for e in deck]
+                card_embeddings = _model.encode(cards, convert_to_numpy=True)
+                norms = np.linalg.norm(card_embeddings, axis=1, keepdims=True)
+                norms[norms == 0.0] = 1.0
+                data._search_embeddings = card_embeddings / norms
+
+            embeddings = data._search_embeddings
+
+            # Encode query and project
+            semantic_query = preprocess_query(query)
+            query_emb = _model.encode(semantic_query, convert_to_numpy=True)
+            q_norm = np.linalg.norm(query_emb)
+            if q_norm > 0:
+                query_emb = query_emb / q_norm
+            else:
+                query_emb = np.zeros_like(query_emb)
+
+            # Dot-product similarity scores
+            semantic_scores_arr = np.dot(embeddings, query_emb)
+            semantic_scores = {
+                idx: float(score) for idx, score in enumerate(semantic_scores_arr)
+            }
+
+            ranked = sorted(
                 (
-                    combine_scores(
-                        semantic_scores.get(idx, 0.0),
-                        keyword_score(keyword_query, entry),
-                        num_terms,
-                    ),
-                    idx,
-                )
-                for idx, entry in enumerate(deck)
-            ),
-            reverse=True,
-        )
-    else:
+                    (
+                        combine_scores(
+                            semantic_scores.get(idx, 0.0),
+                            keyword_score(keyword_query, entry),
+                            num_terms,
+                        ),
+                        idx,
+                    )
+                    for idx, entry in enumerate(deck)
+                ),
+                reverse=True,
+            )
+        except Exception as e:
+            print(
+                f"Warning: Semantic search failed ({e}). Falling back to keyword search."
+            )
+            semantic_ready = False
+
+    if not semantic_ready or _model is None:
         ranked = sorted(
             (
                 (keyword_score(keyword_query, entry), idx)

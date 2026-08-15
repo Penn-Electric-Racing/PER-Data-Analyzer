@@ -8,7 +8,14 @@ from ..constants import DELIMITER, title_block
 from ..core_data_structures.data_instance import DataInstance
 from ..core_data_structures.single_run_data import SingleRunData
 from ..plotting.diff_plotter import plot_diff_bars
-from ..plotting.plotting_constants import *
+from ..plotting.plotting_constants import (
+    DEFAULT_DIFF_PLOT_CONFIG,
+    DEFAULT_FONT_CONFIG,
+    DEFAULT_LAYOUT_CONFIG,
+    DiffPlotConfig,
+    FontConfig,
+    LayoutConfig,
+)
 from ..units import _to_seconds
 
 

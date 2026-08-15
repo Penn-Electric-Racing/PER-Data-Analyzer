@@ -1,5 +1,4 @@
 import numpy as np
-import pytest
 
 from perda.analyzer.concat_helpers import _concat_single_run_data, _upscale_to_us
 from perda.core_data_structures.data_instance import DataInstance
