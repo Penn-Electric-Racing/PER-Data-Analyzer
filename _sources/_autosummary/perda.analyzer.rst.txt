@@ -17,3 +17,5 @@ perda.analyzer
    analyzer_factory
    concat_helpers
    csv
+   run_collection
+   run_collection_factory

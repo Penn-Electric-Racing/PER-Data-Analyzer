@@ -1,0 +1,8 @@
+perda.analyzer.run\_collection
+==============================
+
+.. automodule:: perda.analyzer.run_collection
+   :members:
+   :undoc-members:
+   :show-inheritance:
+

@@ -263,6 +263,8 @@
 <li class="toctree-l3"><a class="reference internal" href="perda.analyzer.analyzer_factory.html">perda.analyzer.analyzer_factory</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.analyzer.concat_helpers.html">perda.analyzer.concat_helpers</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.analyzer.csv.html">perda.analyzer.csv</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.analyzer.run_collection.html">perda.analyzer.run_collection</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.analyzer.run_collection_factory.html">perda.analyzer.run_collection_factory</a></li>
 </ul>
 </details></li>
 <li class="toctree-l2"><a class="reference internal" href="perda.constants.html">perda.constants</a></li>
@@ -379,22 +381,113 @@
                   
   <section id="module-perda.utils.data_summary">
 <span id="perda-utils-data-summary"></span><h1>perda.utils.data_summary<a class="headerlink" href="#module-perda.utils.data_summary" title="Link to this heading">#</a></h1>
+<dl class="py class pydantic_model">
+<dt class="sig sig-object py" id="perda.utils.data_summary.DataInstanceSummary">
+<em class="property"><span class="pre">pydantic</span> <span class="pre">model</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">perda.utils.data_summary.</span></span><span class="sig-name descname"><span class="pre">DataInstanceSummary</span></span><a class="reference internal" href="../_modules/perda/utils/data_summary.html#DataInstanceSummary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.utils.data_summary.DataInstanceSummary" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<p>Summary statistics for a single DataInstance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Fields<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><a class="reference internal" href="#perda.utils.data_summary.DataInstanceSummary.average" title="perda.utils.data_summary.DataInstanceSummary.average"><code class="xref py py-obj docutils literal notranslate"><span class="pre">average</span> <span class="pre">(float)</span></code></a></p></li>
+<li><p><a class="reference internal" href="#perda.utils.data_summary.DataInstanceSummary.count" title="perda.utils.data_summary.DataInstanceSummary.count"><code class="xref py py-obj docutils literal notranslate"><span class="pre">count</span> <span class="pre">(int)</span></code></a></p></li>
+<li><p><a class="reference internal" href="#perda.utils.data_summary.DataInstanceSummary.first_timestamp" title="perda.utils.data_summary.DataInstanceSummary.first_timestamp"><code class="xref py py-obj docutils literal notranslate"><span class="pre">first_timestamp</span> <span class="pre">(float)</span></code></a></p></li>
+<li><p><a class="reference internal" href="#perda.utils.data_summary.DataInstanceSummary.header" title="perda.utils.data_summary.DataInstanceSummary.header"><code class="xref py py-obj docutils literal notranslate"><span class="pre">header</span> <span class="pre">(str)</span></code></a></p></li>
+<li><p><a class="reference internal" href="#perda.utils.data_summary.DataInstanceSummary.last_timestamp" title="perda.utils.data_summary.DataInstanceSummary.last_timestamp"><code class="xref py py-obj docutils literal notranslate"><span class="pre">last_timestamp</span> <span class="pre">(float)</span></code></a></p></li>
+<li><p><a class="reference internal" href="#perda.utils.data_summary.DataInstanceSummary.max_timestamp" title="perda.utils.data_summary.DataInstanceSummary.max_timestamp"><code class="xref py py-obj docutils literal notranslate"><span class="pre">max_timestamp</span> <span class="pre">(float)</span></code></a></p></li>
+<li><p><a class="reference internal" href="#perda.utils.data_summary.DataInstanceSummary.max_value" title="perda.utils.data_summary.DataInstanceSummary.max_value"><code class="xref py py-obj docutils literal notranslate"><span class="pre">max_value</span> <span class="pre">(float)</span></code></a></p></li>
+<li><p><a class="reference internal" href="#perda.utils.data_summary.DataInstanceSummary.min_timestamp" title="perda.utils.data_summary.DataInstanceSummary.min_timestamp"><code class="xref py py-obj docutils literal notranslate"><span class="pre">min_timestamp</span> <span class="pre">(float)</span></code></a></p></li>
+<li><p><a class="reference internal" href="#perda.utils.data_summary.DataInstanceSummary.min_value" title="perda.utils.data_summary.DataInstanceSummary.min_value"><code class="xref py py-obj docutils literal notranslate"><span class="pre">min_value</span> <span class="pre">(float)</span></code></a></p></li>
+<li><p><a class="reference internal" href="#perda.utils.data_summary.DataInstanceSummary.time_unit" title="perda.utils.data_summary.DataInstanceSummary.time_unit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">time_unit</span> <span class="pre">(perda.units.Timescale)</span></code></a></p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="perda.utils.data_summary.DataInstanceSummary.header">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">header</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></em><em class="property"> <span class="pre">[Required]</span></em><a class="headerlink" href="#perda.utils.data_summary.DataInstanceSummary.header" title="Link to this definition">#</a></dt>
+<dd><p>Label / ID / C++ name line of the source DataInstance</p>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="perda.utils.data_summary.DataInstanceSummary.count">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">count</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></em><em class="property"> <span class="pre">[Required]</span></em><a class="headerlink" href="#perda.utils.data_summary.DataInstanceSummary.count" title="Link to this definition">#</a></dt>
+<dd><p>Number of data points</p>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="perda.utils.data_summary.DataInstanceSummary.time_unit">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">time_unit</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="perda.units.html#perda.units.Timescale" title="perda.units.Timescale"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timescale</span></code></a></em><em class="property"> <span class="pre">[Required]</span></em><a class="headerlink" href="#perda.utils.data_summary.DataInstanceSummary.time_unit" title="Link to this definition">#</a></dt>
+<dd><p>Time unit that all timestamps below are expressed in</p>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="perda.utils.data_summary.DataInstanceSummary.first_timestamp">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">first_timestamp</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#perda.utils.data_summary.DataInstanceSummary.first_timestamp" title="Link to this definition">#</a></dt>
+<dd><p>Timestamp of the first data point</p>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="perda.utils.data_summary.DataInstanceSummary.last_timestamp">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">last_timestamp</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#perda.utils.data_summary.DataInstanceSummary.last_timestamp" title="Link to this definition">#</a></dt>
+<dd><p>Timestamp of the last data point</p>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="perda.utils.data_summary.DataInstanceSummary.min_value">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">min_value</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#perda.utils.data_summary.DataInstanceSummary.min_value" title="Link to this definition">#</a></dt>
+<dd><p>Smallest value</p>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="perda.utils.data_summary.DataInstanceSummary.min_timestamp">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">min_timestamp</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#perda.utils.data_summary.DataInstanceSummary.min_timestamp" title="Link to this definition">#</a></dt>
+<dd><p>Timestamp at which the minimum occurs</p>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="perda.utils.data_summary.DataInstanceSummary.max_value">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">max_value</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#perda.utils.data_summary.DataInstanceSummary.max_value" title="Link to this definition">#</a></dt>
+<dd><p>Largest value</p>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="perda.utils.data_summary.DataInstanceSummary.max_timestamp">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">max_timestamp</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#perda.utils.data_summary.DataInstanceSummary.max_timestamp" title="Link to this definition">#</a></dt>
+<dd><p>Timestamp at which the maximum occurs</p>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="perda.utils.data_summary.DataInstanceSummary.average">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">average</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#perda.utils.data_summary.DataInstanceSummary.average" title="Link to this definition">#</a></dt>
+<dd><p>Time-weighted average over the full range</p>
+</dd></dl>
+
+</dd></dl>
+
 <dl class="py function">
 <dt class="sig sig-object py" id="perda.utils.data_summary.data_instance_summary">
 <span class="sig-prename descclassname"><span class="pre">perda.utils.data_summary.</span></span><span class="sig-name descname"><span class="pre">data_instance_summary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_instance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_time_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Timescale.MS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_time_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Timescale.S</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/utils/data_summary.html#data_instance_summary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.utils.data_summary.data_instance_summary" title="Link to this definition">#</a></dt>
-<dd><p>Print information about a DataInstance.</p>
+<dd><p>Summarize a DataInstance.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>data_instance</strong> (<a class="reference internal" href="perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance"><em>DataInstance</em></a>) – The DataInstance to print info about</p></li>
+<li><p><strong>data_instance</strong> (<a class="reference internal" href="perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance"><em>DataInstance</em></a>) – The DataInstance to summarize</p></li>
 <li><p><strong>source_time_unit</strong> (<a class="reference internal" href="perda.units.html#perda.units.Timescale" title="perda.units.Timescale"><em>Timescale</em></a><em>, </em><em>optional</em>) – Time unit of data instance. Default is milliseconds.</p></li>
 <li><p><strong>target_time_unit</strong> (<a class="reference internal" href="perda.units.html#perda.units.Timescale" title="perda.units.Timescale"><em>Timescale</em></a><em>, </em><em>optional</em>) – Time unit used by the summary. Default is Timescale.S.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Statistics for the DataInstance. Printing is left to the caller.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#perda.utils.data_summary.DataInstanceSummary" title="perda.utils.data_summary.DataInstanceSummary">DataInstanceSummary</a></p>
 </dd>
 </dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">data_instance_summary</span><span class="p">(</span><span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;bms.pack.current&quot;</span><span class="p">]))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data_instance_summary</span><span class="p">(</span><span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;bms.pack.current&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">max_value</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py function">
@@ -463,6 +556,19 @@
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.utils.data_summary.DataInstanceSummary"><code class="docutils literal notranslate"><span class="pre">DataInstanceSummary</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.utils.data_summary.DataInstanceSummary.header"><code class="docutils literal notranslate"><span class="pre">DataInstanceSummary.header</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.utils.data_summary.DataInstanceSummary.count"><code class="docutils literal notranslate"><span class="pre">DataInstanceSummary.count</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.utils.data_summary.DataInstanceSummary.time_unit"><code class="docutils literal notranslate"><span class="pre">DataInstanceSummary.time_unit</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.utils.data_summary.DataInstanceSummary.first_timestamp"><code class="docutils literal notranslate"><span class="pre">DataInstanceSummary.first_timestamp</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.utils.data_summary.DataInstanceSummary.last_timestamp"><code class="docutils literal notranslate"><span class="pre">DataInstanceSummary.last_timestamp</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.utils.data_summary.DataInstanceSummary.min_value"><code class="docutils literal notranslate"><span class="pre">DataInstanceSummary.min_value</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.utils.data_summary.DataInstanceSummary.min_timestamp"><code class="docutils literal notranslate"><span class="pre">DataInstanceSummary.min_timestamp</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.utils.data_summary.DataInstanceSummary.max_value"><code class="docutils literal notranslate"><span class="pre">DataInstanceSummary.max_value</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.utils.data_summary.DataInstanceSummary.max_timestamp"><code class="docutils literal notranslate"><span class="pre">DataInstanceSummary.max_timestamp</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.utils.data_summary.DataInstanceSummary.average"><code class="docutils literal notranslate"><span class="pre">DataInstanceSummary.average</span></code></a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.utils.data_summary.data_instance_summary"><code class="docutils literal notranslate"><span class="pre">data_instance_summary()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.utils.data_summary.single_run_summary"><code class="docutils literal notranslate"><span class="pre">single_run_summary()</span></code></a></li>
 </ul>

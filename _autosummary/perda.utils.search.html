@@ -262,6 +262,8 @@
 <li class="toctree-l3"><a class="reference internal" href="perda.analyzer.analyzer_factory.html">perda.analyzer.analyzer_factory</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.analyzer.concat_helpers.html">perda.analyzer.concat_helpers</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.analyzer.csv.html">perda.analyzer.csv</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.analyzer.run_collection.html">perda.analyzer.run_collection</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.analyzer.run_collection_factory.html">perda.analyzer.run_collection_factory</a></li>
 </ul>
 </details></li>
 <li class="toctree-l2"><a class="reference internal" href="perda.constants.html">perda.constants</a></li>
@@ -532,7 +534,7 @@ on semantic relevance.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="perda.utils.search.install_encoder">
 <span class="sig-prename descclassname"><span class="pre">perda.utils.search.</span></span><span class="sig-name descname"><span class="pre">install_encoder</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/utils/search.html#install_encoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.utils.search.install_encoder" title="Link to this definition">#</a></dt>
-<dd><p>Download and save the cross-encoder model for semantic search.</p>
+<dd><p>Download and save the SentenceTransformer model for semantic search.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>True if the model loaded successfully, False otherwise.</p>
@@ -541,11 +543,6 @@ on semantic relevance.</p>
 <dd class="field-even"><p>bool</p>
 </dd>
 </dl>
-<p class="rubric">Notes</p>
-<p>Returns False immediately if <code class="docutils literal notranslate"><span class="pre">sentence-transformers</span></code> is not installed
-(i.e. <code class="docutils literal notranslate"><span class="pre">perda[semantic]</span></code> extra was not requested).
-Any download or filesystem error is caught and printed; the function
-returns False so callers fall back to keyword-only search.</p>
 </dd></dl>
 
 <dl class="py function">
@@ -589,7 +586,7 @@ prefixes, substrings, and minor typos naturally.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="perda.utils.search.search">
-<span class="sig-prename descclassname"><span class="pre">perda.utils.search.</span></span><span class="sig-name descname"><span class="pre">search</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">top_n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/utils/search.html#search"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.utils.search.search" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">perda.utils.search.</span></span><span class="sig-name descname"><span class="pre">search</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">top_n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">semantic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/utils/search.html#search"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.utils.search.search" title="Link to this definition">#</a></dt>
 <dd><p>Search telemetry variables, print the top matches, and return them.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -597,6 +594,8 @@ prefixes, substrings, and minor typos naturally.</p>
 <li><p><strong>data</strong> (<a class="reference internal" href="perda.core_data_structures.single_run_data.html#perda.core_data_structures.single_run_data.SingleRunData" title="perda.core_data_structures.single_run_data.SingleRunData"><em>SingleRunData</em></a>) – Parsed CSV telemetry data.</p></li>
 <li><p><strong>query</strong> (<em>str</em>) – Free-text search query (e.g. “bat wheel”).</p></li>
 <li><p><strong>top_n</strong> (<em>int</em>) – Maximum number of results to return and display (default 10).</p></li>
+<li><p><strong>semantic</strong> (<em>bool</em>) – If True, runs a hybrid search with sentence-transformer embeddings.
+If False, uses fast keyword-only rapidfuzz search (default).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -608,18 +607,6 @@ and <code class="docutils literal notranslate"><span class="pre">descript</span>
 <dd class="field-odd"><p>list[<a class="reference internal" href="#perda.utils.search.SearchResult" title="perda.utils.search.SearchResult">SearchResult</a>]</p>
 </dd>
 </dl>
-<p class="rubric">Notes</p>
-<p>When <code class="docutils literal notranslate"><span class="pre">perda[semantic]</span></code> is installed and the cross-encoder model loads
-successfully, results are ranked by a weighted blend of semantic score and
-rapidfuzz keyword score. Otherwise falls back to keyword-only scoring with
-no error raised.</p>
-<p>Short queries lean on keyword matching; longer queries lean on semantic
-ranking when the model is available.</p>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">results</span> <span class="o">=</span> <span class="n">aly</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s2">&quot;front wheel speed&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span><span class="o">.</span><span class="n">cpp_name</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">results</span><span class="p">]</span>
-</pre></div>
-</div>
 </dd></dl>
 
 </section>

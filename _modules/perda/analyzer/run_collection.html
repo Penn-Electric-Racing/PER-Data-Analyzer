@@ -1,0 +1,721 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>perda.analyzer.run_collection &#8212; PERDA</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../../_static/documentation_options.js?v=8d563738"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/perda/analyzer/run_collection';</script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">PERDA</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../getting_started/index.html">
+    Getting Started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../api/index.html">
+    Code Documentation
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../getting_started/index.html">
+    Getting Started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../api/index.html">
+    Code Documentation
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">perda.analyzer.run_collection</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for perda.analyzer.run_collection</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Iterator</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">plotly.graph_objects</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">go</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">Field</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">..core_data_structures.data_instance</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataInstance</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..plotting.data_instance_plotter</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_single_axis</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..units</span><span class="w"> </span><span class="kn">import</span> <span class="n">Timescale</span><span class="p">,</span> <span class="n">convert_time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..utils.data_summary</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataInstanceSummary</span><span class="p">,</span> <span class="n">data_instance_summary</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.analyzer</span><span class="w"> </span><span class="kn">import</span> <span class="n">Analyzer</span>
+
+<span class="c1"># Common unit that every run&#39;s timestamps are converted to before overlaying, so</span>
+<span class="c1"># that collections mixing v1 (ms) and v2 (us) logs share one x-axis scale.</span>
+<span class="n">COMPARISON_TIMESTAMP_UNIT</span> <span class="o">=</span> <span class="n">Timescale</span><span class="o">.</span><span class="n">US</span>
+
+
+<div class="viewcode-block" id="RunMetadata">
+<a class="viewcode-back" href="../../../_autosummary/perda.analyzer.run_collection.html#perda.analyzer.run_collection.RunMetadata">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RunMetadata</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Cheaply-obtained index metadata for a single telemetry run.&quot;&quot;&quot;</span>
+
+    <span class="n">file_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Path to the log file&quot;</span><span class="p">)</span>
+    <span class="n">date</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Recording date parsed from the header or file stats&quot;</span>
+    <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        One-line description of the run.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            ``&lt;filename&gt; (&lt;date&gt;)``</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">file_path</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">date</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="bp">self</span><span class="o">.</span><span class="n">date</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;unknown date&#39;</span><span class="si">}</span><span class="s2">)&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="RunCollection">
+<a class="viewcode-back" href="../../../_autosummary/perda.analyzer.run_collection.html#perda.analyzer.run_collection.RunCollection">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RunCollection</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A chronologically ordered collection of telemetry runs.</span>
+
+<span class="sd">    Holds only lightweight metadata. Logs are parsed into ``Analyzer`` instances lazily,</span>
+<span class="sd">    one at a time, so that a collection spanning an entire season stays cheap to hold.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Construct via the factory functions in ``run_collection_factory`` (``from_directory``,</span>
+<span class="sd">    ``from_paths``) rather than calling ``__init__`` directly.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">run_metadata</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">RunMetadata</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Build a collection from run metadata, sorted chronologically.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        run_metadata : list[RunMetadata]</span>
+<span class="sd">            Metadata for each run. Runs without a date sort last, by filename.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_runs_by_date</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
+            <span class="n">run_metadata</span><span class="p">,</span>
+            <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">run</span><span class="p">:</span> <span class="p">(</span>
+                <span class="n">run</span><span class="o">.</span><span class="n">date</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">,</span>
+                <span class="n">run</span><span class="o">.</span><span class="n">date</span> <span class="ow">or</span> <span class="n">datetime</span><span class="o">.</span><span class="n">min</span><span class="p">,</span>
+                <span class="n">run</span><span class="o">.</span><span class="n">file_path</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_loaded</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="n">Analyzer</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Listing of every run in chronological order, without loading any of them.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            One line per run, preceded by a count.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">listing</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;  [</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">] </span><span class="si">{</span><span class="n">run</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">run</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_runs_by_date</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;RunCollection with </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="si">}</span><span class="s2"> run(s):</span><span class="se">\n</span><span class="si">{</span><span class="n">listing</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Number of runs in the collection.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_runs_by_date</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Analyzer</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Load the run at the given chronological index.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_run_by_chronological_index</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">filenames</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Filenames of every run, in chronological order. Loads nothing.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">run</span><span class="o">.</span><span class="n">file_path</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">run</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_runs_by_date</span><span class="p">]</span>
+
+<div class="viewcode-block" id="RunCollection.get_run_by_chronological_index">
+<a class="viewcode-back" href="../../../_autosummary/perda.analyzer.run_collection.html#perda.analyzer.run_collection.RunCollection.get_run_by_chronological_index">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_run_by_chronological_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Analyzer</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Load the run at a position in the collection&#39;s chronological ordering.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        index : int</span>
+<span class="sd">            Position in chronological order, not the order paths were supplied.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Analyzer</span>
+<span class="sd">            Analyzer for that run. Repeated calls reuse the same instance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_runs_by_date</span><span class="p">[</span><span class="n">index</span><span class="p">])</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">run</span><span class="p">:</span> <span class="n">RunMetadata</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Analyzer</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parse a run into an Analyzer, reusing an already-parsed one if available.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        run : RunMetadata</span>
+<span class="sd">            Metadata identifying the run to load.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Analyzer</span>
+<span class="sd">            Analyzer for that run.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">run</span><span class="o">.</span><span class="n">file_path</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loaded</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_loaded</span><span class="p">[</span><span class="n">run</span><span class="o">.</span><span class="n">file_path</span><span class="p">]</span> <span class="o">=</span> <span class="n">Analyzer</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">run</span><span class="o">.</span><span class="n">file_path</span><span class="p">),</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loaded</span><span class="p">[</span><span class="n">run</span><span class="o">.</span><span class="n">file_path</span><span class="p">]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_iter_analyzers</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">RunMetadata</span><span class="p">,</span> <span class="n">Analyzer</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Iterate over every run, parsing one log at a time.</span>
+
+<span class="sd">        Unreadable logs are reported and skipped rather than aborting the iteration.</span>
+
+<span class="sd">        Yields</span>
+<span class="sd">        ------</span>
+<span class="sd">        tuple[RunMetadata, Analyzer]</span>
+<span class="sd">            Metadata and loaded Analyzer for each readable run.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">run</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_runs_by_date</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">analyzer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load</span><span class="p">(</span><span class="n">run</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Warning: skipping unreadable log </span><span class="si">{</span><span class="n">run</span><span class="o">.</span><span class="n">file_path</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">error</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">continue</span>
+            <span class="k">yield</span> <span class="n">run</span><span class="p">,</span> <span class="n">analyzer</span>
+
+<div class="viewcode-block" id="RunCollection.filter">
+<a class="viewcode-back" href="../../../_autosummary/perda.analyzer.run_collection.html#perda.analyzer.run_collection.RunCollection.filter">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">predicate</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">RunMetadata</span><span class="p">],</span> <span class="nb">bool</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">RunCollection</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Select runs by their metadata, without loading any log.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        predicate : Callable[[RunMetadata], bool]</span>
+<span class="sd">            Returns True for runs to keep.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        RunCollection</span>
+<span class="sd">            New collection holding only the matching runs.</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        &gt;&gt;&gt; col.filter(lambda run: &quot;endurance&quot; in run.file_path.name)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">RunCollection</span><span class="p">([</span><span class="n">run</span> <span class="k">for</span> <span class="n">run</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_runs_by_date</span> <span class="k">if</span> <span class="n">predicate</span><span class="p">(</span><span class="n">run</span><span class="p">)])</span></div>
+
+
+<div class="viewcode-block" id="RunCollection.filter_by_date">
+<a class="viewcode-back" href="../../../_autosummary/perda.analyzer.run_collection.html#perda.analyzer.run_collection.RunCollection.filter_by_date">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">filter_by_date</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">start_date</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">datetime</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">end_date</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">datetime</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RunCollection</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Select runs recorded within a date range, inclusive on both ends.</span>
+
+<span class="sd">        Runs with no known date are excluded.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        start_date : str | datetime | None, optional</span>
+<span class="sd">            Earliest date to keep, as a datetime or ISO 8601 string. Default is None (no lower bound).</span>
+<span class="sd">        end_date : str | datetime | None, optional</span>
+<span class="sd">            Latest date to keep, as a datetime or ISO 8601 string. Default is None (no upper bound).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        RunCollection</span>
+<span class="sd">            New collection holding only the matching runs.</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        &gt;&gt;&gt; col.filter_by_date(&quot;2026-06-01&quot;, &quot;2026-06-30&quot;)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">start_date</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">start_date</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromisoformat</span><span class="p">(</span><span class="n">start_date</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">end_date</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">end_date</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromisoformat</span><span class="p">(</span><span class="n">end_date</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">run</span><span class="p">:</span> <span class="p">(</span>
+                <span class="n">run</span><span class="o">.</span><span class="n">date</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+                <span class="ow">and</span> <span class="p">(</span><span class="n">start_date</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">run</span><span class="o">.</span><span class="n">date</span> <span class="o">&gt;=</span> <span class="n">start_date</span><span class="p">)</span>
+                <span class="ow">and</span> <span class="p">(</span><span class="n">end_date</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">run</span><span class="o">.</span><span class="n">date</span> <span class="o">&lt;=</span> <span class="n">end_date</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="RunCollection.filter_by_data">
+<a class="viewcode-back" href="../../../_autosummary/perda.analyzer.run_collection.html#perda.analyzer.run_collection.RunCollection.filter_by_data">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">filter_by_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">predicate</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Analyzer</span><span class="p">],</span> <span class="nb">bool</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">RunCollection</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Select runs by their contents, parsing one log at a time.</span>
+
+<span class="sd">        Unlike ``filter``, this must read every log, so prefer narrowing the collection</span>
+<span class="sd">        with ``filter`` or ``filter_by_date`` first.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        predicate : Callable[[Analyzer], bool]</span>
+<span class="sd">            Returns True for runs to keep. Receives the loaded Analyzer.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        RunCollection</span>
+<span class="sd">            New collection holding only the matching runs.</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        &gt;&gt;&gt; overvolted = col.filter_by_data(</span>
+<span class="sd">        ...     lambda aly: (aly.data[&quot;ams.pack.voltage&quot;].value_np &gt; 10.0).any()</span>
+<span class="sd">        ... )</span>
+<span class="sd">        &gt;&gt;&gt; overvolted.filenames</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">RunCollection</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">run</span> <span class="k">for</span> <span class="n">run</span><span class="p">,</span> <span class="n">analyzer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iter_analyzers</span><span class="p">()</span> <span class="k">if</span> <span class="n">predicate</span><span class="p">(</span><span class="n">analyzer</span><span class="p">)]</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="RunCollection.plot_comparison">
+<a class="viewcode-back" href="../../../_autosummary/perda.analyzer.run_collection.html#perda.analyzer.run_collection.RunCollection.plot_comparison">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">plot_comparison</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">cpp_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">max_points</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Overlay a variable from every run in the collection on a single plot.</span>
+
+<span class="sd">        Each run&#39;s timestamps are shifted so that all runs start at t = 0.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        cpp_name : str</span>
+<span class="sd">            C++ name of the variable to compare.</span>
+<span class="sd">        max_points : int | None, optional</span>
+<span class="sd">            Maximum data points to plot per run. Default is None (full fidelity).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        go.Figure</span>
+<span class="sd">            Plotly Figure with one trace per run that contains the variable.</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        &gt;&gt;&gt; col.plot_comparison(&quot;pcm.wheelSpeeds.frontLeft&quot;, max_points=20000).show()</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">overlaid</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">run</span><span class="p">,</span> <span class="n">analyzer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iter_analyzers</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">cpp_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">analyzer</span><span class="o">.</span><span class="n">data</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">di</span> <span class="o">=</span> <span class="n">analyzer</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">cpp_name</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">di</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="n">relative_timestamps</span> <span class="o">=</span> <span class="n">di</span><span class="o">.</span><span class="n">timestamp_np</span> <span class="o">-</span> <span class="n">analyzer</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">data_start_time</span>
+            <span class="n">overlaid</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">DataInstance</span><span class="p">(</span>
+                    <span class="n">timestamp_np</span><span class="o">=</span><span class="n">convert_time</span><span class="p">(</span>
+                        <span class="n">relative_timestamps</span><span class="p">,</span>
+                        <span class="n">analyzer</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">timestamp_unit</span><span class="p">,</span>
+                        <span class="n">COMPARISON_TIMESTAMP_UNIT</span><span class="p">,</span>
+                    <span class="p">),</span>
+                    <span class="n">value_np</span><span class="o">=</span><span class="n">di</span><span class="o">.</span><span class="n">value_np</span><span class="p">,</span>
+                    <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">run</span><span class="o">.</span><span class="n">file_path</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">di</span><span class="o">.</span><span class="n">label</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span>
+                    <span class="n">var_id</span><span class="o">=</span><span class="n">di</span><span class="o">.</span><span class="n">var_id</span><span class="p">,</span>
+                    <span class="n">cpp_name</span><span class="o">=</span><span class="n">di</span><span class="o">.</span><span class="n">cpp_name</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">plot_single_axis</span><span class="p">(</span>
+            <span class="n">overlaid</span><span class="p">,</span>
+            <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Multi-Log Comparison: </span><span class="si">{</span><span class="n">cpp_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">y_axis_title</span><span class="o">=</span><span class="n">cpp_name</span><span class="p">,</span>
+            <span class="n">timestamp_unit</span><span class="o">=</span><span class="n">COMPARISON_TIMESTAMP_UNIT</span><span class="p">,</span>
+            <span class="n">max_points</span><span class="o">=</span><span class="n">max_points</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="RunCollection.compare_summary">
+<a class="viewcode-back" href="../../../_autosummary/perda.analyzer.run_collection.html#perda.analyzer.run_collection.RunCollection.compare_summary">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compare_summary</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cpp_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">DataInstanceSummary</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Summarize a variable&#39;s statistics across every run in the collection.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        cpp_name : str</span>
+<span class="sd">            C++ name of the variable to summarize.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dict[str, DataInstanceSummary]</span>
+<span class="sd">            Summary per run filename, for runs that contain the variable.</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        &gt;&gt;&gt; for filename, summary in col.compare_summary(&quot;bms.pack.voltage&quot;).items():</span>
+<span class="sd">        ...     print(f&quot;{filename}: {summary.max_value}&quot;)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="n">run</span><span class="o">.</span><span class="n">file_path</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">data_instance_summary</span><span class="p">(</span>
+                <span class="n">analyzer</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">cpp_name</span><span class="p">],</span> <span class="n">source_time_unit</span><span class="o">=</span><span class="n">analyzer</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">timestamp_unit</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">run</span><span class="p">,</span> <span class="n">analyzer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iter_analyzers</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">cpp_name</span> <span class="ow">in</span> <span class="n">analyzer</span><span class="o">.</span><span class="n">data</span>
+        <span class="p">}</span></div>
+</div>
+
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2025, Penn Electric Racing.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

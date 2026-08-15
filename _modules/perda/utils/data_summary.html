@@ -302,11 +302,70 @@
                 <article class="bd-article">
                   
   <h1>Source code for perda.utils.data_summary</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">..constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">DELIMITER</span><span class="p">,</span> <span class="n">title_block</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">Field</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">..constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">DELIMITER</span><span class="p">,</span> <span class="n">title_block</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..core_data_structures.data_instance</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataInstance</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..core_data_structures.single_run_data</span><span class="w"> </span><span class="kn">import</span> <span class="n">SingleRunData</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">..units</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..units</span><span class="w"> </span><span class="kn">import</span> <span class="n">Timescale</span><span class="p">,</span> <span class="n">convert_time</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.integrate</span><span class="w"> </span><span class="kn">import</span> <span class="n">average_over_time_range</span>
+
+
+<div class="viewcode-block" id="DataInstanceSummary">
+<a class="viewcode-back" href="../../../_autosummary/perda.utils.data_summary.html#perda.utils.data_summary.DataInstanceSummary">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">DataInstanceSummary</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Summary statistics for a single DataInstance.&quot;&quot;&quot;</span>
+
+    <span class="n">header</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Label / ID / C++ name line of the source DataInstance&quot;</span>
+    <span class="p">)</span>
+    <span class="n">count</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Number of data points&quot;</span><span class="p">)</span>
+    <span class="n">time_unit</span><span class="p">:</span> <span class="n">Timescale</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Time unit that all timestamps below are expressed in&quot;</span>
+    <span class="p">)</span>
+    <span class="n">first_timestamp</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Timestamp of the first data point&quot;</span>
+    <span class="p">)</span>
+    <span class="n">last_timestamp</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Timestamp of the last data point&quot;</span>
+    <span class="p">)</span>
+    <span class="n">min_value</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Smallest value&quot;</span><span class="p">)</span>
+    <span class="n">min_timestamp</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Timestamp at which the minimum occurs&quot;</span>
+    <span class="p">)</span>
+    <span class="n">max_value</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Largest value&quot;</span><span class="p">)</span>
+    <span class="n">max_timestamp</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Timestamp at which the maximum occurs&quot;</span>
+    <span class="p">)</span>
+    <span class="n">average</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Time-weighted average over the full range&quot;</span>
+    <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Human-readable multi-line summary block.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            The DataInstance header, followed by a delimiter and the statistics.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">unit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_unit</span><span class="o">.</span><span class="n">value</span>
+        <span class="n">body</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s2">&quot;Empty DataInstance.&quot;</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">count</span> <span class="o">==</span> <span class="mi">0</span>
+            <span class="k">else</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="p">[</span>
+                    <span class="sa">f</span><span class="s2">&quot;Count:      </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">count</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                    <span class="sa">f</span><span class="s2">&quot;Time range: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">first_timestamp</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">last_timestamp</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span>
+                    <span class="sa">f</span><span class="s2">&quot;Min:        </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">min_value</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2"> at </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">min_timestamp</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span>
+                    <span class="sa">f</span><span class="s2">&quot;Max:        </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">max_value</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2"> at </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">max_timestamp</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span>
+                    <span class="sa">f</span><span class="s2">&quot;Average:    </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">average</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="p">]</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="si">}</span><span class="se">\n</span><span class="si">{</span><span class="n">DELIMITER</span><span class="si">}</span><span class="se">\n</span><span class="si">{</span><span class="n">body</span><span class="si">}</span><span class="s2">&quot;</span></div>
+
 
 
 <div class="viewcode-block" id="data_instance_summary">
@@ -315,52 +374,56 @@
     <span class="n">data_instance</span><span class="p">:</span> <span class="n">DataInstance</span><span class="p">,</span>
     <span class="n">source_time_unit</span><span class="p">:</span> <span class="n">Timescale</span> <span class="o">=</span> <span class="n">Timescale</span><span class="o">.</span><span class="n">MS</span><span class="p">,</span>
     <span class="n">target_time_unit</span><span class="p">:</span> <span class="n">Timescale</span> <span class="o">=</span> <span class="n">Timescale</span><span class="o">.</span><span class="n">S</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataInstanceSummary</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Print information about a DataInstance.</span>
+<span class="sd">    Summarize a DataInstance.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    data_instance : DataInstance</span>
-<span class="sd">        The DataInstance to print info about</span>
+<span class="sd">        The DataInstance to summarize</span>
 <span class="sd">    source_time_unit : Timescale, optional</span>
 <span class="sd">        Time unit of data instance. Default is milliseconds.</span>
 <span class="sd">    target_time_unit : Timescale, optional</span>
 <span class="sd">        Time unit used by the summary. Default is Timescale.S.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    DataInstanceSummary</span>
+<span class="sd">        Statistics for the DataInstance. Printing is left to the caller.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; print(data_instance_summary(aly.data[&quot;bms.pack.current&quot;]))</span>
+<span class="sd">    &gt;&gt;&gt; data_instance_summary(aly.data[&quot;bms.pack.current&quot;]).max_value</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="nb">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">data_instance</span><span class="p">))</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">DELIMITER</span><span class="p">)</span>
+    <span class="n">header</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">data_instance</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_instance</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="n">min_val</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">data_instance</span><span class="o">.</span><span class="n">value_np</span><span class="o">.</span><span class="n">min</span><span class="p">())</span>
-        <span class="n">max_val</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">data_instance</span><span class="o">.</span><span class="n">value_np</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_instance</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">DataInstanceSummary</span><span class="p">(</span><span class="n">header</span><span class="o">=</span><span class="n">header</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">time_unit</span><span class="o">=</span><span class="n">target_time_unit</span><span class="p">)</span>
 
-        <span class="n">min_val_idx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">data_instance</span><span class="o">.</span><span class="n">value_np</span><span class="o">.</span><span class="n">argmin</span><span class="p">())</span>
-        <span class="n">max_val_idx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">data_instance</span><span class="o">.</span><span class="n">value_np</span><span class="o">.</span><span class="n">argmax</span><span class="p">())</span>
-        <span class="n">min_ts</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">data_instance</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">[</span><span class="n">min_val_idx</span><span class="p">])</span>
-        <span class="n">max_ts</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">data_instance</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">[</span><span class="n">max_val_idx</span><span class="p">])</span>
+    <span class="n">min_val_idx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">data_instance</span><span class="o">.</span><span class="n">value_np</span><span class="o">.</span><span class="n">argmin</span><span class="p">())</span>
+    <span class="n">max_val_idx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">data_instance</span><span class="o">.</span><span class="n">value_np</span><span class="o">.</span><span class="n">argmax</span><span class="p">())</span>
 
-        <span class="n">first_ts</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">data_instance</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-        <span class="n">last_ts</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">data_instance</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_target</span><span class="p">(</span><span class="n">timestamp</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">convert_time</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">timestamp</span><span class="p">),</span> <span class="n">source_time_unit</span><span class="p">,</span> <span class="n">target_time_unit</span><span class="p">)</span>
 
-        <span class="n">first_ts</span> <span class="o">=</span> <span class="n">convert_time</span><span class="p">(</span><span class="n">first_ts</span><span class="p">,</span> <span class="n">source_time_unit</span><span class="p">,</span> <span class="n">target_time_unit</span><span class="p">)</span>
-        <span class="n">last_ts</span> <span class="o">=</span> <span class="n">convert_time</span><span class="p">(</span><span class="n">last_ts</span><span class="p">,</span> <span class="n">source_time_unit</span><span class="p">,</span> <span class="n">target_time_unit</span><span class="p">)</span>
-        <span class="n">min_ts</span> <span class="o">=</span> <span class="n">convert_time</span><span class="p">(</span><span class="n">min_ts</span><span class="p">,</span> <span class="n">source_time_unit</span><span class="p">,</span> <span class="n">target_time_unit</span><span class="p">)</span>
-        <span class="n">max_ts</span> <span class="o">=</span> <span class="n">convert_time</span><span class="p">(</span><span class="n">max_ts</span><span class="p">,</span> <span class="n">source_time_unit</span><span class="p">,</span> <span class="n">target_time_unit</span><span class="p">)</span>
-
-        <span class="n">avg_val</span> <span class="o">=</span> <span class="n">average_over_time_range</span><span class="p">(</span>
+    <span class="k">return</span> <span class="n">DataInstanceSummary</span><span class="p">(</span>
+        <span class="n">header</span><span class="o">=</span><span class="n">header</span><span class="p">,</span>
+        <span class="n">count</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">data_instance</span><span class="p">),</span>
+        <span class="n">time_unit</span><span class="o">=</span><span class="n">target_time_unit</span><span class="p">,</span>
+        <span class="n">first_timestamp</span><span class="o">=</span><span class="n">to_target</span><span class="p">(</span><span class="n">data_instance</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+        <span class="n">last_timestamp</span><span class="o">=</span><span class="n">to_target</span><span class="p">(</span><span class="n">data_instance</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]),</span>
+        <span class="n">min_value</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">data_instance</span><span class="o">.</span><span class="n">value_np</span><span class="o">.</span><span class="n">min</span><span class="p">()),</span>
+        <span class="n">min_timestamp</span><span class="o">=</span><span class="n">to_target</span><span class="p">(</span><span class="n">data_instance</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">[</span><span class="n">min_val_idx</span><span class="p">]),</span>
+        <span class="n">max_value</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">data_instance</span><span class="o">.</span><span class="n">value_np</span><span class="o">.</span><span class="n">max</span><span class="p">()),</span>
+        <span class="n">max_timestamp</span><span class="o">=</span><span class="n">to_target</span><span class="p">(</span><span class="n">data_instance</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">[</span><span class="n">max_val_idx</span><span class="p">]),</span>
+        <span class="n">average</span><span class="o">=</span><span class="n">average_over_time_range</span><span class="p">(</span>
             <span class="n">data_instance</span><span class="p">,</span>
             <span class="n">source_time_unit</span><span class="o">=</span><span class="n">source_time_unit</span><span class="p">,</span>
             <span class="n">target_time_unit</span><span class="o">=</span><span class="n">target_time_unit</span><span class="p">,</span>
-        <span class="p">)</span>
-
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Count:      </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">data_instance</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Time range: </span><span class="si">{</span><span class="n">first_ts</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">last_ts</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">target_time_unit</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Min:        </span><span class="si">{</span><span class="n">min_val</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2"> at </span><span class="si">{</span><span class="n">min_ts</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">target_time_unit</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Max:        </span><span class="si">{</span><span class="n">max_val</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2"> at </span><span class="si">{</span><span class="n">max_ts</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">target_time_unit</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Average:    </span><span class="si">{</span><span class="n">avg_val</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Empty DataInstance.&quot;</span><span class="p">)</span></div>
+        <span class="p">),</span>
+    <span class="p">)</span></div>
 
 
 

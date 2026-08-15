@@ -309,7 +309,14 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">..core_data_structures.data_instance</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataInstance</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..units</span><span class="w"> </span><span class="kn">import</span> <span class="n">Timescale</span><span class="p">,</span> <span class="n">_to_seconds</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">.plotting_constants</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.plotting_constants</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">DEFAULT_FONT_CONFIG</span><span class="p">,</span>
+    <span class="n">DEFAULT_LAYOUT_CONFIG</span><span class="p">,</span>
+    <span class="n">DEFAULT_VLINE_CONFIG</span><span class="p">,</span>
+    <span class="n">FontConfig</span><span class="p">,</span>
+    <span class="n">LayoutConfig</span><span class="p">,</span>
+    <span class="n">VLineConfig</span><span class="p">,</span>
+<span class="p">)</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_add_vlines</span><span class="p">(</span>
@@ -351,6 +358,7 @@
     <span class="n">timestamp_unit</span><span class="p">:</span> <span class="n">Timescale</span> <span class="o">=</span> <span class="n">Timescale</span><span class="o">.</span><span class="n">MS</span><span class="p">,</span>
     <span class="n">vlines</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">vline_config</span><span class="p">:</span> <span class="s2">&quot;VLineConfig&quot;</span> <span class="o">=</span> <span class="n">DEFAULT_VLINE_CONFIG</span><span class="p">,</span>
+    <span class="n">max_points</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Plot one or more DataInstances on a single y-axis using Plotly.</span>
@@ -373,6 +381,8 @@
 <span class="sd">        X-axis positions (in seconds) where vertical lines are drawn. Default is None.</span>
 <span class="sd">    vline_config : VLineConfig, optional</span>
 <span class="sd">        Visual configuration for the vertical lines.</span>
+<span class="sd">    max_points : int | None, optional</span>
+<span class="sd">        Maximum number of data points to plot per trace (enables zero-copy step downsampling). Default is None (full fidelity).</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -394,13 +404,20 @@
             <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Warning: No data points in DataInstance for </span><span class="si">{</span><span class="n">di</span><span class="o">.</span><span class="n">label</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="k">continue</span>
 
-        <span class="c1"># Convert timestamps from the log unit to seconds for plotting.</span>
-        <span class="n">timestamps_s</span> <span class="o">=</span> <span class="n">_to_seconds</span><span class="p">(</span><span class="n">di</span><span class="o">.</span><span class="n">timestamp_np</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">),</span> <span class="n">timestamp_unit</span><span class="p">)</span>
+        <span class="c1"># Convert timestamps from the log unit to seconds for plotting with optional downsampling.</span>
+        <span class="n">n_points</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">di</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">max_points</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">n_points</span> <span class="o">&gt;</span> <span class="n">max_points</span> <span class="ow">and</span> <span class="n">max_points</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">step</span> <span class="o">=</span> <span class="p">(</span><span class="n">n_points</span> <span class="o">+</span> <span class="n">max_points</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="n">max_points</span>
+            <span class="n">timestamps_s</span> <span class="o">=</span> <span class="n">_to_seconds</span><span class="p">(</span><span class="n">di</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">[::</span><span class="n">step</span><span class="p">],</span> <span class="n">timestamp_unit</span><span class="p">)</span>
+            <span class="n">values_np</span> <span class="o">=</span> <span class="n">di</span><span class="o">.</span><span class="n">value_np</span><span class="p">[::</span><span class="n">step</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">timestamps_s</span> <span class="o">=</span> <span class="n">_to_seconds</span><span class="p">(</span><span class="n">di</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">,</span> <span class="n">timestamp_unit</span><span class="p">)</span>
+            <span class="n">values_np</span> <span class="o">=</span> <span class="n">di</span><span class="o">.</span><span class="n">value_np</span>
 
         <span class="n">fig</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span>
             <span class="n">go</span><span class="o">.</span><span class="n">Scattergl</span><span class="p">(</span>
                 <span class="n">x</span><span class="o">=</span><span class="n">timestamps_s</span><span class="p">,</span>
-                <span class="n">y</span><span class="o">=</span><span class="n">di</span><span class="o">.</span><span class="n">value_np</span><span class="p">,</span>
+                <span class="n">y</span><span class="o">=</span><span class="n">values_np</span><span class="p">,</span>
                 <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;lines&quot;</span><span class="p">,</span>
                 <span class="n">name</span><span class="o">=</span><span class="n">di</span><span class="o">.</span><span class="n">label</span><span class="p">,</span>
             <span class="p">)</span>
@@ -448,6 +465,7 @@
     <span class="n">timestamp_unit</span><span class="p">:</span> <span class="n">Timescale</span> <span class="o">=</span> <span class="n">Timescale</span><span class="o">.</span><span class="n">MS</span><span class="p">,</span>
     <span class="n">vlines</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">vline_config</span><span class="p">:</span> <span class="n">VLineConfig</span> <span class="o">=</span> <span class="n">DEFAULT_VLINE_CONFIG</span><span class="p">,</span>
+    <span class="n">max_points</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Plot DataInstances on dual y-axes using Plotly.</span>
@@ -476,6 +494,8 @@
 <span class="sd">        X-axis positions (in seconds) where vertical lines are drawn. Default is None.</span>
 <span class="sd">    vline_config : VLineConfig, optional</span>
 <span class="sd">        Visual configuration for the vertical lines.</span>
+<span class="sd">    max_points : int | None, optional</span>
+<span class="sd">        Maximum number of data points to plot per trace (enables zero-copy step downsampling). Default is None (full fidelity).</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -499,13 +519,20 @@
             <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Warning: No data points in DataInstance for </span><span class="si">{</span><span class="n">di</span><span class="o">.</span><span class="n">label</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="k">continue</span>
 
-        <span class="c1"># Convert timestamps from the log unit to seconds for plotting.</span>
-        <span class="n">timestamps_s</span> <span class="o">=</span> <span class="n">_to_seconds</span><span class="p">(</span><span class="n">di</span><span class="o">.</span><span class="n">timestamp_np</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">),</span> <span class="n">timestamp_unit</span><span class="p">)</span>
+        <span class="c1"># Convert timestamps from the log unit to seconds for plotting with optional downsampling.</span>
+        <span class="n">n_points</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">di</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">max_points</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">n_points</span> <span class="o">&gt;</span> <span class="n">max_points</span> <span class="ow">and</span> <span class="n">max_points</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">step</span> <span class="o">=</span> <span class="p">(</span><span class="n">n_points</span> <span class="o">+</span> <span class="n">max_points</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="n">max_points</span>
+            <span class="n">timestamps_s</span> <span class="o">=</span> <span class="n">_to_seconds</span><span class="p">(</span><span class="n">di</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">[::</span><span class="n">step</span><span class="p">],</span> <span class="n">timestamp_unit</span><span class="p">)</span>
+            <span class="n">values_np</span> <span class="o">=</span> <span class="n">di</span><span class="o">.</span><span class="n">value_np</span><span class="p">[::</span><span class="n">step</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">timestamps_s</span> <span class="o">=</span> <span class="n">_to_seconds</span><span class="p">(</span><span class="n">di</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">,</span> <span class="n">timestamp_unit</span><span class="p">)</span>
+            <span class="n">values_np</span> <span class="o">=</span> <span class="n">di</span><span class="o">.</span><span class="n">value_np</span>
 
         <span class="n">fig</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span>
             <span class="n">go</span><span class="o">.</span><span class="n">Scattergl</span><span class="p">(</span>
                 <span class="n">x</span><span class="o">=</span><span class="n">timestamps_s</span><span class="p">,</span>
-                <span class="n">y</span><span class="o">=</span><span class="n">di</span><span class="o">.</span><span class="n">value_np</span><span class="p">,</span>
+                <span class="n">y</span><span class="o">=</span><span class="n">values_np</span><span class="p">,</span>
                 <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;lines&quot;</span><span class="p">,</span>
                 <span class="n">name</span><span class="o">=</span><span class="n">di</span><span class="o">.</span><span class="n">label</span><span class="p">,</span>
             <span class="p">),</span>
@@ -518,13 +545,20 @@
             <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Warning: No data points in DataInstance for </span><span class="si">{</span><span class="n">di</span><span class="o">.</span><span class="n">label</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="k">continue</span>
 
-        <span class="c1"># Convert timestamps from the log unit to seconds for plotting.</span>
-        <span class="n">timestamps_s</span> <span class="o">=</span> <span class="n">_to_seconds</span><span class="p">(</span><span class="n">di</span><span class="o">.</span><span class="n">timestamp_np</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">),</span> <span class="n">timestamp_unit</span><span class="p">)</span>
+        <span class="c1"># Convert timestamps from the log unit to seconds for plotting with optional downsampling.</span>
+        <span class="n">n_points</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">di</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">max_points</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">n_points</span> <span class="o">&gt;</span> <span class="n">max_points</span> <span class="ow">and</span> <span class="n">max_points</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">step</span> <span class="o">=</span> <span class="p">(</span><span class="n">n_points</span> <span class="o">+</span> <span class="n">max_points</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="n">max_points</span>
+            <span class="n">timestamps_s</span> <span class="o">=</span> <span class="n">_to_seconds</span><span class="p">(</span><span class="n">di</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">[::</span><span class="n">step</span><span class="p">],</span> <span class="n">timestamp_unit</span><span class="p">)</span>
+            <span class="n">values_np</span> <span class="o">=</span> <span class="n">di</span><span class="o">.</span><span class="n">value_np</span><span class="p">[::</span><span class="n">step</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">timestamps_s</span> <span class="o">=</span> <span class="n">_to_seconds</span><span class="p">(</span><span class="n">di</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">,</span> <span class="n">timestamp_unit</span><span class="p">)</span>
+            <span class="n">values_np</span> <span class="o">=</span> <span class="n">di</span><span class="o">.</span><span class="n">value_np</span>
 
         <span class="n">fig</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span>
             <span class="n">go</span><span class="o">.</span><span class="n">Scattergl</span><span class="p">(</span>
                 <span class="n">x</span><span class="o">=</span><span class="n">timestamps_s</span><span class="p">,</span>
-                <span class="n">y</span><span class="o">=</span><span class="n">di</span><span class="o">.</span><span class="n">value_np</span><span class="p">,</span>
+                <span class="n">y</span><span class="o">=</span><span class="n">values_np</span><span class="p">,</span>
                 <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;lines&quot;</span><span class="p">,</span>
                 <span class="n">name</span><span class="o">=</span><span class="n">di</span><span class="o">.</span><span class="n">label</span><span class="p">,</span>
                 <span class="n">line</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">dash</span><span class="o">=</span><span class="s2">&quot;dash&quot;</span><span class="p">),</span>

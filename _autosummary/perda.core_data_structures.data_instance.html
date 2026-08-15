@@ -263,6 +263,8 @@
 <li class="toctree-l3"><a class="reference internal" href="perda.analyzer.analyzer_factory.html">perda.analyzer.analyzer_factory</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.analyzer.concat_helpers.html">perda.analyzer.concat_helpers</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.analyzer.csv.html">perda.analyzer.csv</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.analyzer.run_collection.html">perda.analyzer.run_collection</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.analyzer.run_collection_factory.html">perda.analyzer.run_collection_factory</a></li>
 </ul>
 </details></li>
 <li class="toctree-l2"><a class="reference internal" href="perda.constants.html">perda.constants</a></li>
@@ -394,8 +396,8 @@
 <dd class="field-even"><ul class="simple">
 <li><p><a class="reference internal" href="#perda.core_data_structures.data_instance.DataInstance.cpp_name" title="perda.core_data_structures.data_instance.DataInstance.cpp_name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cpp_name</span> <span class="pre">(str</span> <span class="pre">|</span> <span class="pre">None)</span></code></a></p></li>
 <li><p><a class="reference internal" href="#perda.core_data_structures.data_instance.DataInstance.label" title="perda.core_data_structures.data_instance.DataInstance.label"><code class="xref py py-obj docutils literal notranslate"><span class="pre">label</span> <span class="pre">(str</span> <span class="pre">|</span> <span class="pre">None)</span></code></a></p></li>
-<li><p><a class="reference internal" href="#perda.core_data_structures.data_instance.DataInstance.timestamp_np" title="perda.core_data_structures.data_instance.DataInstance.timestamp_np"><code class="xref py py-obj docutils literal notranslate"><span class="pre">timestamp_np</span> <span class="pre">(numpy.ndarray[tuple[Any,</span> <span class="pre">...],</span> <span class="pre">numpy.dtype[numpy._typing._array_like._ScalarT]])</span></code></a></p></li>
-<li><p><a class="reference internal" href="#perda.core_data_structures.data_instance.DataInstance.value_np" title="perda.core_data_structures.data_instance.DataInstance.value_np"><code class="xref py py-obj docutils literal notranslate"><span class="pre">value_np</span> <span class="pre">(numpy.ndarray[tuple[Any,</span> <span class="pre">...],</span> <span class="pre">numpy.dtype[numpy._typing._array_like._ScalarT]])</span></code></a></p></li>
+<li><p><a class="reference internal" href="#perda.core_data_structures.data_instance.DataInstance.timestamp_np" title="perda.core_data_structures.data_instance.DataInstance.timestamp_np"><code class="xref py py-obj docutils literal notranslate"><span class="pre">timestamp_np</span> <span class="pre">(NDArray)</span></code></a></p></li>
+<li><p><a class="reference internal" href="#perda.core_data_structures.data_instance.DataInstance.value_np" title="perda.core_data_structures.data_instance.DataInstance.value_np"><code class="xref py py-obj docutils literal notranslate"><span class="pre">value_np</span> <span class="pre">(NDArray)</span></code></a></p></li>
 <li><p><a class="reference internal" href="#perda.core_data_structures.data_instance.DataInstance.var_id" title="perda.core_data_structures.data_instance.DataInstance.var_id"><code class="xref py py-obj docutils literal notranslate"><span class="pre">var_id</span> <span class="pre">(int</span> <span class="pre">|</span> <span class="pre">None)</span></code></a></p></li>
 </ul>
 </dd>
@@ -408,7 +410,7 @@
 </dl>
 <dl class="py attribute pydantic_field">
 <dt class="sig sig-object py" id="perda.core_data_structures.data_instance.DataInstance.timestamp_np">
-<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">timestamp_np</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code><span class="pre">[</span><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code><span class="pre">[</span><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code><span class="pre">,</span> <code class="xref py py-data docutils literal notranslate"><span class="pre">...</span></code><span class="pre">],</span> <code class="xref py py-class docutils literal notranslate"><span class="pre">dtype</span></code><span class="pre">[</span><code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code><span class="pre">(</span><code class="docutils literal notranslate"><span class="pre">_ScalarT</span></code><span class="pre">,</span> <span class="pre">bound=</span> <code class="xref py py-class docutils literal notranslate"><span class="pre">generic</span></code><span class="pre">)]]</span></em><em class="property"> <span class="pre">[Required]</span></em><a class="headerlink" href="#perda.core_data_structures.data_instance.DataInstance.timestamp_np" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">timestamp_np</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">TypeAliasType</span></code></em><em class="property"> <span class="pre">[Required]</span></em><a class="headerlink" href="#perda.core_data_structures.data_instance.DataInstance.timestamp_np" title="Link to this definition">#</a></dt>
 <dd><p>Timestamps as a 1D NumPy array</p>
 <dl class="field-list simple">
 <dt class="field-odd">Validated by<span class="colon">:</span></dt>
@@ -421,7 +423,7 @@
 
 <dl class="py attribute pydantic_field">
 <dt class="sig sig-object py" id="perda.core_data_structures.data_instance.DataInstance.value_np">
-<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">value_np</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code><span class="pre">[</span><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code><span class="pre">[</span><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code><span class="pre">,</span> <code class="xref py py-data docutils literal notranslate"><span class="pre">...</span></code><span class="pre">],</span> <code class="xref py py-class docutils literal notranslate"><span class="pre">dtype</span></code><span class="pre">[</span><code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code><span class="pre">(</span><code class="docutils literal notranslate"><span class="pre">_ScalarT</span></code><span class="pre">,</span> <span class="pre">bound=</span> <code class="xref py py-class docutils literal notranslate"><span class="pre">generic</span></code><span class="pre">)]]</span></em><em class="property"> <span class="pre">[Required]</span></em><a class="headerlink" href="#perda.core_data_structures.data_instance.DataInstance.value_np" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">value_np</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">TypeAliasType</span></code></em><em class="property"> <span class="pre">[Required]</span></em><a class="headerlink" href="#perda.core_data_structures.data_instance.DataInstance.value_np" title="Link to this definition">#</a></dt>
 <dd><p>Values as a 1D NumPy array</p>
 <dl class="field-list simple">
 <dt class="field-odd">Validated by<span class="colon">:</span></dt>
@@ -456,7 +458,7 @@
 <dd><p>Validate that timestamp array is 1-dimensional, positive, and strictly increasing.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">...</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">dtype</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code>(<code class="docutils literal notranslate"><span class="pre">_ScalarT</span></code>, bound= <code class="xref py py-class docutils literal notranslate"><span class="pre">generic</span></code>)]]</span></p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">TypeAliasType</span></code></span></p>
 </dd>
 <dt class="field-even">Parameters<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>v</strong> (<em>Any</em>)</p>
@@ -470,7 +472,7 @@
 <dd><p>Validate that value array is 1-dimensional</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">...</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">dtype</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code>(<code class="docutils literal notranslate"><span class="pre">_ScalarT</span></code>, bound= <code class="xref py py-class docutils literal notranslate"><span class="pre">generic</span></code>)]]</span></p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">TypeAliasType</span></code></span></p>
 </dd>
 <dt class="field-even">Parameters<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>v</strong> (<em>Any</em>)</p>

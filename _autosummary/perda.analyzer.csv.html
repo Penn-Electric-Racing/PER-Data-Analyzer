@@ -50,7 +50,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/perda.analyzer.csv';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="perda.constants" href="perda.constants.html" />
+    <link rel="next" title="perda.analyzer.run_collection" href="perda.analyzer.run_collection.html" />
     <link rel="prev" title="perda.analyzer.concat_helpers" href="perda.analyzer.concat_helpers.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -263,6 +263,8 @@
 <li class="toctree-l3"><a class="reference internal" href="perda.analyzer.analyzer_factory.html">perda.analyzer.analyzer_factory</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.analyzer.concat_helpers.html">perda.analyzer.concat_helpers</a></li>
 <li class="toctree-l3 current active"><a class="current reference internal" href="#">perda.analyzer.csv</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.analyzer.run_collection.html">perda.analyzer.run_collection</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.analyzer.run_collection_factory.html">perda.analyzer.run_collection_factory</a></li>
 </ul>
 </details></li>
 <li class="toctree-l2"><a class="reference internal" href="perda.constants.html">perda.constants</a></li>
@@ -402,6 +404,23 @@
 </dl>
 </dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="perda.analyzer.csv.parse_header_creation_time">
+<span class="sig-prename descclassname"><span class="pre">perda.analyzer.csv.</span></span><span class="sig-name descname"><span class="pre">parse_header_creation_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">header_line</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/analyzer/csv.html#parse_header_creation_time"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.analyzer.csv.parse_header_creation_time" title="Link to this definition">#</a></dt>
+<dd><p>Extract the recording date from a log file’s first line.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>header_line</strong> (<em>str</em>) – First line of the log file, e.g. <code class="docutils literal notranslate"><span class="pre">&quot;PER</span> <span class="pre">Log:</span> <span class="pre">Thu</span> <span class="pre">Jun</span> <span class="pre">11</span> <span class="pre">17:06:37</span> <span class="pre">2026</span> <span class="pre">v2.0&quot;</span></code>.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Parsed recording date, or None if the header carries no recognizable date.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>datetime | None</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 
 
@@ -424,11 +443,11 @@
       </div>
     </a>
     <a class="right-next"
-       href="perda.constants.html"
+       href="perda.analyzer.run_collection.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">perda.constants</p>
+        <p class="prev-next-title">perda.analyzer.run_collection</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -452,6 +471,7 @@
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.analyzer.csv.parse_csv"><code class="docutils literal notranslate"><span class="pre">parse_csv()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.analyzer.csv.parse_header_creation_time"><code class="docutils literal notranslate"><span class="pre">parse_header_creation_time()</span></code></a></li>
 </ul>
   </nav></div>
 
