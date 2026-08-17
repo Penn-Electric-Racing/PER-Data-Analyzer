@@ -161,14 +161,14 @@ def search(
     if semantic_ready and _model is not None:
         try:
             # Lazy-build card embeddings
-            if getattr(data, "_search_embeddings", None) is None:
+            embeddings = data._search_embeddings
+            if embeddings is None:
                 cards = [e.card for e in deck]
                 card_embeddings = _model.encode(cards, convert_to_numpy=True)
                 norms = np.linalg.norm(card_embeddings, axis=1, keepdims=True)
                 norms[norms == 0.0] = 1.0
-                data._search_embeddings = card_embeddings / norms
-
-            embeddings = data._search_embeddings
+                embeddings = card_embeddings / norms
+                data._search_embeddings = embeddings
 
             # Encode query and project
             semantic_query = preprocess_query(query)

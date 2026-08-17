@@ -1,6 +1,8 @@
 from datetime import datetime
 from typing import Dict, List, Optional, Union
 
+import numpy as np
+from numpy.typing import NDArray
 from pydantic import BaseModel, ConfigDict, Field, PrivateAttr
 
 from ..units import Timescale
@@ -14,7 +16,7 @@ class SingleRunData(BaseModel):
 
     # Private caches (excluded from Pydantic serialization)
     _search_deck: Optional[list] = PrivateAttr(default=None)
-    _search_embeddings: Optional[object] = PrivateAttr(default=None)
+    _search_embeddings: Optional[NDArray[np.float32]] = PrivateAttr(default=None)
 
     # Core data storage
     id_to_instance: Dict[int, DataInstance] = Field(
