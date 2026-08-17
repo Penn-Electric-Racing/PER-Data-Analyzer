@@ -28,7 +28,9 @@ def test_from_paths_accepts_strings(write_log):
 @pytest.mark.parametrize(
     "header",
     [
-        pytest.param("Standard Generic Log File Header With No Date", id="no_per_prefix"),
+        pytest.param(
+            "Standard Generic Log File Header With No Date", id="no_per_prefix"
+        ),
         pytest.param("PER Log: not a real date v2.0", id="unparseable_date"),
     ],
 )

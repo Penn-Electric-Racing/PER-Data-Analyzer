@@ -1,8 +1,9 @@
+from __future__ import annotations
+
 import numpy as np
 from numpy.typing import NDArray
 
 from ..core_data_structures.data_instance import DataInstance
-from ..core_data_structures.resampling_helpers import ResampleMethod, _interpolate
 from ..units import Timescale, _to_seconds
 
 
@@ -68,48 +69,3 @@ def apply_time_offset(
         )
 
     return results[0] if len(results) == 1 else results
-
-
-def resample_to_freq(
-    di: DataInstance,
-    freq_hz: float,
-    timestamp_divisor: float,
-    method: ResampleMethod = ResampleMethod.LINEAR,
-) -> DataInstance:
-    """
-    Resample a DataInstance onto a uniform frequency grid.
-
-    Parameters
-    ----------
-    di : DataInstance
-        Source DataInstance
-    freq_hz : float
-        Target sampling frequency in Hz
-    timestamp_divisor : float
-        Raw timestamp units per second (e.g. 1e6 for microseconds)
-    method : ResampleMethod, optional
-        Interpolation method. Default is LINEAR.
-
-    Returns
-    -------
-    DataInstance
-        New DataInstance with values resampled onto a uniform timestamp grid
-    """
-    dt = timestamp_divisor / freq_hz
-    target_ts = np.arange(
-        di.timestamp_np[0], di.timestamp_np[-1], dt, dtype=np.float64
-    ).astype(np.int64)
-    resampled_val = _interpolate(
-        target_ts.astype(np.float64),
-        di.timestamp_np.astype(np.float64),
-        di.value_np,
-        method,
-    )
-
-    return DataInstance(
-        timestamp_np=target_ts,
-        value_np=resampled_val,
-        label=di.label,
-        var_id=di.var_id,
-        cpp_name=di.cpp_name,
-    )

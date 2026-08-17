@@ -9,7 +9,7 @@ from perda.core_data_structures.data_instance import (
     outer_join_data_instances,
 )
 from perda.core_data_structures.joins import inner_join, left_join, outer_join
-from perda.core_data_structures.resampling_helpers import ResampleMethod
+from perda.core_data_structures.resampling import ResampleMethod
 
 
 @pytest.mark.parametrize(

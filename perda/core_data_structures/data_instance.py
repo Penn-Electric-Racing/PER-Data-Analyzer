@@ -1,12 +1,13 @@
-from enum import Enum
-from typing import Any, Callable, List, Tuple, Union
+from __future__ import annotations
+
+from typing import Any, Callable
 
 import numpy as np
 from numpy.typing import NDArray
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from .joins import inner_join, left_join, outer_join
-from .resampling_helpers import ResampleMethod, _interpolate
+from .resampling import ResampleMethod, _interpolate
 
 
 class DataInstance(BaseModel):
@@ -72,7 +73,7 @@ class DataInstance(BaseModel):
         """
         return self.timestamp_np.shape[0]
 
-    def __add__(self, other: Union["DataInstance", int, float]) -> "DataInstance":
+    def __add__(self, other: DataInstance | int | float) -> DataInstance:
         """
         Add two DataInstances or add a scalar to a DataInstance.
         """
@@ -87,7 +88,7 @@ class DataInstance(BaseModel):
             )
         raise TypeError("add expects (DataInstance, DataInstance|scalar) in any order")
 
-    def __sub__(self, other: Union["DataInstance", int, float]) -> "DataInstance":
+    def __sub__(self, other: DataInstance | int | float) -> DataInstance:
         """
         Subtract a DataInstance or scalar from this DataInstance.
         """
@@ -102,7 +103,7 @@ class DataInstance(BaseModel):
             )
         raise TypeError("sub expects (DataInstance, DataInstance|scalar)")
 
-    def __mul__(self, other: Union["DataInstance", int, float]) -> "DataInstance":
+    def __mul__(self, other: DataInstance | int | float) -> DataInstance:
         """
         Multiply two DataInstances or multiply a DataInstance by a scalar.
         """
@@ -117,7 +118,7 @@ class DataInstance(BaseModel):
             )
         raise TypeError("mul expects (DataInstance, DataInstance|scalar)")
 
-    def __truediv__(self, other: Union["DataInstance", int, float]) -> "DataInstance":
+    def __truediv__(self, other: DataInstance | int | float) -> DataInstance:
         """
         Divide this DataInstance by another DataInstance or scalar.
         """
@@ -132,7 +133,7 @@ class DataInstance(BaseModel):
             )
         raise TypeError("div expects (DataInstance, DataInstance|scalar)")
 
-    def __pow__(self, other: Union["DataInstance", int, float]) -> "DataInstance":
+    def __pow__(self, other: DataInstance | int | float) -> DataInstance:
         """
         Raise this DataInstance to the power of another DataInstance or scalar.
         """
@@ -147,7 +148,7 @@ class DataInstance(BaseModel):
             )
         raise TypeError("pow_ expects (DataInstance, DataInstance|scalar)")
 
-    def __neg__(self) -> "DataInstance":
+    def __neg__(self) -> DataInstance:
         """
         Negate all values in this DataInstance.
         """
@@ -162,7 +163,7 @@ class DataInstance(BaseModel):
         self,
         ts_start: float | None = None,
         ts_end: float | None = None,
-    ) -> "DataInstance":
+    ) -> DataInstance:
         """
         Return a new DataInstance containing only points within the given timestamp range.
 
@@ -196,13 +197,59 @@ class DataInstance(BaseModel):
             cpp_name=self.cpp_name,
         )
 
+    def resample_to_freq(
+        self,
+        freq_hz: float,
+        timestamp_divisor: float,
+        method: ResampleMethod = ResampleMethod.LINEAR,
+    ) -> DataInstance:
+        """
+        Return a new DataInstance resampled onto a uniform frequency grid.
+
+        Parameters
+        ----------
+        freq_hz : float
+            Target sampling frequency in Hz
+        timestamp_divisor : float
+            Raw timestamp units per second (e.g. 1e6 for microseconds)
+        method : ResampleMethod, optional
+            Interpolation method. Default is LINEAR.
+
+        Returns
+        -------
+        DataInstance
+            New DataInstance with values resampled onto a uniform timestamp grid
+
+        Examples
+        --------
+        >>> uniform = di.resample_to_freq(freq_hz=100.0, timestamp_divisor=1e6)
+        """
+        dt = timestamp_divisor / freq_hz
+        target_ts = np.arange(
+            self.timestamp_np[0], self.timestamp_np[-1], dt, dtype=np.float64
+        ).astype(np.int64)
+        resampled_val = _interpolate(
+            target_ts.astype(np.float64),
+            self.timestamp_np.astype(np.float64),
+            self.value_np,
+            method,
+        )
+
+        return DataInstance(
+            timestamp_np=target_ts,
+            value_np=resampled_val,
+            label=self.label,
+            var_id=self.var_id,
+            cpp_name=self.cpp_name,
+        )
+
 
 def left_join_data_instances(
     left: DataInstance,
-    right: Union[DataInstance, List[DataInstance]],
+    right: DataInstance | list[DataInstance],
     *,
     method: ResampleMethod = ResampleMethod.LINEAR,
-) -> Tuple[DataInstance, ...]:
+) -> tuple[DataInstance, ...]:
     """
     Left join one or more DataInstances onto the left timestamp grid.
 
@@ -240,7 +287,7 @@ def left_join_data_instances(
         method=method,
     )
 
-    results: List[DataInstance] = [
+    results: list[DataInstance] = [
         DataInstance(
             timestamp_np=ts, value_np=left_val, label=left.label, var_id=left.var_id
         ),
@@ -273,7 +320,7 @@ def outer_join_data_instances(
     *,
     drop_nan: bool = True,
     fill: float = 0.0,
-) -> Tuple[DataInstance, DataInstance]:
+) -> tuple[DataInstance, DataInstance]:
     """
     Outer join two DataInstances: union of timestamps with interpolation.
 
@@ -321,7 +368,7 @@ def inner_join_data_instances(
     *,
     tolerance: float,
     method: ResampleMethod = ResampleMethod.LINEAR,
-) -> Tuple[DataInstance, DataInstance]:
+) -> tuple[DataInstance, DataInstance]:
     """
     Inner join two DataInstances: keep only left timestamps with matching right timestamps.
 
@@ -475,49 +522,4 @@ def apply_ufunc_inner_join(
         value_np=result_val,
         label=left.label,
         var_id=left.var_id,
-    )
-
-
-class FilterOptions(Enum):
-    """Specifies which array(s) a filter function receives as input."""
-
-    VALUES = "left_only"
-    TIMESTAMPS = "right_only"
-    BOTH = "both"
-
-
-def apply_ufunc_filter(
-    data: DataInstance,
-    filter_func: Callable,
-    apply_to: FilterOptions = FilterOptions.VALUES,
-) -> DataInstance:
-    """
-    Apply a filter function to a DataInstance.
-
-    Parameters
-    ----------
-    data : DataInstance
-        Input DataInstance
-    filter_func : Callable
-        Function that takes in values and/or timestamps and returns a boolean mask
-    apply_to : FilterOptions, optional
-        Whether to apply the filter to values, timestamps, or both. Default is values
-
-    Returns
-    -------
-    DataInstance
-        Filtered DataInstance
-    """
-    if apply_to == FilterOptions.VALUES:
-        mask = filter_func(data.value_np)
-    elif apply_to == FilterOptions.TIMESTAMPS:
-        mask = filter_func(data.timestamp_np)
-    else:
-        mask = filter_func(data.timestamp_np, data.value_np)
-
-    return DataInstance(
-        timestamp_np=data.timestamp_np[mask],
-        value_np=data.value_np[mask],
-        label=data.label,
-        var_id=data.var_id,
     )
