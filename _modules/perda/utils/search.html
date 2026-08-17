@@ -476,14 +476,14 @@
     <span class="k">if</span> <span class="n">semantic_ready</span> <span class="ow">and</span> <span class="n">_model</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="c1"># Lazy-build card embeddings</span>
-            <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="s2">&quot;_search_embeddings&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">embeddings</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">_search_embeddings</span>
+            <span class="k">if</span> <span class="n">embeddings</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">cards</span> <span class="o">=</span> <span class="p">[</span><span class="n">e</span><span class="o">.</span><span class="n">card</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">deck</span><span class="p">]</span>
                 <span class="n">card_embeddings</span> <span class="o">=</span> <span class="n">_model</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">cards</span><span class="p">,</span> <span class="n">convert_to_numpy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
                 <span class="n">norms</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">card_embeddings</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
                 <span class="n">norms</span><span class="p">[</span><span class="n">norms</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
-                <span class="n">data</span><span class="o">.</span><span class="n">_search_embeddings</span> <span class="o">=</span> <span class="n">card_embeddings</span> <span class="o">/</span> <span class="n">norms</span>
-
-            <span class="n">embeddings</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">_search_embeddings</span>
+                <span class="n">embeddings</span> <span class="o">=</span> <span class="n">card_embeddings</span> <span class="o">/</span> <span class="n">norms</span>
+                <span class="n">data</span><span class="o">.</span><span class="n">_search_embeddings</span> <span class="o">=</span> <span class="n">embeddings</span>
 
             <span class="c1"># Encode query and project</span>
             <span class="n">semantic_query</span> <span class="o">=</span> <span class="n">preprocess_query</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>

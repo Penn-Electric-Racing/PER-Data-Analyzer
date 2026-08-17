@@ -16,10 +16,10 @@ perda.utils
    accel_calculator
    data_summary
    diff
-   filtering
    frequency_analysis
    gps_analysis
    integrate
    preprocessing
-   resampling
    search
+   signal_processing
+   time_alignment

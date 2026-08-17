@@ -272,7 +272,8 @@
 <li class="toctree-l3 current active"><a class="current reference internal" href="#">perda.core_data_structures.data_instance</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.deduplication.html">perda.core_data_structures.deduplication</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.joins.html">perda.core_data_structures.joins</a></li>
-<li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.resampling_helpers.html">perda.core_data_structures.resampling_helpers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.masking.html">perda.core_data_structures.masking</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.resampling.html">perda.core_data_structures.resampling</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.single_run_data.html">perda.core_data_structures.single_run_data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.split_helpers.html">perda.core_data_structures.split_helpers</a></li>
 </ul>
@@ -302,13 +303,13 @@
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.accel_calculator.html">perda.utils.accel_calculator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.data_summary.html">perda.utils.data_summary</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.diff.html">perda.utils.diff</a></li>
-<li class="toctree-l3"><a class="reference internal" href="perda.utils.filtering.html">perda.utils.filtering</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.frequency_analysis.html">perda.utils.frequency_analysis</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.gps_analysis.html">perda.utils.gps_analysis</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.integrate.html">perda.utils.integrate</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.preprocessing.html">perda.utils.preprocessing</a></li>
-<li class="toctree-l3"><a class="reference internal" href="perda.utils.resampling.html">perda.utils.resampling</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.search.html">perda.utils.search</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.utils.signal_processing.html">perda.utils.signal_processing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.utils.time_alignment.html">perda.utils.time_alignment</a></li>
 </ul>
 </details></li>
 </ul>
@@ -410,7 +411,7 @@
 </dl>
 <dl class="py attribute pydantic_field">
 <dt class="sig sig-object py" id="perda.core_data_structures.data_instance.DataInstance.timestamp_np">
-<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">timestamp_np</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">TypeAliasType</span></code></em><em class="property"> <span class="pre">[Required]</span></em><a class="headerlink" href="#perda.core_data_structures.data_instance.DataInstance.timestamp_np" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">timestamp_np</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">NDArray</span></em><em class="property"> <span class="pre">[Required]</span></em><a class="headerlink" href="#perda.core_data_structures.data_instance.DataInstance.timestamp_np" title="Link to this definition">#</a></dt>
 <dd><p>Timestamps as a 1D NumPy array</p>
 <dl class="field-list simple">
 <dt class="field-odd">Validated by<span class="colon">:</span></dt>
@@ -423,7 +424,7 @@
 
 <dl class="py attribute pydantic_field">
 <dt class="sig sig-object py" id="perda.core_data_structures.data_instance.DataInstance.value_np">
-<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">value_np</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">TypeAliasType</span></code></em><em class="property"> <span class="pre">[Required]</span></em><a class="headerlink" href="#perda.core_data_structures.data_instance.DataInstance.value_np" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">value_np</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">NDArray</span></em><em class="property"> <span class="pre">[Required]</span></em><a class="headerlink" href="#perda.core_data_structures.data_instance.DataInstance.value_np" title="Link to this definition">#</a></dt>
 <dd><p>Values as a 1D NumPy array</p>
 <dl class="field-list simple">
 <dt class="field-odd">Validated by<span class="colon">:</span></dt>
@@ -436,19 +437,19 @@
 
 <dl class="py attribute pydantic_field">
 <dt class="sig sig-object py" id="perda.core_data_structures.data_instance.DataInstance.label">
-<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">label</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> <span class="pre">|</span> <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#perda.core_data_structures.data_instance.DataInstance.label" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">label</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span> <span class="pre">|</span> <span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#perda.core_data_structures.data_instance.DataInstance.label" title="Link to this definition">#</a></dt>
 <dd><p>Human-readable label for this variable</p>
 </dd></dl>
 
 <dl class="py attribute pydantic_field">
 <dt class="sig sig-object py" id="perda.core_data_structures.data_instance.DataInstance.var_id">
-<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">var_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> <span class="pre">|</span> <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#perda.core_data_structures.data_instance.DataInstance.var_id" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">var_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span> <span class="pre">|</span> <span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#perda.core_data_structures.data_instance.DataInstance.var_id" title="Link to this definition">#</a></dt>
 <dd><p>Unique variable ID</p>
 </dd></dl>
 
 <dl class="py attribute pydantic_field">
 <dt class="sig sig-object py" id="perda.core_data_structures.data_instance.DataInstance.cpp_name">
-<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cpp_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> <span class="pre">|</span> <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#perda.core_data_structures.data_instance.DataInstance.cpp_name" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cpp_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span> <span class="pre">|</span> <span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#perda.core_data_structures.data_instance.DataInstance.cpp_name" title="Link to this definition">#</a></dt>
 <dd><p>C++ variable name</p>
 </dd></dl>
 
@@ -518,49 +519,31 @@
 </div>
 </dd></dl>
 
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="perda.core_data_structures.data_instance.FilterOptions">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">perda.core_data_structures.data_instance.</span></span><span class="sig-name descname"><span class="pre">FilterOptions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/core_data_structures/data_instance.html#FilterOptions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.core_data_structures.data_instance.FilterOptions" title="Link to this definition">#</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
-<p>Specifies which array(s) a filter function receives as input.</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="perda.core_data_structures.data_instance.FilterOptions.BOTH">
-<span class="sig-name descname"><span class="pre">BOTH</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'both'</span></em><a class="headerlink" href="#perda.core_data_structures.data_instance.FilterOptions.BOTH" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="perda.core_data_structures.data_instance.FilterOptions.TIMESTAMPS">
-<span class="sig-name descname"><span class="pre">TIMESTAMPS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'right_only'</span></em><a class="headerlink" href="#perda.core_data_structures.data_instance.FilterOptions.TIMESTAMPS" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="perda.core_data_structures.data_instance.FilterOptions.VALUES">
-<span class="sig-name descname"><span class="pre">VALUES</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'left_only'</span></em><a class="headerlink" href="#perda.core_data_structures.data_instance.FilterOptions.VALUES" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="perda.core_data_structures.data_instance.apply_ufunc_filter">
-<span class="sig-prename descclassname"><span class="pre">perda.core_data_structures.data_instance.</span></span><span class="sig-name descname"><span class="pre">apply_ufunc_filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">apply_to</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">FilterOptions.VALUES</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/core_data_structures/data_instance.html#apply_ufunc_filter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.core_data_structures.data_instance.apply_ufunc_filter" title="Link to this definition">#</a></dt>
-<dd><p>Apply a filter function to a DataInstance.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="perda.core_data_structures.data_instance.DataInstance.resample_to_freq">
+<span class="sig-name descname"><span class="pre">resample_to_freq</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">freq_hz</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_time_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Timescale.MS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">ResampleMethod.LINEAR</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/core_data_structures/data_instance.html#DataInstance.resample_to_freq"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.core_data_structures.data_instance.DataInstance.resample_to_freq" title="Link to this definition">#</a></dt>
+<dd><p>Return a new DataInstance resampled onto a uniform frequency grid.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>data</strong> (<a class="reference internal" href="#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance"><em>DataInstance</em></a>) – Input DataInstance</p></li>
-<li><p><strong>filter_func</strong> (<em>Callable</em>) – Function that takes in values and/or timestamps and returns a boolean mask</p></li>
-<li><p><strong>apply_to</strong> (<a class="reference internal" href="#perda.core_data_structures.data_instance.FilterOptions" title="perda.core_data_structures.data_instance.FilterOptions"><em>FilterOptions</em></a><em>, </em><em>optional</em>) – Whether to apply the filter to values, timestamps, or both. Default is values</p></li>
+<li><p><strong>freq_hz</strong> (<em>float</em>) – Target sampling frequency in Hz</p></li>
+<li><p><strong>source_time_unit</strong> (<a class="reference internal" href="perda.units.html#perda.units.Timescale" title="perda.units.Timescale"><em>Timescale</em></a><em>, </em><em>optional</em>) – Timestamp unit of <code class="docutils literal notranslate"><span class="pre">timestamp_np</span></code>. Default is <code class="docutils literal notranslate"><span class="pre">Timescale.MS</span></code>.</p></li>
+<li><p><strong>method</strong> (<a class="reference internal" href="perda.core_data_structures.resampling.html#perda.core_data_structures.resampling.ResampleMethod" title="perda.core_data_structures.resampling.ResampleMethod"><em>ResampleMethod</em></a><em>, </em><em>optional</em>) – Interpolation method. Default is LINEAR.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Filtered DataInstance</p>
+<dd class="field-even"><p>New DataInstance with values resampled onto a uniform timestamp grid</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance">DataInstance</a></p>
 </dd>
 </dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">uniform</span> <span class="o">=</span> <span class="n">di</span><span class="o">.</span><span class="n">resample_to_freq</span><span class="p">(</span><span class="n">freq_hz</span><span class="o">=</span><span class="mf">100.0</span><span class="p">,</span> <span class="n">source_time_unit</span><span class="o">=</span><span class="n">Timescale</span><span class="o">.</span><span class="n">US</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="py function">
@@ -641,11 +624,11 @@ Default is True.</p></li>
 <li><p><strong>right</strong> (<a class="reference internal" href="#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance"><em>DataInstance</em></a>) – Right DataInstance</p></li>
 <li><p><strong>tolerance</strong> (<em>float</em>) – Maximum allowed distance between left and right timestamps for a match.
 Timestamps with distance &gt; tolerance are dropped.</p></li>
-<li><p><strong>method</strong> (<a class="reference internal" href="perda.core_data_structures.resampling_helpers.html#perda.core_data_structures.resampling_helpers.ResampleMethod" title="perda.core_data_structures.resampling_helpers.ResampleMethod"><em>ResampleMethod</em></a><em>, </em><em>optional</em>) – Interpolation method for right values. Default is LINEAR.</p></li>
+<li><p><strong>method</strong> (<a class="reference internal" href="perda.core_data_structures.resampling.html#perda.core_data_structures.resampling.ResampleMethod" title="perda.core_data_structures.resampling.ResampleMethod"><em>ResampleMethod</em></a><em>, </em><em>optional</em>) – Interpolation method for right values. Default is LINEAR.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<a class="reference internal" href="#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataInstance</span></code></a>, <a class="reference internal" href="#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataInstance</span></code></a>]</span></p>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>[<a class="reference internal" href="#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataInstance</span></code></a>, <a class="reference internal" href="#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataInstance</span></code></a>]</span></p>
 </dd>
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><ul class="simple">
@@ -669,7 +652,7 @@ To resample onto a uniform frequency grid first, call
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>left</strong> (<a class="reference internal" href="#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance"><em>DataInstance</em></a>) – Left DataInstance (defines the target timestamp grid)</p></li>
 <li><p><strong>right</strong> (<a class="reference internal" href="#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance"><em>DataInstance</em></a><em> or </em><em>list</em><em> of </em><a class="reference internal" href="#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance"><em>DataInstance</em></a>) – One or more right DataInstances to align to the left grid</p></li>
-<li><p><strong>method</strong> (<a class="reference internal" href="perda.core_data_structures.resampling_helpers.html#perda.core_data_structures.resampling_helpers.ResampleMethod" title="perda.core_data_structures.resampling_helpers.ResampleMethod"><em>ResampleMethod</em></a><em>, </em><em>optional</em>) – Interpolation method. Default is LINEAR.</p></li>
+<li><p><strong>method</strong> (<a class="reference internal" href="perda.core_data_structures.resampling.html#perda.core_data_structures.resampling.ResampleMethod" title="perda.core_data_structures.resampling.ResampleMethod"><em>ResampleMethod</em></a><em>, </em><em>optional</em>) – Interpolation method. Default is LINEAR.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -702,7 +685,7 @@ Default is True.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<a class="reference internal" href="#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataInstance</span></code></a>, <a class="reference internal" href="#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataInstance</span></code></a>]</span></p>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>[<a class="reference internal" href="#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataInstance</span></code></a>, <a class="reference internal" href="#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataInstance</span></code></a>]</span></p>
 </dd>
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><ul class="simple">
@@ -773,15 +756,9 @@ Default is True.</p></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.core_data_structures.data_instance.DataInstance.validate_value"><code class="docutils literal notranslate"><span class="pre">DataInstance.validate_value</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.core_data_structures.data_instance.DataInstance.model_post_init"><code class="docutils literal notranslate"><span class="pre">DataInstance.model_post_init()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.core_data_structures.data_instance.DataInstance.trim"><code class="docutils literal notranslate"><span class="pre">DataInstance.trim()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.core_data_structures.data_instance.DataInstance.resample_to_freq"><code class="docutils literal notranslate"><span class="pre">DataInstance.resample_to_freq()</span></code></a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.core_data_structures.data_instance.FilterOptions"><code class="docutils literal notranslate"><span class="pre">FilterOptions</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.core_data_structures.data_instance.FilterOptions.BOTH"><code class="docutils literal notranslate"><span class="pre">FilterOptions.BOTH</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.core_data_structures.data_instance.FilterOptions.TIMESTAMPS"><code class="docutils literal notranslate"><span class="pre">FilterOptions.TIMESTAMPS</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.core_data_structures.data_instance.FilterOptions.VALUES"><code class="docutils literal notranslate"><span class="pre">FilterOptions.VALUES</span></code></a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.core_data_structures.data_instance.apply_ufunc_filter"><code class="docutils literal notranslate"><span class="pre">apply_ufunc_filter()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.core_data_structures.data_instance.apply_ufunc_inner_join"><code class="docutils literal notranslate"><span class="pre">apply_ufunc_inner_join()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.core_data_structures.data_instance.apply_ufunc_left_join"><code class="docutils literal notranslate"><span class="pre">apply_ufunc_left_join()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.core_data_structures.data_instance.apply_ufunc_outer_join"><code class="docutils literal notranslate"><span class="pre">apply_ufunc_outer_join()</span></code></a></li>

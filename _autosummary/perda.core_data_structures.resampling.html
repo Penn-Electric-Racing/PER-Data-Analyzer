@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>perda.utils.frequency_analysis &#8212; PERDA</title>
+    <title>perda.core_data_structures.resampling &#8212; PERDA</title>
   
   
   
@@ -47,11 +47,11 @@
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=f281be69"></script>
     <script src="../_static/design-tabs.js?v=f930bc37"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/perda.utils.frequency_analysis';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/perda.core_data_structures.resampling';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="perda.utils.gps_analysis" href="perda.utils.gps_analysis.html" />
-    <link rel="prev" title="perda.utils.diff" href="perda.utils.diff.html" />
+    <link rel="next" title="perda.core_data_structures.single_run_data" href="perda.core_data_structures.single_run_data.html" />
+    <link rel="prev" title="perda.core_data_structures.masking" href="perda.core_data_structures.masking.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
@@ -268,12 +268,12 @@
 </ul>
 </details></li>
 <li class="toctree-l2"><a class="reference internal" href="perda.constants.html">perda.constants</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="perda.core_data_structures.html">perda.core_data_structures</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="perda.core_data_structures.html">perda.core_data_structures</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.data_instance.html">perda.core_data_structures.data_instance</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.deduplication.html">perda.core_data_structures.deduplication</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.joins.html">perda.core_data_structures.joins</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.masking.html">perda.core_data_structures.masking</a></li>
-<li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.resampling.html">perda.core_data_structures.resampling</a></li>
+<li class="toctree-l3 current active"><a class="current reference internal" href="#">perda.core_data_structures.resampling</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.single_run_data.html">perda.core_data_structures.single_run_data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.split_helpers.html">perda.core_data_structures.split_helpers</a></li>
 </ul>
@@ -299,11 +299,11 @@
 </ul>
 </details></li>
 <li class="toctree-l2"><a class="reference internal" href="perda.units.html">perda.units</a></li>
-<li class="toctree-l2 current active has-children"><a class="reference internal" href="perda.utils.html">perda.utils</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 has-children"><a class="reference internal" href="perda.utils.html">perda.utils</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.accel_calculator.html">perda.utils.accel_calculator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.data_summary.html">perda.utils.data_summary</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.diff.html">perda.utils.diff</a></li>
-<li class="toctree-l3 current active"><a class="current reference internal" href="#">perda.utils.frequency_analysis</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.utils.frequency_analysis.html">perda.utils.frequency_analysis</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.gps_analysis.html">perda.utils.gps_analysis</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.integrate.html">perda.utils.integrate</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.preprocessing.html">perda.utils.preprocessing</a></li>
@@ -361,9 +361,9 @@
     <li class="breadcrumb-item"><a href="perda.html" class="nav-link">perda</a></li>
     
     
-    <li class="breadcrumb-item"><a href="perda.utils.html" class="nav-link">perda.utils</a></li>
+    <li class="breadcrumb-item"><a href="perda.core_data_structures.html" class="nav-link">perda.core_data_structures</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">perda.utils.frequency_analysis</span></li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">perda.core_data_structures.resampling</span></li>
   </ul>
 </nav>
 </div>
@@ -380,43 +380,33 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="module-perda.utils.frequency_analysis">
-<span id="perda-utils-frequency-analysis"></span><h1>perda.utils.frequency_analysis<a class="headerlink" href="#module-perda.utils.frequency_analysis" title="Link to this heading">#</a></h1>
-<dl class="py function">
-<dt class="sig sig-object py" id="perda.utils.frequency_analysis.analyze_frequency">
-<span class="sig-prename descclassname"><span class="pre">perda.utils.frequency_analysis.</span></span><span class="sig-name descname"><span class="pre">analyze_frequency</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_instance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_frequency_hz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_time_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Timescale.MS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gap_threshold_multiplier</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">font_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">FontConfig(large=20,</span> <span class="pre">medium=14,</span> <span class="pre">small=10)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layout_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">LayoutConfig(width=1200,</span> <span class="pre">height=700,</span> <span class="pre">margin={'l':</span> <span class="pre">70,</span> <span class="pre">'r':</span> <span class="pre">50,</span> <span class="pre">'t':</span> <span class="pre">90,</span> <span class="pre">'b':</span> <span class="pre">70},</span> <span class="pre">plot_bgcolor='white',</span> <span class="pre">title_x=0.5,</span> <span class="pre">title_xanchor='center',</span> <span class="pre">title_yanchor='top',</span> <span class="pre">grid_width_per_col=400,</span> <span class="pre">grid_height_per_row=350,</span> <span class="pre">grid_horizontal_spacing=0.08,</span> <span class="pre">grid_vertical_spacing=0.12,</span> <span class="pre">max_display_resolution=50)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">ScatterHistogramPlotConfig(color_scatter='blue',</span> <span class="pre">color_line='crimson',</span> <span class="pre">color_histogram='blue',</span> <span class="pre">histogram_bins=80)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/utils/frequency_analysis.html#analyze_frequency"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.utils.frequency_analysis.analyze_frequency" title="Link to this definition">#</a></dt>
-<dd><p>Analyse the sampling frequency of a DataInstance and return a diagnostic figure.</p>
-<p>Prints a summary of frequency statistics and gap detection, then returns a
-figure with two subplots: instantaneous frequency over time and a frequency
-histogram.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>data_instance</strong> (<a class="reference internal" href="perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance"><em>DataInstance</em></a>) – The DataInstance whose logging cadence to analyse.</p></li>
-<li><p><strong>expected_frequency_hz</strong> (<em>float</em><em> | </em><em>None</em><em>, </em><em>optional</em>) – Nominal expected sampling frequency in Hz. When provided, additional
-diagnostics (frequency error, missed-message estimate, reference lines)
-are included. Default is None.</p></li>
-<li><p><strong>source_time_unit</strong> (<a class="reference internal" href="perda.units.html#perda.units.Timescale" title="perda.units.Timescale"><em>Timescale</em></a><em>, </em><em>optional</em>) – Timestamp unit used in <code class="docutils literal notranslate"><span class="pre">data_instance.timestamp_np</span></code>. Default is ms.</p></li>
-<li><p><strong>gap_threshold_multiplier</strong> (<em>float</em><em>, </em><em>optional</em>) – An interval is flagged as a gap when it exceeds this multiple of the
-expected interval (if <code class="docutils literal notranslate"><span class="pre">expected_frequency_hz</span></code> is given) or the median
-interval. Default is 2.0.</p></li>
-<li><p><strong>font_config</strong> (<a class="reference internal" href="perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.FontConfig" title="perda.plotting.plotting_constants.FontConfig"><em>FontConfig</em></a><em>, </em><em>optional</em>) – Font sizes for plot elements.</p></li>
-<li><p><strong>layout_config</strong> (<a class="reference internal" href="perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.LayoutConfig" title="perda.plotting.plotting_constants.LayoutConfig"><em>LayoutConfig</em></a><em>, </em><em>optional</em>) – Plot dimensions and margins.</p></li>
-<li><p><strong>plot_config</strong> (<a class="reference internal" href="perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.ScatterHistogramPlotConfig" title="perda.plotting.plotting_constants.ScatterHistogramPlotConfig"><em>ScatterHistogramPlotConfig</em></a><em> | </em><em>None</em><em>, </em><em>optional</em>) – Colors and histogram bin count.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Plotly figure with frequency time-series and frequency histogram subplots.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>go.Figure</p>
-</dd>
-</dl>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span> <span class="o">=</span> <span class="n">analyze_frequency</span><span class="p">(</span><span class="n">di</span><span class="p">,</span> <span class="n">expected_frequency_hz</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</pre></div>
-</div>
+  <section id="module-perda.core_data_structures.resampling">
+<span id="perda-core-data-structures-resampling"></span><h1>perda.core_data_structures.resampling<a class="headerlink" href="#module-perda.core_data_structures.resampling" title="Link to this heading">#</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="perda.core_data_structures.resampling.ResampleMethod">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">perda.core_data_structures.resampling.</span></span><span class="sig-name descname"><span class="pre">ResampleMethod</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/core_data_structures/resampling.html#ResampleMethod"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.core_data_structures.resampling.ResampleMethod" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<p>Interpolation strategy used when aligning a series to a target timestamp grid.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="perda.core_data_structures.resampling.ResampleMethod.CUBIC">
+<span class="sig-name descname"><span class="pre">CUBIC</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'cubic'</span></em><a class="headerlink" href="#perda.core_data_structures.resampling.ResampleMethod.CUBIC" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="perda.core_data_structures.resampling.ResampleMethod.LINEAR">
+<span class="sig-name descname"><span class="pre">LINEAR</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'linear'</span></em><a class="headerlink" href="#perda.core_data_structures.resampling.ResampleMethod.LINEAR" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="perda.core_data_structures.resampling.ResampleMethod.NEAREST">
+<span class="sig-name descname"><span class="pre">NEAREST</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'nearest'</span></em><a class="headerlink" href="#perda.core_data_structures.resampling.ResampleMethod.NEAREST" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="perda.core_data_structures.resampling.ResampleMethod.ZOH">
+<span class="sig-name descname"><span class="pre">ZOH</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'zoh'</span></em><a class="headerlink" href="#perda.core_data_structures.resampling.ResampleMethod.ZOH" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
 </section>
@@ -432,20 +422,20 @@ interval. Default is 2.0.</p></li>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="perda.utils.diff.html"
+       href="perda.core_data_structures.masking.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">perda.utils.diff</p>
+        <p class="prev-next-title">perda.core_data_structures.masking</p>
       </div>
     </a>
     <a class="right-next"
-       href="perda.utils.gps_analysis.html"
+       href="perda.core_data_structures.single_run_data.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">perda.utils.gps_analysis</p>
+        <p class="prev-next-title">perda.core_data_structures.single_run_data</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -468,7 +458,13 @@ interval. Default is 2.0.</p></li>
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.utils.frequency_analysis.analyze_frequency"><code class="docutils literal notranslate"><span class="pre">analyze_frequency()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.core_data_structures.resampling.ResampleMethod"><code class="docutils literal notranslate"><span class="pre">ResampleMethod</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.core_data_structures.resampling.ResampleMethod.CUBIC"><code class="docutils literal notranslate"><span class="pre">ResampleMethod.CUBIC</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.core_data_structures.resampling.ResampleMethod.LINEAR"><code class="docutils literal notranslate"><span class="pre">ResampleMethod.LINEAR</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.core_data_structures.resampling.ResampleMethod.NEAREST"><code class="docutils literal notranslate"><span class="pre">ResampleMethod.NEAREST</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.core_data_structures.resampling.ResampleMethod.ZOH"><code class="docutils literal notranslate"><span class="pre">ResampleMethod.ZOH</span></code></a></li>
+</ul>
+</li>
 </ul>
   </nav></div>
 
@@ -476,7 +472,7 @@ interval. Default is 2.0.</p></li>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="../_sources/_autosummary/perda.utils.frequency_analysis.rst.txt"
+      <li><a href="../_sources/_autosummary/perda.core_data_structures.resampling.rst.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div></div>

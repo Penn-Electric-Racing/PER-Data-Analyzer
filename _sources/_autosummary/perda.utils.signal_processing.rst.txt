@@ -1,0 +1,8 @@
+perda.utils.signal\_processing
+==============================
+
+.. automodule:: perda.utils.signal_processing
+   :members:
+   :undoc-members:
+   :show-inheritance:
+

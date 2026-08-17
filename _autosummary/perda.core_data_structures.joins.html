@@ -50,7 +50,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/perda.core_data_structures.joins';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="perda.core_data_structures.resampling_helpers" href="perda.core_data_structures.resampling_helpers.html" />
+    <link rel="next" title="perda.core_data_structures.masking" href="perda.core_data_structures.masking.html" />
     <link rel="prev" title="perda.core_data_structures.deduplication" href="perda.core_data_structures.deduplication.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -272,7 +272,8 @@
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.data_instance.html">perda.core_data_structures.data_instance</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.deduplication.html">perda.core_data_structures.deduplication</a></li>
 <li class="toctree-l3 current active"><a class="current reference internal" href="#">perda.core_data_structures.joins</a></li>
-<li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.resampling_helpers.html">perda.core_data_structures.resampling_helpers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.masking.html">perda.core_data_structures.masking</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.resampling.html">perda.core_data_structures.resampling</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.single_run_data.html">perda.core_data_structures.single_run_data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.split_helpers.html">perda.core_data_structures.split_helpers</a></li>
 </ul>
@@ -302,13 +303,13 @@
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.accel_calculator.html">perda.utils.accel_calculator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.data_summary.html">perda.utils.data_summary</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.diff.html">perda.utils.diff</a></li>
-<li class="toctree-l3"><a class="reference internal" href="perda.utils.filtering.html">perda.utils.filtering</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.frequency_analysis.html">perda.utils.frequency_analysis</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.gps_analysis.html">perda.utils.gps_analysis</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.integrate.html">perda.utils.integrate</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.preprocessing.html">perda.utils.preprocessing</a></li>
-<li class="toctree-l3"><a class="reference internal" href="perda.utils.resampling.html">perda.utils.resampling</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.search.html">perda.utils.search</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.utils.signal_processing.html">perda.utils.signal_processing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.utils.time_alignment.html">perda.utils.time_alignment</a></li>
 </ul>
 </details></li>
 </ul>
@@ -395,11 +396,11 @@ then interpolate right values onto those timestamps.</p>
 <li><p><strong>right_val</strong> (<em>NDArray</em>) – Values for right series</p></li>
 <li><p><strong>tolerance</strong> (<em>float</em>) – Maximum allowed distance to the nearest right timestamp for a left
 timestamp to be kept.</p></li>
-<li><p><strong>method</strong> (<a class="reference internal" href="perda.core_data_structures.resampling_helpers.html#perda.core_data_structures.resampling_helpers.ResampleMethod" title="perda.core_data_structures.resampling_helpers.ResampleMethod"><em>ResampleMethod</em></a><em>, </em><em>optional</em>) – Interpolation method for right values. Default is LINEAR.</p></li>
+<li><p><strong>method</strong> (<a class="reference internal" href="perda.core_data_structures.resampling.html#perda.core_data_structures.resampling.ResampleMethod" title="perda.core_data_structures.resampling.ResampleMethod"><em>ResampleMethod</em></a><em>, </em><em>optional</em>) – Interpolation method for right values. Default is LINEAR.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">TypeAliasType</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">TypeAliasType</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">TypeAliasType</span></code>]</span></p>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">TypeAliasType</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">TypeAliasType</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">TypeAliasType</span></code>]</span></p>
 </dd>
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><ul class="simple">
@@ -423,11 +424,11 @@ timestamp to be kept.</p></li>
 <li><p><strong>left_val</strong> (<em>NDArray</em>) – Values for left series</p></li>
 <li><p><strong>right_ts</strong> (<em>NDArray</em>) – Timestamps for right series</p></li>
 <li><p><strong>right_val</strong> (<em>NDArray</em>) – Values for right series</p></li>
-<li><p><strong>method</strong> (<a class="reference internal" href="perda.core_data_structures.resampling_helpers.html#perda.core_data_structures.resampling_helpers.ResampleMethod" title="perda.core_data_structures.resampling_helpers.ResampleMethod"><em>ResampleMethod</em></a><em>, </em><em>optional</em>) – Interpolation method. Default is LINEAR.</p></li>
+<li><p><strong>method</strong> (<a class="reference internal" href="perda.core_data_structures.resampling.html#perda.core_data_structures.resampling.ResampleMethod" title="perda.core_data_structures.resampling.ResampleMethod"><em>ResampleMethod</em></a><em>, </em><em>optional</em>) – Interpolation method. Default is LINEAR.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">TypeAliasType</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">TypeAliasType</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">TypeAliasType</span></code>]</span></p>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">TypeAliasType</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">TypeAliasType</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">TypeAliasType</span></code>]</span></p>
 </dd>
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><ul class="simple">
@@ -451,14 +452,14 @@ timestamp to be kept.</p></li>
 <li><p><strong>left_val</strong> (<em>NDArray</em>) – Values for left series</p></li>
 <li><p><strong>right_ts</strong> (<em>NDArray</em>) – Timestamps for right series</p></li>
 <li><p><strong>right_val</strong> (<em>NDArray</em>) – Values for right series</p></li>
-<li><p><strong>method</strong> (<a class="reference internal" href="perda.core_data_structures.resampling_helpers.html#perda.core_data_structures.resampling_helpers.ResampleMethod" title="perda.core_data_structures.resampling_helpers.ResampleMethod"><em>ResampleMethod</em></a><em>, </em><em>optional</em>) – Interpolation method. Default is LINEAR.</p></li>
+<li><p><strong>method</strong> (<a class="reference internal" href="perda.core_data_structures.resampling.html#perda.core_data_structures.resampling.ResampleMethod" title="perda.core_data_structures.resampling.ResampleMethod"><em>ResampleMethod</em></a><em>, </em><em>optional</em>) – Interpolation method. Default is LINEAR.</p></li>
 <li><p><strong>drop_nan</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, drop rows where either series has NaN after interpolation.
 Default is True.</p></li>
 <li><p><strong>fill</strong> (<em>float</em><em>, </em><em>optional</em>) – Fill value for NaNs when drop_nan is False. Default is 0.0.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">TypeAliasType</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">TypeAliasType</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">TypeAliasType</span></code>]</span></p>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">TypeAliasType</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">TypeAliasType</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">TypeAliasType</span></code>]</span></p>
 </dd>
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><ul class="simple">
@@ -493,11 +494,11 @@ Default is True.</p></li>
       </div>
     </a>
     <a class="right-next"
-       href="perda.core_data_structures.resampling_helpers.html"
+       href="perda.core_data_structures.masking.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">perda.core_data_structures.resampling_helpers</p>
+        <p class="prev-next-title">perda.core_data_structures.masking</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

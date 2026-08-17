@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>perda.core_data_structures.resampling_helpers &#8212; PERDA</title>
+    <title>perda.core_data_structures.masking &#8212; PERDA</title>
   
   
   
@@ -47,10 +47,10 @@
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=f281be69"></script>
     <script src="../_static/design-tabs.js?v=f930bc37"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/perda.core_data_structures.resampling_helpers';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/perda.core_data_structures.masking';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="perda.core_data_structures.single_run_data" href="perda.core_data_structures.single_run_data.html" />
+    <link rel="next" title="perda.core_data_structures.resampling" href="perda.core_data_structures.resampling.html" />
     <link rel="prev" title="perda.core_data_structures.joins" href="perda.core_data_structures.joins.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -272,7 +272,8 @@
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.data_instance.html">perda.core_data_structures.data_instance</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.deduplication.html">perda.core_data_structures.deduplication</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.joins.html">perda.core_data_structures.joins</a></li>
-<li class="toctree-l3 current active"><a class="current reference internal" href="#">perda.core_data_structures.resampling_helpers</a></li>
+<li class="toctree-l3 current active"><a class="current reference internal" href="#">perda.core_data_structures.masking</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.resampling.html">perda.core_data_structures.resampling</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.single_run_data.html">perda.core_data_structures.single_run_data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.split_helpers.html">perda.core_data_structures.split_helpers</a></li>
 </ul>
@@ -302,13 +303,13 @@
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.accel_calculator.html">perda.utils.accel_calculator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.data_summary.html">perda.utils.data_summary</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.diff.html">perda.utils.diff</a></li>
-<li class="toctree-l3"><a class="reference internal" href="perda.utils.filtering.html">perda.utils.filtering</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.frequency_analysis.html">perda.utils.frequency_analysis</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.gps_analysis.html">perda.utils.gps_analysis</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.integrate.html">perda.utils.integrate</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.preprocessing.html">perda.utils.preprocessing</a></li>
-<li class="toctree-l3"><a class="reference internal" href="perda.utils.resampling.html">perda.utils.resampling</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.search.html">perda.utils.search</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.utils.signal_processing.html">perda.utils.signal_processing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.utils.time_alignment.html">perda.utils.time_alignment</a></li>
 </ul>
 </details></li>
 </ul>
@@ -362,7 +363,7 @@
     
     <li class="breadcrumb-item"><a href="perda.core_data_structures.html" class="nav-link">perda.core_data_structures</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">perda.core_data_structures.resampling_helpers</span></li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">perda.core_data_structures.masking</span></li>
   </ul>
 </nav>
 </div>
@@ -379,33 +380,49 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="module-perda.core_data_structures.resampling_helpers">
-<span id="perda-core-data-structures-resampling-helpers"></span><h1>perda.core_data_structures.resampling_helpers<a class="headerlink" href="#module-perda.core_data_structures.resampling_helpers" title="Link to this heading">#</a></h1>
+  <section id="module-perda.core_data_structures.masking">
+<span id="perda-core-data-structures-masking"></span><h1>perda.core_data_structures.masking<a class="headerlink" href="#module-perda.core_data_structures.masking" title="Link to this heading">#</a></h1>
 <dl class="py class">
-<dt class="sig sig-object py" id="perda.core_data_structures.resampling_helpers.ResampleMethod">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">perda.core_data_structures.resampling_helpers.</span></span><span class="sig-name descname"><span class="pre">ResampleMethod</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/core_data_structures/resampling_helpers.html#ResampleMethod"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.core_data_structures.resampling_helpers.ResampleMethod" title="Link to this definition">#</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
-<p>Interpolation strategy used when aligning a series to a target timestamp grid.</p>
+<dt class="sig sig-object py" id="perda.core_data_structures.masking.FilterOptions">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">perda.core_data_structures.masking.</span></span><span class="sig-name descname"><span class="pre">FilterOptions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/core_data_structures/masking.html#FilterOptions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.core_data_structures.masking.FilterOptions" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<p>Specifies which array(s) a filter function receives as input.</p>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="perda.core_data_structures.resampling_helpers.ResampleMethod.CUBIC">
-<span class="sig-name descname"><span class="pre">CUBIC</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'cubic'</span></em><a class="headerlink" href="#perda.core_data_structures.resampling_helpers.ResampleMethod.CUBIC" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="perda.core_data_structures.masking.FilterOptions.BOTH">
+<span class="sig-name descname"><span class="pre">BOTH</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'both'</span></em><a class="headerlink" href="#perda.core_data_structures.masking.FilterOptions.BOTH" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="perda.core_data_structures.resampling_helpers.ResampleMethod.LINEAR">
-<span class="sig-name descname"><span class="pre">LINEAR</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'linear'</span></em><a class="headerlink" href="#perda.core_data_structures.resampling_helpers.ResampleMethod.LINEAR" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="perda.core_data_structures.masking.FilterOptions.TIMESTAMPS">
+<span class="sig-name descname"><span class="pre">TIMESTAMPS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'right_only'</span></em><a class="headerlink" href="#perda.core_data_structures.masking.FilterOptions.TIMESTAMPS" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="perda.core_data_structures.resampling_helpers.ResampleMethod.NEAREST">
-<span class="sig-name descname"><span class="pre">NEAREST</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'nearest'</span></em><a class="headerlink" href="#perda.core_data_structures.resampling_helpers.ResampleMethod.NEAREST" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="perda.core_data_structures.masking.FilterOptions.VALUES">
+<span class="sig-name descname"><span class="pre">VALUES</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'left_only'</span></em><a class="headerlink" href="#perda.core_data_structures.masking.FilterOptions.VALUES" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
-<dl class="py attribute">
-<dt class="sig sig-object py" id="perda.core_data_structures.resampling_helpers.ResampleMethod.ZOH">
-<span class="sig-name descname"><span class="pre">ZOH</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'zoh'</span></em><a class="headerlink" href="#perda.core_data_structures.resampling_helpers.ResampleMethod.ZOH" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+</dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="perda.core_data_structures.masking.apply_ufunc_filter">
+<span class="sig-prename descclassname"><span class="pre">perda.core_data_structures.masking.</span></span><span class="sig-name descname"><span class="pre">apply_ufunc_filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">apply_to</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">FilterOptions.VALUES</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/core_data_structures/masking.html#apply_ufunc_filter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.core_data_structures.masking.apply_ufunc_filter" title="Link to this definition">#</a></dt>
+<dd><p>Apply a filter function to a DataInstance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<a class="reference internal" href="perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance"><em>DataInstance</em></a>) – Input DataInstance</p></li>
+<li><p><strong>filter_func</strong> (<em>Callable</em>) – Function that takes in values and/or timestamps and returns a boolean mask</p></li>
+<li><p><strong>apply_to</strong> (<a class="reference internal" href="#perda.core_data_structures.masking.FilterOptions" title="perda.core_data_structures.masking.FilterOptions"><em>FilterOptions</em></a><em>, </em><em>optional</em>) – Whether to apply the filter to values, timestamps, or both. Default is values</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Filtered DataInstance</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance">DataInstance</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 </section>
@@ -430,11 +447,11 @@
       </div>
     </a>
     <a class="right-next"
-       href="perda.core_data_structures.single_run_data.html"
+       href="perda.core_data_structures.resampling.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">perda.core_data_structures.single_run_data</p>
+        <p class="prev-next-title">perda.core_data_structures.resampling</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -457,13 +474,13 @@
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.core_data_structures.resampling_helpers.ResampleMethod"><code class="docutils literal notranslate"><span class="pre">ResampleMethod</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.core_data_structures.resampling_helpers.ResampleMethod.CUBIC"><code class="docutils literal notranslate"><span class="pre">ResampleMethod.CUBIC</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.core_data_structures.resampling_helpers.ResampleMethod.LINEAR"><code class="docutils literal notranslate"><span class="pre">ResampleMethod.LINEAR</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.core_data_structures.resampling_helpers.ResampleMethod.NEAREST"><code class="docutils literal notranslate"><span class="pre">ResampleMethod.NEAREST</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.core_data_structures.resampling_helpers.ResampleMethod.ZOH"><code class="docutils literal notranslate"><span class="pre">ResampleMethod.ZOH</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.core_data_structures.masking.FilterOptions"><code class="docutils literal notranslate"><span class="pre">FilterOptions</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.core_data_structures.masking.FilterOptions.BOTH"><code class="docutils literal notranslate"><span class="pre">FilterOptions.BOTH</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.core_data_structures.masking.FilterOptions.TIMESTAMPS"><code class="docutils literal notranslate"><span class="pre">FilterOptions.TIMESTAMPS</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.core_data_structures.masking.FilterOptions.VALUES"><code class="docutils literal notranslate"><span class="pre">FilterOptions.VALUES</span></code></a></li>
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.core_data_structures.masking.apply_ufunc_filter"><code class="docutils literal notranslate"><span class="pre">apply_ufunc_filter()</span></code></a></li>
 </ul>
   </nav></div>
 
@@ -471,7 +488,7 @@
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="../_sources/_autosummary/perda.core_data_structures.resampling_helpers.rst.txt"
+      <li><a href="../_sources/_autosummary/perda.core_data_structures.masking.rst.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div></div>

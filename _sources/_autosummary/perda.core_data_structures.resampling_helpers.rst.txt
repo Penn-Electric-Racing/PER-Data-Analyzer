@@ -1,8 +1,0 @@
-perda.core\_data\_structures.resampling\_helpers
-================================================
-
-.. automodule:: perda.core_data_structures.resampling_helpers
-   :members:
-   :undoc-members:
-   :show-inheritance:
-

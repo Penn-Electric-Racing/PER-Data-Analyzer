@@ -1,0 +1,8 @@
+perda.utils.time\_alignment
+===========================
+
+.. automodule:: perda.utils.time_alignment
+   :members:
+   :undoc-members:
+   :show-inheritance:
+

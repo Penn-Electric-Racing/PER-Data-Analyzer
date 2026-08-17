@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>perda.utils.filtering &#8212; PERDA</title>
+    <title>perda.utils.signal_processing &#8212; PERDA</title>
   
   
   
@@ -46,7 +46,7 @@
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../../_static/copybutton.js?v=f281be69"></script>
     <script src="../../../_static/design-tabs.js?v=f930bc37"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/perda/utils/filtering';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/perda/utils/signal_processing';</script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
@@ -284,7 +284,7 @@
     
     <li class="breadcrumb-item"><a href="../../index.html" class="nav-link">Module code</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">perda.utils.filtering</span></li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">perda.utils.signal_processing</span></li>
   </ul>
 </nav>
 </div>
@@ -301,8 +301,10 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <h1>Source code for perda.utils.filtering</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+  <h1>Source code for perda.utils.signal_processing</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="kn">import</span> <span class="n">float64</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">numpy.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">NDArray</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">scipy.fft</span><span class="w"> </span><span class="kn">import</span> <span class="n">rfft</span><span class="p">,</span> <span class="n">rfftfreq</span>
@@ -314,7 +316,7 @@
 
 
 <div class="viewcode-block" id="apply_sos_filter">
-<a class="viewcode-back" href="../../../_autosummary/perda.utils.filtering.html#perda.utils.filtering.apply_sos_filter">[docs]</a>
+<a class="viewcode-back" href="../../../_autosummary/perda.utils.signal_processing.html#perda.utils.signal_processing.apply_sos_filter">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">apply_sos_filter</span><span class="p">(</span>
     <span class="n">signal</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">sos</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span>
@@ -352,7 +354,7 @@
 
 
 <div class="viewcode-block" id="lowpass_filter">
-<a class="viewcode-back" href="../../../_autosummary/perda.utils.filtering.html#perda.utils.filtering.lowpass_filter">[docs]</a>
+<a class="viewcode-back" href="../../../_autosummary/perda.utils.signal_processing.html#perda.utils.signal_processing.lowpass_filter">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">lowpass_filter</span><span class="p">(</span>
     <span class="n">di</span><span class="p">:</span> <span class="n">DataInstance</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="n">DataInstance</span><span class="p">],</span>
     <span class="n">cutoff_hz</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
@@ -441,7 +443,7 @@
 
 
 <div class="viewcode-block" id="lowpass_filter_by_distance">
-<a class="viewcode-back" href="../../../_autosummary/perda.utils.filtering.html#perda.utils.filtering.lowpass_filter_by_distance">[docs]</a>
+<a class="viewcode-back" href="../../../_autosummary/perda.utils.signal_processing.html#perda.utils.signal_processing.lowpass_filter_by_distance">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">lowpass_filter_by_distance</span><span class="p">(</span>
     <span class="n">di</span><span class="p">:</span> <span class="n">DataInstance</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="n">DataInstance</span><span class="p">],</span>
     <span class="n">distance_di</span><span class="p">:</span> <span class="n">DataInstance</span><span class="p">,</span>
@@ -534,7 +536,7 @@
 
 
 <div class="viewcode-block" id="zscore_filter">
-<a class="viewcode-back" href="../../../_autosummary/perda.utils.filtering.html#perda.utils.filtering.zscore_filter">[docs]</a>
+<a class="viewcode-back" href="../../../_autosummary/perda.utils.signal_processing.html#perda.utils.signal_processing.zscore_filter">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">zscore_filter</span><span class="p">(</span>
     <span class="n">di</span><span class="p">:</span> <span class="n">DataInstance</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="n">DataInstance</span><span class="p">],</span>
     <span class="n">window_s</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
@@ -625,7 +627,7 @@
 
 
 <div class="viewcode-block" id="compute_fft">
-<a class="viewcode-back" href="../../../_autosummary/perda.utils.filtering.html#perda.utils.filtering.compute_fft">[docs]</a>
+<a class="viewcode-back" href="../../../_autosummary/perda.utils.signal_processing.html#perda.utils.signal_processing.compute_fft">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">compute_fft</span><span class="p">(</span>
     <span class="n">di</span><span class="p">:</span> <span class="n">DataInstance</span><span class="p">,</span>
     <span class="n">source_time_unit</span><span class="p">:</span> <span class="n">Timescale</span> <span class="o">=</span> <span class="n">Timescale</span><span class="o">.</span><span class="n">MS</span><span class="p">,</span>

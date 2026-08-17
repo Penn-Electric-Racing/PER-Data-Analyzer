@@ -1,0 +1,8 @@
+perda.core\_data\_structures.masking
+====================================
+
+.. automodule:: perda.core_data_structures.masking
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
