@@ -6,6 +6,7 @@ import numpy as np
 from numpy.typing import NDArray
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
+from ..units import Timescale, _from_seconds
 from .joins import inner_join, left_join, outer_join
 from .resampling import ResampleMethod, _interpolate
 
@@ -200,7 +201,7 @@ class DataInstance(BaseModel):
     def resample_to_freq(
         self,
         freq_hz: float,
-        timestamp_divisor: float,
+        source_time_unit: Timescale = Timescale.MS,
         method: ResampleMethod = ResampleMethod.LINEAR,
     ) -> DataInstance:
         """
@@ -210,8 +211,8 @@ class DataInstance(BaseModel):
         ----------
         freq_hz : float
             Target sampling frequency in Hz
-        timestamp_divisor : float
-            Raw timestamp units per second (e.g. 1e6 for microseconds)
+        source_time_unit : Timescale, optional
+            Timestamp unit of ``timestamp_np``. Default is ``Timescale.MS``.
         method : ResampleMethod, optional
             Interpolation method. Default is LINEAR.
 
@@ -222,9 +223,9 @@ class DataInstance(BaseModel):
 
         Examples
         --------
-        >>> uniform = di.resample_to_freq(freq_hz=100.0, timestamp_divisor=1e6)
+        >>> uniform = di.resample_to_freq(freq_hz=100.0, source_time_unit=Timescale.US)
         """
-        dt = timestamp_divisor / freq_hz
+        dt = _from_seconds(1.0 / freq_hz, source_time_unit)
         target_ts = np.arange(
             self.timestamp_np[0], self.timestamp_np[-1], dt, dtype=np.float64
         ).astype(np.int64)

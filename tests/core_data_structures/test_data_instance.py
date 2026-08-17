@@ -11,6 +11,7 @@ from perda.core_data_structures.data_instance import (
     apply_ufunc_outer_join,
 )
 from perda.core_data_structures.resampling import ResampleMethod
+from perda.units import Timescale
 
 
 @pytest.mark.parametrize(
@@ -318,7 +319,7 @@ def test_resample_to_freq_output_shape(freq_hz, expected_len, expected_spacing):
         timestamp_np=np.array([0, 1_000_000], dtype=np.int64),
         value_np=np.array([0.0, 1.0]),
     )
-    result = di.resample_to_freq(freq_hz=freq_hz, timestamp_divisor=1e6)
+    result = di.resample_to_freq(freq_hz=freq_hz, source_time_unit=Timescale.US)
     assert len(result.timestamp_np) == expected_len
     if expected_spacing is not None and len(result.timestamp_np) > 1:
         np.testing.assert_allclose(
@@ -333,7 +334,7 @@ def test_resample_to_freq_starts_at_first_input_timestamp():
         timestamp_np=np.array([1000, 2000], dtype=np.int64),
         value_np=np.array([0.0, 1.0]),
     )
-    result = di.resample_to_freq(freq_hz=1.0, timestamp_divisor=1e3)
+    result = di.resample_to_freq(freq_hz=1.0, source_time_unit=Timescale.MS)
     assert result.timestamp_np[0] == 1000
 
 
@@ -342,7 +343,7 @@ def test_resample_to_freq_does_not_include_last_timestamp():
         timestamp_np=np.array([0, 1_000_000], dtype=np.int64),
         value_np=np.array([0.0, 1.0]),
     )
-    result = di.resample_to_freq(freq_hz=1.0, timestamp_divisor=1e6)
+    result = di.resample_to_freq(freq_hz=1.0, source_time_unit=Timescale.US)
     assert result.timestamp_np[-1] < di.timestamp_np[-1]
 
 
@@ -351,7 +352,7 @@ def test_resample_to_freq_value_correctness_linear():
         timestamp_np=np.array([0, 1_000_000], dtype=np.int64),
         value_np=np.array([0.0, 10.0]),
     )
-    result = di.resample_to_freq(freq_hz=2.0, timestamp_divisor=1e6)
+    result = di.resample_to_freq(freq_hz=2.0, source_time_unit=Timescale.US)
     np.testing.assert_allclose(result.value_np, [0.0, 5.0])
 
 
@@ -360,7 +361,7 @@ def test_resample_to_freq_single_output_point():
         timestamp_np=np.array([0, 500_000], dtype=np.int64),
         value_np=np.array([0.0, 5.0]),
     )
-    result = di.resample_to_freq(freq_hz=1.0, timestamp_divisor=1e6)
+    result = di.resample_to_freq(freq_hz=1.0, source_time_unit=Timescale.US)
     assert len(result.timestamp_np) == 1
     assert result.timestamp_np[0] == 0
 
@@ -371,9 +372,18 @@ def test_resample_to_freq_zoh_method():
         value_np=np.array([5.0, 10.0]),
     )
     result = di.resample_to_freq(
-        freq_hz=4.0, timestamp_divisor=1e6, method=ResampleMethod.ZOH
+        freq_hz=4.0, source_time_unit=Timescale.US, method=ResampleMethod.ZOH
     )
     np.testing.assert_allclose(result.value_np, [5.0, 5.0, 5.0, 5.0])
+
+
+def test_resample_to_freq_defaults_to_milliseconds():
+    di = DataInstance(
+        timestamp_np=np.array([0, 1000], dtype=np.int64),
+        value_np=np.array([0.0, 10.0]),
+    )
+    result = di.resample_to_freq(freq_hz=2.0)
+    np.testing.assert_array_equal(result.timestamp_np, [0, 500])
 
 
 def test_resample_to_freq_preserves_metadata():
@@ -384,7 +394,7 @@ def test_resample_to_freq_preserves_metadata():
         var_id=7,
         cpp_name="speed_cpp",
     )
-    result = di.resample_to_freq(freq_hz=2.0, timestamp_divisor=1e6)
+    result = di.resample_to_freq(freq_hz=2.0, source_time_unit=Timescale.US)
     assert result.label == "speed"
     assert result.var_id == 7
     assert result.cpp_name == "speed_cpp"
