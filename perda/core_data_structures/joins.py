@@ -1,9 +1,9 @@
-from typing import Tuple
+from __future__ import annotations
 
 import numpy as np
 from numpy.typing import NDArray
 
-from .resampling_helpers import ResampleMethod, _interpolate
+from .resampling import ResampleMethod, _interpolate
 
 
 def left_join(
@@ -13,7 +13,7 @@ def left_join(
     right_val: NDArray,
     *,
     method: ResampleMethod = ResampleMethod.LINEAR,
-) -> Tuple[NDArray, NDArray, NDArray]:
+) -> tuple[NDArray, NDArray, NDArray]:
     """
     Left join: interpolate right values onto the left timestamp grid.
 
@@ -59,7 +59,7 @@ def outer_join(
     method: ResampleMethod = ResampleMethod.LINEAR,
     drop_nan: bool = True,
     fill: float = 0.0,
-) -> Tuple[NDArray, NDArray, NDArray]:
+) -> tuple[NDArray, NDArray, NDArray]:
     """
     Outer join: union of timestamps with interpolation.
 
@@ -120,7 +120,7 @@ def inner_join(
     *,
     tolerance: float,
     method: ResampleMethod = ResampleMethod.LINEAR,
-) -> Tuple[NDArray, NDArray, NDArray]:
+) -> tuple[NDArray, NDArray, NDArray]:
     """
     Inner join: keep only left timestamps that have a right timestamp within tolerance,
     then interpolate right values onto those timestamps.

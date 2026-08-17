@@ -6,12 +6,12 @@ from pydantic import ValidationError
 
 from perda.core_data_structures.data_instance import (
     DataInstance,
-    FilterOptions,
-    apply_ufunc_filter,
     apply_ufunc_inner_join,
     apply_ufunc_left_join,
     apply_ufunc_outer_join,
 )
+from perda.core_data_structures.resampling import ResampleMethod
+from perda.units import Timescale
 
 
 @pytest.mark.parametrize(
@@ -236,52 +236,6 @@ def test_trim_returns_new_instance(di_simple):
     assert result is not di_simple
 
 
-def test_filter_values_keeps_matching_rows(di_simple):
-    result = apply_ufunc_filter(di_simple, lambda v: v > 1.0)
-    np.testing.assert_array_equal(result.value_np, [2.0, 3.0])
-    np.testing.assert_array_equal(result.timestamp_np, [2, 3])
-
-
-def test_filter_timestamps_keeps_matching_rows(di_simple):
-    result = apply_ufunc_filter(
-        di_simple, lambda ts: ts >= 2, apply_to=FilterOptions.TIMESTAMPS
-    )
-    np.testing.assert_array_equal(result.timestamp_np, [2, 3])
-
-
-def test_filter_both_receives_timestamp_and_value(di_simple):
-    result = apply_ufunc_filter(
-        di_simple,
-        lambda ts, v: (ts > 0) & (v < 3.0),
-        apply_to=FilterOptions.BOTH,
-    )
-    np.testing.assert_array_equal(result.timestamp_np, [1, 2])
-
-
-def test_filter_all_false_returns_empty(di_simple):
-    result = apply_ufunc_filter(di_simple, lambda v: v > 1000.0)
-    assert len(result) == 0
-
-
-def test_filter_all_true_returns_unchanged(di_simple):
-    result = apply_ufunc_filter(di_simple, lambda v: v >= 0)
-    np.testing.assert_array_equal(result.timestamp_np, di_simple.timestamp_np)
-    np.testing.assert_array_equal(result.value_np, di_simple.value_np)
-
-
-def test_filter_preserves_metadata(di_with_metadata):
-    result = apply_ufunc_filter(di_with_metadata, lambda v: v > 0)
-    assert result.label == di_with_metadata.label
-    assert result.var_id == di_with_metadata.var_id
-    assert result.cpp_name is None  # apply_ufunc_filter does not forward cpp_name
-
-
-def test_filter_values_default_apply_to(di_simple):
-    result = apply_ufunc_filter(di_simple, lambda v: v == 0.0)
-    assert len(result) == 1
-    assert result.value_np[0] == 0.0
-
-
 def test_apply_ufunc_left_join_add_matches_operator(di_simple, di_sparse):
     result_ufunc = apply_ufunc_left_join(di_simple, di_sparse, np.add)
     result_op = di_simple + di_sparse
@@ -349,3 +303,98 @@ def test_apply_ufunc_inner_join_tolerance_filters_unmatched():
     )
     result = apply_ufunc_inner_join(a, b, np.add, tolerance=3)
     np.testing.assert_array_equal(result.timestamp_np, [0, 10])
+
+
+@pytest.mark.parametrize(
+    "freq_hz, expected_len, expected_spacing",
+    [
+        pytest.param(1.0, 1, None, id="1hz_single_point"),
+        pytest.param(2.0, 2, 500_000, id="2hz_two_points"),
+        pytest.param(4.0, 4, 250_000, id="4hz_four_points"),
+        pytest.param(5.0, 5, 200_000, id="5hz_five_points"),
+    ],
+)
+def test_resample_to_freq_output_shape(freq_hz, expected_len, expected_spacing):
+    di = DataInstance(
+        timestamp_np=np.array([0, 1_000_000], dtype=np.int64),
+        value_np=np.array([0.0, 1.0]),
+    )
+    result = di.resample_to_freq(freq_hz=freq_hz, source_time_unit=Timescale.US)
+    assert len(result.timestamp_np) == expected_len
+    if expected_spacing is not None and len(result.timestamp_np) > 1:
+        np.testing.assert_allclose(
+            np.diff(result.timestamp_np.astype(np.float64)),
+            expected_spacing,
+            rtol=1e-6,
+        )
+
+
+def test_resample_to_freq_starts_at_first_input_timestamp():
+    di = DataInstance(
+        timestamp_np=np.array([1000, 2000], dtype=np.int64),
+        value_np=np.array([0.0, 1.0]),
+    )
+    result = di.resample_to_freq(freq_hz=1.0, source_time_unit=Timescale.MS)
+    assert result.timestamp_np[0] == 1000
+
+
+def test_resample_to_freq_does_not_include_last_timestamp():
+    di = DataInstance(
+        timestamp_np=np.array([0, 1_000_000], dtype=np.int64),
+        value_np=np.array([0.0, 1.0]),
+    )
+    result = di.resample_to_freq(freq_hz=1.0, source_time_unit=Timescale.US)
+    assert result.timestamp_np[-1] < di.timestamp_np[-1]
+
+
+def test_resample_to_freq_value_correctness_linear():
+    di = DataInstance(
+        timestamp_np=np.array([0, 1_000_000], dtype=np.int64),
+        value_np=np.array([0.0, 10.0]),
+    )
+    result = di.resample_to_freq(freq_hz=2.0, source_time_unit=Timescale.US)
+    np.testing.assert_allclose(result.value_np, [0.0, 5.0])
+
+
+def test_resample_to_freq_single_output_point():
+    di = DataInstance(
+        timestamp_np=np.array([0, 500_000], dtype=np.int64),
+        value_np=np.array([0.0, 5.0]),
+    )
+    result = di.resample_to_freq(freq_hz=1.0, source_time_unit=Timescale.US)
+    assert len(result.timestamp_np) == 1
+    assert result.timestamp_np[0] == 0
+
+
+def test_resample_to_freq_zoh_method():
+    di = DataInstance(
+        timestamp_np=np.array([0, 1_000_000], dtype=np.int64),
+        value_np=np.array([5.0, 10.0]),
+    )
+    result = di.resample_to_freq(
+        freq_hz=4.0, source_time_unit=Timescale.US, method=ResampleMethod.ZOH
+    )
+    np.testing.assert_allclose(result.value_np, [5.0, 5.0, 5.0, 5.0])
+
+
+def test_resample_to_freq_defaults_to_milliseconds():
+    di = DataInstance(
+        timestamp_np=np.array([0, 1000], dtype=np.int64),
+        value_np=np.array([0.0, 10.0]),
+    )
+    result = di.resample_to_freq(freq_hz=2.0)
+    np.testing.assert_array_equal(result.timestamp_np, [0, 500])
+
+
+def test_resample_to_freq_preserves_metadata():
+    di = DataInstance(
+        timestamp_np=np.array([0, 1_000_000], dtype=np.int64),
+        value_np=np.array([0.0, 10.0]),
+        label="speed",
+        var_id=7,
+        cpp_name="speed_cpp",
+    )
+    result = di.resample_to_freq(freq_hz=2.0, source_time_unit=Timescale.US)
+    assert result.label == "speed"
+    assert result.var_id == 7
+    assert result.cpp_name == "speed_cpp"
