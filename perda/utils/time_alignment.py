@@ -4,7 +4,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from ..core_data_structures.data_instance import DataInstance
-from ..units import Timescale, _to_seconds
+from ..units import Timescale, to_seconds
 
 
 def apply_time_offset(
@@ -44,7 +44,7 @@ def apply_time_offset(
             results.append(instance)
             continue
 
-        t_s: NDArray = _to_seconds(
+        t_s: NDArray = to_seconds(
             instance.timestamp_np.astype(np.float64), source_time_unit
         )
         signal = instance.value_np.astype(np.float64)

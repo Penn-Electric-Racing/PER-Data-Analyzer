@@ -9,7 +9,7 @@ from ..core_data_structures.single_run_data import SingleRunData
 from ..plotting.data_instance_plotter import *
 from ..plotting.plotting_constants import *
 from ..plotting.subplots import data_instance_subplots
-from ..units import _from_seconds, _to_seconds
+from ..units import from_seconds, to_seconds
 from ..utils.accel_calculator import *
 from ..utils.data_summary import single_run_summary
 from ..utils.diff import diff
@@ -220,12 +220,12 @@ class Analyzer:
         # Convert concat boundaries to seconds for the plotter
         vlines: List[float] | None = None
         if self.data.concat_boundaries:
-            vlines = [_to_seconds(float(b), unit) for b in self.data.concat_boundaries]
+            vlines = [to_seconds(float(b), unit) for b in self.data.concat_boundaries]
 
         # Apply time range filter if specified (convert seconds -> raw units for trim)
         if ts_start is not None or ts_end is not None:
-            start_raw = _from_seconds(ts_start, unit) if ts_start is not None else None
-            end_raw = _from_seconds(ts_end, unit) if ts_end is not None else None
+            start_raw = from_seconds(ts_start, unit) if ts_start is not None else None
+            end_raw = from_seconds(ts_end, unit) if ts_end is not None else None
             var_1_norm = [di.trim(start_raw, end_raw) for di in var_1_norm]
 
         if var_2 is not None:
@@ -333,8 +333,8 @@ class Analyzer:
         """
         unit = self.data.timestamp_unit
 
-        start_raw = _from_seconds(ts_start, unit) if ts_start is not None else None
-        end_raw = _from_seconds(ts_end, unit) if ts_end is not None else None
+        start_raw = from_seconds(ts_start, unit) if ts_start is not None else None
+        end_raw = from_seconds(ts_end, unit) if ts_end is not None else None
 
         normalized_rows: List[List[DataInstance]] = []
         for row_entry in rows:

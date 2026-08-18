@@ -6,7 +6,7 @@ import numpy as np
 from numpy.typing import NDArray
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-from ..units import Timescale, _from_seconds
+from ..units import Timescale, from_seconds
 from .joins import inner_join, left_join, outer_join
 from .resampling import ResampleMethod, _interpolate
 
@@ -225,7 +225,7 @@ class DataInstance(BaseModel):
         --------
         >>> uniform = di.resample_to_freq(freq_hz=100.0, source_time_unit=Timescale.US)
         """
-        dt = _from_seconds(1.0 / freq_hz, source_time_unit)
+        dt = from_seconds(1.0 / freq_hz, source_time_unit)
         target_ts = np.arange(
             self.timestamp_np[0], self.timestamp_np[-1], dt, dtype=np.float64
         ).astype(np.int64)

@@ -4,7 +4,7 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
 from ..core_data_structures.data_instance import DataInstance
-from ..units import Timescale, _to_seconds
+from ..units import Timescale, to_seconds
 from .plotting_constants import (
     DEFAULT_FONT_CONFIG,
     DEFAULT_LAYOUT_CONFIG,
@@ -102,10 +102,10 @@ def plot_single_axis(
         n_points = len(di)
         if max_points is not None and n_points > max_points and max_points > 0:
             step = (n_points + max_points - 1) // max_points
-            timestamps_s = _to_seconds(di.timestamp_np[::step], timestamp_unit)
+            timestamps_s = to_seconds(di.timestamp_np[::step], timestamp_unit)
             values_np = di.value_np[::step]
         else:
-            timestamps_s = _to_seconds(di.timestamp_np, timestamp_unit)
+            timestamps_s = to_seconds(di.timestamp_np, timestamp_unit)
             values_np = di.value_np
 
         fig.add_trace(
@@ -214,10 +214,10 @@ def plot_dual_axis(
         n_points = len(di)
         if max_points is not None and n_points > max_points and max_points > 0:
             step = (n_points + max_points - 1) // max_points
-            timestamps_s = _to_seconds(di.timestamp_np[::step], timestamp_unit)
+            timestamps_s = to_seconds(di.timestamp_np[::step], timestamp_unit)
             values_np = di.value_np[::step]
         else:
-            timestamps_s = _to_seconds(di.timestamp_np, timestamp_unit)
+            timestamps_s = to_seconds(di.timestamp_np, timestamp_unit)
             values_np = di.value_np
 
         fig.add_trace(
@@ -240,10 +240,10 @@ def plot_dual_axis(
         n_points = len(di)
         if max_points is not None and n_points > max_points and max_points > 0:
             step = (n_points + max_points - 1) // max_points
-            timestamps_s = _to_seconds(di.timestamp_np[::step], timestamp_unit)
+            timestamps_s = to_seconds(di.timestamp_np[::step], timestamp_unit)
             values_np = di.value_np[::step]
         else:
-            timestamps_s = _to_seconds(di.timestamp_np, timestamp_unit)
+            timestamps_s = to_seconds(di.timestamp_np, timestamp_unit)
             values_np = di.value_np
 
         fig.add_trace(

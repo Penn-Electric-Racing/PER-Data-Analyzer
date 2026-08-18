@@ -15,7 +15,7 @@ class Timescale(Enum):
     S = "s"
 
 
-def _to_seconds(timestamp: Numeric, source_time_unit: Timescale) -> Numeric:
+def to_seconds(timestamp: Numeric, source_time_unit: Timescale) -> Numeric:
     """Convert a timestamp from the given unit to seconds.
 
     Parameters
@@ -37,7 +37,7 @@ def _to_seconds(timestamp: Numeric, source_time_unit: Timescale) -> Numeric:
     return timestamp
 
 
-def _from_seconds(timestamp_s: Numeric, target_time_unit: Timescale) -> Numeric:
+def from_seconds(timestamp_s: Numeric, target_time_unit: Timescale) -> Numeric:
     """Convert a timestamp from seconds to the given unit.
 
     Parameters
@@ -95,7 +95,7 @@ def convert_time(
     >>> convert_time(5000.0, Timescale.MS, Timescale.S)
     5.0
     """
-    return _from_seconds(_to_seconds(timestamp, source_time_unit), target_time_unit)
+    return from_seconds(to_seconds(timestamp, source_time_unit), target_time_unit)
 
 
 @overload

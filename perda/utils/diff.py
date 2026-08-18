@@ -16,7 +16,7 @@ from ..plotting.plotting_constants import (
     FontConfig,
     LayoutConfig,
 )
-from ..units import _to_seconds
+from ..units import to_seconds
 
 
 def _pct(num: float, den: float) -> float:
@@ -253,10 +253,10 @@ def diff(
         total=len(shared_cpp_name_to_instances),
     )
     for _, (rpi_di, server_di) in pbar:
-        rpi_ts_s = _to_seconds(
+        rpi_ts_s = to_seconds(
             rpi_di.timestamp_np.astype(np.float64), rpi_data.timestamp_unit
         )
-        server_ts_s = _to_seconds(
+        server_ts_s = to_seconds(
             server_di.timestamp_np.astype(np.float64), server_data.timestamp_unit
         )
         rpi_extra_ts, server_extra_ts, var_diff_ts, var_matched_ts = (
