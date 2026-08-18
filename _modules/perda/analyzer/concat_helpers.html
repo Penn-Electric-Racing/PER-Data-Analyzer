@@ -313,7 +313,7 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_upscale_to_us</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">SingleRunData</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SingleRunData</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Convert a millisecond-unit SingleRunData to microseconds in place.</span>
 
 <span class="sd">    Parameters</span>
@@ -325,7 +325,7 @@
 <span class="sd">    -------</span>
 <span class="sd">    SingleRunData</span>
 <span class="sd">        New SingleRunData with all timestamps scaled to microseconds</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">new_instances</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">for</span> <span class="n">var_id</span><span class="p">,</span> <span class="n">di</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">id_to_instance</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="n">new_instances</span><span class="p">[</span><span class="n">var_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">DataInstance</span><span class="p">(</span>
@@ -354,10 +354,10 @@
     <span class="n">second</span><span class="p">:</span> <span class="n">SingleRunData</span><span class="p">,</span>
     <span class="n">gap</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SingleRunData</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Concatenate two SingleRunData objects sequentially in time.</span>
 
-<span class="sd">    The second run&#39;s timestamps are shifted so they start ``gap`` units after</span>
+<span class="sd">    The second run's timestamps are shifted so they start ``gap`` units after</span>
 <span class="sd">    the first run ends.  Variables are matched by ``cpp_name``; unmatched</span>
 <span class="sd">    variables appear in the result with data from only one run.</span>
 
@@ -381,7 +381,7 @@
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
 <span class="sd">    &gt;&gt;&gt; merged = concat_single_run_data(aly1.data, aly2.data)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># Reconcile timestamp units</span>
     <span class="k">if</span> <span class="n">first</span><span class="o">.</span><span class="n">timestamp_unit</span> <span class="o">!=</span> <span class="n">second</span><span class="o">.</span><span class="n">timestamp_unit</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">first</span><span class="o">.</span><span class="n">timestamp_unit</span> <span class="o">==</span> <span class="n">Timescale</span><span class="o">.</span><span class="n">MS</span><span class="p">:</span>
@@ -397,16 +397,16 @@
     <span class="n">first_by_name</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">DataInstance</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">first_descript</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">for</span> <span class="n">var_id</span><span class="p">,</span> <span class="n">di</span> <span class="ow">in</span> <span class="n">first</span><span class="o">.</span><span class="n">id_to_instance</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-        <span class="n">name</span> <span class="o">=</span> <span class="n">first</span><span class="o">.</span><span class="n">id_to_cpp_name</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">var_id</span><span class="p">,</span> <span class="n">di</span><span class="o">.</span><span class="n">cpp_name</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">first</span><span class="o">.</span><span class="n">id_to_cpp_name</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">var_id</span><span class="p">,</span> <span class="n">di</span><span class="o">.</span><span class="n">cpp_name</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">)</span>
         <span class="n">first_by_name</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">di</span>
-        <span class="n">first_descript</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">first</span><span class="o">.</span><span class="n">id_to_descript</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">var_id</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="n">first_descript</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">first</span><span class="o">.</span><span class="n">id_to_descript</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">var_id</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span>
 
     <span class="n">second_by_name</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">DataInstance</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">second_descript</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">for</span> <span class="n">var_id</span><span class="p">,</span> <span class="n">di</span> <span class="ow">in</span> <span class="n">second</span><span class="o">.</span><span class="n">id_to_instance</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-        <span class="n">name</span> <span class="o">=</span> <span class="n">second</span><span class="o">.</span><span class="n">id_to_cpp_name</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">var_id</span><span class="p">,</span> <span class="n">di</span><span class="o">.</span><span class="n">cpp_name</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">second</span><span class="o">.</span><span class="n">id_to_cpp_name</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">var_id</span><span class="p">,</span> <span class="n">di</span><span class="o">.</span><span class="n">cpp_name</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">)</span>
         <span class="n">second_by_name</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">di</span>
-        <span class="n">second_descript</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">second</span><span class="o">.</span><span class="n">id_to_descript</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">var_id</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="n">second_descript</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">second</span><span class="o">.</span><span class="n">id_to_descript</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">var_id</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span>
 
     <span class="c1"># Union of all cpp_names, preserving first-run order then second-run extras</span>
     <span class="n">all_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">first_by_name</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
@@ -482,7 +482,7 @@
     <span class="n">second</span><span class="p">:</span> <span class="n">Analyzer</span><span class="p">,</span>
     <span class="n">gap</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Analyzer</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Concatenate two Analyzers sequentially in time.</span>
 
 <span class="sd">    Variables are matched by cpp_name. Unmatched variables are kept with</span>
@@ -506,8 +506,8 @@
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
 <span class="sd">    &gt;&gt;&gt; merged = concat(aly1, aly2)</span>
-<span class="sd">    &gt;&gt;&gt; merged.plot(&quot;ams.pack.voltage&quot;)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    &gt;&gt;&gt; merged.plot("ams.pack.voltage")</span>
+<span class="sd">    """</span>
     <span class="n">merged</span> <span class="o">=</span> <span class="nb">object</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="n">Analyzer</span><span class="p">)</span>
     <span class="n">merged</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">_concat_single_run_data</span><span class="p">(</span><span class="n">first</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">second</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">gap</span><span class="o">=</span><span class="n">gap</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">merged</span></div>

@@ -316,7 +316,7 @@
 <div class="viewcode-block" id="SingleRunData">
 <a class="viewcode-back" href="../../../_autosummary/perda.core_data_structures.single_run_data.html#perda.core_data_structures.single_run_data.SingleRunData">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">SingleRunData</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Pydantic model to store parsed CSV data with dictionary-like lookup.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Pydantic model to store parsed CSV data with dictionary-like lookup."""</span>
 
     <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span><span class="n">arbitrary_types_allowed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
@@ -326,41 +326,41 @@
 
     <span class="c1"># Core data storage</span>
     <span class="n">id_to_instance</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">DataInstance</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
-        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Mapping from variable ID to DataInstance&quot;</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">"Mapping from variable ID to DataInstance"</span>
     <span class="p">)</span>
     <span class="n">cpp_name_to_id</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
-        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Mapping from variable name to variable ID&quot;</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">"Mapping from variable name to variable ID"</span>
     <span class="p">)</span>
     <span class="n">id_to_cpp_name</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
-        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Mapping from variable ID to variable name&quot;</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">"Mapping from variable ID to variable name"</span>
     <span class="p">)</span>
     <span class="n">id_to_descript</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
-        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Mapping from variable ID to variable description&quot;</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">"Mapping from variable ID to variable description"</span>
     <span class="p">)</span>
 
     <span class="c1"># Metadata</span>
     <span class="n">creation_time</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
         <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Timestamp when this run log was recorded&quot;</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">"Timestamp when this run log was recorded"</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">total_data_points</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
-        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Total number of data points across all variables&quot;</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">"Total number of data points across all variables"</span>
     <span class="p">)</span>
-    <span class="n">data_start_time</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Start timestamp in log timestamp unit&quot;</span><span class="p">)</span>
-    <span class="n">data_end_time</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;End timestamp in log timestamp unit&quot;</span><span class="p">)</span>
+    <span class="n">data_start_time</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">"Start timestamp in log timestamp unit"</span><span class="p">)</span>
+    <span class="n">data_end_time</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">"End timestamp in log timestamp unit"</span><span class="p">)</span>
     <span class="n">timestamp_unit</span><span class="p">:</span> <span class="n">Timescale</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
         <span class="n">default</span><span class="o">=</span><span class="n">Timescale</span><span class="o">.</span><span class="n">MS</span><span class="p">,</span>
-        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Timestamp logging unit for this run (ms/us)&quot;</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">"Timestamp logging unit for this run (ms/us)"</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">concat_boundaries</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
         <span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span>
-        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Timestamps where concatenated runs begin (post-shift)&quot;</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">"Timestamps where concatenated runs begin (post-shift)"</span><span class="p">,</span>
     <span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">input_var_id_name</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">DataInstance</span><span class="p">]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataInstance</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Dictionary-like access to DataInstance by variable ID or variable name.</span>
 
 <span class="sd">        Parameters</span>
@@ -372,7 +372,7 @@
 <span class="sd">        -------</span>
 <span class="sd">        DataInstance</span>
 <span class="sd">            DataInstance corresponding to the input</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="c1"># Dummy return for plotting function for convenience</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_var_id_name</span><span class="p">,</span> <span class="n">DataInstance</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">input_var_id_name</span>
@@ -380,20 +380,20 @@
         <span class="c1"># If input is a variable ID</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_var_id_name</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">input_var_id_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">id_to_instance</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot find variable ID: </span><span class="si">{</span><span class="n">input_var_id_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Cannot find variable ID: </span><span class="si">{</span><span class="n">input_var_id_name</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">id_to_instance</span><span class="p">[</span><span class="n">input_var_id_name</span><span class="p">]</span>
 
         <span class="c1"># If input is variable name</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_var_id_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">input_var_id_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cpp_name_to_id</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot find variable name: </span><span class="si">{</span><span class="n">input_var_id_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Cannot find variable name: </span><span class="si">{</span><span class="n">input_var_id_name</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">id_to_instance</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">cpp_name_to_id</span><span class="p">[</span><span class="n">input_var_id_name</span><span class="p">]]</span>
 
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Input must be a string, int, or DataInstance.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Input must be a string, int, or DataInstance."</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cpp_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">di</span><span class="p">:</span> <span class="n">DataInstance</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Add or replace a variable using dictionary-style assignment.</span>
 
 <span class="sd">        Dispatches to ``replace`` if ``cpp_name`` already exists, else ``add``.</span>
@@ -407,9 +407,9 @@
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
-<span class="sd">        &gt;&gt;&gt; data[&quot;my.new.var&quot;] = DataInstance(timestamp_np=ts, value_np=vals, label=&quot;My var&quot;, cpp_name=&quot;my.new.var&quot;)</span>
-<span class="sd">        &gt;&gt;&gt; data[&quot;my.existing.var&quot;] = updated_di</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        &gt;&gt;&gt; data["my.new.var"] = DataInstance(timestamp_np=ts, value_np=vals, label="My var", cpp_name="my.new.var")</span>
+<span class="sd">        &gt;&gt;&gt; data["my.existing.var"] = updated_di</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="n">cpp_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">cpp_name</span><span class="p">,</span> <span class="n">di</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -418,7 +418,7 @@
 <div class="viewcode-block" id="SingleRunData.add">
 <a class="viewcode-back" href="../../../_autosummary/perda.core_data_structures.single_run_data.html#perda.core_data_structures.single_run_data.SingleRunData.add">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cpp_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">di</span><span class="p">:</span> <span class="n">DataInstance</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Insert a new derived DataInstance using a synthetic negative ID.</span>
 
 <span class="sd">        Parameters</span>
@@ -427,16 +427,16 @@
 <span class="sd">            C++ variable name key for the new variable.</span>
 <span class="sd">        di : DataInstance</span>
 <span class="sd">            DataInstance to insert.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="n">cpp_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">cpp_name</span><span class="si">}</span><span class="s2">&#39; already exists; use replace() to overwrite.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"'</span><span class="si">{</span><span class="n">cpp_name</span><span class="si">}</span><span class="s2">' already exists; use replace() to overwrite."</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">di</span><span class="o">.</span><span class="n">cpp_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">di</span><span class="o">.</span><span class="n">cpp_name</span> <span class="o">!=</span> <span class="n">cpp_name</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Using </span><span class="si">{</span><span class="n">cpp_name</span><span class="si">}</span><span class="s2"> as DataInstance.cpp_name&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Using </span><span class="si">{</span><span class="n">cpp_name</span><span class="si">}</span><span class="s2"> as DataInstance.cpp_name"</span><span class="p">)</span>
 
         <span class="n">synthetic_id</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id_to_instance</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">di</span><span class="o">.</span><span class="n">var_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">di</span><span class="o">.</span><span class="n">var_id</span> <span class="o">!=</span> <span class="n">synthetic_id</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Inserting DataInstance with new var_id </span><span class="si">{</span><span class="n">synthetic_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Inserting DataInstance with new var_id </span><span class="si">{</span><span class="n">synthetic_id</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
         <span class="n">stored</span> <span class="o">=</span> <span class="n">DataInstance</span><span class="p">(</span>
             <span class="n">timestamp_np</span><span class="o">=</span><span class="n">di</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">,</span>
@@ -448,7 +448,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">id_to_instance</span><span class="p">[</span><span class="n">synthetic_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">stored</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cpp_name_to_id</span><span class="p">[</span><span class="n">cpp_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">synthetic_id</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">id_to_cpp_name</span><span class="p">[</span><span class="n">synthetic_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">cpp_name</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">id_to_descript</span><span class="p">[</span><span class="n">synthetic_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">di</span><span class="o">.</span><span class="n">label</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">id_to_descript</span><span class="p">[</span><span class="n">synthetic_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">di</span><span class="o">.</span><span class="n">label</span> <span class="ow">or</span> <span class="s2">""</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_search_deck</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_search_embeddings</span> <span class="o">=</span> <span class="kc">None</span></div>
 
@@ -456,7 +456,7 @@
 <div class="viewcode-block" id="SingleRunData.replace">
 <a class="viewcode-back" href="../../../_autosummary/perda.core_data_structures.single_run_data.html#perda.core_data_structures.single_run_data.SingleRunData.replace">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">replace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cpp_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">di</span><span class="p">:</span> <span class="n">DataInstance</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Overwrite the values of an existing variable in-place.</span>
 
 <span class="sd">        Parameters</span>
@@ -465,21 +465,21 @@
 <span class="sd">          C++ variable name of the variable to replace.</span>
 <span class="sd">        di : DataInstance</span>
 <span class="sd">          DataInstance whose ``value_np`` that replaces the stored one.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="n">cpp_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">cpp_name</span><span class="si">}</span><span class="s2">&#39; not found; use add() to insert a new variable.&quot;</span>
+                <span class="sa">f</span><span class="s2">"'</span><span class="si">{</span><span class="n">cpp_name</span><span class="si">}</span><span class="s2">' not found; use add() to insert a new variable."</span>
             <span class="p">)</span>
 
         <span class="n">var_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cpp_name_to_id</span><span class="p">[</span><span class="n">cpp_name</span><span class="p">]</span>
         <span class="n">old</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">id_to_instance</span><span class="p">[</span><span class="n">var_id</span><span class="p">]</span>
 
         <span class="k">if</span> <span class="n">di</span><span class="o">.</span><span class="n">cpp_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">di</span><span class="o">.</span><span class="n">cpp_name</span> <span class="o">!=</span> <span class="n">cpp_name</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Retaining old DataInstance.cpp_name </span><span class="si">{</span><span class="n">cpp_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Retaining old DataInstance.cpp_name </span><span class="si">{</span><span class="n">cpp_name</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">di</span><span class="o">.</span><span class="n">var_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">di</span><span class="o">.</span><span class="n">var_id</span> <span class="o">!=</span> <span class="n">var_id</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Retaining old DataInstance.var_id </span><span class="si">{</span><span class="n">var_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Retaining old DataInstance.var_id </span><span class="si">{</span><span class="n">var_id</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">di</span><span class="o">.</span><span class="n">label</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">di</span><span class="o">.</span><span class="n">label</span> <span class="o">!=</span> <span class="n">old</span><span class="o">.</span><span class="n">label</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Retaining old DataInstance.label </span><span class="si">{</span><span class="n">old</span><span class="o">.</span><span class="n">label</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Retaining old DataInstance.label </span><span class="si">{</span><span class="n">old</span><span class="o">.</span><span class="n">label</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">id_to_instance</span><span class="p">[</span><span class="n">var_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">DataInstance</span><span class="p">(</span>
             <span class="n">timestamp_np</span><span class="o">=</span><span class="n">di</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">,</span>
@@ -493,7 +493,7 @@
 
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_var_id_name</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Check if variable ID or variable name exists in the data.</span>
 
 <span class="sd">        Parameters</span>
@@ -505,7 +505,7 @@
 <span class="sd">        -------</span>
 <span class="sd">        bool</span>
 <span class="sd">            True if the variable ID or variable name exists in the data</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="p">[</span><span class="n">input_var_id_name</span><span class="p">]</span>
             <span class="k">return</span> <span class="kc">True</span>

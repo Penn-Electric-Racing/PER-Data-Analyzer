@@ -312,7 +312,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">scipy.signal</span><span class="w"> </span><span class="kn">import</span> <span class="n">butter</span><span class="p">,</span> <span class="n">sosfiltfilt</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">..core_data_structures.data_instance</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataInstance</span><span class="p">,</span> <span class="n">left_join_data_instances</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">..units</span><span class="w"> </span><span class="kn">import</span> <span class="n">Timescale</span><span class="p">,</span> <span class="n">_to_seconds</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..units</span><span class="w"> </span><span class="kn">import</span> <span class="n">Timescale</span><span class="p">,</span> <span class="n">to_seconds</span>
 
 
 <div class="viewcode-block" id="apply_sos_filter">
@@ -322,7 +322,7 @@
     <span class="n">sos</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">order</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Apply a second-order-section filter with NaN masking.</span>
+<span class="w">    </span><span class="sd">"""Apply a second-order-section filter with NaN masking.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -338,13 +338,13 @@
 <span class="sd">    NDArray[float64] | None</span>
 <span class="sd">        Filtered signal with NaN preserved at original NaN positions, or</span>
 <span class="sd">        ``None`` if there are too few valid samples to filter.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">valid</span> <span class="o">=</span> <span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">signal</span><span class="p">)</span>
     <span class="n">min_samples</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">order</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
 
     <span class="n">count</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">valid</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>
     <span class="k">if</span> <span class="n">count</span> <span class="o">&lt;</span> <span class="n">min_samples</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Too few valid points &quot;</span> <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">count</span><span class="si">}</span><span class="s2"> &lt; </span><span class="si">{</span><span class="n">min_samples</span><span class="si">}</span><span class="s2">), skipping&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Too few valid points "</span> <span class="sa">f</span><span class="s2">"(</span><span class="si">{</span><span class="n">count</span><span class="si">}</span><span class="s2"> &lt; </span><span class="si">{</span><span class="n">min_samples</span><span class="si">}</span><span class="s2">), skipping"</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">None</span>
 
     <span class="n">filtered</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
@@ -361,7 +361,7 @@
     <span class="n">source_time_unit</span><span class="p">:</span> <span class="n">Timescale</span> <span class="o">=</span> <span class="n">Timescale</span><span class="o">.</span><span class="n">MS</span><span class="p">,</span>
     <span class="n">order</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataInstance</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="n">DataInstance</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Apply a Butterworth lowpass filter in the time domain.</span>
+<span class="w">    </span><span class="sd">"""Apply a Butterworth lowpass filter in the time domain.</span>
 
 <span class="sd">    Returns a new DataInstance (or list thereof) with filtered values.</span>
 <span class="sd">    Original timestamps and metadata are preserved. NaN positions in the</span>
@@ -370,7 +370,7 @@
 <span class="sd">    To re-filter at a different cutoff without stacking, pass the original</span>
 <span class="sd">    (pre-filter) DataInstance again::</span>
 
-<span class="sd">        di_original = aly.data[&quot;pcm.wheelSpeeds.frontRight&quot;]</span>
+<span class="sd">        di_original = aly.data["pcm.wheelSpeeds.frontRight"]</span>
 <span class="sd">        di_10hz = lowpass_filter(di_original, cutoff_hz=10.0)</span>
 <span class="sd">        di_5hz  = lowpass_filter(di_original, cutoff_hz=5.0)   # not stacked</span>
 
@@ -395,18 +395,18 @@
 <span class="sd">    --------</span>
 <span class="sd">    &gt;&gt;&gt; di_filtered = lowpass_filter(di, cutoff_hz=10.0)</span>
 <span class="sd">    &gt;&gt;&gt; di_filtered = lowpass_filter([di_a, di_b], cutoff_hz=5.0)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">di_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">di</span><span class="p">]</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">di</span><span class="p">,</span> <span class="n">DataInstance</span><span class="p">)</span> <span class="k">else</span> <span class="n">di</span>
 
     <span class="n">results</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">DataInstance</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
 
     <span class="k">for</span> <span class="n">instance</span> <span class="ow">in</span> <span class="n">di_list</span><span class="p">:</span>
-        <span class="n">ts_s</span> <span class="o">=</span> <span class="n">_to_seconds</span><span class="p">(</span><span class="n">instance</span><span class="o">.</span><span class="n">timestamp_np</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span> <span class="n">source_time_unit</span><span class="p">)</span>
+        <span class="n">ts_s</span> <span class="o">=</span> <span class="n">to_seconds</span><span class="p">(</span><span class="n">instance</span><span class="o">.</span><span class="n">timestamp_np</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span> <span class="n">source_time_unit</span><span class="p">)</span>
         <span class="n">dt</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">ts_s</span><span class="p">)))</span>
         <span class="k">if</span> <span class="n">dt</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">dt</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;Non-positive median time step &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">dt</span><span class="si">:</span><span class="s2">.6f</span><span class="si">}</span><span class="s2"> s). Cannot determine sample rate.&quot;</span>
+                <span class="s2">"Non-positive median time step "</span>
+                <span class="sa">f</span><span class="s2">"(</span><span class="si">{</span><span class="n">dt</span><span class="si">:</span><span class="s2">.6f</span><span class="si">}</span><span class="s2"> s). Cannot determine sample rate."</span>
             <span class="p">)</span>
 
         <span class="n">fs</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">dt</span>
@@ -414,13 +414,13 @@
 
         <span class="k">if</span> <span class="n">cutoff_hz</span> <span class="o">&gt;=</span> <span class="n">nyq</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Cutoff frequency (</span><span class="si">{</span><span class="n">cutoff_hz</span><span class="si">}</span><span class="s2"> Hz) greater than Nyquist frequency&quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">nyq</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> Hz), skipping filter&quot;</span>
+                <span class="sa">f</span><span class="s2">"Cutoff frequency (</span><span class="si">{</span><span class="n">cutoff_hz</span><span class="si">}</span><span class="s2"> Hz) greater than Nyquist frequency"</span>
+                <span class="sa">f</span><span class="s2">"(</span><span class="si">{</span><span class="n">nyq</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> Hz), skipping filter"</span>
             <span class="p">)</span>
             <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">instance</span><span class="p">)</span>
             <span class="k">continue</span>
 
-        <span class="n">sos</span> <span class="o">=</span> <span class="n">butter</span><span class="p">(</span><span class="n">order</span><span class="p">,</span> <span class="n">cutoff_hz</span> <span class="o">/</span> <span class="n">nyq</span><span class="p">,</span> <span class="n">btype</span><span class="o">=</span><span class="s2">&quot;low&quot;</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="s2">&quot;sos&quot;</span><span class="p">)</span>
+        <span class="n">sos</span> <span class="o">=</span> <span class="n">butter</span><span class="p">(</span><span class="n">order</span><span class="p">,</span> <span class="n">cutoff_hz</span> <span class="o">/</span> <span class="n">nyq</span><span class="p">,</span> <span class="n">btype</span><span class="o">=</span><span class="s2">"low"</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="s2">"sos"</span><span class="p">)</span>
         <span class="n">signal</span> <span class="o">=</span> <span class="n">instance</span><span class="o">.</span><span class="n">value_np</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
         <span class="n">filtered</span> <span class="o">=</span> <span class="n">apply_sos_filter</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span> <span class="n">sos</span><span class="p">,</span> <span class="n">order</span><span class="p">)</span>
 
@@ -432,7 +432,7 @@
             <span class="n">DataInstance</span><span class="p">(</span>
                 <span class="n">timestamp_np</span><span class="o">=</span><span class="n">instance</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">,</span>
                 <span class="n">value_np</span><span class="o">=</span><span class="n">filtered</span><span class="p">,</span>
-                <span class="n">label</span><span class="o">=</span><span class="n">instance</span><span class="o">.</span><span class="n">label</span> <span class="ow">or</span> <span class="sa">f</span><span class="s2">&quot;var_id=</span><span class="si">{</span><span class="n">instance</span><span class="o">.</span><span class="n">var_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="n">label</span><span class="o">=</span><span class="n">instance</span><span class="o">.</span><span class="n">label</span> <span class="ow">or</span> <span class="sa">f</span><span class="s2">"var_id=</span><span class="si">{</span><span class="n">instance</span><span class="o">.</span><span class="n">var_id</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
                 <span class="n">var_id</span><span class="o">=</span><span class="n">instance</span><span class="o">.</span><span class="n">var_id</span><span class="p">,</span>
                 <span class="n">cpp_name</span><span class="o">=</span><span class="n">instance</span><span class="o">.</span><span class="n">cpp_name</span><span class="p">,</span>
             <span class="p">)</span>
@@ -450,11 +450,11 @@
     <span class="n">cutoff_freq_per_meter</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">order</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataInstance</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="n">DataInstance</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Apply a Butterworth lowpass filter in the spatial domain.</span>
+<span class="w">    </span><span class="sd">"""Apply a Butterworth lowpass filter in the spatial domain.</span>
 
 <span class="sd">    The sample rate is derived from a cumulative-distance DataInstance</span>
 <span class="sd">    rather than timestamps.  ``distance_di`` is interpolated onto each</span>
-<span class="sd">    signal&#39;s timestamp grid before use, so the two need not share the</span>
+<span class="sd">    signal's timestamp grid before use, so the two need not share the</span>
 <span class="sd">    same grid.</span>
 
 <span class="sd">    Parameters</span>
@@ -477,12 +477,12 @@
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
 <span class="sd">    &gt;&gt;&gt; di_filtered = lowpass_filter_by_distance(di, distance_di, cutoff_freq_per_meter=0.05)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">di_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">di</span><span class="p">]</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">di</span><span class="p">,</span> <span class="n">DataInstance</span><span class="p">)</span> <span class="k">else</span> <span class="n">di</span>
     <span class="n">results</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">DataInstance</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
 
     <span class="k">for</span> <span class="n">instance</span> <span class="ow">in</span> <span class="n">di_list</span><span class="p">:</span>
-        <span class="c1"># Align distance onto the signal&#39;s timestamp grid</span>
+        <span class="c1"># Align distance onto the signal's timestamp grid</span>
         <span class="n">_</span><span class="p">,</span> <span class="n">distance_aligned</span> <span class="o">=</span> <span class="n">left_join_data_instances</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="n">distance_di</span><span class="p">)</span>
         <span class="n">dist_values</span> <span class="o">=</span> <span class="n">distance_aligned</span><span class="o">.</span><span class="n">value_np</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
         <span class="n">signal</span> <span class="o">=</span> <span class="n">instance</span><span class="o">.</span><span class="n">value_np</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
@@ -496,7 +496,7 @@
         <span class="n">positive_diffs</span> <span class="o">=</span> <span class="n">diffs</span><span class="p">[</span><span class="n">diffs</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">positive_diffs</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;No positive distance steps found. Cannot determine spatial sample rate.&quot;</span>
+                <span class="s2">"No positive distance steps found. Cannot determine spatial sample rate."</span>
             <span class="p">)</span>
 
         <span class="n">dx_median</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">positive_diffs</span><span class="p">))</span>
@@ -505,13 +505,13 @@
 
         <span class="k">if</span> <span class="n">cutoff_freq_per_meter</span> <span class="o">&gt;=</span> <span class="n">nyq</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Cutoff frequency (</span><span class="si">{</span><span class="n">cutoff_freq_per_meter</span><span class="si">}</span><span class="s2"> 1/m) greater than Nyquist frequency&quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">nyq</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2"> 1/m), skipping filter&quot;</span>
+                <span class="sa">f</span><span class="s2">"Cutoff frequency (</span><span class="si">{</span><span class="n">cutoff_freq_per_meter</span><span class="si">}</span><span class="s2"> 1/m) greater than Nyquist frequency"</span>
+                <span class="sa">f</span><span class="s2">"(</span><span class="si">{</span><span class="n">nyq</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2"> 1/m), skipping filter"</span>
             <span class="p">)</span>
             <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">instance</span><span class="p">)</span>
             <span class="k">continue</span>
 
-        <span class="n">sos</span> <span class="o">=</span> <span class="n">butter</span><span class="p">(</span><span class="n">order</span><span class="p">,</span> <span class="n">cutoff_freq_per_meter</span> <span class="o">/</span> <span class="n">nyq</span><span class="p">,</span> <span class="n">btype</span><span class="o">=</span><span class="s2">&quot;low&quot;</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="s2">&quot;sos&quot;</span><span class="p">)</span>
+        <span class="n">sos</span> <span class="o">=</span> <span class="n">butter</span><span class="p">(</span><span class="n">order</span><span class="p">,</span> <span class="n">cutoff_freq_per_meter</span> <span class="o">/</span> <span class="n">nyq</span><span class="p">,</span> <span class="n">btype</span><span class="o">=</span><span class="s2">"low"</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="s2">"sos"</span><span class="p">)</span>
         <span class="n">filtered_dedup</span> <span class="o">=</span> <span class="n">apply_sos_filter</span><span class="p">(</span><span class="n">signal_dedup</span><span class="p">,</span> <span class="n">sos</span><span class="p">,</span> <span class="n">order</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">filtered_dedup</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -525,7 +525,7 @@
             <span class="n">DataInstance</span><span class="p">(</span>
                 <span class="n">timestamp_np</span><span class="o">=</span><span class="n">instance</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">,</span>
                 <span class="n">value_np</span><span class="o">=</span><span class="n">filtered</span><span class="p">,</span>
-                <span class="n">label</span><span class="o">=</span><span class="n">instance</span><span class="o">.</span><span class="n">label</span> <span class="ow">or</span> <span class="sa">f</span><span class="s2">&quot;var_id=</span><span class="si">{</span><span class="n">instance</span><span class="o">.</span><span class="n">var_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="n">label</span><span class="o">=</span><span class="n">instance</span><span class="o">.</span><span class="n">label</span> <span class="ow">or</span> <span class="sa">f</span><span class="s2">"var_id=</span><span class="si">{</span><span class="n">instance</span><span class="o">.</span><span class="n">var_id</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
                 <span class="n">var_id</span><span class="o">=</span><span class="n">instance</span><span class="o">.</span><span class="n">var_id</span><span class="p">,</span>
                 <span class="n">cpp_name</span><span class="o">=</span><span class="n">instance</span><span class="o">.</span><span class="n">cpp_name</span><span class="p">,</span>
             <span class="p">)</span>
@@ -543,7 +543,7 @@
     <span class="n">threshold</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">source_time_unit</span><span class="p">:</span> <span class="n">Timescale</span> <span class="o">=</span> <span class="n">Timescale</span><span class="o">.</span><span class="n">MS</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataInstance</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="n">DataInstance</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Remove outliers using a rolling-window z-score and interpolate gaps.</span>
+<span class="w">    </span><span class="sd">"""Remove outliers using a rolling-window z-score and interpolate gaps.</span>
 
 <span class="sd">    For each sample, a z-score is computed relative to the local rolling</span>
 <span class="sd">    mean and standard deviation.  Samples with ``|z| &gt; threshold`` are</span>
@@ -568,18 +568,18 @@
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
 <span class="sd">    &gt;&gt;&gt; di_clean = zscore_filter(di, window_s=1.0, threshold=3.0)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">di_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">di</span><span class="p">]</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">di</span><span class="p">,</span> <span class="n">DataInstance</span><span class="p">)</span> <span class="k">else</span> <span class="n">di</span>
 
     <span class="n">results</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">DataInstance</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
 
     <span class="k">for</span> <span class="n">instance</span> <span class="ow">in</span> <span class="n">di_list</span><span class="p">:</span>
-        <span class="n">ts_s</span> <span class="o">=</span> <span class="n">_to_seconds</span><span class="p">(</span><span class="n">instance</span><span class="o">.</span><span class="n">timestamp_np</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span> <span class="n">source_time_unit</span><span class="p">)</span>
+        <span class="n">ts_s</span> <span class="o">=</span> <span class="n">to_seconds</span><span class="p">(</span><span class="n">instance</span><span class="o">.</span><span class="n">timestamp_np</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span> <span class="n">source_time_unit</span><span class="p">)</span>
         <span class="n">dt</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">ts_s</span><span class="p">)))</span>
         <span class="k">if</span> <span class="n">dt</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;Non-positive median time step &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">dt</span><span class="si">:</span><span class="s2">.6f</span><span class="si">}</span><span class="s2"> s). Cannot determine sample rate.&quot;</span>
+                <span class="s2">"Non-positive median time step "</span>
+                <span class="sa">f</span><span class="s2">"(</span><span class="si">{</span><span class="n">dt</span><span class="si">:</span><span class="s2">.6f</span><span class="si">}</span><span class="s2"> s). Cannot determine sample rate."</span>
             <span class="p">)</span>
 
         <span class="n">fs</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">dt</span>
@@ -587,8 +587,8 @@
 
         <span class="n">signal</span> <span class="o">=</span> <span class="n">instance</span><span class="o">.</span><span class="n">value_np</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
 
-        <span class="n">roll_mean</span> <span class="o">=</span> <span class="n">uniform_filter1d</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">win_samples</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;nearest&quot;</span><span class="p">)</span>
-        <span class="n">roll_sq_mean</span> <span class="o">=</span> <span class="n">uniform_filter1d</span><span class="p">(</span><span class="n">signal</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">win_samples</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;nearest&quot;</span><span class="p">)</span>
+        <span class="n">roll_mean</span> <span class="o">=</span> <span class="n">uniform_filter1d</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">win_samples</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">"nearest"</span><span class="p">)</span>
+        <span class="n">roll_sq_mean</span> <span class="o">=</span> <span class="n">uniform_filter1d</span><span class="p">(</span><span class="n">signal</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">win_samples</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">"nearest"</span><span class="p">)</span>
         <span class="c1"># Guard against floating-point negatives inside sqrt</span>
         <span class="n">roll_std</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">roll_sq_mean</span> <span class="o">-</span> <span class="n">roll_mean</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">))</span>
 
@@ -616,7 +616,7 @@
             <span class="n">DataInstance</span><span class="p">(</span>
                 <span class="n">timestamp_np</span><span class="o">=</span><span class="n">instance</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">,</span>
                 <span class="n">value_np</span><span class="o">=</span><span class="n">filtered</span><span class="p">,</span>
-                <span class="n">label</span><span class="o">=</span><span class="n">instance</span><span class="o">.</span><span class="n">label</span> <span class="ow">or</span> <span class="sa">f</span><span class="s2">&quot;var_id=</span><span class="si">{</span><span class="n">instance</span><span class="o">.</span><span class="n">var_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="n">label</span><span class="o">=</span><span class="n">instance</span><span class="o">.</span><span class="n">label</span> <span class="ow">or</span> <span class="sa">f</span><span class="s2">"var_id=</span><span class="si">{</span><span class="n">instance</span><span class="o">.</span><span class="n">var_id</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
                 <span class="n">var_id</span><span class="o">=</span><span class="n">instance</span><span class="o">.</span><span class="n">var_id</span><span class="p">,</span>
                 <span class="n">cpp_name</span><span class="o">=</span><span class="n">instance</span><span class="o">.</span><span class="n">cpp_name</span><span class="p">,</span>
             <span class="p">)</span>
@@ -633,7 +633,7 @@
     <span class="n">source_time_unit</span><span class="p">:</span> <span class="n">Timescale</span> <span class="o">=</span> <span class="n">Timescale</span><span class="o">.</span><span class="n">MS</span><span class="p">,</span>
     <span class="n">distance_di</span><span class="p">:</span> <span class="n">DataInstance</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the real FFT magnitude spectrum of a DataInstance.</span>
+<span class="w">    </span><span class="sd">"""Compute the real FFT magnitude spectrum of a DataInstance.</span>
 
 <span class="sd">    NaN values are dropped before the transform.  The signal is</span>
 <span class="sd">    mean-subtracted to suppress the DC component.</span>
@@ -648,7 +648,7 @@
 <span class="sd">    distance_di : DataInstance | None, optional</span>
 <span class="sd">        If provided, the FFT is computed in the spatial domain and the</span>
 <span class="sd">        sample spacing is derived from cumulative distance in meters</span>
-<span class="sd">        (interpolated onto ``di``&#39;s timestamp grid). Default is None</span>
+<span class="sd">        (interpolated onto ``di``'s timestamp grid). Default is None</span>
 <span class="sd">        (time domain, result in Hz).</span>
 
 <span class="sd">    Returns</span>
@@ -662,13 +662,13 @@
 <span class="sd">    --------</span>
 <span class="sd">    &gt;&gt;&gt; freqs, mags = compute_fft(di)</span>
 <span class="sd">    &gt;&gt;&gt; fig = plot_fft_spectrum([freqs], [mags], [di.label])</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">signal</span> <span class="o">=</span> <span class="n">di</span><span class="o">.</span><span class="n">value_np</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
     <span class="n">valid</span> <span class="o">=</span> <span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">signal</span><span class="p">)</span>
     <span class="n">signal_clean</span> <span class="o">=</span> <span class="n">signal</span><span class="p">[</span><span class="n">valid</span><span class="p">]</span>
 
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">signal_clean</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Not enough valid samples to compute FFT.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Not enough valid samples to compute FFT."</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">distance_di</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">_</span><span class="p">,</span> <span class="n">distance_aligned</span> <span class="o">=</span> <span class="n">left_join_data_instances</span><span class="p">(</span><span class="n">di</span><span class="p">,</span> <span class="n">distance_di</span><span class="p">)</span>
@@ -677,16 +677,16 @@
         <span class="n">positive_diffs</span> <span class="o">=</span> <span class="n">positive_diffs</span><span class="p">[</span><span class="n">positive_diffs</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">positive_diffs</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">positive_diffs</span><span class="p">)):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;No positive distance steps found; cannot compute spatial FFT.&quot;</span>
+                <span class="s2">"No positive distance steps found; cannot compute spatial FFT."</span>
             <span class="p">)</span>
         <span class="n">dx</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">positive_diffs</span><span class="p">))</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">ts_s</span> <span class="o">=</span> <span class="n">_to_seconds</span><span class="p">(</span><span class="n">di</span><span class="o">.</span><span class="n">timestamp_np</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span> <span class="n">source_time_unit</span><span class="p">)</span>
+        <span class="n">ts_s</span> <span class="o">=</span> <span class="n">to_seconds</span><span class="p">(</span><span class="n">di</span><span class="o">.</span><span class="n">timestamp_np</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span> <span class="n">source_time_unit</span><span class="p">)</span>
         <span class="n">dt</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">ts_s</span><span class="p">)))</span>
         <span class="k">if</span> <span class="n">dt</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;Non-positive median time step &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">dt</span><span class="si">:</span><span class="s2">.6f</span><span class="si">}</span><span class="s2"> s). Cannot determine sample rate.&quot;</span>
+                <span class="s2">"Non-positive median time step "</span>
+                <span class="sa">f</span><span class="s2">"(</span><span class="si">{</span><span class="n">dt</span><span class="si">:</span><span class="s2">.6f</span><span class="si">}</span><span class="s2"> s). Cannot determine sample rate."</span>
             <span class="p">)</span>
         <span class="n">dx</span> <span class="o">=</span> <span class="n">dt</span>
 

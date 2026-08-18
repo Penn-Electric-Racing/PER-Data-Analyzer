@@ -308,7 +308,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">numpy.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">NDArray</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">..core_data_structures.data_instance</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataInstance</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">..units</span><span class="w"> </span><span class="kn">import</span> <span class="n">Timescale</span><span class="p">,</span> <span class="n">_to_seconds</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..units</span><span class="w"> </span><span class="kn">import</span> <span class="n">Timescale</span><span class="p">,</span> <span class="n">to_seconds</span>
 
 
 <div class="viewcode-block" id="apply_time_offset">
@@ -318,7 +318,7 @@
     <span class="n">offset_s</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">source_time_unit</span><span class="p">:</span> <span class="n">Timescale</span> <span class="o">=</span> <span class="n">Timescale</span><span class="o">.</span><span class="n">MS</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataInstance</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="n">DataInstance</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Shift signals in time by a fixed offset, but keeping the same timestamp list.</span>
+<span class="w">    </span><span class="sd">"""Shift signals in time by a fixed offset, but keeping the same timestamp list.</span>
 
 <span class="sd">    Shifts the values, not the timestamps. Create a new time series with the same values offset_s away,</span>
 <span class="sd">    then re-interpolate the original timestamps onto this series.</span>
@@ -341,7 +341,7 @@
 <span class="sd">    --------</span>
 <span class="sd">    &gt;&gt;&gt; di_aligned = apply_time_offset(gps_speed_di, offset_s=-0.08)</span>
 <span class="sd">    &gt;&gt;&gt; a, b = apply_time_offset([di_a, di_b], offset_s=0.05)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">di_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">di</span><span class="p">]</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">di</span><span class="p">,</span> <span class="n">DataInstance</span><span class="p">)</span> <span class="k">else</span> <span class="n">di</span>
 
     <span class="n">results</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">DataInstance</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
@@ -350,13 +350,13 @@
             <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">instance</span><span class="p">)</span>
             <span class="k">continue</span>
 
-        <span class="n">t_s</span><span class="p">:</span> <span class="n">NDArray</span> <span class="o">=</span> <span class="n">_to_seconds</span><span class="p">(</span>
+        <span class="n">t_s</span><span class="p">:</span> <span class="n">NDArray</span> <span class="o">=</span> <span class="n">to_seconds</span><span class="p">(</span>
             <span class="n">instance</span><span class="o">.</span><span class="n">timestamp_np</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span> <span class="n">source_time_unit</span>
         <span class="p">)</span>
         <span class="n">signal</span> <span class="o">=</span> <span class="n">instance</span><span class="o">.</span><span class="n">value_np</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
         <span class="n">valid</span> <span class="o">=</span> <span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">signal</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">valid</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Too few valid points to interpolate, skipping time offset&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">"Too few valid points to interpolate, skipping time offset"</span><span class="p">)</span>
             <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">instance</span><span class="p">)</span>
             <span class="k">continue</span>
 
@@ -368,7 +368,7 @@
             <span class="n">DataInstance</span><span class="p">(</span>
                 <span class="n">timestamp_np</span><span class="o">=</span><span class="n">instance</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">,</span>
                 <span class="n">value_np</span><span class="o">=</span><span class="n">shifted</span><span class="p">,</span>
-                <span class="n">label</span><span class="o">=</span><span class="n">instance</span><span class="o">.</span><span class="n">label</span> <span class="ow">or</span> <span class="sa">f</span><span class="s2">&quot;var_id=</span><span class="si">{</span><span class="n">instance</span><span class="o">.</span><span class="n">var_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="n">label</span><span class="o">=</span><span class="n">instance</span><span class="o">.</span><span class="n">label</span> <span class="ow">or</span> <span class="sa">f</span><span class="s2">"var_id=</span><span class="si">{</span><span class="n">instance</span><span class="o">.</span><span class="n">var_id</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
                 <span class="n">var_id</span><span class="o">=</span><span class="n">instance</span><span class="o">.</span><span class="n">var_id</span><span class="p">,</span>
                 <span class="n">cpp_name</span><span class="o">=</span><span class="n">instance</span><span class="o">.</span><span class="n">cpp_name</span><span class="p">,</span>
             <span class="p">)</span>

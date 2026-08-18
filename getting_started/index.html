@@ -399,14 +399,14 @@ the installation instructions above.</p>
 library in external environments like Google Colab.</p>
 <section id="install-via-pip">
 <h4>1. Install via pip<a class="headerlink" href="#install-via-pip" title="Link to this heading">#</a></h4>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;perda[notebook] @ git+https://github.com/Penn-Electric-Racing/PER-Data-Analyzer.git@main&quot;</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"perda[notebook] @ git+https://github.com/Penn-Electric-Racing/PER-Data-Analyzer.git@main"</span>
 </pre></div>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>You can embed the above command in a Google Colab notebook to automatically install when you run the notebook.
 Append an exclamation mark and leave it in a normal code cell like below:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>!pip install &quot;perda[notebook] @ git+https://github.com/Penn-Electric-Racing/PER-Data-Analyzer.git@main&quot;
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>!pip install "perda[notebook] @ git+https://github.com/Penn-Electric-Racing/PER-Data-Analyzer.git@main"
 </pre></div>
 </div>
 </div>
@@ -416,7 +416,7 @@ Append an exclamation mark and leave it in a normal code cell like below:</p>
 <p>The default installation supports keyword-based search. To also enable semantic (AI-powered) search,
 install the <code class="docutils literal notranslate"><span class="pre">full</span></code> extra instead. This pulls in <code class="docutils literal notranslate"><span class="pre">sentence-transformers</span></code> and its dependencies
 (including PyTorch), so expect a larger download.</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>!pip install &quot;perda[full] @ git+https://github.com/Penn-Electric-Racing/PER-Data-Analyzer.git@main&quot;
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>!pip install "perda[full] @ git+https://github.com/Penn-Electric-Racing/PER-Data-Analyzer.git@main"
 </pre></div>
 </div>
 <p>When the semantic model is available, <a class="reference internal" href="../_autosummary/perda.utils.search.html#perda.utils.search.search" title="perda.utils.search.search"><code class="xref py py-func docutils literal notranslate"><span class="pre">perda.utils.search.search()</span></code></a> automatically uses it.

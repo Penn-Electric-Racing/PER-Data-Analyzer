@@ -326,14 +326,14 @@
     <span class="n">magnitudes</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">series_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
     <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">x_label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Frequency (Hz)&quot;</span><span class="p">,</span>
-    <span class="n">y_label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Magnitude&quot;</span><span class="p">,</span>
+    <span class="n">x_label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"Frequency (Hz)"</span><span class="p">,</span>
+    <span class="n">y_label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"Magnitude"</span><span class="p">,</span>
     <span class="n">stacked</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">layout_config</span><span class="p">:</span> <span class="n">LayoutConfig</span> <span class="o">=</span> <span class="n">DEFAULT_LAYOUT_CONFIG</span><span class="p">,</span>
     <span class="n">font_config</span><span class="p">:</span> <span class="n">FontConfig</span> <span class="o">=</span> <span class="n">DEFAULT_FONT_CONFIG</span><span class="p">,</span>
     <span class="n">fft_config</span><span class="p">:</span> <span class="n">FFTPlotConfig</span> <span class="o">=</span> <span class="n">DEFAULT_FFT_PLOT_CONFIG</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot one or more pre-computed FFT magnitude spectra.</span>
+<span class="w">    </span><span class="sd">"""Plot one or more pre-computed FFT magnitude spectra.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -366,22 +366,22 @@
 <span class="sd">    &gt;&gt;&gt; freqs, mags = compute_fft(di)</span>
 <span class="sd">    &gt;&gt;&gt; fig = plot_fft_spectrum([freqs], [mags], [di.label])</span>
 <span class="sd">    &gt;&gt;&gt; fig.show()</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">frequencies</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;At least one series must be provided.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"At least one series must be provided."</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">magnitudes</span><span class="p">)</span> <span class="o">==</span> <span class="n">n</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">series_names</span><span class="p">)):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Inconsistent array lengths.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Inconsistent array lengths."</span><span class="p">)</span>
 
-    <span class="n">x_axis_type</span> <span class="o">=</span> <span class="s2">&quot;log&quot;</span> <span class="k">if</span> <span class="n">fft_config</span><span class="o">.</span><span class="n">log_x</span> <span class="k">else</span> <span class="s2">&quot;linear&quot;</span>
-    <span class="n">y_axis_type</span> <span class="o">=</span> <span class="s2">&quot;log&quot;</span> <span class="k">if</span> <span class="n">fft_config</span><span class="o">.</span><span class="n">log_y</span> <span class="k">else</span> <span class="s2">&quot;linear&quot;</span>
+    <span class="n">x_axis_type</span> <span class="o">=</span> <span class="s2">"log"</span> <span class="k">if</span> <span class="n">fft_config</span><span class="o">.</span><span class="n">log_x</span> <span class="k">else</span> <span class="s2">"linear"</span>
+    <span class="n">y_axis_type</span> <span class="o">=</span> <span class="s2">"log"</span> <span class="k">if</span> <span class="n">fft_config</span><span class="o">.</span><span class="n">log_y</span> <span class="k">else</span> <span class="s2">"linear"</span>
 
     <span class="k">if</span> <span class="n">stacked</span><span class="p">:</span>
         <span class="n">fig</span> <span class="o">=</span> <span class="n">make_subplots</span><span class="p">(</span>
             <span class="n">rows</span><span class="o">=</span><span class="n">n</span><span class="p">,</span>
             <span class="n">cols</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
             <span class="n">shared_xaxes</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-            <span class="n">subplot_titles</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;FFT: </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">series_names</span><span class="p">],</span>
+            <span class="n">subplot_titles</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s2">"FFT: </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">series_names</span><span class="p">],</span>
             <span class="n">vertical_spacing</span><span class="o">=</span><span class="n">layout_config</span><span class="o">.</span><span class="n">grid_vertical_spacing</span><span class="p">,</span>
         <span class="p">)</span>
 
@@ -392,7 +392,7 @@
                 <span class="n">go</span><span class="o">.</span><span class="n">Scattergl</span><span class="p">(</span>
                     <span class="n">x</span><span class="o">=</span><span class="n">xf</span><span class="p">,</span>
                     <span class="n">y</span><span class="o">=</span><span class="n">yf</span><span class="p">,</span>
-                    <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;lines&quot;</span><span class="p">,</span>
+                    <span class="n">mode</span><span class="o">=</span><span class="s2">"lines"</span><span class="p">,</span>
                     <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
                     <span class="n">line</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="n">fft_config</span><span class="o">.</span><span class="n">line_color</span><span class="p">),</span>
                 <span class="p">),</span>
@@ -423,8 +423,8 @@
             <span class="n">title</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
                 <span class="n">text</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
                 <span class="n">x</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
-                <span class="n">xanchor</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span>
-                <span class="n">yanchor</span><span class="o">=</span><span class="s2">&quot;top&quot;</span><span class="p">,</span>
+                <span class="n">xanchor</span><span class="o">=</span><span class="s2">"center"</span><span class="p">,</span>
+                <span class="n">yanchor</span><span class="o">=</span><span class="s2">"top"</span><span class="p">,</span>
                 <span class="n">font</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">font_config</span><span class="o">.</span><span class="n">large</span><span class="p">),</span>
             <span class="p">),</span>
             <span class="n">height</span><span class="o">=</span><span class="n">layout_config</span><span class="o">.</span><span class="n">grid_height_per_row</span> <span class="o">*</span> <span class="n">n</span><span class="p">,</span>
@@ -440,7 +440,7 @@
                 <span class="n">go</span><span class="o">.</span><span class="n">Scattergl</span><span class="p">(</span>
                     <span class="n">x</span><span class="o">=</span><span class="n">xf</span><span class="p">,</span>
                     <span class="n">y</span><span class="o">=</span><span class="n">yf</span><span class="p">,</span>
-                    <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;lines&quot;</span><span class="p">,</span>
+                    <span class="n">mode</span><span class="o">=</span><span class="s2">"lines"</span><span class="p">,</span>
                     <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
                 <span class="p">)</span>
             <span class="p">)</span>
@@ -448,8 +448,8 @@
             <span class="n">title</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
                 <span class="n">text</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
                 <span class="n">x</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
-                <span class="n">xanchor</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span>
-                <span class="n">yanchor</span><span class="o">=</span><span class="s2">&quot;top&quot;</span><span class="p">,</span>
+                <span class="n">xanchor</span><span class="o">=</span><span class="s2">"center"</span><span class="p">,</span>
+                <span class="n">yanchor</span><span class="o">=</span><span class="s2">"top"</span><span class="p">,</span>
                 <span class="n">font</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">font_config</span><span class="o">.</span><span class="n">large</span><span class="p">),</span>
             <span class="p">),</span>
             <span class="n">xaxis</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
@@ -464,7 +464,7 @@
             <span class="p">),</span>
             <span class="n">height</span><span class="o">=</span><span class="n">layout_config</span><span class="o">.</span><span class="n">height</span><span class="p">,</span>
             <span class="n">width</span><span class="o">=</span><span class="n">layout_config</span><span class="o">.</span><span class="n">width</span><span class="p">,</span>
-            <span class="n">plot_bgcolor</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">,</span>
+            <span class="n">plot_bgcolor</span><span class="o">=</span><span class="s2">"white"</span><span class="p">,</span>
             <span class="n">showlegend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="n">legend</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">font</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">font_config</span><span class="o">.</span><span class="n">small</span><span class="p">)),</span>
         <span class="p">)</span>

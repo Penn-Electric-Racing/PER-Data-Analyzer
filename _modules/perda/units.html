@@ -308,22 +308,24 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="kn">import</span> <span class="n">float64</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">numpy.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">NDArray</span>
 
-<span class="n">Numeric</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;Numeric&quot;</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">])</span>
+<span class="n">Numeric</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">"Numeric"</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">])</span>
 
 
 <div class="viewcode-block" id="Timescale">
 <a class="viewcode-back" href="../../_autosummary/perda.units.html#perda.units.Timescale">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Timescale</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Supported timestamp units for time-series data.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Supported timestamp units for time-series data."""</span>
 
-    <span class="n">US</span> <span class="o">=</span> <span class="s2">&quot;us&quot;</span>
-    <span class="n">MS</span> <span class="o">=</span> <span class="s2">&quot;ms&quot;</span>
-    <span class="n">S</span> <span class="o">=</span> <span class="s2">&quot;s&quot;</span></div>
+    <span class="n">US</span> <span class="o">=</span> <span class="s2">"us"</span>
+    <span class="n">MS</span> <span class="o">=</span> <span class="s2">"ms"</span>
+    <span class="n">S</span> <span class="o">=</span> <span class="s2">"s"</span></div>
 
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_to_seconds</span><span class="p">(</span><span class="n">timestamp</span><span class="p">:</span> <span class="n">Numeric</span><span class="p">,</span> <span class="n">source_time_unit</span><span class="p">:</span> <span class="n">Timescale</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Numeric</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert a timestamp from the given unit to seconds.</span>
+<div class="viewcode-block" id="to_seconds">
+<a class="viewcode-back" href="../../_autosummary/perda.units.html#perda.units.to_seconds">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">to_seconds</span><span class="p">(</span><span class="n">timestamp</span><span class="p">:</span> <span class="n">Numeric</span><span class="p">,</span> <span class="n">source_time_unit</span><span class="p">:</span> <span class="n">Timescale</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Numeric</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Convert a timestamp from the given unit to seconds.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -336,16 +338,19 @@
 <span class="sd">    -------</span>
 <span class="sd">    float | NDArray[Float64]</span>
 <span class="sd">        Timestamp(s) in seconds.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">source_time_unit</span> <span class="o">==</span> <span class="n">Timescale</span><span class="o">.</span><span class="n">US</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">timestamp</span> <span class="o">/</span> <span class="mf">1e6</span>
     <span class="k">if</span> <span class="n">source_time_unit</span> <span class="o">==</span> <span class="n">Timescale</span><span class="o">.</span><span class="n">MS</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">timestamp</span> <span class="o">/</span> <span class="mf">1e3</span>
-    <span class="k">return</span> <span class="n">timestamp</span>
+    <span class="k">return</span> <span class="n">timestamp</span></div>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_from_seconds</span><span class="p">(</span><span class="n">timestamp_s</span><span class="p">:</span> <span class="n">Numeric</span><span class="p">,</span> <span class="n">target_time_unit</span><span class="p">:</span> <span class="n">Timescale</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Numeric</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert a timestamp from seconds to the given unit.</span>
+
+<div class="viewcode-block" id="from_seconds">
+<a class="viewcode-back" href="../../_autosummary/perda.units.html#perda.units.from_seconds">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">from_seconds</span><span class="p">(</span><span class="n">timestamp_s</span><span class="p">:</span> <span class="n">Numeric</span><span class="p">,</span> <span class="n">target_time_unit</span><span class="p">:</span> <span class="n">Timescale</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Numeric</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Convert a timestamp from seconds to the given unit.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -358,12 +363,13 @@
 <span class="sd">    -------</span>
 <span class="sd">    float | NDArray[Float64]</span>
 <span class="sd">        Timestamp(s) in the target unit.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">target_time_unit</span> <span class="o">==</span> <span class="n">Timescale</span><span class="o">.</span><span class="n">US</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">timestamp_s</span> <span class="o">*</span> <span class="mf">1e6</span>
     <span class="k">if</span> <span class="n">target_time_unit</span> <span class="o">==</span> <span class="n">Timescale</span><span class="o">.</span><span class="n">MS</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">timestamp_s</span> <span class="o">*</span> <span class="mf">1e3</span>
-    <span class="k">return</span> <span class="n">timestamp_s</span>
+    <span class="k">return</span> <span class="n">timestamp_s</span></div>
+
 
 
 <span class="nd">@overload</span>
@@ -383,7 +389,7 @@
     <span class="n">source_time_unit</span><span class="p">:</span> <span class="n">Timescale</span><span class="p">,</span>
     <span class="n">target_time_unit</span><span class="p">:</span> <span class="n">Timescale</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Numeric</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert a timestamp between two timescale units.</span>
+<span class="w">    </span><span class="sd">"""Convert a timestamp between two timescale units.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -403,8 +409,8 @@
 <span class="sd">    --------</span>
 <span class="sd">    &gt;&gt;&gt; convert_time(5000.0, Timescale.MS, Timescale.S)</span>
 <span class="sd">    5.0</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">_from_seconds</span><span class="p">(</span><span class="n">_to_seconds</span><span class="p">(</span><span class="n">timestamp</span><span class="p">,</span> <span class="n">source_time_unit</span><span class="p">),</span> <span class="n">target_time_unit</span><span class="p">)</span></div>
+<span class="sd">    """</span>
+    <span class="k">return</span> <span class="n">from_seconds</span><span class="p">(</span><span class="n">to_seconds</span><span class="p">(</span><span class="n">timestamp</span><span class="p">,</span> <span class="n">source_time_unit</span><span class="p">),</span> <span class="n">target_time_unit</span><span class="p">)</span></div>
 
 
 
@@ -415,7 +421,7 @@
 <div class="viewcode-block" id="mph_to_m_per_s">
 <a class="viewcode-back" href="../../_autosummary/perda.units.html#perda.units.mph_to_m_per_s">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">mph_to_m_per_s</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">Numeric</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Numeric</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert a speed value from miles per hour to meters per second.</span>
+<span class="w">    </span><span class="sd">"""Convert a speed value from miles per hour to meters per second.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -431,7 +437,7 @@
 <span class="sd">    --------</span>
 <span class="sd">    &gt;&gt;&gt; mph_to_m_per_s(1.0)</span>
 <span class="sd">    0.44704</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="n">value</span> <span class="o">/</span> <span class="mi">3600</span> <span class="o">*</span> <span class="mf">1609.34</span></div>
 
 
@@ -443,7 +449,7 @@
 <div class="viewcode-block" id="in_to_m">
 <a class="viewcode-back" href="../../_autosummary/perda.units.html#perda.units.in_to_m">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">in_to_m</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">Numeric</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Numeric</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert a length value from inches to meters.</span>
+<span class="w">    </span><span class="sd">"""Convert a length value from inches to meters.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -459,7 +465,7 @@
 <span class="sd">    --------</span>
 <span class="sd">    &gt;&gt;&gt; in_to_m(1.0)</span>
 <span class="sd">    0.0254</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="n">value</span> <span class="o">*</span> <span class="mf">0.0254</span></div>
 
 

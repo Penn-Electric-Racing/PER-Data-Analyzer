@@ -312,20 +312,20 @@
 <div class="viewcode-block" id="AccelSegmentResult">
 <a class="viewcode-back" href="../../../_autosummary/perda.utils.accel_calculator.html#perda.utils.accel_calculator.AccelSegmentResult">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">AccelSegmentResult</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Result of a single segment marked as an acceleration test&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Result of a single segment marked as an acceleration test"""</span>
 
-    <span class="n">start_time</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Timestamp when the segment began.&quot;</span><span class="p">)</span>
+    <span class="n">start_time</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">"Timestamp when the segment began."</span><span class="p">)</span>
     <span class="n">time_to_dist</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
-        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Time to travel `dist_reached` meters from segment start.&quot;</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">"Time to travel `dist_reached` meters from segment start."</span>
     <span class="p">)</span>
-    <span class="n">dist_reached</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Distance of the segment in meters.&quot;</span><span class="p">)</span>
-    <span class="n">timescale</span><span class="p">:</span> <span class="n">Timescale</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Time unit for the output times.&quot;</span><span class="p">)</span>
+    <span class="n">dist_reached</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">"Distance of the segment in meters."</span><span class="p">)</span>
+    <span class="n">timescale</span><span class="p">:</span> <span class="n">Timescale</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">"Time unit for the output times."</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a one-line summary of this acceleration segment result.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Return a one-line summary of this acceleration segment result."""</span>
         <span class="k">return</span> <span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Accel at </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">start_time</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">s: &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;reached </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dist_reached</span><span class="si">}</span><span class="s2">m in </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">time_to_dist</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">s&quot;</span>
+            <span class="sa">f</span><span class="s2">"Accel at </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">start_time</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">s: "</span>
+            <span class="sa">f</span><span class="s2">"reached </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dist_reached</span><span class="si">}</span><span class="s2">m in </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">time_to_dist</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">s"</span>
         <span class="p">)</span></div>
 
 
@@ -338,7 +338,7 @@
     <span class="n">torque_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
     <span class="n">speed_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataInstance</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Detect acceleration events based on torque and speed thresholds.</span>
+<span class="w">    </span><span class="sd">"""Detect acceleration events based on torque and speed thresholds.</span>
 
 <span class="sd">    An event is active when torque exceeds `torque_threshold` and speed exceeds</span>
 <span class="sd">    `speed_threshold`, and ends when speed drops back to or below `speed_threshold`.</span>
@@ -357,13 +357,13 @@
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    DataInstance</span>
-<span class="sd">        Binary signal (0.0 or 1.0) on `speed_obj` timestamps, labeled &quot;Accel Event&quot;,</span>
+<span class="sd">        Binary signal (0.0 or 1.0) on `speed_obj` timestamps, labeled "Accel Event",</span>
 <span class="sd">        where 1.0 indicates an active acceleration event.</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
 <span class="sd">    &gt;&gt;&gt; signal = detect_accel_event(torque_di, speed_di)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">torque_interp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span>
         <span class="n">speed_obj</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">,</span> <span class="n">torque_obj</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">,</span> <span class="n">torque_obj</span><span class="o">.</span><span class="n">value_np</span>
     <span class="p">)</span>
@@ -383,7 +383,7 @@
             <span class="n">signal_values</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
 
     <span class="k">return</span> <span class="n">DataInstance</span><span class="p">(</span>
-        <span class="n">timestamp_np</span><span class="o">=</span><span class="n">speed_obj</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">,</span> <span class="n">value_np</span><span class="o">=</span><span class="n">signal_values</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Accel Event&quot;</span>
+        <span class="n">timestamp_np</span><span class="o">=</span><span class="n">speed_obj</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">,</span> <span class="n">value_np</span><span class="o">=</span><span class="n">signal_values</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Accel Event"</span>
     <span class="p">)</span></div>
 
 
@@ -397,7 +397,7 @@
     <span class="n">source_time_unit</span><span class="p">:</span> <span class="n">Timescale</span> <span class="o">=</span> <span class="n">Timescale</span><span class="o">.</span><span class="n">MS</span><span class="p">,</span>
     <span class="n">target_time_unit</span><span class="p">:</span> <span class="n">Timescale</span> <span class="o">=</span> <span class="n">Timescale</span><span class="o">.</span><span class="n">S</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">AccelSegmentResult</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute time-to-distance results for each acceleration event.</span>
+<span class="w">    </span><span class="sd">"""Compute time-to-distance results for each acceleration event.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -422,7 +422,7 @@
 <span class="sd">    &gt;&gt;&gt; results = compute_accel_results(signal_di, distance_di)</span>
 <span class="sd">    &gt;&gt;&gt; for r in results:</span>
 <span class="sd">    ...     print(r)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">sig</span> <span class="o">=</span> <span class="n">signal_obj</span><span class="o">.</span><span class="n">value_np</span>
     <span class="n">time</span> <span class="o">=</span> <span class="n">signal_obj</span><span class="o">.</span><span class="n">timestamp_np</span>
 

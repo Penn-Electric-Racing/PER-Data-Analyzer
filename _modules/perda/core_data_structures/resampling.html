@@ -314,12 +314,12 @@
 <div class="viewcode-block" id="ResampleMethod">
 <a class="viewcode-back" href="../../../_autosummary/perda.core_data_structures.resampling.html#perda.core_data_structures.resampling.ResampleMethod">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ResampleMethod</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Interpolation strategy used when aligning a series to a target timestamp grid.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Interpolation strategy used when aligning a series to a target timestamp grid."""</span>
 
-    <span class="n">LINEAR</span> <span class="o">=</span> <span class="s2">&quot;linear&quot;</span>
-    <span class="n">ZOH</span> <span class="o">=</span> <span class="s2">&quot;zoh&quot;</span>
-    <span class="n">NEAREST</span> <span class="o">=</span> <span class="s2">&quot;nearest&quot;</span>
-    <span class="n">CUBIC</span> <span class="o">=</span> <span class="s2">&quot;cubic&quot;</span></div>
+    <span class="n">LINEAR</span> <span class="o">=</span> <span class="s2">"linear"</span>
+    <span class="n">ZOH</span> <span class="o">=</span> <span class="s2">"zoh"</span>
+    <span class="n">NEAREST</span> <span class="o">=</span> <span class="s2">"nearest"</span>
+    <span class="n">CUBIC</span> <span class="o">=</span> <span class="s2">"cubic"</span></div>
 
 
 
@@ -329,7 +329,7 @@
     <span class="n">src_v</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">,</span>
     <span class="n">method</span><span class="p">:</span> <span class="n">ResampleMethod</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Interpolate src_v (sampled at src_t) onto target timestamps.</span>
 
 <span class="sd">    Parameters</span>
@@ -347,14 +347,14 @@
 <span class="sd">    -------</span>
 <span class="sd">    NDArray</span>
 <span class="sd">        Interpolated values at target timestamps</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="n">ResampleMethod</span><span class="o">.</span><span class="n">LINEAR</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">src_t</span><span class="p">,</span> <span class="n">src_v</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="n">ResampleMethod</span><span class="o">.</span><span class="n">ZOH</span><span class="p">:</span>
         <span class="n">f</span> <span class="o">=</span> <span class="n">interp1d</span><span class="p">(</span>
             <span class="n">src_t</span><span class="p">,</span>
             <span class="n">src_v</span><span class="p">,</span>
-            <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;previous&quot;</span><span class="p">,</span>
+            <span class="n">kind</span><span class="o">=</span><span class="s2">"previous"</span><span class="p">,</span>
             <span class="n">bounds_error</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
             <span class="n">fill_value</span><span class="o">=</span><span class="p">(</span><span class="n">src_v</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">src_v</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]),</span>
         <span class="p">)</span>
@@ -363,7 +363,7 @@
         <span class="n">f</span> <span class="o">=</span> <span class="n">interp1d</span><span class="p">(</span>
             <span class="n">src_t</span><span class="p">,</span>
             <span class="n">src_v</span><span class="p">,</span>
-            <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;nearest&quot;</span><span class="p">,</span>
+            <span class="n">kind</span><span class="o">=</span><span class="s2">"nearest"</span><span class="p">,</span>
             <span class="n">bounds_error</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
             <span class="n">fill_value</span><span class="o">=</span><span class="p">(</span><span class="n">src_v</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">src_v</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]),</span>
         <span class="p">)</span>
@@ -374,13 +374,13 @@
         <span class="n">f</span> <span class="o">=</span> <span class="n">interp1d</span><span class="p">(</span>
             <span class="n">src_t</span><span class="p">,</span>
             <span class="n">src_v</span><span class="p">,</span>
-            <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;cubic&quot;</span><span class="p">,</span>
+            <span class="n">kind</span><span class="o">=</span><span class="s2">"cubic"</span><span class="p">,</span>
             <span class="n">bounds_error</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
             <span class="n">fill_value</span><span class="o">=</span><span class="p">(</span><span class="n">src_v</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">src_v</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]),</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">f</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown resample method &#39;</span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Unknown resample method '</span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s2">'"</span><span class="p">)</span>
 </pre></div>
 
                 </article>

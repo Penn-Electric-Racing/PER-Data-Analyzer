@@ -319,24 +319,24 @@
 <div class="viewcode-block" id="parse_header_creation_time">
 <a class="viewcode-back" href="../../../_autosummary/perda.analyzer.csv.html#perda.analyzer.csv.parse_header_creation_time">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">parse_header_creation_time</span><span class="p">(</span><span class="n">header_line</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">datetime</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Extract the recording date from a log file&#39;s first line.</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Extract the recording date from a log file's first line.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    header_line : str</span>
-<span class="sd">        First line of the log file, e.g. ``&quot;PER Log: Thu Jun 11 17:06:37 2026 v2.0&quot;``.</span>
+<span class="sd">        First line of the log file, e.g. ``"PER Log: Thu Jun 11 17:06:37 2026 v2.0"``.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    datetime | None</span>
 <span class="sd">        Parsed recording date, or None if the header carries no recognizable date.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;PER Log:\s*(.*?)(?:\s+v\d+\.\d+)?$&quot;</span><span class="p">,</span> <span class="n">header_line</span><span class="p">)</span>
+<span class="sd">    """</span>
+    <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s2">"PER Log:\s*(.*?)(?:\s+v\d+\.\d+)?$"</span><span class="p">,</span> <span class="n">header_line</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">match</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">None</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span> <span class="s2">&quot;</span><span class="si">%a</span><span class="s2"> %b </span><span class="si">%d</span><span class="s2"> %H:%M:%S %Y&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span> <span class="s2">"</span><span class="si">%a</span><span class="s2"> %b </span><span class="si">%d</span><span class="s2"> %H:%M:%S %Y"</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">None</span></div>
 
@@ -345,7 +345,7 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">_find_start_end_indices_for_each_unique_value</span><span class="p">(</span>
     <span class="n">var_ids</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Find contiguous slice boundary index pairs for a sorted 1D array.</span>
 
 <span class="sd">    Parameters</span>
@@ -357,7 +357,7 @@
 <span class="sd">    -------</span>
 <span class="sd">    dict[int, tuple[int, int]]</span>
 <span class="sd">        Mapping from each unique variable ID to its ``(start, end)`` slice bounds.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">var_ids</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">{}</span>
 
@@ -385,7 +385,7 @@
     <span class="n">parsing_errors_limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
     <span class="n">verbose</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SingleRunData</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Parse CSV file and return SingleRunData model.</span>
 
 <span class="sd">    Parameters</span>
@@ -395,7 +395,7 @@
 <span class="sd">    parsing_errors_limit : int, optional</span>
 <span class="sd">        Maximum number of parsing errors before stopping. -1 for no limit. Default is 100</span>
 <span class="sd">    parse_unit : Timescale | str | None, optional</span>
-<span class="sd">        Logging timestamp unit. If None, auto-detects using header suffix &quot;v2.0&quot; (us) or defaults to ms.</span>
+<span class="sd">        Logging timestamp unit. If None, auto-detects using header suffix "v2.0" (us) or defaults to ms.</span>
 <span class="sd">    verbose : int, optional</span>
 <span class="sd">        Verbosity level. 0 for no output, 1 for basic output, 2 for detailed output. Default is 1.</span>
 
@@ -403,71 +403,71 @@
 <span class="sd">    -------</span>
 <span class="sd">    SingleRunData</span>
 <span class="sd">        Parsed data structure containing all variables</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># Maps variable ID to variable name</span>
     <span class="n">id_to_cpp_name</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">id_to_descript</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
 
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="s2">"r"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="c1"># Parse and print first line (header)</span>
         <span class="n">header_line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
         <span class="n">parse_unit</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">Timescale</span><span class="o">.</span><span class="n">US</span> <span class="k">if</span> <span class="n">header_line</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;v2.0&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="n">Timescale</span><span class="o">.</span><span class="n">MS</span>
+            <span class="n">Timescale</span><span class="o">.</span><span class="n">US</span> <span class="k">if</span> <span class="n">header_line</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">"v2.0"</span><span class="p">)</span> <span class="k">else</span> <span class="n">Timescale</span><span class="o">.</span><span class="n">MS</span>
         <span class="p">)</span>
 
         <span class="n">creation_time</span> <span class="o">=</span> <span class="n">parse_header_creation_time</span><span class="p">(</span><span class="n">header_line</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">verbose</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Header: </span><span class="si">{</span><span class="n">header_line</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Timestamp unit: </span><span class="si">{</span><span class="n">parse_unit</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Header: </span><span class="si">{</span><span class="n">header_line</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Timestamp unit: </span><span class="si">{</span><span class="n">parse_unit</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">creation_time</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Log recorded on: </span><span class="si">{</span><span class="n">creation_time</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Log recorded on: </span><span class="si">{</span><span class="n">creation_time</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
         <span class="c1"># Block 1: Variable ID/Name pairs</span>
         <span class="k">if</span> <span class="n">verbose</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
-            <span class="n">pbar</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Reading variable ID mappings&quot;</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot; lines&quot;</span><span class="p">,</span> <span class="n">initial</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+            <span class="n">pbar</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">desc</span><span class="o">=</span><span class="s2">"Reading variable ID mappings"</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">" lines"</span><span class="p">,</span> <span class="n">initial</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
         <span class="n">skip_rows</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># header line</span>
         <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
-        <span class="k">while</span> <span class="n">line</span> <span class="ow">and</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;Value &quot;</span><span class="p">):</span>
+        <span class="k">while</span> <span class="n">line</span> <span class="ow">and</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"Value "</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">verbose</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
                 <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
             <span class="n">skip_rows</span> <span class="o">+=</span> <span class="mi">1</span>
 
-            <span class="c1"># Remove &quot;Value &quot; prefix, separate into variable name and ID</span>
-            <span class="n">identifier</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">6</span><span class="p">:]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;: &quot;</span><span class="p">)</span>
+            <span class="c1"># Remove "Value " prefix, separate into variable name and ID</span>
+            <span class="n">identifier</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">6</span><span class="p">:]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">": "</span><span class="p">)</span>
 
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">var_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">identifier</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
                 <span class="n">name_part</span> <span class="o">=</span> <span class="n">identifier</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
                 <span class="c1"># Check format: Value Desc (cpp.name): id | Value cpp.name: id</span>
-                <span class="k">if</span> <span class="s2">&quot;(&quot;</span> <span class="ow">in</span> <span class="n">name_part</span> <span class="ow">and</span> <span class="s2">&quot;)&quot;</span> <span class="ow">in</span> <span class="n">name_part</span><span class="p">:</span>
-                    <span class="n">open_idx</span> <span class="o">=</span> <span class="n">name_part</span><span class="o">.</span><span class="n">rfind</span><span class="p">(</span><span class="s2">&quot;(&quot;</span><span class="p">)</span>
-                    <span class="n">close_idx</span> <span class="o">=</span> <span class="n">name_part</span><span class="o">.</span><span class="n">rfind</span><span class="p">(</span><span class="s2">&quot;)&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="s2">"("</span> <span class="ow">in</span> <span class="n">name_part</span> <span class="ow">and</span> <span class="s2">")"</span> <span class="ow">in</span> <span class="n">name_part</span><span class="p">:</span>
+                    <span class="n">open_idx</span> <span class="o">=</span> <span class="n">name_part</span><span class="o">.</span><span class="n">rfind</span><span class="p">(</span><span class="s2">"("</span><span class="p">)</span>
+                    <span class="n">close_idx</span> <span class="o">=</span> <span class="n">name_part</span><span class="o">.</span><span class="n">rfind</span><span class="p">(</span><span class="s2">")"</span><span class="p">)</span>
                     <span class="k">if</span> <span class="n">open_idx</span> <span class="o">&lt;</span> <span class="n">close_idx</span><span class="p">:</span>
                         <span class="n">cpp_name</span> <span class="o">=</span> <span class="n">name_part</span><span class="p">[</span><span class="n">open_idx</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">:</span> <span class="n">close_idx</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
                         <span class="n">descript</span> <span class="o">=</span> <span class="n">name_part</span><span class="p">[:</span><span class="n">open_idx</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
                     <span class="k">else</span><span class="p">:</span>
                         <span class="n">cpp_name</span> <span class="o">=</span> <span class="n">name_part</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-                        <span class="n">descript</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+                        <span class="n">descript</span> <span class="o">=</span> <span class="s2">""</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">cpp_name</span> <span class="o">=</span> <span class="n">name_part</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-                    <span class="n">descript</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+                    <span class="n">descript</span> <span class="o">=</span> <span class="s2">""</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">cpp_name</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Empty cpp_name in mapping line: </span><span class="si">{</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Empty cpp_name in mapping line: </span><span class="si">{</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
                 <span class="c1"># Store variable ID to name mapping</span>
                 <span class="k">if</span> <span class="n">var_id</span> <span class="ow">in</span> <span class="n">id_to_cpp_name</span><span class="p">:</span>
                     <span class="k">if</span> <span class="n">verbose</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
                         <span class="nb">print</span><span class="p">(</span>
-                            <span class="sa">f</span><span class="s2">&quot;Warning: Duplicate variable ID </span><span class="si">{</span><span class="n">var_id</span><span class="si">}</span><span class="s2"> at line </span><span class="si">{</span><span class="n">pbar</span><span class="o">.</span><span class="n">n</span><span class="si">}</span><span class="s2">. Overwriting previous name.&quot;</span>
+                            <span class="sa">f</span><span class="s2">"Warning: Duplicate variable ID </span><span class="si">{</span><span class="n">var_id</span><span class="si">}</span><span class="s2"> at line </span><span class="si">{</span><span class="n">pbar</span><span class="o">.</span><span class="n">n</span><span class="si">}</span><span class="s2">. Overwriting previous name."</span>
                         <span class="p">)</span>
                 <span class="n">id_to_cpp_name</span><span class="p">[</span><span class="n">var_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">cpp_name</span>
                 <span class="n">id_to_descript</span><span class="p">[</span><span class="n">var_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">descript</span>
 
             <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">verbose</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
-                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error parsing variable ID/Name pair at line </span><span class="si">{</span><span class="n">pbar</span><span class="o">.</span><span class="n">n</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Error parsing variable ID/Name pair at line </span><span class="si">{</span><span class="n">pbar</span><span class="o">.</span><span class="n">n</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
             <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">verbose</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
@@ -475,42 +475,42 @@
 
     <span class="c1"># Block 2: Read data with Polars, Block 3: Sort — all in one step</span>
     <span class="k">if</span> <span class="n">verbose</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Reading and sorting data...&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"Reading and sorting data..."</span><span class="p">)</span>
     <span class="n">df</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span>
         <span class="n">file_path</span><span class="p">,</span>
         <span class="n">skip_rows</span><span class="o">=</span><span class="n">skip_rows</span><span class="p">,</span>
         <span class="n">has_header</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">new_columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;timestamp&quot;</span><span class="p">,</span> <span class="s2">&quot;var_id&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">],</span>
-        <span class="n">schema</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;column_1&quot;</span><span class="p">:</span> <span class="n">pl</span><span class="o">.</span><span class="n">Int64</span><span class="p">,</span> <span class="s2">&quot;column_2&quot;</span><span class="p">:</span> <span class="n">pl</span><span class="o">.</span><span class="n">Int32</span><span class="p">,</span> <span class="s2">&quot;column_3&quot;</span><span class="p">:</span> <span class="n">pl</span><span class="o">.</span><span class="n">Float64</span><span class="p">},</span>
+        <span class="n">new_columns</span><span class="o">=</span><span class="p">[</span><span class="s2">"timestamp"</span><span class="p">,</span> <span class="s2">"var_id"</span><span class="p">,</span> <span class="s2">"value"</span><span class="p">],</span>
+        <span class="n">schema</span><span class="o">=</span><span class="p">{</span><span class="s2">"column_1"</span><span class="p">:</span> <span class="n">pl</span><span class="o">.</span><span class="n">Int64</span><span class="p">,</span> <span class="s2">"column_2"</span><span class="p">:</span> <span class="n">pl</span><span class="o">.</span><span class="n">Int32</span><span class="p">,</span> <span class="s2">"column_3"</span><span class="p">:</span> <span class="n">pl</span><span class="o">.</span><span class="n">Float64</span><span class="p">},</span>
         <span class="n">ignore_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">glob</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span>
 
     <span class="n">parsing_errors</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span>
         <span class="n">df</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
-            <span class="n">df</span><span class="p">[</span><span class="s2">&quot;timestamp&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">is_null</span><span class="p">()</span> <span class="o">|</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;var_id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">is_null</span><span class="p">()</span> <span class="o">|</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">is_null</span><span class="p">()</span>
+            <span class="n">df</span><span class="p">[</span><span class="s2">"timestamp"</span><span class="p">]</span><span class="o">.</span><span class="n">is_null</span><span class="p">()</span> <span class="o">|</span> <span class="n">df</span><span class="p">[</span><span class="s2">"var_id"</span><span class="p">]</span><span class="o">.</span><span class="n">is_null</span><span class="p">()</span> <span class="o">|</span> <span class="n">df</span><span class="p">[</span><span class="s2">"value"</span><span class="p">]</span><span class="o">.</span><span class="n">is_null</span><span class="p">()</span>
         <span class="p">)</span>
     <span class="p">)</span>
     <span class="k">if</span> <span class="n">parsing_errors_limit</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">parsing_errors</span> <span class="o">&gt;=</span> <span class="n">parsing_errors_limit</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Too many data parsing errors encountered.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">"Too many data parsing errors encountered."</span><span class="p">)</span>
 
     <span class="n">df</span> <span class="o">=</span> <span class="p">(</span>
         <span class="n">df</span><span class="o">.</span><span class="n">drop_nulls</span><span class="p">()</span>
-        <span class="o">.</span><span class="n">with_columns</span><span class="p">((</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s2">&quot;timestamp&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="n">ts_offset</span><span class="p">)</span><span class="o">.</span><span class="n">alias</span><span class="p">(</span><span class="s2">&quot;timestamp&quot;</span><span class="p">))</span>
-        <span class="o">.</span><span class="n">sort</span><span class="p">([</span><span class="s2">&quot;var_id&quot;</span><span class="p">,</span> <span class="s2">&quot;timestamp&quot;</span><span class="p">])</span>
+        <span class="o">.</span><span class="n">with_columns</span><span class="p">((</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s2">"timestamp"</span><span class="p">)</span> <span class="o">+</span> <span class="n">ts_offset</span><span class="p">)</span><span class="o">.</span><span class="n">alias</span><span class="p">(</span><span class="s2">"timestamp"</span><span class="p">))</span>
+        <span class="o">.</span><span class="n">sort</span><span class="p">([</span><span class="s2">"var_id"</span><span class="p">,</span> <span class="s2">"timestamp"</span><span class="p">])</span>
     <span class="p">)</span>
 
     <span class="k">if</span> <span class="n">df</span><span class="o">.</span><span class="n">is_empty</span><span class="p">():</span>
-        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;No valid data points found after parsing.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">"No valid data points found after parsing."</span><span class="p">)</span>
 
     <span class="n">total_data_points</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
-    <span class="n">data_start_time</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">cast</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;timestamp&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()))</span>
-    <span class="n">data_end_time</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">cast</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;timestamp&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()))</span>
+    <span class="n">data_start_time</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">cast</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">df</span><span class="p">[</span><span class="s2">"timestamp"</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()))</span>
+    <span class="n">data_end_time</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">cast</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">df</span><span class="p">[</span><span class="s2">"timestamp"</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()))</span>
 
     <span class="c1"># Extract sorted columns to main numpy arrays</span>
-    <span class="n">var_ids</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;var_id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
-    <span class="n">timestamps_all</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;timestamp&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
-    <span class="n">values_all</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+    <span class="n">var_ids</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">"var_id"</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+    <span class="n">timestamps_all</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">"timestamp"</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+    <span class="n">values_all</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">"value"</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
 
     <span class="c1"># Fast O(N) boundary scan using helper function</span>
     <span class="n">slice_map</span> <span class="o">=</span> <span class="n">_find_start_end_indices_for_each_unique_value</span><span class="p">(</span><span class="n">var_ids</span><span class="p">)</span>
@@ -519,7 +519,7 @@
     <span class="n">id_to_instance</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">DataInstance</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">cpp_name_to_id</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">if</span> <span class="n">verbose</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
-        <span class="n">di_pbar</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Creating DataInstances&quot;</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">id_to_cpp_name</span><span class="p">))</span>
+        <span class="n">di_pbar</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">desc</span><span class="o">=</span><span class="s2">"Creating DataInstances"</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">id_to_cpp_name</span><span class="p">))</span>
     <span class="k">for</span> <span class="n">var_id</span> <span class="ow">in</span> <span class="n">id_to_cpp_name</span><span class="p">:</span>
         <span class="n">name</span> <span class="o">=</span> <span class="n">id_to_cpp_name</span><span class="p">[</span><span class="n">var_id</span><span class="p">]</span>
         <span class="n">descript</span> <span class="o">=</span> <span class="n">id_to_descript</span><span class="p">[</span><span class="n">var_id</span><span class="p">]</span>
@@ -547,7 +547,7 @@
 
     <span class="c1"># Create and return SingleRunData model</span>
     <span class="k">if</span> <span class="n">verbose</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;CSV parsing complete with </span><span class="si">{</span><span class="n">parsing_errors</span><span class="si">}</span><span class="s2"> parsing errors.&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"CSV parsing complete with </span><span class="si">{</span><span class="n">parsing_errors</span><span class="si">}</span><span class="s2"> parsing errors."</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">SingleRunData</span><span class="p">(</span>
         <span class="n">id_to_instance</span><span class="o">=</span><span class="n">id_to_instance</span><span class="p">,</span>
         <span class="n">cpp_name_to_id</span><span class="o">=</span><span class="n">cpp_name_to_id</span><span class="p">,</span>

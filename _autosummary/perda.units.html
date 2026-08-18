@@ -428,6 +428,26 @@
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="perda.units.from_seconds">
+<span class="sig-prename descclassname"><span class="pre">perda.units.</span></span><span class="sig-name descname"><span class="pre">from_seconds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timestamp_s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_time_unit</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/units.html#from_seconds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.units.from_seconds" title="Link to this definition">#</a></dt>
+<dd><p>Convert a timestamp from seconds to the given unit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>timestamp_s</strong> (<em>float</em><em> | </em><em>NDArray</em><em>[</em><em>Float64</em><em>]</em>) – Timestamp(s) in seconds.</p></li>
+<li><p><strong>target_time_unit</strong> (<a class="reference internal" href="#perda.units.Timescale" title="perda.units.Timescale"><em>Timescale</em></a>) – Desired output unit.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Timestamp(s) in the target unit.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float | NDArray[Float64]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="perda.units.in_to_m">
 <span class="sig-prename descclassname"><span class="pre">perda.units.</span></span><span class="sig-name descname"><span class="pre">in_to_m</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/units.html#in_to_m"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.units.in_to_m" title="Link to this definition">#</a></dt>
 <dd><p>Convert a length value from inches to meters.</p>
@@ -469,6 +489,26 @@
 <span class="go">0.44704</span>
 </pre></div>
 </div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="perda.units.to_seconds">
+<span class="sig-prename descclassname"><span class="pre">perda.units.</span></span><span class="sig-name descname"><span class="pre">to_seconds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timestamp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_time_unit</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/units.html#to_seconds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.units.to_seconds" title="Link to this definition">#</a></dt>
+<dd><p>Convert a timestamp from the given unit to seconds.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>timestamp</strong> (<em>float</em><em> | </em><em>NDArray</em><em>[</em><em>Float64</em><em>]</em>) – Timestamp(s) to convert.</p></li>
+<li><p><strong>source_time_unit</strong> (<a class="reference internal" href="#perda.units.Timescale" title="perda.units.Timescale"><em>Timescale</em></a>) – Unit of the input timestamp.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Timestamp(s) in seconds.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float | NDArray[Float64]</p>
+</dd>
+</dl>
 </dd></dl>
 
 </section>
@@ -527,8 +567,10 @@
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.units.convert_time"><code class="docutils literal notranslate"><span class="pre">convert_time()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.units.from_seconds"><code class="docutils literal notranslate"><span class="pre">from_seconds()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.units.in_to_m"><code class="docutils literal notranslate"><span class="pre">in_to_m()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.units.mph_to_m_per_s"><code class="docutils literal notranslate"><span class="pre">mph_to_m_per_s()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.units.to_seconds"><code class="docutils literal notranslate"><span class="pre">to_seconds()</span></code></a></li>
 </ul>
   </nav></div>
 

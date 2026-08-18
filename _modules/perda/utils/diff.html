@@ -320,11 +320,11 @@
     <span class="n">FontConfig</span><span class="p">,</span>
     <span class="n">LayoutConfig</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">..units</span><span class="w"> </span><span class="kn">import</span> <span class="n">_to_seconds</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..units</span><span class="w"> </span><span class="kn">import</span> <span class="n">to_seconds</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_pct</span><span class="p">(</span><span class="n">num</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">den</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return num/den as a percentage, or 0.0 if den is non-positive.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Return num/den as a percentage, or 0.0 if den is non-positive."""</span>
     <span class="k">return</span> <span class="mf">0.0</span> <span class="k">if</span> <span class="n">den</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="k">else</span> <span class="p">(</span><span class="n">num</span> <span class="o">/</span> <span class="n">den</span><span class="p">)</span> <span class="o">*</span> <span class="mf">100.0</span>
 
 
@@ -345,7 +345,7 @@
     <span class="nb">int</span><span class="p">,</span>
     <span class="nb">int</span><span class="p">,</span>
 <span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;JIT-compiled two-pointer core; returns typed lists and final (i, j) indices.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""JIT-compiled two-pointer core; returns typed lists and final (i, j) indices."""</span>
     <span class="n">rpi_extra</span> <span class="o">=</span> <span class="n">numba</span><span class="o">.</span><span class="n">typed</span><span class="o">.</span><span class="n">List</span><span class="o">.</span><span class="n">empty_list</span><span class="p">(</span><span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
     <span class="n">server_extra</span> <span class="o">=</span> <span class="n">numba</span><span class="o">.</span><span class="n">typed</span><span class="o">.</span><span class="n">List</span><span class="o">.</span><span class="n">empty_list</span><span class="p">(</span><span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
     <span class="n">diff_ts</span> <span class="o">=</span> <span class="n">numba</span><span class="o">.</span><span class="n">typed</span><span class="o">.</span><span class="n">List</span><span class="o">.</span><span class="n">empty_list</span><span class="p">(</span><span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
@@ -400,7 +400,7 @@
     <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
 <span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compare two time-series point-by-point and classify each point.</span>
+<span class="w">    </span><span class="sd">"""Compare two time-series point-by-point and classify each point.</span>
 
 <span class="sd">    Uses a two-pointer walk over sorted timestamps. Points within</span>
 <span class="sd">    ``timestamp_tolerance_s`` of each other are considered matched; their</span>
@@ -428,7 +428,7 @@
 <span class="sd">    -------</span>
 <span class="sd">    tuple[npt.NDArray[np.float64], npt.NDArray[np.float64], npt.NDArray[np.float64], npt.NDArray[np.float64]]</span>
 <span class="sd">        (base_extra_ts, incom_extra_ts, value_mismatch_ts, matched_ts)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">ts_a</span> <span class="o">=</span> <span class="n">base_ts</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="n">va</span> <span class="o">=</span> <span class="n">base_vals</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="n">ts_b</span> <span class="o">=</span> <span class="n">incom_ts</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -472,7 +472,7 @@
     <span class="n">layout_config</span><span class="p">:</span> <span class="n">LayoutConfig</span> <span class="o">=</span> <span class="n">DEFAULT_LAYOUT_CONFIG</span><span class="p">,</span>
     <span class="n">font_config</span><span class="p">:</span> <span class="n">FontConfig</span> <span class="o">=</span> <span class="n">DEFAULT_FONT_CONFIG</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compare two SingleRunData objects and report differences.</span>
+<span class="w">    </span><span class="sd">"""Compare two SingleRunData objects and report differences.</span>
 
 <span class="sd">    Performs a three-stage comparison:</span>
 
@@ -482,7 +482,7 @@
 <span class="sd">    3. Summary + plot: prints a diff summary table and displays an interactive</span>
 <span class="sd">       Plotly bar chart of per-bucket diff counts.</span>
 
-<span class="sd">    Timestamps from each run are converted to seconds using the run&#39;s</span>
+<span class="sd">    Timestamps from each run are converted to seconds using the run's</span>
 <span class="sd">    ``timestamp_unit`` metadata before comparison, so runs with different</span>
 <span class="sd">    logging units are handled correctly.</span>
 
@@ -499,7 +499,7 @@
 <span class="sd">        Relative tolerance for value comparison via ``np.isclose``. Defaults to 1e-3.</span>
 <span class="sd">    diff_atol:</span>
 <span class="sd">        Absolute tolerance for value comparison via ``np.isclose``. Defaults to 1e-3.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">base_cpp_name_to_id</span> <span class="o">=</span> <span class="n">rpi_data</span><span class="o">.</span><span class="n">cpp_name_to_id</span>
     <span class="n">base_id_to_instance</span> <span class="o">=</span> <span class="n">rpi_data</span><span class="o">.</span><span class="n">id_to_instance</span>
 
@@ -528,16 +528,16 @@
     <span class="k">if</span> <span class="n">has_mismatch</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span>
             <span class="n">title_block</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Mismatched Variables: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">in_rpi_not_in_server</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nb">len</span><span class="p">(</span><span class="n">in_server_not_in_rpi</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">"Mismatched Variables: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">in_rpi_not_in_server</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nb">len</span><span class="p">(</span><span class="n">in_server_not_in_rpi</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
             <span class="p">)</span>
         <span class="p">)</span>
         <span class="k">if</span> <span class="n">in_rpi_not_in_server</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Only in RPI:     </span><span class="si">{</span><span class="n">in_rpi_not_in_server</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  Only in RPI:     </span><span class="si">{</span><span class="n">in_rpi_not_in_server</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">in_server_not_in_rpi</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Only in server: </span><span class="si">{</span><span class="n">in_server_not_in_rpi</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  Only in server: </span><span class="si">{</span><span class="n">in_server_not_in_rpi</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">()</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">title_block</span><span class="p">(</span><span class="s2">&quot;All C++ names match&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">title_block</span><span class="p">(</span><span class="s2">"All C++ names match"</span><span class="p">)</span> <span class="o">+</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
 
     <span class="c1"># ===== Stage 2: Compare DataInstances =====</span>
     <span class="n">rpi_extra_ts_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
@@ -554,15 +554,15 @@
     <span class="n">timestamps_compared</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">pbar</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span>
         <span class="n">shared_cpp_name_to_instances</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span>
-        <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Comparing matching variables&quot;</span><span class="p">,</span>
-        <span class="n">unit</span><span class="o">=</span><span class="s2">&quot; vars&quot;</span><span class="p">,</span>
+        <span class="n">desc</span><span class="o">=</span><span class="s2">"Comparing matching variables"</span><span class="p">,</span>
+        <span class="n">unit</span><span class="o">=</span><span class="s2">" vars"</span><span class="p">,</span>
         <span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">shared_cpp_name_to_instances</span><span class="p">),</span>
     <span class="p">)</span>
     <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="p">(</span><span class="n">rpi_di</span><span class="p">,</span> <span class="n">server_di</span><span class="p">)</span> <span class="ow">in</span> <span class="n">pbar</span><span class="p">:</span>
-        <span class="n">rpi_ts_s</span> <span class="o">=</span> <span class="n">_to_seconds</span><span class="p">(</span>
+        <span class="n">rpi_ts_s</span> <span class="o">=</span> <span class="n">to_seconds</span><span class="p">(</span>
             <span class="n">rpi_di</span><span class="o">.</span><span class="n">timestamp_np</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span> <span class="n">rpi_data</span><span class="o">.</span><span class="n">timestamp_unit</span>
         <span class="p">)</span>
-        <span class="n">server_ts_s</span> <span class="o">=</span> <span class="n">_to_seconds</span><span class="p">(</span>
+        <span class="n">server_ts_s</span> <span class="o">=</span> <span class="n">to_seconds</span><span class="p">(</span>
             <span class="n">server_di</span><span class="o">.</span><span class="n">timestamp_np</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span> <span class="n">server_data</span><span class="o">.</span><span class="n">timestamp_unit</span>
         <span class="p">)</span>
         <span class="n">rpi_extra_ts</span><span class="p">,</span> <span class="n">server_extra_ts</span><span class="p">,</span> <span class="n">var_diff_ts</span><span class="p">,</span> <span class="n">var_matched_ts</span> <span class="o">=</span> <span class="p">(</span>
@@ -587,7 +587,7 @@
         <span class="n">total_matched_entries</span> <span class="o">+=</span> <span class="n">var_matched_ts</span><span class="o">.</span><span class="n">size</span>
         <span class="n">total_diff_entries</span> <span class="o">+=</span> <span class="n">var_diff_ts</span><span class="o">.</span><span class="n">size</span>
         <span class="n">timestamps_compared</span> <span class="o">+=</span> <span class="n">rpi_di</span><span class="o">.</span><span class="n">timestamp_np</span><span class="o">.</span><span class="n">size</span> <span class="o">+</span> <span class="n">server_di</span><span class="o">.</span><span class="n">timestamp_np</span><span class="o">.</span><span class="n">size</span>
-        <span class="n">pbar</span><span class="o">.</span><span class="n">set_postfix</span><span class="p">({</span><span class="s2">&quot;timestamps&quot;</span><span class="p">:</span> <span class="n">timestamps_compared</span><span class="p">})</span>
+        <span class="n">pbar</span><span class="o">.</span><span class="n">set_postfix</span><span class="p">({</span><span class="s2">"timestamps"</span><span class="p">:</span> <span class="n">timestamps_compared</span><span class="p">})</span>
     <span class="n">pbar</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
     <span class="n">pbar</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
@@ -614,26 +614,26 @@
 
     <span class="c1"># ===== Stage 3: Summary + Plot =====</span>
     <span class="n">rows</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="p">(</span><span class="s2">&quot;Matched variables:&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">shared_cpp_name_to_instances</span><span class="p">))),</span>
-        <span class="p">(</span><span class="s2">&quot;Total RPI entries:&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">total_rpi_entries</span><span class="p">)),</span>
-        <span class="p">(</span><span class="s2">&quot;Total server entries:&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">total_server_entries</span><span class="p">)),</span>
-        <span class="p">(</span><span class="s2">&quot;Matched entries:&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">total_matched_entries</span><span class="p">)),</span>
-        <span class="p">(</span><span class="s2">&quot;RPI-only entries:&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">total_rpi_extra_entries</span><span class="p">)),</span>
-        <span class="p">(</span><span class="s2">&quot;Server-only entries:&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">total_server_extra_entries</span><span class="p">)),</span>
-        <span class="p">(</span><span class="s2">&quot;Value mismatch entries:&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">total_diff_entries</span><span class="p">)),</span>
+        <span class="p">(</span><span class="s2">"Matched variables:"</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">shared_cpp_name_to_instances</span><span class="p">))),</span>
+        <span class="p">(</span><span class="s2">"Total RPI entries:"</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">total_rpi_entries</span><span class="p">)),</span>
+        <span class="p">(</span><span class="s2">"Total server entries:"</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">total_server_entries</span><span class="p">)),</span>
+        <span class="p">(</span><span class="s2">"Matched entries:"</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">total_matched_entries</span><span class="p">)),</span>
+        <span class="p">(</span><span class="s2">"RPI-only entries:"</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">total_rpi_extra_entries</span><span class="p">)),</span>
+        <span class="p">(</span><span class="s2">"Server-only entries:"</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">total_server_extra_entries</span><span class="p">)),</span>
+        <span class="p">(</span><span class="s2">"Value mismatch entries:"</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">total_diff_entries</span><span class="p">)),</span>
         <span class="p">(</span>
-            <span class="s2">&quot;RPI entries lost:&quot;</span><span class="p">,</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">_pct</span><span class="p">(</span><span class="n">total_rpi_extra_entries</span><span class="p">,</span><span class="w"> </span><span class="n">total_rpi_entries</span><span class="p">)</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">%&quot;</span><span class="p">,</span>
+            <span class="s2">"RPI entries lost:"</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">_pct</span><span class="p">(</span><span class="n">total_rpi_extra_entries</span><span class="p">,</span><span class="w"> </span><span class="n">total_rpi_entries</span><span class="p">)</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">%"</span><span class="p">,</span>
         <span class="p">),</span>
         <span class="p">(</span>
-            <span class="s2">&quot;Server entries lost:&quot;</span><span class="p">,</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">_pct</span><span class="p">(</span><span class="n">total_server_extra_entries</span><span class="p">,</span><span class="w"> </span><span class="n">total_server_entries</span><span class="p">)</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">%&quot;</span><span class="p">,</span>
+            <span class="s2">"Server entries lost:"</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">_pct</span><span class="p">(</span><span class="n">total_server_extra_entries</span><span class="p">,</span><span class="w"> </span><span class="n">total_server_entries</span><span class="p">)</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">%"</span><span class="p">,</span>
         <span class="p">),</span>
     <span class="p">]</span>
     <span class="n">col_width</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">label</span><span class="p">)</span> <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">)</span> <span class="o">+</span> <span class="mi">2</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">title_block</span><span class="p">(</span><span class="s2">&quot;Diff Summary&quot;</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">title_block</span><span class="p">(</span><span class="s2">"Diff Summary"</span><span class="p">))</span>
     <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">label</span><span class="si">:</span><span class="s2">&lt;</span><span class="si">{</span><span class="n">col_width</span><span class="si">}}</span><span class="s2">  </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">label</span><span class="si">:</span><span class="s2">&lt;</span><span class="si">{</span><span class="n">col_width</span><span class="si">}}</span><span class="s2">  </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">DELIMITER</span><span class="p">)</span>
 
     <span class="n">fig</span> <span class="o">=</span> <span class="n">plot_diff_bars</span><span class="p">(</span>
@@ -641,7 +641,7 @@
         <span class="n">incom_extra_ts</span><span class="o">=</span><span class="n">server_extra_all</span><span class="p">,</span>
         <span class="n">value_mismatch_ts</span><span class="o">=</span><span class="n">diff_all</span><span class="p">,</span>
         <span class="n">total_present_ts</span><span class="o">=</span><span class="n">total_present_all</span><span class="p">,</span>
-        <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Diff Counts Over Time&quot;</span><span class="p">,</span>
+        <span class="n">title</span><span class="o">=</span><span class="s2">"Diff Counts Over Time"</span><span class="p">,</span>
         <span class="n">diff_plot_config</span><span class="o">=</span><span class="n">diff_plot_config</span><span class="p">,</span>
         <span class="n">layout_config</span><span class="o">=</span><span class="n">layout_config</span><span class="p">,</span>
         <span class="n">font_config</span><span class="o">=</span><span class="n">font_config</span><span class="p">,</span>

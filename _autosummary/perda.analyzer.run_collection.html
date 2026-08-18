@@ -413,8 +413,8 @@ one at a time, so that a collection spanning an entire season stays cheap to hol
 </dd>
 </dl>
 <p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">filename</span><span class="p">,</span> <span class="n">summary</span> <span class="ow">in</span> <span class="n">col</span><span class="o">.</span><span class="n">compare_summary</span><span class="p">(</span><span class="s2">&quot;bms.pack.voltage&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">summary</span><span class="o">.</span><span class="n">max_value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">filename</span><span class="p">,</span> <span class="n">summary</span> <span class="ow">in</span> <span class="n">col</span><span class="o">.</span><span class="n">compare_summary</span><span class="p">(</span><span class="s2">"bms.pack.voltage"</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">summary</span><span class="o">.</span><span class="n">max_value</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -441,7 +441,7 @@ one at a time, so that a collection spanning an entire season stays cheap to hol
 </dd>
 </dl>
 <p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">col</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">run</span><span class="p">:</span> <span class="s2">&quot;endurance&quot;</span> <span class="ow">in</span> <span class="n">run</span><span class="o">.</span><span class="n">file_path</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">col</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">run</span><span class="p">:</span> <span class="s2">"endurance"</span> <span class="ow">in</span> <span class="n">run</span><span class="o">.</span><span class="n">file_path</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -465,7 +465,7 @@ with <code class="docutils literal notranslate"><span class="pre">filter</span><
 </dl>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">overvolted</span> <span class="o">=</span> <span class="n">col</span><span class="o">.</span><span class="n">filter_by_data</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="k">lambda</span> <span class="n">aly</span><span class="p">:</span> <span class="p">(</span><span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;ams.pack.voltage&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value_np</span> <span class="o">&gt;</span> <span class="mf">10.0</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="k">lambda</span> <span class="n">aly</span><span class="p">:</span> <span class="p">(</span><span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">"ams.pack.voltage"</span><span class="p">]</span><span class="o">.</span><span class="n">value_np</span> <span class="o">&gt;</span> <span class="mf">10.0</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">()</span>
 <span class="gp">... </span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">overvolted</span><span class="o">.</span><span class="n">filenames</span>
 </pre></div>
@@ -492,7 +492,7 @@ with <code class="docutils literal notranslate"><span class="pre">filter</span><
 </dd>
 </dl>
 <p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">col</span><span class="o">.</span><span class="n">filter_by_date</span><span class="p">(</span><span class="s2">&quot;2026-06-01&quot;</span><span class="p">,</span> <span class="s2">&quot;2026-06-30&quot;</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">col</span><span class="o">.</span><span class="n">filter_by_date</span><span class="p">(</span><span class="s2">"2026-06-01"</span><span class="p">,</span> <span class="s2">"2026-06-30"</span><span class="p">)</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -534,7 +534,7 @@ with <code class="docutils literal notranslate"><span class="pre">filter</span><
 </dd>
 </dl>
 <p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">col</span><span class="o">.</span><span class="n">plot_comparison</span><span class="p">(</span><span class="s2">&quot;pcm.wheelSpeeds.frontLeft&quot;</span><span class="p">,</span> <span class="n">max_points</span><span class="o">=</span><span class="mi">20000</span><span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">col</span><span class="o">.</span><span class="n">plot_comparison</span><span class="p">(</span><span class="s2">"pcm.wheelSpeeds.frontLeft"</span><span class="p">,</span> <span class="n">max_points</span><span class="o">=</span><span class="mi">20000</span><span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
 </dd></dl>

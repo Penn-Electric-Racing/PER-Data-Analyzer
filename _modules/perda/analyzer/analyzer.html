@@ -313,7 +313,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">..plotting.data_instance_plotter</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..plotting.plotting_constants</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..plotting.subplots</span><span class="w"> </span><span class="kn">import</span> <span class="n">data_instance_subplots</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">..units</span><span class="w"> </span><span class="kn">import</span> <span class="n">_from_seconds</span><span class="p">,</span> <span class="n">_to_seconds</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..units</span><span class="w"> </span><span class="kn">import</span> <span class="n">from_seconds</span><span class="p">,</span> <span class="n">to_seconds</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..utils.accel_calculator</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..utils.data_summary</span><span class="w"> </span><span class="kn">import</span> <span class="n">single_run_summary</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..utils.diff</span><span class="w"> </span><span class="kn">import</span> <span class="n">diff</span>
@@ -327,7 +327,7 @@
 <div class="viewcode-block" id="Analyzer">
 <a class="viewcode-back" href="../../../_autosummary/perda.analyzer.analyzer.html#perda.analyzer.analyzer.Analyzer">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Analyzer</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Primary class for loading and analyzing car log data.</span>
+<span class="w">    </span><span class="sd">"""Primary class for loading and analyzing car log data.</span>
 
 <span class="sd">    After loading, all variables live in ``analyzer.data`` (a</span>
 <span class="sd">    :class:`~perda.core_data_structures.SingleRunData`), which supports</span>
@@ -336,38 +336,38 @@
 
 <span class="sd">    Access by name or variable ID</span>
 <span class="sd">    ------------------------------</span>
-<span class="sd">    &gt;&gt;&gt; di = aly.data[&quot;pcm.wheelSpeeds.frontRight&quot;]   # by cpp_name</span>
+<span class="sd">    &gt;&gt;&gt; di = aly.data["pcm.wheelSpeeds.frontRight"]   # by cpp_name</span>
 <span class="sd">    &gt;&gt;&gt; di = aly.data[42]                             # by variable ID</span>
 
 <span class="sd">    Check membership</span>
 <span class="sd">    ----------------</span>
-<span class="sd">    &gt;&gt;&gt; &quot;pcm.wheelSpeeds.frontRight&quot; in aly.data       # True / False</span>
+<span class="sd">    &gt;&gt;&gt; "pcm.wheelSpeeds.frontRight" in aly.data       # True / False</span>
 
 <span class="sd">    Read raw arrays</span>
 <span class="sd">    ---------------</span>
-<span class="sd">    &gt;&gt;&gt; di.timestamp_np   # NDArray[int64] — timestamps in the log&#39;s native unit</span>
+<span class="sd">    &gt;&gt;&gt; di.timestamp_np   # NDArray[int64] — timestamps in the log's native unit</span>
 <span class="sd">    &gt;&gt;&gt; di.value_np       # NDArray[float64] — sample values</span>
 
 <span class="sd">    Arithmetic between variables</span>
 <span class="sd">    ----------------------------</span>
-<span class="sd">    &gt;&gt;&gt; avg_speed = (aly.data[&quot;pcm.wheelSpeeds.frontRight&quot;] + aly.data[&quot;pcm.wheelSpeeds.frontLeft&quot;]) / 2.0</span>
+<span class="sd">    &gt;&gt;&gt; avg_speed = (aly.data["pcm.wheelSpeeds.frontRight"] + aly.data["pcm.wheelSpeeds.frontLeft"]) / 2.0</span>
 
-<span class="sd">    Trim to a time window (timestamps in the log&#39;s native unit)</span>
+<span class="sd">    Trim to a time window (timestamps in the log's native unit)</span>
 <span class="sd">    ------------------------------------------------------------</span>
-<span class="sd">    &gt;&gt;&gt; di_trimmed = aly.data[&quot;pcm.wheelSpeeds.frontRight&quot;].trim(ts_start=10_000, ts_end=30_000)</span>
+<span class="sd">    &gt;&gt;&gt; di_trimmed = aly.data["pcm.wheelSpeeds.frontRight"].trim(ts_start=10_000, ts_end=30_000)</span>
 
-<span class="sd">    Find variables when you don&#39;t know the exact name</span>
+<span class="sd">    Find variables when you don't know the exact name</span>
 <span class="sd">    --------------------------------------------------</span>
-<span class="sd">    &gt;&gt;&gt; results = aly.search(&quot;front wheel speed&quot;)   # prints + returns list[SearchResult]</span>
+<span class="sd">    &gt;&gt;&gt; results = aly.search("front wheel speed")   # prints + returns list[SearchResult]</span>
 <span class="sd">    &gt;&gt;&gt; di = aly.data[results[0].cpp_name]</span>
 
 <span class="sd">    Summary stats for one variable</span>
 <span class="sd">    ------------------------------</span>
 <span class="sd">    &gt;&gt;&gt; from perda.utils import data_instance_summary</span>
-<span class="sd">    &gt;&gt;&gt; summary = data_instance_summary(aly.data[&quot;pcm.wheelSpeeds.frontRight&quot;])</span>
+<span class="sd">    &gt;&gt;&gt; summary = data_instance_summary(aly.data["pcm.wheelSpeeds.frontRight"])</span>
 <span class="sd">    &gt;&gt;&gt; print(summary)          # formatted block</span>
 <span class="sd">    &gt;&gt;&gt; summary.max_value       # or read the fields directly</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -377,7 +377,7 @@
         <span class="n">verbose</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
         <span class="n">preprocessing</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">PreprocessingStep</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Initialize a new analyzer instance.</span>
 
 <span class="sd">        Parameters</span>
@@ -396,13 +396,13 @@
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
 <span class="sd">        &gt;&gt;&gt; from perda.utils.preprocessing import correct_motor_data, correct_steering_angle</span>
-<span class="sd">        &gt;&gt;&gt; aly = Analyzer(&quot;path/to/log.csv&quot;, preprocessing=[correct_motor_data])</span>
-<span class="sd">        &gt;&gt;&gt; aly = Analyzer(&quot;path/to/log.csv&quot;, preprocessing=[</span>
+<span class="sd">        &gt;&gt;&gt; aly = Analyzer("path/to/log.csv", preprocessing=[correct_motor_data])</span>
+<span class="sd">        &gt;&gt;&gt; aly = Analyzer("path/to/log.csv", preprocessing=[</span>
 <span class="sd">        ...     correct_motor_data,</span>
 <span class="sd">        ...     correct_steering_angle(calibration=((1.5, -90.0), (3.0, 0.0), (4.5, 90.0))),</span>
 <span class="sd">        ... ])</span>
 <span class="sd">        &gt;&gt;&gt; print(aly)  # lists all available variables</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">:</span> <span class="n">SingleRunData</span> <span class="o">=</span> <span class="n">parse_csv</span><span class="p">(</span>
             <span class="n">filepath</span><span class="p">,</span>
             <span class="n">ts_offset</span><span class="p">,</span>
@@ -413,7 +413,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">apply_preprocessing</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">preprocessing</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a summary of all variables in the loaded run data.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Return a summary of all variables in the loaded run data."""</span>
         <span class="n">old_stdout</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span>
 
         <span class="n">buffer</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">()</span>
@@ -433,7 +433,7 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">search</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">top_n</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span> <span class="n">semantic</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">SearchResult</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Natural language search for available variables in the parsed data.</span>
 
 <span class="sd">        Prints matching results to stdout and returns them for programmatic use.</span>
@@ -441,7 +441,7 @@
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        query : str</span>
-<span class="sd">            Free-text search query (e.g. &quot;front wheel speed&quot;).</span>
+<span class="sd">            Free-text search query (e.g. "front wheel speed").</span>
 <span class="sd">        top_n : int</span>
 <span class="sd">            Maximum number of results to return and display (default 10).</span>
 <span class="sd">        semantic : bool</span>
@@ -456,10 +456,10 @@
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
-<span class="sd">        &gt;&gt;&gt; results = aly.search(&quot;front wheel speed&quot;)</span>
-<span class="sd">        &gt;&gt;&gt; results = aly.search(&quot;front wheel speed&quot;, top_n=5, semantic=True)</span>
+<span class="sd">        &gt;&gt;&gt; results = aly.search("front wheel speed")</span>
+<span class="sd">        &gt;&gt;&gt; results = aly.search("front wheel speed", top_n=5, semantic=True)</span>
 <span class="sd">        &gt;&gt;&gt; names = [r.cpp_name for r in results]</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="n">search</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">query</span><span class="p">,</span> <span class="n">top_n</span><span class="p">,</span> <span class="n">semantic</span><span class="p">)</span></div>
 
 
@@ -482,7 +482,7 @@
         <span class="n">vline_config</span><span class="p">:</span> <span class="n">VLineConfig</span> <span class="o">=</span> <span class="n">DEFAULT_VLINE_CONFIG</span><span class="p">,</span>
         <span class="n">max_points</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Display variables from the parsed data on an interactive Plotly plot.</span>
 
 <span class="sd">        Concat boundaries (if any) are automatically shown as vertical lines.</span>
@@ -515,14 +515,14 @@
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
-<span class="sd">        &gt;&gt;&gt; fig = aly.plot(&quot;pcm.wheelSpeeds.frontRight&quot;)</span>
-<span class="sd">        &gt;&gt;&gt; fig = aly.plot([&quot;pcm.wheelSpeeds.frontRight&quot;, &quot;pcm.wheelSpeeds.frontLeft&quot;], title=&quot;Front Wheel Speeds&quot;)</span>
-<span class="sd">        &gt;&gt;&gt; fig = aly.plot(&quot;pcm.moc.motor.requestedTorque&quot;, &quot;pcm.wheelSpeeds.frontRight&quot;, ts_start=10.0, ts_end=30.0)</span>
+<span class="sd">        &gt;&gt;&gt; fig = aly.plot("pcm.wheelSpeeds.frontRight")</span>
+<span class="sd">        &gt;&gt;&gt; fig = aly.plot(["pcm.wheelSpeeds.frontRight", "pcm.wheelSpeeds.frontLeft"], title="Front Wheel Speeds")</span>
+<span class="sd">        &gt;&gt;&gt; fig = aly.plot("pcm.moc.motor.requestedTorque", "pcm.wheelSpeeds.frontRight", ts_start=10.0, ts_end=30.0)</span>
 <span class="sd">        &gt;&gt;&gt; # Plot a derived DataInstance (e.g. average of two signals)</span>
-<span class="sd">        &gt;&gt;&gt; avg_speed = (aly.data[&quot;pcm.wheelSpeeds.frontRight&quot;] + aly.data[&quot;pcm.wheelSpeeds.frontLeft&quot;]) / 2.0</span>
+<span class="sd">        &gt;&gt;&gt; avg_speed = (aly.data["pcm.wheelSpeeds.frontRight"] + aly.data["pcm.wheelSpeeds.frontLeft"]) / 2.0</span>
 <span class="sd">        &gt;&gt;&gt; fig = aly.plot(avg_speed)</span>
 <span class="sd">        &gt;&gt;&gt; fig.show()</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="c1"># Normalize left input to List[DataInstance]</span>
         <span class="n">var_1_norm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_normalize_input</span><span class="p">(</span><span class="n">var_1</span><span class="p">)</span>
 
@@ -531,12 +531,12 @@
         <span class="c1"># Convert concat boundaries to seconds for the plotter</span>
         <span class="n">vlines</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">concat_boundaries</span><span class="p">:</span>
-            <span class="n">vlines</span> <span class="o">=</span> <span class="p">[</span><span class="n">_to_seconds</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">b</span><span class="p">),</span> <span class="n">unit</span><span class="p">)</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">concat_boundaries</span><span class="p">]</span>
+            <span class="n">vlines</span> <span class="o">=</span> <span class="p">[</span><span class="n">to_seconds</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">b</span><span class="p">),</span> <span class="n">unit</span><span class="p">)</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">concat_boundaries</span><span class="p">]</span>
 
         <span class="c1"># Apply time range filter if specified (convert seconds -&gt; raw units for trim)</span>
         <span class="k">if</span> <span class="n">ts_start</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">ts_end</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">start_raw</span> <span class="o">=</span> <span class="n">_from_seconds</span><span class="p">(</span><span class="n">ts_start</span><span class="p">,</span> <span class="n">unit</span><span class="p">)</span> <span class="k">if</span> <span class="n">ts_start</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
-            <span class="n">end_raw</span> <span class="o">=</span> <span class="n">_from_seconds</span><span class="p">(</span><span class="n">ts_end</span><span class="p">,</span> <span class="n">unit</span><span class="p">)</span> <span class="k">if</span> <span class="n">ts_end</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+            <span class="n">start_raw</span> <span class="o">=</span> <span class="n">from_seconds</span><span class="p">(</span><span class="n">ts_start</span><span class="p">,</span> <span class="n">unit</span><span class="p">)</span> <span class="k">if</span> <span class="n">ts_start</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+            <span class="n">end_raw</span> <span class="o">=</span> <span class="n">from_seconds</span><span class="p">(</span><span class="n">ts_end</span><span class="p">,</span> <span class="n">unit</span><span class="p">)</span> <span class="k">if</span> <span class="n">ts_end</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
             <span class="n">var_1_norm</span> <span class="o">=</span> <span class="p">[</span><span class="n">di</span><span class="o">.</span><span class="n">trim</span><span class="p">(</span><span class="n">start_raw</span><span class="p">,</span> <span class="n">end_raw</span><span class="p">)</span> <span class="k">for</span> <span class="n">di</span> <span class="ow">in</span> <span class="n">var_1_norm</span><span class="p">]</span>
 
         <span class="k">if</span> <span class="n">var_2</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -594,7 +594,7 @@
         <span class="n">layout_config</span><span class="p">:</span> <span class="n">LayoutConfig</span> <span class="o">=</span> <span class="n">DEFAULT_LAYOUT_CONFIG</span><span class="p">,</span>
         <span class="n">font_config</span><span class="p">:</span> <span class="n">FontConfig</span> <span class="o">=</span> <span class="n">DEFAULT_FONT_CONFIG</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Plot multiple variables as stacked subplots on a shared time axis.</span>
 
 <span class="sd">        Each entry in ``rows`` becomes one subplot row. Pass a list of</span>
@@ -632,23 +632,23 @@
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
-<span class="sd">        &gt;&gt;&gt; fig = aly.subplots([&quot;pcm.wheelSpeeds.frontRight&quot;, &quot;pcm.moc.motor.requestedTorque&quot;])</span>
+<span class="sd">        &gt;&gt;&gt; fig = aly.subplots(["pcm.wheelSpeeds.frontRight", "pcm.moc.motor.requestedTorque"])</span>
 <span class="sd">        &gt;&gt;&gt; fig = aly.subplots(</span>
 <span class="sd">        ...     rows=[</span>
-<span class="sd">        ...         [&quot;pcm.wheelSpeeds.frontRight&quot;, &quot;pcm.wheelSpeeds.frontLeft&quot;],</span>
-<span class="sd">        ...         &quot;pcm.moc.motor.requestedTorque&quot;,</span>
+<span class="sd">        ...         ["pcm.wheelSpeeds.frontRight", "pcm.wheelSpeeds.frontLeft"],</span>
+<span class="sd">        ...         "pcm.moc.motor.requestedTorque",</span>
 <span class="sd">        ...     ],</span>
-<span class="sd">        ...     title=&quot;Run Overview&quot;,</span>
-<span class="sd">        ...     row_y_labels=[&quot;Wheel Speed (mph)&quot;, &quot;Torque (Nm)&quot;],</span>
+<span class="sd">        ...     title="Run Overview",</span>
+<span class="sd">        ...     row_y_labels=["Wheel Speed (mph)", "Torque (Nm)"],</span>
 <span class="sd">        ...     ts_start=5.0,</span>
 <span class="sd">        ...     ts_end=30.0,</span>
 <span class="sd">        ... )</span>
 <span class="sd">        &gt;&gt;&gt; fig.show()</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">unit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">timestamp_unit</span>
 
-        <span class="n">start_raw</span> <span class="o">=</span> <span class="n">_from_seconds</span><span class="p">(</span><span class="n">ts_start</span><span class="p">,</span> <span class="n">unit</span><span class="p">)</span> <span class="k">if</span> <span class="n">ts_start</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
-        <span class="n">end_raw</span> <span class="o">=</span> <span class="n">_from_seconds</span><span class="p">(</span><span class="n">ts_end</span><span class="p">,</span> <span class="n">unit</span><span class="p">)</span> <span class="k">if</span> <span class="n">ts_end</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="n">start_raw</span> <span class="o">=</span> <span class="n">from_seconds</span><span class="p">(</span><span class="n">ts_start</span><span class="p">,</span> <span class="n">unit</span><span class="p">)</span> <span class="k">if</span> <span class="n">ts_start</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="n">end_raw</span> <span class="o">=</span> <span class="n">from_seconds</span><span class="p">(</span><span class="n">ts_end</span><span class="p">,</span> <span class="n">unit</span><span class="p">)</span> <span class="k">if</span> <span class="n">ts_end</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
 
         <span class="n">normalized_rows</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">DataInstance</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">row_entry</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
@@ -680,7 +680,7 @@
         <span class="n">layout_config</span><span class="p">:</span> <span class="n">LayoutConfig</span> <span class="o">=</span> <span class="n">DEFAULT_LAYOUT_CONFIG</span><span class="p">,</span>
         <span class="n">font_config</span><span class="p">:</span> <span class="n">FontConfig</span> <span class="o">=</span> <span class="n">DEFAULT_FONT_CONFIG</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Compute the differences between the current data (assumed to be from RPI) and server data.</span>
 
 <span class="sd">        Parameters</span>
@@ -702,7 +702,7 @@
 <span class="sd">        --------</span>
 <span class="sd">        &gt;&gt;&gt; fig = aly.diff(server_data)</span>
 <span class="sd">        &gt;&gt;&gt; fig.show()</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="n">diff</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
             <span class="n">server_data</span><span class="p">,</span>
@@ -726,7 +726,7 @@
         <span class="n">layout_config</span><span class="p">:</span> <span class="n">LayoutConfig</span> <span class="o">=</span> <span class="n">DEFAULT_LAYOUT_CONFIG</span><span class="p">,</span>
         <span class="n">plot_config</span><span class="p">:</span> <span class="n">ScatterHistogramPlotConfig</span> <span class="o">=</span> <span class="n">DEFAULT_SCATTER_HISTOGRAM_PLOT_CONFIG</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Analyse the sampling frequency of a variable and return a diagnostic figure.</span>
 
 <span class="sd">        Prints a summary to stdout and returns a Plotly figure with two subplots:</span>
@@ -754,9 +754,9 @@
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
-<span class="sd">        &gt;&gt;&gt; fig = aly.analyze_frequency(&quot;ams.stack.thermistors.temperature[38]&quot;, expected_frequency_hz=100)</span>
+<span class="sd">        &gt;&gt;&gt; fig = aly.analyze_frequency("ams.stack.thermistors.temperature[38]", expected_frequency_hz=100)</span>
 <span class="sd">        &gt;&gt;&gt; fig.show()</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">di</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">var</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">_analyze_frequency</span><span class="p">(</span>
             <span class="n">di</span><span class="p">,</span>
@@ -773,9 +773,9 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">input_data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">DataInstance</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">DataInstance</span><span class="p">]]],</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">DataInstance</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Normalize various input types to a list of DataInstances.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_data</span><span class="p">,</span> <span class="n">DataInstance</span><span class="p">):</span>
             <span class="k">return</span> <span class="p">[</span><span class="n">input_data</span><span class="p">]</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_data</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
@@ -789,7 +789,7 @@
 <div class="viewcode-block" id="Analyzer.get_accel_times">
 <a class="viewcode-back" href="../../../_autosummary/perda.analyzer.analyzer.html#perda.analyzer.analyzer.Analyzer.get_accel_times">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_accel_times</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">AccelSegmentResult</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Intelligently detect and extract segments of the log where an</span>
 <span class="sd">        acceleration run occurs, then compute acceleration times.</span>
 
@@ -803,13 +803,13 @@
 <span class="sd">        &gt;&gt;&gt; results = aly.get_accel_times()</span>
 <span class="sd">        &gt;&gt;&gt; for r in results:</span>
 <span class="sd">        ...     print(r)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">speed_obj</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;pcm.wheelSpeeds.frontRight&quot;</span><span class="p">]</span>
-            <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;pcm.wheelSpeeds.frontLeft&quot;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">"pcm.wheelSpeeds.frontRight"</span><span class="p">]</span>
+            <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">"pcm.wheelSpeeds.frontLeft"</span><span class="p">]</span>
         <span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span>
         <span class="n">signal_obj</span> <span class="o">=</span> <span class="n">detect_accel_event</span><span class="p">(</span>
-            <span class="n">torque_obj</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;pcm.moc.motor.requestedTorque&quot;</span><span class="p">],</span> <span class="n">speed_obj</span><span class="o">=</span><span class="n">speed_obj</span>
+            <span class="n">torque_obj</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">"pcm.moc.motor.requestedTorque"</span><span class="p">],</span> <span class="n">speed_obj</span><span class="o">=</span><span class="n">speed_obj</span>
         <span class="p">)</span>
 
         <span class="n">time_arr</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">distance</span> <span class="o">=</span> <span class="n">smoothed_filtered_integration</span><span class="p">(</span>
@@ -818,7 +818,7 @@
         <span class="n">distance_obj</span> <span class="o">=</span> <span class="n">DataInstance</span><span class="p">(</span>
             <span class="n">timestamp_np</span><span class="o">=</span><span class="n">time_arr</span><span class="p">,</span>
             <span class="n">value_np</span><span class="o">=</span><span class="n">distance</span><span class="p">,</span>
-            <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Distance&quot;</span><span class="p">,</span>
+            <span class="n">label</span><span class="o">=</span><span class="s2">"Distance"</span><span class="p">,</span>
         <span class="p">)</span>
 
         <span class="k">return</span> <span class="n">compute_accel_results</span><span class="p">(</span>

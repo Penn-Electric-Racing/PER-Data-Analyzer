@@ -317,7 +317,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">..utils.data_summary</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataInstanceSummary</span><span class="p">,</span> <span class="n">data_instance_summary</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.analyzer</span><span class="w"> </span><span class="kn">import</span> <span class="n">Analyzer</span>
 
-<span class="c1"># Common unit that every run&#39;s timestamps are converted to before overlaying, so</span>
+<span class="c1"># Common unit that every run's timestamps are converted to before overlaying, so</span>
 <span class="c1"># that collections mixing v1 (ms) and v2 (us) logs share one x-axis scale.</span>
 <span class="n">COMPARISON_TIMESTAMP_UNIT</span> <span class="o">=</span> <span class="n">Timescale</span><span class="o">.</span><span class="n">US</span>
 
@@ -325,30 +325,30 @@
 <div class="viewcode-block" id="RunMetadata">
 <a class="viewcode-back" href="../../../_autosummary/perda.analyzer.run_collection.html#perda.analyzer.run_collection.RunMetadata">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">RunMetadata</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Cheaply-obtained index metadata for a single telemetry run.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Cheaply-obtained index metadata for a single telemetry run."""</span>
 
-    <span class="n">file_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Path to the log file&quot;</span><span class="p">)</span>
+    <span class="n">file_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">"Path to the log file"</span><span class="p">)</span>
     <span class="n">date</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
-        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Recording date parsed from the header or file stats&quot;</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">"Recording date parsed from the header or file stats"</span>
     <span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        One-line description of the run.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        str</span>
 <span class="sd">            ``&lt;filename&gt; (&lt;date&gt;)``</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">file_path</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">date</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="bp">self</span><span class="o">.</span><span class="n">date</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;unknown date&#39;</span><span class="si">}</span><span class="s2">)&quot;</span></div>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">file_path</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">date</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="bp">self</span><span class="o">.</span><span class="n">date</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">'unknown date'</span><span class="si">}</span><span class="s2">)"</span></div>
 
 
 
 <div class="viewcode-block" id="RunCollection">
 <a class="viewcode-back" href="../../../_autosummary/perda.analyzer.run_collection.html#perda.analyzer.run_collection.RunCollection">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">RunCollection</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;A chronologically ordered collection of telemetry runs.</span>
+<span class="w">    </span><span class="sd">"""A chronologically ordered collection of telemetry runs.</span>
 
 <span class="sd">    Holds only lightweight metadata. Logs are parsed into ``Analyzer`` instances lazily,</span>
 <span class="sd">    one at a time, so that a collection spanning an entire season stays cheap to hold.</span>
@@ -357,17 +357,17 @@
 <span class="sd">    -----</span>
 <span class="sd">    Construct via the factory functions in ``run_collection_factory`` (``from_directory``,</span>
 <span class="sd">    ``from_paths``) rather than calling ``__init__`` directly.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">run_metadata</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">RunMetadata</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Build a collection from run metadata, sorted chronologically.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        run_metadata : list[RunMetadata]</span>
 <span class="sd">            Metadata for each run. Runs without a date sort last, by filename.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_runs_by_date</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
             <span class="n">run_metadata</span><span class="p">,</span>
             <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">run</span><span class="p">:</span> <span class="p">(</span>
@@ -379,37 +379,37 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_loaded</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="n">Analyzer</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Listing of every run in chronological order, without loading any of them.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        str</span>
 <span class="sd">            One line per run, preceded by a count.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">listing</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;  [</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">] </span><span class="si">{</span><span class="n">run</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">run</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_runs_by_date</span><span class="p">)</span>
+<span class="sd">        """</span>
+        <span class="n">listing</span> <span class="o">=</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"  [</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">] </span><span class="si">{</span><span class="n">run</span><span class="si">}</span><span class="s2">"</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">run</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_runs_by_date</span><span class="p">)</span>
         <span class="p">)</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;RunCollection with </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="si">}</span><span class="s2"> run(s):</span><span class="se">\n</span><span class="si">{</span><span class="n">listing</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"RunCollection with </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="si">}</span><span class="s2"> run(s):</span><span class="se">\n</span><span class="si">{</span><span class="n">listing</span><span class="si">}</span><span class="s2">"</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Number of runs in the collection.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Number of runs in the collection."""</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_runs_by_date</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Analyzer</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Load the run at the given chronological index.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Load the run at the given chronological index."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_run_by_chronological_index</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">filenames</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Filenames of every run, in chronological order. Loads nothing.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Filenames of every run, in chronological order. Loads nothing."""</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">run</span><span class="o">.</span><span class="n">file_path</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">run</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_runs_by_date</span><span class="p">]</span>
 
 <div class="viewcode-block" id="RunCollection.get_run_by_chronological_index">
 <a class="viewcode-back" href="../../../_autosummary/perda.analyzer.run_collection.html#perda.analyzer.run_collection.RunCollection.get_run_by_chronological_index">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_run_by_chronological_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Analyzer</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Load the run at a position in the collection&#39;s chronological ordering.</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Load the run at a position in the collection's chronological ordering.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -420,12 +420,12 @@
 <span class="sd">        -------</span>
 <span class="sd">        Analyzer</span>
 <span class="sd">            Analyzer for that run. Repeated calls reuse the same instance.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_runs_by_date</span><span class="p">[</span><span class="n">index</span><span class="p">])</span></div>
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">run</span><span class="p">:</span> <span class="n">RunMetadata</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Analyzer</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Parse a run into an Analyzer, reusing an already-parsed one if available.</span>
 
 <span class="sd">        Parameters</span>
@@ -437,13 +437,13 @@
 <span class="sd">        -------</span>
 <span class="sd">        Analyzer</span>
 <span class="sd">            Analyzer for that run.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="n">run</span><span class="o">.</span><span class="n">file_path</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loaded</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_loaded</span><span class="p">[</span><span class="n">run</span><span class="o">.</span><span class="n">file_path</span><span class="p">]</span> <span class="o">=</span> <span class="n">Analyzer</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">run</span><span class="o">.</span><span class="n">file_path</span><span class="p">),</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loaded</span><span class="p">[</span><span class="n">run</span><span class="o">.</span><span class="n">file_path</span><span class="p">]</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_iter_analyzers</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">RunMetadata</span><span class="p">,</span> <span class="n">Analyzer</span><span class="p">]]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Iterate over every run, parsing one log at a time.</span>
 
 <span class="sd">        Unreadable logs are reported and skipped rather than aborting the iteration.</span>
@@ -452,19 +452,19 @@
 <span class="sd">        ------</span>
 <span class="sd">        tuple[RunMetadata, Analyzer]</span>
 <span class="sd">            Metadata and loaded Analyzer for each readable run.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">for</span> <span class="n">run</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_runs_by_date</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">analyzer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load</span><span class="p">(</span><span class="n">run</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Warning: skipping unreadable log </span><span class="si">{</span><span class="n">run</span><span class="o">.</span><span class="n">file_path</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">error</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Warning: skipping unreadable log </span><span class="si">{</span><span class="n">run</span><span class="o">.</span><span class="n">file_path</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">error</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
                 <span class="k">continue</span>
             <span class="k">yield</span> <span class="n">run</span><span class="p">,</span> <span class="n">analyzer</span>
 
 <div class="viewcode-block" id="RunCollection.filter">
 <a class="viewcode-back" href="../../../_autosummary/perda.analyzer.run_collection.html#perda.analyzer.run_collection.RunCollection.filter">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">predicate</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">RunMetadata</span><span class="p">],</span> <span class="nb">bool</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">RunCollection</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Select runs by their metadata, without loading any log.</span>
 
 <span class="sd">        Parameters</span>
@@ -479,8 +479,8 @@
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
-<span class="sd">        &gt;&gt;&gt; col.filter(lambda run: &quot;endurance&quot; in run.file_path.name)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        &gt;&gt;&gt; col.filter(lambda run: "endurance" in run.file_path.name)</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="n">RunCollection</span><span class="p">([</span><span class="n">run</span> <span class="k">for</span> <span class="n">run</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_runs_by_date</span> <span class="k">if</span> <span class="n">predicate</span><span class="p">(</span><span class="n">run</span><span class="p">)])</span></div>
 
 
@@ -491,7 +491,7 @@
         <span class="n">start_date</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">datetime</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">end_date</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">datetime</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RunCollection</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Select runs recorded within a date range, inclusive on both ends.</span>
 
 <span class="sd">        Runs with no known date are excluded.</span>
@@ -510,8 +510,8 @@
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
-<span class="sd">        &gt;&gt;&gt; col.filter_by_date(&quot;2026-06-01&quot;, &quot;2026-06-30&quot;)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        &gt;&gt;&gt; col.filter_by_date("2026-06-01", "2026-06-30")</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">start_date</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">start_date</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromisoformat</span><span class="p">(</span><span class="n">start_date</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">end_date</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
@@ -529,7 +529,7 @@
 <div class="viewcode-block" id="RunCollection.filter_by_data">
 <a class="viewcode-back" href="../../../_autosummary/perda.analyzer.run_collection.html#perda.analyzer.run_collection.RunCollection.filter_by_data">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">filter_by_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">predicate</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Analyzer</span><span class="p">],</span> <span class="nb">bool</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">RunCollection</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Select runs by their contents, parsing one log at a time.</span>
 
 <span class="sd">        Unlike ``filter``, this must read every log, so prefer narrowing the collection</span>
@@ -548,10 +548,10 @@
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
 <span class="sd">        &gt;&gt;&gt; overvolted = col.filter_by_data(</span>
-<span class="sd">        ...     lambda aly: (aly.data[&quot;ams.pack.voltage&quot;].value_np &gt; 10.0).any()</span>
+<span class="sd">        ...     lambda aly: (aly.data["ams.pack.voltage"].value_np &gt; 10.0).any()</span>
 <span class="sd">        ... )</span>
 <span class="sd">        &gt;&gt;&gt; overvolted.filenames</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="n">RunCollection</span><span class="p">(</span>
             <span class="p">[</span><span class="n">run</span> <span class="k">for</span> <span class="n">run</span><span class="p">,</span> <span class="n">analyzer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iter_analyzers</span><span class="p">()</span> <span class="k">if</span> <span class="n">predicate</span><span class="p">(</span><span class="n">analyzer</span><span class="p">)]</span>
         <span class="p">)</span></div>
@@ -562,10 +562,10 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">plot_comparison</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">cpp_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">max_points</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Overlay a variable from every run in the collection on a single plot.</span>
 
-<span class="sd">        Each run&#39;s timestamps are shifted so that all runs start at t = 0.</span>
+<span class="sd">        Each run's timestamps are shifted so that all runs start at t = 0.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -581,8 +581,8 @@
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
-<span class="sd">        &gt;&gt;&gt; col.plot_comparison(&quot;pcm.wheelSpeeds.frontLeft&quot;, max_points=20000).show()</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        &gt;&gt;&gt; col.plot_comparison("pcm.wheelSpeeds.frontLeft", max_points=20000).show()</span>
+<span class="sd">        """</span>
         <span class="n">overlaid</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">run</span><span class="p">,</span> <span class="n">analyzer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iter_analyzers</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">cpp_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">analyzer</span><span class="o">.</span><span class="n">data</span><span class="p">:</span>
@@ -600,7 +600,7 @@
                         <span class="n">COMPARISON_TIMESTAMP_UNIT</span><span class="p">,</span>
                     <span class="p">),</span>
                     <span class="n">value_np</span><span class="o">=</span><span class="n">di</span><span class="o">.</span><span class="n">value_np</span><span class="p">,</span>
-                    <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">run</span><span class="o">.</span><span class="n">file_path</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">di</span><span class="o">.</span><span class="n">label</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span>
+                    <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">run</span><span class="o">.</span><span class="n">file_path</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">di</span><span class="o">.</span><span class="n">label</span><span class="si">}</span><span class="s2">)"</span><span class="p">,</span>
                     <span class="n">var_id</span><span class="o">=</span><span class="n">di</span><span class="o">.</span><span class="n">var_id</span><span class="p">,</span>
                     <span class="n">cpp_name</span><span class="o">=</span><span class="n">di</span><span class="o">.</span><span class="n">cpp_name</span><span class="p">,</span>
                 <span class="p">)</span>
@@ -608,7 +608,7 @@
 
         <span class="k">return</span> <span class="n">plot_single_axis</span><span class="p">(</span>
             <span class="n">overlaid</span><span class="p">,</span>
-            <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Multi-Log Comparison: </span><span class="si">{</span><span class="n">cpp_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Multi-Log Comparison: </span><span class="si">{</span><span class="n">cpp_name</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
             <span class="n">y_axis_title</span><span class="o">=</span><span class="n">cpp_name</span><span class="p">,</span>
             <span class="n">timestamp_unit</span><span class="o">=</span><span class="n">COMPARISON_TIMESTAMP_UNIT</span><span class="p">,</span>
             <span class="n">max_points</span><span class="o">=</span><span class="n">max_points</span><span class="p">,</span>
@@ -618,8 +618,8 @@
 <div class="viewcode-block" id="RunCollection.compare_summary">
 <a class="viewcode-back" href="../../../_autosummary/perda.analyzer.run_collection.html#perda.analyzer.run_collection.RunCollection.compare_summary">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">compare_summary</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cpp_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">DataInstanceSummary</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Summarize a variable&#39;s statistics across every run in the collection.</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Summarize a variable's statistics across every run in the collection.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -633,9 +633,9 @@
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
-<span class="sd">        &gt;&gt;&gt; for filename, summary in col.compare_summary(&quot;bms.pack.voltage&quot;).items():</span>
-<span class="sd">        ...     print(f&quot;{filename}: {summary.max_value}&quot;)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        &gt;&gt;&gt; for filename, summary in col.compare_summary("bms.pack.voltage").items():</span>
+<span class="sd">        ...     print(f"{filename}: {summary.max_value}")</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="p">{</span>
             <span class="n">run</span><span class="o">.</span><span class="n">file_path</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">data_instance_summary</span><span class="p">(</span>
                 <span class="n">analyzer</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">cpp_name</span><span class="p">],</span> <span class="n">source_time_unit</span><span class="o">=</span><span class="n">analyzer</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">timestamp_unit</span>

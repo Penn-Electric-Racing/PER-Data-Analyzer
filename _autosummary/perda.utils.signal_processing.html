@@ -449,7 +449,7 @@ Original timestamps and metadata are preserved. NaN positions in the
 input remain NaN in the output.</p>
 <p>To re-filter at a different cutoff without stacking, pass the original
 (pre-filter) DataInstance again:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">di_original</span> <span class="o">=</span> <span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;pcm.wheelSpeeds.frontRight&quot;</span><span class="p">]</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">di_original</span> <span class="o">=</span> <span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">"pcm.wheelSpeeds.frontRight"</span><span class="p">]</span>
 <span class="n">di_10hz</span> <span class="o">=</span> <span class="n">lowpass_filter</span><span class="p">(</span><span class="n">di_original</span><span class="p">,</span> <span class="n">cutoff_hz</span><span class="o">=</span><span class="mf">10.0</span><span class="p">)</span>
 <span class="n">di_5hz</span>  <span class="o">=</span> <span class="n">lowpass_filter</span><span class="p">(</span><span class="n">di_original</span><span class="p">,</span> <span class="n">cutoff_hz</span><span class="o">=</span><span class="mf">5.0</span><span class="p">)</span>   <span class="c1"># not stacked</span>
 </pre></div>

@@ -310,13 +310,13 @@
 <div class="viewcode-block" id="FontConfig">
 <a class="viewcode-back" href="../../../_autosummary/perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.FontConfig">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">FontConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Font configuration for plot elements.</span>
+<span class="w">    </span><span class="sd">"""Font configuration for plot elements.</span>
 
 <span class="sd">    Simplified to three sizes:</span>
 <span class="sd">    - Large: Titles</span>
 <span class="sd">    - Medium: Axis labels, legend titles</span>
 <span class="sd">    - Small: Tick labels, legend items</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">large</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">20</span>
     <span class="n">medium</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">14</span>
@@ -327,18 +327,18 @@
 <div class="viewcode-block" id="LayoutConfig">
 <a class="viewcode-back" href="../../../_autosummary/perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.LayoutConfig">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">LayoutConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Layout configuration for plot dimensions and spacing.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Layout configuration for plot dimensions and spacing."""</span>
 
     <span class="n">width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1200</span>
     <span class="n">height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">700</span>
 
     <span class="n">margin</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span><span class="n">l</span><span class="o">=</span><span class="mi">70</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">70</span><span class="p">))</span>
 
-    <span class="n">plot_bgcolor</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;white&quot;</span>
+    <span class="n">plot_bgcolor</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"white"</span>
 
     <span class="n">title_x</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span>
-    <span class="n">title_xanchor</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;center&quot;</span>
-    <span class="n">title_yanchor</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;top&quot;</span>
+    <span class="n">title_xanchor</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"center"</span>
+    <span class="n">title_yanchor</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"top"</span>
 
     <span class="n">grid_width_per_col</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">400</span>
     <span class="n">grid_height_per_row</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">350</span>
@@ -352,24 +352,24 @@
 <div class="viewcode-block" id="DiffPlotConfig">
 <a class="viewcode-back" href="../../../_autosummary/perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.DiffPlotConfig">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">DiffPlotConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Configuration for diff bar chart visualization.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Configuration for diff bar chart visualization."""</span>
 
     <span class="n">bucket_size_s</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span>
-    <span class="n">color_base_extra</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;blue&quot;</span>
-    <span class="n">color_incom_extra</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;darkorange&quot;</span>
-    <span class="n">color_value_mismatch</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;crimson&quot;</span>
-    <span class="n">color_total</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;gray&quot;</span></div>
+    <span class="n">color_base_extra</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"blue"</span>
+    <span class="n">color_incom_extra</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"darkorange"</span>
+    <span class="n">color_value_mismatch</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"crimson"</span>
+    <span class="n">color_total</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"gray"</span></div>
 
 
 
 <div class="viewcode-block" id="ScatterHistogramPlotConfig">
 <a class="viewcode-back" href="../../../_autosummary/perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.ScatterHistogramPlotConfig">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ScatterHistogramPlotConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Configuration for frequency analysis visualization.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Configuration for frequency analysis visualization."""</span>
 
-    <span class="n">color_scatter</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;blue&quot;</span>
-    <span class="n">color_line</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;crimson&quot;</span>
-    <span class="n">color_histogram</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;blue&quot;</span>
+    <span class="n">color_scatter</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"blue"</span>
+    <span class="n">color_line</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"crimson"</span>
+    <span class="n">color_histogram</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"blue"</span>
     <span class="n">histogram_bins</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">80</span></div>
 
 
@@ -377,11 +377,11 @@
 <div class="viewcode-block" id="VLineConfig">
 <a class="viewcode-back" href="../../../_autosummary/perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.VLineConfig">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">VLineConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Configuration for vertical marker lines on plots.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Configuration for vertical marker lines on plots."""</span>
 
-    <span class="n">color</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;gray&quot;</span>
+    <span class="n">color</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"gray"</span>
     <span class="n">width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span>
-    <span class="n">dash</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;dash&quot;</span>
+    <span class="n">dash</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"dash"</span>
     <span class="n">opacity</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.7</span></div>
 
 
@@ -389,12 +389,12 @@
 <div class="viewcode-block" id="GpsMapConfig">
 <a class="viewcode-back" href="../../../_autosummary/perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.GpsMapConfig">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">GpsMapConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Configuration for GPS plotting and outlier filtering.</span>
+<span class="w">    </span><span class="sd">"""Configuration for GPS plotting and outlier filtering.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    mapbox_style : str</span>
-<span class="sd">        Mapbox tile style. ``&quot;carto-positron&quot;`` is free and requires no token.</span>
+<span class="sd">        Mapbox tile style. ``"carto-positron"`` is free and requires no token.</span>
 <span class="sd">    mapbox_token : str</span>
 <span class="sd">        Mapbox access token. Only needed for Mapbox-hosted styles.</span>
 <span class="sd">    marker_size : int</span>
@@ -408,18 +408,18 @@
 <span class="sd">    max_radius_m : float</span>
 <span class="sd">        Maximum allowed distance in metres from the centroid of all GPS points.</span>
 <span class="sd">        Points further than this are discarded as outliers.</span>
-<span class="sd">        Set to ``float(&quot;inf&quot;)`` to disable.</span>
+<span class="sd">        Set to ``float("inf")`` to disable.</span>
 <span class="sd">    max_jump_m : float</span>
 <span class="sd">        Maximum allowed step distance in metres between consecutive points.</span>
 <span class="sd">        Points that jump further than this are discarded as outliers.</span>
-<span class="sd">        Set to ``float(&quot;inf&quot;)`` to disable.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">        Set to ``float("inf")`` to disable.</span>
+<span class="sd">    """</span>
 
-    <span class="n">mapbox_style</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;carto-positron&quot;</span>
-    <span class="n">mapbox_token</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">mapbox_style</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"carto-positron"</span>
+    <span class="n">mapbox_token</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span>
     <span class="n">marker_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span>
     <span class="n">line_width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span>
-    <span class="n">line_color</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;red&quot;</span>
+    <span class="n">line_color</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"red"</span>
     <span class="n">zoom_padding</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.4</span>
     <span class="n">max_radius_m</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">5_000.0</span>
     <span class="n">max_jump_m</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">30.0</span></div>
@@ -429,7 +429,7 @@
 <div class="viewcode-block" id="FFTPlotConfig">
 <a class="viewcode-back" href="../../../_autosummary/perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.FFTPlotConfig">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">FFTPlotConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Configuration for FFT magnitude spectrum plots.</span>
+<span class="w">    </span><span class="sd">"""Configuration for FFT magnitude spectrum plots.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -438,15 +438,15 @@
 <span class="sd">    log_y : bool</span>
 <span class="sd">        Logarithmic y-axis (magnitude). Default is False.</span>
 <span class="sd">    line_color : str</span>
-<span class="sd">        Color of the spectrum trace(s). Default is ``&quot;steelblue&quot;``.</span>
+<span class="sd">        Color of the spectrum trace(s). Default is ``"steelblue"``.</span>
 <span class="sd">    height_single : int</span>
 <span class="sd">        Figure height in pixels when ``stacked=False`` (single-panel view).</span>
 <span class="sd">        Default is 500.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">log_x</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">log_y</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
-    <span class="n">line_color</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;steelblue&quot;</span>
+    <span class="n">line_color</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"steelblue"</span>
     <span class="n">height_single</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">500</span></div>
 
 

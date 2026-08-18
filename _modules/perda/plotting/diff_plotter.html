@@ -322,7 +322,7 @@
     <span class="n">bucket_size_s</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">n_buckets</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Count timestamps falling into each fixed-width time bucket.</span>
+<span class="w">    </span><span class="sd">"""Count timestamps falling into each fixed-width time bucket.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -338,7 +338,7 @@
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    int64 array of length ``n_buckets`` with per-bucket counts.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">timestamps_s</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_buckets</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
     <span class="n">indices</span> <span class="o">=</span> <span class="p">(</span>
@@ -354,14 +354,14 @@
     <span class="n">incom_extra_ts</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">value_mismatch_ts</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">total_present_ts</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-    <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="s2">&quot;Diff Counts Over Time (bucketed)&quot;</span><span class="p">,</span>
-    <span class="n">y_axis_title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="s2">&quot;Event Count&quot;</span><span class="p">,</span>
+    <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="s2">"Diff Counts Over Time (bucketed)"</span><span class="p">,</span>
+    <span class="n">y_axis_title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="s2">"Event Count"</span><span class="p">,</span>
     <span class="n">show_legend</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">diff_plot_config</span><span class="p">:</span> <span class="n">DiffPlotConfig</span> <span class="o">=</span> <span class="n">DEFAULT_DIFF_PLOT_CONFIG</span><span class="p">,</span>
     <span class="n">layout_config</span><span class="p">:</span> <span class="n">LayoutConfig</span> <span class="o">=</span> <span class="n">DEFAULT_LAYOUT_CONFIG</span><span class="p">,</span>
     <span class="n">font_config</span><span class="p">:</span> <span class="n">FontConfig</span> <span class="o">=</span> <span class="n">DEFAULT_FONT_CONFIG</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot diff results as bucketed bar charts.</span>
+<span class="w">    </span><span class="sd">"""Plot diff results as bucketed bar charts.</span>
 
 <span class="sd">    Renders four overlaid bar traces — total datapoints present (background),</span>
 <span class="sd">    base-only extras, incoming-only extras, and value mismatches — bucketed</span>
@@ -393,9 +393,9 @@
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    go.Figure</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">total_present_ts</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No diff events to plot.&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"No diff events to plot."</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">()</span>
 
     <span class="n">bucket_size_s</span> <span class="o">=</span> <span class="n">diff_plot_config</span><span class="o">.</span><span class="n">bucket_size_s</span>
@@ -420,7 +420,7 @@
         <span class="n">go</span><span class="o">.</span><span class="n">Bar</span><span class="p">(</span>
             <span class="n">x</span><span class="o">=</span><span class="n">midpoints_s</span><span class="p">,</span>
             <span class="n">y</span><span class="o">=</span><span class="n">total_counts</span><span class="p">,</span>
-            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;All Datapoints Present&quot;</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">"All Datapoints Present"</span><span class="p">,</span>
             <span class="n">marker_color</span><span class="o">=</span><span class="n">diff_plot_config</span><span class="o">.</span><span class="n">color_total</span><span class="p">,</span>
             <span class="n">opacity</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span>
         <span class="p">)</span>
@@ -429,7 +429,7 @@
         <span class="n">go</span><span class="o">.</span><span class="n">Bar</span><span class="p">(</span>
             <span class="n">x</span><span class="o">=</span><span class="n">midpoints_s</span><span class="p">,</span>
             <span class="n">y</span><span class="o">=</span><span class="n">base_counts</span><span class="p">,</span>
-            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Base-Only Points&quot;</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">"Base-Only Points"</span><span class="p">,</span>
             <span class="n">marker_color</span><span class="o">=</span><span class="n">diff_plot_config</span><span class="o">.</span><span class="n">color_base_extra</span><span class="p">,</span>
         <span class="p">)</span>
     <span class="p">)</span>
@@ -437,7 +437,7 @@
         <span class="n">go</span><span class="o">.</span><span class="n">Bar</span><span class="p">(</span>
             <span class="n">x</span><span class="o">=</span><span class="n">midpoints_s</span><span class="p">,</span>
             <span class="n">y</span><span class="o">=</span><span class="n">incom_counts</span><span class="p">,</span>
-            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Incoming-Only Points&quot;</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">"Incoming-Only Points"</span><span class="p">,</span>
             <span class="n">marker_color</span><span class="o">=</span><span class="n">diff_plot_config</span><span class="o">.</span><span class="n">color_incom_extra</span><span class="p">,</span>
         <span class="p">)</span>
     <span class="p">)</span>
@@ -445,13 +445,13 @@
         <span class="n">go</span><span class="o">.</span><span class="n">Bar</span><span class="p">(</span>
             <span class="n">x</span><span class="o">=</span><span class="n">midpoints_s</span><span class="p">,</span>
             <span class="n">y</span><span class="o">=</span><span class="n">diff_counts</span><span class="p">,</span>
-            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Value Mismatch Points&quot;</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">"Value Mismatch Points"</span><span class="p">,</span>
             <span class="n">marker_color</span><span class="o">=</span><span class="n">diff_plot_config</span><span class="o">.</span><span class="n">color_value_mismatch</span><span class="p">,</span>
         <span class="p">)</span>
     <span class="p">)</span>
 
     <span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span>
-        <span class="n">barmode</span><span class="o">=</span><span class="s2">&quot;overlay&quot;</span><span class="p">,</span>
+        <span class="n">barmode</span><span class="o">=</span><span class="s2">"overlay"</span><span class="p">,</span>
         <span class="n">title</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
             <span class="n">text</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
             <span class="n">x</span><span class="o">=</span><span class="n">layout_config</span><span class="o">.</span><span class="n">title_x</span><span class="p">,</span>
@@ -459,10 +459,10 @@
             <span class="n">yanchor</span><span class="o">=</span><span class="n">layout_config</span><span class="o">.</span><span class="n">title_yanchor</span><span class="p">,</span>
             <span class="n">font</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">font_config</span><span class="o">.</span><span class="n">large</span><span class="p">),</span>
         <span class="p">),</span>
-        <span class="n">xaxis_title</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;Time (s)&quot;</span><span class="p">,</span> <span class="n">font</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">font_config</span><span class="o">.</span><span class="n">medium</span><span class="p">)),</span>
+        <span class="n">xaxis_title</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="s2">"Time (s)"</span><span class="p">,</span> <span class="n">font</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">font_config</span><span class="o">.</span><span class="n">medium</span><span class="p">)),</span>
         <span class="n">yaxis_title</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">y_axis_title</span><span class="p">,</span> <span class="n">font</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">font_config</span><span class="o">.</span><span class="n">medium</span><span class="p">)),</span>
         <span class="n">showlegend</span><span class="o">=</span><span class="n">show_legend</span><span class="p">,</span>
-        <span class="n">hovermode</span><span class="o">=</span><span class="s2">&quot;x unified&quot;</span><span class="p">,</span>
+        <span class="n">hovermode</span><span class="o">=</span><span class="s2">"x unified"</span><span class="p">,</span>
         <span class="n">width</span><span class="o">=</span><span class="n">layout_config</span><span class="o">.</span><span class="n">width</span><span class="p">,</span>
         <span class="n">height</span><span class="o">=</span><span class="n">layout_config</span><span class="o">.</span><span class="n">height</span><span class="p">,</span>
         <span class="n">margin</span><span class="o">=</span><span class="n">layout_config</span><span class="o">.</span><span class="n">margin</span><span class="p">,</span>

@@ -313,112 +313,112 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">..constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">DELIMITER</span><span class="p">,</span> <span class="n">title_block</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..core_data_structures.single_run_data</span><span class="w"> </span><span class="kn">import</span> <span class="n">SingleRunData</span>
 
-<span class="n">_MODEL_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="o">.</span><span class="n">parents</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="s2">&quot;models&quot;</span> <span class="o">/</span> <span class="s2">&quot;all-MiniLM-L6-v2&quot;</span>
-<span class="n">_HF_MODEL_ID</span> <span class="o">=</span> <span class="s2">&quot;sentence-transformers/all-MiniLM-L6-v2&quot;</span>
+<span class="n">_MODEL_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="o">.</span><span class="n">parents</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="s2">"models"</span> <span class="o">/</span> <span class="s2">"all-MiniLM-L6-v2"</span>
+<span class="n">_HF_MODEL_ID</span> <span class="o">=</span> <span class="s2">"sentence-transformers/all-MiniLM-L6-v2"</span>
 
 <span class="c1"># SentenceTransformer instance when loaded, else None</span>
 <span class="n">_model</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span>
 
 <span class="n">ABBREVIATIONS</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;pcm&quot;</span><span class="p">:</span> <span class="s2">&quot;powertrain control module&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;pdu&quot;</span><span class="p">:</span> <span class="s2">&quot;power distribution unit&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;ams&quot;</span><span class="p">:</span> <span class="s2">&quot;accumulator management system&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;bms&quot;</span><span class="p">:</span> <span class="s2">&quot;battery management system&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;lvbms&quot;</span><span class="p">:</span> <span class="s2">&quot;low voltage battery management system&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;dash&quot;</span><span class="p">:</span> <span class="s2">&quot;dashboard&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;ludwig&quot;</span><span class="p">:</span> <span class="s2">&quot;data acquisition dashboard&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;daqdash&quot;</span><span class="p">:</span> <span class="s2">&quot;data acquisition dashboard&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;moc&quot;</span><span class="p">:</span> <span class="s2">&quot;motor controller&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;nav&quot;</span><span class="p">:</span> <span class="s2">&quot;vectornav&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;vnav&quot;</span><span class="p">:</span> <span class="s2">&quot;vectornav&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;ins&quot;</span><span class="p">:</span> <span class="s2">&quot;inertial navigation system&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;bat&quot;</span><span class="p">:</span> <span class="s2">&quot;battery&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;bspd&quot;</span><span class="p">:</span> <span class="s2">&quot;brake system plausibility device&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;rtds&quot;</span><span class="p">:</span> <span class="s2">&quot;ready to drive sound&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;imd&quot;</span><span class="p">:</span> <span class="s2">&quot;insulation monitoring device&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;flt&quot;</span><span class="p">:</span> <span class="s2">&quot;fault&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;smo&quot;</span><span class="p">:</span> <span class="s2">&quot;sliding mode observer&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;mma&quot;</span><span class="p">:</span> <span class="s2">&quot;minimum maximum average&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;aerorake&quot;</span><span class="p">:</span> <span class="s2">&quot;aero rakes&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;shockpot&quot;</span><span class="p">:</span> <span class="s2">&quot;shock potentiometer&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;regen&quot;</span><span class="p">:</span> <span class="s2">&quot;regenerative braking&quot;</span><span class="p">,</span>
+    <span class="s2">"pcm"</span><span class="p">:</span> <span class="s2">"powertrain control module"</span><span class="p">,</span>
+    <span class="s2">"pdu"</span><span class="p">:</span> <span class="s2">"power distribution unit"</span><span class="p">,</span>
+    <span class="s2">"ams"</span><span class="p">:</span> <span class="s2">"accumulator management system"</span><span class="p">,</span>
+    <span class="s2">"bms"</span><span class="p">:</span> <span class="s2">"battery management system"</span><span class="p">,</span>
+    <span class="s2">"lvbms"</span><span class="p">:</span> <span class="s2">"low voltage battery management system"</span><span class="p">,</span>
+    <span class="s2">"dash"</span><span class="p">:</span> <span class="s2">"dashboard"</span><span class="p">,</span>
+    <span class="s2">"ludwig"</span><span class="p">:</span> <span class="s2">"data acquisition dashboard"</span><span class="p">,</span>
+    <span class="s2">"daqdash"</span><span class="p">:</span> <span class="s2">"data acquisition dashboard"</span><span class="p">,</span>
+    <span class="s2">"moc"</span><span class="p">:</span> <span class="s2">"motor controller"</span><span class="p">,</span>
+    <span class="s2">"nav"</span><span class="p">:</span> <span class="s2">"vectornav"</span><span class="p">,</span>
+    <span class="s2">"vnav"</span><span class="p">:</span> <span class="s2">"vectornav"</span><span class="p">,</span>
+    <span class="s2">"ins"</span><span class="p">:</span> <span class="s2">"inertial navigation system"</span><span class="p">,</span>
+    <span class="s2">"bat"</span><span class="p">:</span> <span class="s2">"battery"</span><span class="p">,</span>
+    <span class="s2">"bspd"</span><span class="p">:</span> <span class="s2">"brake system plausibility device"</span><span class="p">,</span>
+    <span class="s2">"rtds"</span><span class="p">:</span> <span class="s2">"ready to drive sound"</span><span class="p">,</span>
+    <span class="s2">"imd"</span><span class="p">:</span> <span class="s2">"insulation monitoring device"</span><span class="p">,</span>
+    <span class="s2">"flt"</span><span class="p">:</span> <span class="s2">"fault"</span><span class="p">,</span>
+    <span class="s2">"smo"</span><span class="p">:</span> <span class="s2">"sliding mode observer"</span><span class="p">,</span>
+    <span class="s2">"mma"</span><span class="p">:</span> <span class="s2">"minimum maximum average"</span><span class="p">,</span>
+    <span class="s2">"aerorake"</span><span class="p">:</span> <span class="s2">"aero rakes"</span><span class="p">,</span>
+    <span class="s2">"shockpot"</span><span class="p">:</span> <span class="s2">"shock potentiometer"</span><span class="p">,</span>
+    <span class="s2">"regen"</span><span class="p">:</span> <span class="s2">"regenerative braking"</span><span class="p">,</span>
 <span class="p">}</span>
 
 
 <div class="viewcode-block" id="SearchEntry">
 <a class="viewcode-back" href="../../../_autosummary/perda.utils.search.html#perda.utils.search.SearchEntry">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">SearchEntry</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;One entry in the search deck, holding raw variable data alongside its search card.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""One entry in the search deck, holding raw variable data alongside its search card."""</span>
 
-    <span class="n">var_id</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Internal variable ID.&quot;</span><span class="p">)</span>
-    <span class="n">cpp_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;C++ variable name used for data access.&quot;</span><span class="p">)</span>
-    <span class="n">descript</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Human-readable variable description.&quot;</span><span class="p">)</span>
-    <span class="n">card</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Space-separated search card text for scoring.&quot;</span><span class="p">)</span></div>
+    <span class="n">var_id</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">"Internal variable ID."</span><span class="p">)</span>
+    <span class="n">cpp_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">"C++ variable name used for data access."</span><span class="p">)</span>
+    <span class="n">descript</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">"Human-readable variable description."</span><span class="p">)</span>
+    <span class="n">card</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">"Space-separated search card text for scoring."</span><span class="p">)</span></div>
 
 
 
 <div class="viewcode-block" id="SearchResult">
 <a class="viewcode-back" href="../../../_autosummary/perda.utils.search.html#perda.utils.search.SearchResult">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">SearchResult</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;A single ranked result returned by :func:`search`.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""A single ranked result returned by :func:`search`."""</span>
 
     <span class="n">rank</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
-        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;1-based position in the result list (1 = best match).&quot;</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">"1-based position in the result list (1 = best match)."</span>
     <span class="p">)</span>
-    <span class="n">score</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Relevance score (higher is better).&quot;</span><span class="p">)</span>
-    <span class="n">var_id</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Internal variable ID.&quot;</span><span class="p">)</span>
-    <span class="n">cpp_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;C++ variable name used for data access.&quot;</span><span class="p">)</span>
-    <span class="n">descript</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Human-readable variable description.&quot;</span><span class="p">)</span>
+    <span class="n">score</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">"Relevance score (higher is better)."</span><span class="p">)</span>
+    <span class="n">var_id</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">"Internal variable ID."</span><span class="p">)</span>
+    <span class="n">cpp_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">"C++ variable name used for data access."</span><span class="p">)</span>
+    <span class="n">descript</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">"Human-readable variable description."</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="n">col_score</span><span class="p">,</span> <span class="n">col_id</span><span class="p">,</span> <span class="n">col_name</span><span class="p">,</span> <span class="n">col_desc</span> <span class="o">=</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">60</span>
         <span class="n">name</span> <span class="o">=</span> <span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">cpp_name</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cpp_name</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">col_name</span>
-            <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">cpp_name</span><span class="p">[:</span> <span class="n">col_name</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;…&quot;</span>
+            <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">cpp_name</span><span class="p">[:</span> <span class="n">col_name</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="s2">"…"</span>
         <span class="p">)</span>
         <span class="n">desc</span> <span class="o">=</span> <span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">descript</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">descript</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">col_desc</span>
-            <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">descript</span><span class="p">[:</span> <span class="n">col_desc</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;…&quot;</span>
+            <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">descript</span><span class="p">[:</span> <span class="n">col_desc</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="s2">"…"</span>
         <span class="p">)</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">score</span><span class="si">:</span><span class="s2">&lt;</span><span class="si">{</span><span class="n">col_score</span><span class="si">}</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">  </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">var_id</span><span class="si">:</span><span class="s2">&lt;</span><span class="si">{</span><span class="n">col_id</span><span class="si">}}</span><span class="s2">  </span><span class="si">{</span><span class="n">name</span><span class="si">:</span><span class="s2">&lt;</span><span class="si">{</span><span class="n">col_name</span><span class="si">}}</span><span class="s2">  </span><span class="si">{</span><span class="n">desc</span><span class="si">:</span><span class="s2">&lt;</span><span class="si">{</span><span class="n">col_desc</span><span class="si">}}</span><span class="s2">&quot;</span></div>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">score</span><span class="si">:</span><span class="s2">&lt;</span><span class="si">{</span><span class="n">col_score</span><span class="si">}</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">  </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">var_id</span><span class="si">:</span><span class="s2">&lt;</span><span class="si">{</span><span class="n">col_id</span><span class="si">}}</span><span class="s2">  </span><span class="si">{</span><span class="n">name</span><span class="si">:</span><span class="s2">&lt;</span><span class="si">{</span><span class="n">col_name</span><span class="si">}}</span><span class="s2">  </span><span class="si">{</span><span class="n">desc</span><span class="si">:</span><span class="s2">&lt;</span><span class="si">{</span><span class="n">col_desc</span><span class="si">}}</span><span class="s2">"</span></div>
 
 
 
 <div class="viewcode-block" id="install_encoder">
 <a class="viewcode-back" href="../../../_autosummary/perda.utils.search.html#perda.utils.search.install_encoder">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">install_encoder</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Download and save the SentenceTransformer model for semantic search.</span>
+<span class="w">    </span><span class="sd">"""Download and save the SentenceTransformer model for semantic search.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    bool</span>
 <span class="sd">        True if the model loaded successfully, False otherwise.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">global</span> <span class="n">_model</span>
 
     <span class="k">try</span><span class="p">:</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">sentence_transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">SentenceTransformer</span>
     <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span>
-            <span class="s2">&quot;Warning: sentence-transformers is not installed. Falling back to keyword-only search.&quot;</span>
+            <span class="s2">"Warning: sentence-transformers is not installed. Falling back to keyword-only search."</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="kc">False</span>
 
     <span class="k">try</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">_MODEL_DIR</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Downloading SentenceTransformer model (one-time setup)...&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">"Downloading SentenceTransformer model (one-time setup)..."</span><span class="p">)</span>
             <span class="n">_model</span> <span class="o">=</span> <span class="n">SentenceTransformer</span><span class="p">(</span><span class="n">_HF_MODEL_ID</span><span class="p">)</span>
             <span class="n">_MODEL_DIR</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="n">_model</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">_MODEL_DIR</span><span class="p">))</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Model saved to: </span><span class="si">{</span><span class="n">_MODEL_DIR</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Model saved to: </span><span class="si">{</span><span class="n">_MODEL_DIR</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">_model</span> <span class="o">=</span> <span class="n">SentenceTransformer</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">_MODEL_DIR</span><span class="p">))</span>
         <span class="k">return</span> <span class="kc">True</span>
     <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Warning: SentenceTransformer model unavailable (</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">). Falling back to keyword-only search.&quot;</span>
+            <span class="sa">f</span><span class="s2">"Warning: SentenceTransformer model unavailable (</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">). Falling back to keyword-only search."</span>
         <span class="p">)</span>
         <span class="n">_model</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">return</span> <span class="kc">False</span></div>
@@ -430,14 +430,14 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">search</span><span class="p">(</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">SingleRunData</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">top_n</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span> <span class="n">semantic</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">SearchResult</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Search telemetry variables, print the top matches, and return them.</span>
+<span class="w">    </span><span class="sd">"""Search telemetry variables, print the top matches, and return them.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    data : SingleRunData</span>
 <span class="sd">        Parsed CSV telemetry data.</span>
 <span class="sd">    query : str</span>
-<span class="sd">        Free-text search query (e.g. &quot;bat wheel&quot;).</span>
+<span class="sd">        Free-text search query (e.g. "bat wheel").</span>
 <span class="sd">    top_n : int</span>
 <span class="sd">        Maximum number of results to return and display (default 10).</span>
 <span class="sd">    semantic : bool</span>
@@ -450,20 +450,20 @@
 <span class="sd">        Top matches in descending relevance order (at most ``top_n`` entries).</span>
 <span class="sd">        Each entry exposes ``rank``, ``score``, ``var_id``, ``cpp_name``,</span>
 <span class="sd">        and ``descript`` for programmatic access.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">top_n</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;top_n must be a positive integer.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"top_n must be a positive integer."</span><span class="p">)</span>
 
     <span class="n">query</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">query</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Search query cannot be empty.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Search query cannot be empty."</span><span class="p">)</span>
 
-    <span class="n">keyword_query</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[a-z0-9]+&quot;</span><span class="p">,</span> <span class="n">query</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+    <span class="n">keyword_query</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s2">"[a-z0-9]+"</span><span class="p">,</span> <span class="n">query</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">keyword_query</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Search query must contain letters or numbers.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Search query must contain letters or numbers."</span><span class="p">)</span>
 
     <span class="c1"># Lazy-build search deck</span>
-    <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="s2">&quot;_search_deck&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="s2">"_search_deck"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">data</span><span class="o">.</span><span class="n">_search_deck</span> <span class="o">=</span> <span class="n">build_search_deck</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
     <span class="n">deck</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">_search_deck</span>
 
@@ -516,7 +516,7 @@
             <span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Warning: Semantic search failed (</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">). Falling back to keyword search.&quot;</span>
+                <span class="sa">f</span><span class="s2">"Warning: Semantic search failed (</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">). Falling back to keyword search."</span>
             <span class="p">)</span>
             <span class="n">semantic_ready</span> <span class="o">=</span> <span class="kc">False</span>
 
@@ -549,7 +549,7 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_print_search_results</span><span class="p">(</span><span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">results</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">SearchResult</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Print search results as a compact 4-column table.</span>
+<span class="w">    </span><span class="sd">"""Print search results as a compact 4-column table.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -557,13 +557,13 @@
 <span class="sd">        The original search query string.</span>
 <span class="sd">    results : list[SearchResult]</span>
 <span class="sd">        Ordered list of search results to display.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">col_score</span><span class="p">,</span> <span class="n">col_id</span><span class="p">,</span> <span class="n">col_name</span><span class="p">,</span> <span class="n">col_desc</span> <span class="o">=</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">60</span>
 
-    <span class="nb">print</span><span class="p">(</span><span class="n">title_block</span><span class="p">(</span><span class="s2">&quot;Search Results&quot;</span><span class="p">))</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Query: </span><span class="si">{</span><span class="n">query</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">title_block</span><span class="p">(</span><span class="s2">"Search Results"</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Query: </span><span class="si">{</span><span class="n">query</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span>
-        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;Score&#39;</span><span class="si">:</span><span class="s2">&lt;</span><span class="si">{</span><span class="n">col_score</span><span class="si">}}</span><span class="s2">  </span><span class="si">{</span><span class="s1">&#39;ID&#39;</span><span class="si">:</span><span class="s2">&lt;</span><span class="si">{</span><span class="n">col_id</span><span class="si">}}</span><span class="s2">  </span><span class="si">{</span><span class="s1">&#39;C++ Name&#39;</span><span class="si">:</span><span class="s2">&lt;</span><span class="si">{</span><span class="n">col_name</span><span class="si">}}</span><span class="s2">  </span><span class="si">{</span><span class="s1">&#39;Description&#39;</span><span class="si">:</span><span class="s2">&lt;</span><span class="si">{</span><span class="n">col_desc</span><span class="si">}}</span><span class="s2">&quot;</span>
+        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="s1">'Score'</span><span class="si">:</span><span class="s2">&lt;</span><span class="si">{</span><span class="n">col_score</span><span class="si">}}</span><span class="s2">  </span><span class="si">{</span><span class="s1">'ID'</span><span class="si">:</span><span class="s2">&lt;</span><span class="si">{</span><span class="n">col_id</span><span class="si">}}</span><span class="s2">  </span><span class="si">{</span><span class="s1">'C++ Name'</span><span class="si">:</span><span class="s2">&lt;</span><span class="si">{</span><span class="n">col_name</span><span class="si">}}</span><span class="s2">  </span><span class="si">{</span><span class="s1">'Description'</span><span class="si">:</span><span class="s2">&lt;</span><span class="si">{</span><span class="n">col_desc</span><span class="si">}}</span><span class="s2">"</span>
     <span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">DELIMITER</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
@@ -573,7 +573,7 @@
 <div class="viewcode-block" id="preprocess_query">
 <a class="viewcode-back" href="../../../_autosummary/perda.utils.search.html#perda.utils.search.preprocess_query">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">preprocess_query</span><span class="p">(</span><span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Expand domain abbreviations in a search query for semantic ranking.</span>
+<span class="w">    </span><span class="sd">"""Expand domain abbreviations in a search query for semantic ranking.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -584,20 +584,20 @@
 <span class="sd">    -------</span>
 <span class="sd">    str</span>
 <span class="sd">        Query with known abbreviations expanded and duplicate tokens removed.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">terms</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">term</span> <span class="ow">in</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[a-z0-9]+&quot;</span><span class="p">,</span> <span class="n">query</span><span class="o">.</span><span class="n">lower</span><span class="p">()):</span>
+    <span class="k">for</span> <span class="n">term</span> <span class="ow">in</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s2">"[a-z0-9]+"</span><span class="p">,</span> <span class="n">query</span><span class="o">.</span><span class="n">lower</span><span class="p">()):</span>
         <span class="n">terms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">term</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">term</span> <span class="ow">in</span> <span class="n">ABBREVIATIONS</span><span class="p">:</span>
             <span class="n">terms</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">ABBREVIATIONS</span><span class="p">[</span><span class="n">term</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
-    <span class="k">return</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">dict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span><span class="n">terms</span><span class="p">))</span></div>
+    <span class="k">return</span> <span class="s2">" "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">dict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span><span class="n">terms</span><span class="p">))</span></div>
 
 
 
 <div class="viewcode-block" id="build_search_deck">
 <a class="viewcode-back" href="../../../_autosummary/perda.utils.search.html#perda.utils.search.build_search_deck">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">build_search_deck</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">SingleRunData</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">SearchEntry</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build the search deck from all variables in a run.</span>
+<span class="w">    </span><span class="sd">"""Build the search deck from all variables in a run.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -608,7 +608,7 @@
 <span class="sd">    -------</span>
 <span class="sd">    list[SearchEntry]</span>
 <span class="sd">        One entry per variable, containing its ID, names, description, and search card.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="p">[</span>
         <span class="n">SearchEntry</span><span class="p">(</span>
             <span class="n">var_id</span><span class="o">=</span><span class="n">var_id</span><span class="p">,</span>
@@ -624,7 +624,7 @@
 <div class="viewcode-block" id="build_search_card">
 <a class="viewcode-back" href="../../../_autosummary/perda.utils.search.html#perda.utils.search.build_search_card">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">build_search_card</span><span class="p">(</span><span class="n">cpp_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">descript</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build a search card for one variable.</span>
+<span class="w">    </span><span class="sd">"""Build a search card for one variable.</span>
 
 <span class="sd">    Splits the C++ identifier on separators and camelCase boundaries, expands</span>
 <span class="sd">    known abbreviations inline, and appends the description.</span>
@@ -632,7 +632,7 @@
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    cpp_name : str</span>
-<span class="sd">        C++ variable name (e.g. &quot;pcm.requestedTorque&quot;).</span>
+<span class="sd">        C++ variable name (e.g. "pcm.requestedTorque").</span>
 <span class="sd">    descript : str</span>
 <span class="sd">        Human-readable variable description.</span>
 
@@ -640,22 +640,22 @@
 <span class="sd">    -------</span>
 <span class="sd">    str</span>
 <span class="sd">        Space-separated card text ready for the cross-encoder and keyword scorer.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">tokens</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">segment</span> <span class="ow">in</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[._]&quot;</span><span class="p">,</span> <span class="n">cpp_name</span><span class="p">):</span>
-        <span class="k">for</span> <span class="n">part</span> <span class="ow">in</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;([a-z])([A-Z])&quot;</span><span class="p">,</span> <span class="sa">r</span><span class="s2">&quot;\1 \2&quot;</span><span class="p">,</span> <span class="n">segment</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">segment</span> <span class="ow">in</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="sa">r</span><span class="s2">"[._]"</span><span class="p">,</span> <span class="n">cpp_name</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">part</span> <span class="ow">in</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">"([a-z])([A-Z])"</span><span class="p">,</span> <span class="sa">r</span><span class="s2">"\1 \2"</span><span class="p">,</span> <span class="n">segment</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">():</span>
             <span class="n">lowered</span> <span class="o">=</span> <span class="n">part</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
             <span class="n">tokens</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                 <span class="n">ABBREVIATIONS</span><span class="p">[</span><span class="n">lowered</span><span class="p">]</span> <span class="k">if</span> <span class="n">lowered</span> <span class="ow">in</span> <span class="n">ABBREVIATIONS</span> <span class="k">else</span> <span class="n">lowered</span>
             <span class="p">)</span>
-    <span class="k">return</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">dict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span><span class="n">tokens</span><span class="p">))</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="n">descript</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span></div>
+    <span class="k">return</span> <span class="s2">" "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">dict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span><span class="n">tokens</span><span class="p">))</span> <span class="o">+</span> <span class="s2">" "</span> <span class="o">+</span> <span class="n">descript</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span></div>
 
 
 
 <div class="viewcode-block" id="keyword_score">
 <a class="viewcode-back" href="../../../_autosummary/perda.utils.search.html#perda.utils.search.keyword_score">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">keyword_score</span><span class="p">(</span><span class="n">query_terms</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">entry</span><span class="p">:</span> <span class="n">SearchEntry</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Score a card against query terms using fuzzy partial matching.</span>
+<span class="w">    </span><span class="sd">"""Score a card against query terms using fuzzy partial matching.</span>
 
 <span class="sd">    Uses rapidfuzz.fuzz.partial_ratio per term then averages. Handles</span>
 <span class="sd">    prefixes, substrings, and minor typos naturally.</span>
@@ -671,10 +671,10 @@
 <span class="sd">    -------</span>
 <span class="sd">    float</span>
 <span class="sd">        Mean fuzzy match score in [0, 1].</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">raw_text</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">cpp_name</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="n">entry</span><span class="o">.</span><span class="n">descript</span>
-    <span class="n">search_text</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-        <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;([a-z])([A-Z])&quot;</span><span class="p">,</span> <span class="sa">r</span><span class="s2">&quot;\1 \2&quot;</span><span class="p">,</span> <span class="n">raw_text</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+<span class="sd">    """</span>
+    <span class="n">raw_text</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">cpp_name</span> <span class="o">+</span> <span class="s2">" "</span> <span class="o">+</span> <span class="n">entry</span><span class="o">.</span><span class="n">descript</span>
+    <span class="n">search_text</span> <span class="o">=</span> <span class="s2">" "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+        <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">"([a-z])([A-Z])"</span><span class="p">,</span> <span class="sa">r</span><span class="s2">"\1 \2"</span><span class="p">,</span> <span class="n">raw_text</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
     <span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
 
     <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span>
@@ -688,7 +688,7 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">combine_scores</span><span class="p">(</span>
     <span class="n">semantic_score</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">keyword_score</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">num_terms</span><span class="p">:</span> <span class="nb">int</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Combine semantic and keyword scores using a weighted blend.</span>
+<span class="w">    </span><span class="sd">"""Combine semantic and keyword scores using a weighted blend.</span>
 
 <span class="sd">    Short queries (fewer terms) get more keyword weight; longer queries lean</span>
 <span class="sd">    on semantic relevance.</span>
@@ -706,7 +706,7 @@
 <span class="sd">    -------</span>
 <span class="sd">    float</span>
 <span class="sd">        Combined score</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">kw_weight</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.6</span> <span class="o">-</span> <span class="mf">0.05</span> <span class="o">*</span> <span class="p">(</span><span class="n">num_terms</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
     <span class="n">combined</span> <span class="o">=</span> <span class="n">kw_weight</span> <span class="o">*</span> <span class="n">keyword_score</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">kw_weight</span><span class="p">)</span> <span class="o">*</span> <span class="n">semantic_score</span>
     <span class="k">return</span> <span class="n">combined</span></div>

@@ -393,39 +393,39 @@ dictionary-like access returning <code class="xref py py-class docutils literal 
 objects.</p>
 <section id="access-by-name-or-variable-id">
 <h2>Access by name or variable ID<a class="headerlink" href="#access-by-name-or-variable-id" title="Link to this heading">#</a></h2>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">di</span> <span class="o">=</span> <span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;pcm.wheelSpeeds.frontRight&quot;</span><span class="p">]</span>   <span class="c1"># by cpp_name</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">di</span> <span class="o">=</span> <span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">"pcm.wheelSpeeds.frontRight"</span><span class="p">]</span>   <span class="c1"># by cpp_name</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">di</span> <span class="o">=</span> <span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">42</span><span class="p">]</span>                             <span class="c1"># by variable ID</span>
 </pre></div>
 </div>
 </section>
 <section id="check-membership">
 <h2>Check membership<a class="headerlink" href="#check-membership" title="Link to this heading">#</a></h2>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="s2">&quot;pcm.wheelSpeeds.frontRight&quot;</span> <span class="ow">in</span> <span class="n">aly</span><span class="o">.</span><span class="n">data</span>       <span class="c1"># True / False</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="s2">"pcm.wheelSpeeds.frontRight"</span> <span class="ow">in</span> <span class="n">aly</span><span class="o">.</span><span class="n">data</span>       <span class="c1"># True / False</span>
 </pre></div>
 </div>
 </section>
 <section id="read-raw-arrays">
 <h2>Read raw arrays<a class="headerlink" href="#read-raw-arrays" title="Link to this heading">#</a></h2>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">di</span><span class="o">.</span><span class="n">timestamp_np</span>   <span class="c1"># NDArray[int64] — timestamps in the log&#39;s native unit</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">di</span><span class="o">.</span><span class="n">timestamp_np</span>   <span class="c1"># NDArray[int64] — timestamps in the log's native unit</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">di</span><span class="o">.</span><span class="n">value_np</span>       <span class="c1"># NDArray[float64] — sample values</span>
 </pre></div>
 </div>
 </section>
 <section id="arithmetic-between-variables">
 <h2>Arithmetic between variables<a class="headerlink" href="#arithmetic-between-variables" title="Link to this heading">#</a></h2>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">avg_speed</span> <span class="o">=</span> <span class="p">(</span><span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;pcm.wheelSpeeds.frontRight&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;pcm.wheelSpeeds.frontLeft&quot;</span><span class="p">])</span> <span class="o">/</span> <span class="mf">2.0</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">avg_speed</span> <span class="o">=</span> <span class="p">(</span><span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">"pcm.wheelSpeeds.frontRight"</span><span class="p">]</span> <span class="o">+</span> <span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">"pcm.wheelSpeeds.frontLeft"</span><span class="p">])</span> <span class="o">/</span> <span class="mf">2.0</span>
 </pre></div>
 </div>
 </section>
 <section id="trim-to-a-time-window-timestamps-in-the-log-s-native-unit">
 <h2>Trim to a time window (timestamps in the log’s native unit)<a class="headerlink" href="#trim-to-a-time-window-timestamps-in-the-log-s-native-unit" title="Link to this heading">#</a></h2>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">di_trimmed</span> <span class="o">=</span> <span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;pcm.wheelSpeeds.frontRight&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">trim</span><span class="p">(</span><span class="n">ts_start</span><span class="o">=</span><span class="mi">10_000</span><span class="p">,</span> <span class="n">ts_end</span><span class="o">=</span><span class="mi">30_000</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">di_trimmed</span> <span class="o">=</span> <span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">"pcm.wheelSpeeds.frontRight"</span><span class="p">]</span><span class="o">.</span><span class="n">trim</span><span class="p">(</span><span class="n">ts_start</span><span class="o">=</span><span class="mi">10_000</span><span class="p">,</span> <span class="n">ts_end</span><span class="o">=</span><span class="mi">30_000</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
 <section id="find-variables-when-you-don-t-know-the-exact-name">
 <h2>Find variables when you don’t know the exact name<a class="headerlink" href="#find-variables-when-you-don-t-know-the-exact-name" title="Link to this heading">#</a></h2>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">results</span> <span class="o">=</span> <span class="n">aly</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s2">&quot;front wheel speed&quot;</span><span class="p">)</span>   <span class="c1"># prints + returns list[SearchResult]</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">results</span> <span class="o">=</span> <span class="n">aly</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s2">"front wheel speed"</span><span class="p">)</span>   <span class="c1"># prints + returns list[SearchResult]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">di</span> <span class="o">=</span> <span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">cpp_name</span><span class="p">]</span>
 </pre></div>
 </div>
@@ -433,7 +433,7 @@ objects.</p>
 <section id="summary-stats-for-one-variable">
 <h2>Summary stats for one variable<a class="headerlink" href="#summary-stats-for-one-variable" title="Link to this heading">#</a></h2>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">perda.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">data_instance_summary</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">summary</span> <span class="o">=</span> <span class="n">data_instance_summary</span><span class="p">(</span><span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;pcm.wheelSpeeds.frontRight&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">summary</span> <span class="o">=</span> <span class="n">data_instance_summary</span><span class="p">(</span><span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">"pcm.wheelSpeeds.frontRight"</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">summary</span><span class="p">)</span>          <span class="c1"># formatted block</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">summary</span><span class="o">.</span><span class="n">max_value</span>       <span class="c1"># or read the fields directly</span>
 </pre></div>
@@ -465,7 +465,7 @@ are flagged as gaps. Default is 2.0.</p></li>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span> <span class="o">=</span> <span class="n">aly</span><span class="o">.</span><span class="n">analyze_frequency</span><span class="p">(</span><span class="s2">&quot;ams.stack.thermistors.temperature[38]&quot;</span><span class="p">,</span> <span class="n">expected_frequency_hz</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span> <span class="o">=</span> <span class="n">aly</span><span class="o">.</span><span class="n">analyze_frequency</span><span class="p">(</span><span class="s2">"ams.stack.thermistors.temperature[38]"</span><span class="p">,</span> <span class="n">expected_frequency_hz</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -547,11 +547,11 @@ acceleration run occurs, then compute acceleration times.</p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span> <span class="o">=</span> <span class="n">aly</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s2">&quot;pcm.wheelSpeeds.frontRight&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span> <span class="o">=</span> <span class="n">aly</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="s2">&quot;pcm.wheelSpeeds.frontRight&quot;</span><span class="p">,</span> <span class="s2">&quot;pcm.wheelSpeeds.frontLeft&quot;</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Front Wheel Speeds&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span> <span class="o">=</span> <span class="n">aly</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s2">&quot;pcm.moc.motor.requestedTorque&quot;</span><span class="p">,</span> <span class="s2">&quot;pcm.wheelSpeeds.frontRight&quot;</span><span class="p">,</span> <span class="n">ts_start</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span> <span class="n">ts_end</span><span class="o">=</span><span class="mf">30.0</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span> <span class="o">=</span> <span class="n">aly</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s2">"pcm.wheelSpeeds.frontRight"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span> <span class="o">=</span> <span class="n">aly</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="s2">"pcm.wheelSpeeds.frontRight"</span><span class="p">,</span> <span class="s2">"pcm.wheelSpeeds.frontLeft"</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s2">"Front Wheel Speeds"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span> <span class="o">=</span> <span class="n">aly</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s2">"pcm.moc.motor.requestedTorque"</span><span class="p">,</span> <span class="s2">"pcm.wheelSpeeds.frontRight"</span><span class="p">,</span> <span class="n">ts_start</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span> <span class="n">ts_end</span><span class="o">=</span><span class="mf">30.0</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Plot a derived DataInstance (e.g. average of two signals)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">avg_speed</span> <span class="o">=</span> <span class="p">(</span><span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;pcm.wheelSpeeds.frontRight&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;pcm.wheelSpeeds.frontLeft&quot;</span><span class="p">])</span> <span class="o">/</span> <span class="mf">2.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">avg_speed</span> <span class="o">=</span> <span class="p">(</span><span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">"pcm.wheelSpeeds.frontRight"</span><span class="p">]</span> <span class="o">+</span> <span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">"pcm.wheelSpeeds.frontLeft"</span><span class="p">])</span> <span class="o">/</span> <span class="mf">2.0</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span> <span class="o">=</span> <span class="n">aly</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">avg_speed</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
@@ -581,8 +581,8 @@ and <code class="docutils literal notranslate"><span class="pre">descript</span>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">results</span> <span class="o">=</span> <span class="n">aly</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s2">&quot;front wheel speed&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">results</span> <span class="o">=</span> <span class="n">aly</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s2">&quot;front wheel speed&quot;</span><span class="p">,</span> <span class="n">top_n</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">semantic</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">results</span> <span class="o">=</span> <span class="n">aly</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s2">"front wheel speed"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">results</span> <span class="o">=</span> <span class="n">aly</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s2">"front wheel speed"</span><span class="p">,</span> <span class="n">top_n</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">semantic</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span><span class="o">.</span><span class="n">cpp_name</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">results</span><span class="p">]</span>
 </pre></div>
 </div>
@@ -619,14 +619,14 @@ excluded from all rows. Default is None (no upper bound).</p></li>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span> <span class="o">=</span> <span class="n">aly</span><span class="o">.</span><span class="n">subplots</span><span class="p">([</span><span class="s2">&quot;pcm.wheelSpeeds.frontRight&quot;</span><span class="p">,</span> <span class="s2">&quot;pcm.moc.motor.requestedTorque&quot;</span><span class="p">])</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span> <span class="o">=</span> <span class="n">aly</span><span class="o">.</span><span class="n">subplots</span><span class="p">([</span><span class="s2">"pcm.wheelSpeeds.frontRight"</span><span class="p">,</span> <span class="s2">"pcm.moc.motor.requestedTorque"</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span> <span class="o">=</span> <span class="n">aly</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span>
 <span class="gp">... </span>    <span class="n">rows</span><span class="o">=</span><span class="p">[</span>
-<span class="gp">... </span>        <span class="p">[</span><span class="s2">&quot;pcm.wheelSpeeds.frontRight&quot;</span><span class="p">,</span> <span class="s2">&quot;pcm.wheelSpeeds.frontLeft&quot;</span><span class="p">],</span>
-<span class="gp">... </span>        <span class="s2">&quot;pcm.moc.motor.requestedTorque&quot;</span><span class="p">,</span>
+<span class="gp">... </span>        <span class="p">[</span><span class="s2">"pcm.wheelSpeeds.frontRight"</span><span class="p">,</span> <span class="s2">"pcm.wheelSpeeds.frontLeft"</span><span class="p">],</span>
+<span class="gp">... </span>        <span class="s2">"pcm.moc.motor.requestedTorque"</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="p">],</span>
-<span class="gp">... </span>    <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Run Overview&quot;</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">row_y_labels</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Wheel Speed (mph)&quot;</span><span class="p">,</span> <span class="s2">&quot;Torque (Nm)&quot;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">title</span><span class="o">=</span><span class="s2">"Run Overview"</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">row_y_labels</span><span class="o">=</span><span class="p">[</span><span class="s2">"Wheel Speed (mph)"</span><span class="p">,</span> <span class="s2">"Torque (Nm)"</span><span class="p">],</span>
 <span class="gp">... </span>    <span class="n">ts_start</span><span class="o">=</span><span class="mf">5.0</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="n">ts_end</span><span class="o">=</span><span class="mf">30.0</span><span class="p">,</span>
 <span class="gp">... </span><span class="p">)</span>

@@ -313,11 +313,11 @@
 <div class="viewcode-block" id="FilterOptions">
 <a class="viewcode-back" href="../../../_autosummary/perda.core_data_structures.masking.html#perda.core_data_structures.masking.FilterOptions">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">FilterOptions</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Specifies which array(s) a filter function receives as input.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Specifies which array(s) a filter function receives as input."""</span>
 
-    <span class="n">VALUES</span> <span class="o">=</span> <span class="s2">&quot;left_only&quot;</span>
-    <span class="n">TIMESTAMPS</span> <span class="o">=</span> <span class="s2">&quot;right_only&quot;</span>
-    <span class="n">BOTH</span> <span class="o">=</span> <span class="s2">&quot;both&quot;</span></div>
+    <span class="n">VALUES</span> <span class="o">=</span> <span class="s2">"left_only"</span>
+    <span class="n">TIMESTAMPS</span> <span class="o">=</span> <span class="s2">"right_only"</span>
+    <span class="n">BOTH</span> <span class="o">=</span> <span class="s2">"both"</span></div>
 
 
 
@@ -328,7 +328,7 @@
     <span class="n">filter_func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
     <span class="n">apply_to</span><span class="p">:</span> <span class="n">FilterOptions</span> <span class="o">=</span> <span class="n">FilterOptions</span><span class="o">.</span><span class="n">VALUES</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataInstance</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Apply a filter function to a DataInstance.</span>
 
 <span class="sd">    Parameters</span>
@@ -344,7 +344,7 @@
 <span class="sd">    -------</span>
 <span class="sd">    DataInstance</span>
 <span class="sd">        Filtered DataInstance</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">apply_to</span> <span class="o">==</span> <span class="n">FilterOptions</span><span class="o">.</span><span class="n">VALUES</span><span class="p">:</span>
         <span class="n">mask</span> <span class="o">=</span> <span class="n">filter_func</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">value_np</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">apply_to</span> <span class="o">==</span> <span class="n">FilterOptions</span><span class="o">.</span><span class="n">TIMESTAMPS</span><span class="p">:</span>

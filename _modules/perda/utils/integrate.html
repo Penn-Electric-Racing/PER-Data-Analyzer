@@ -322,7 +322,7 @@
     <span class="n">source_time_unit</span><span class="p">:</span> <span class="n">Timescale</span> <span class="o">=</span> <span class="n">Timescale</span><span class="o">.</span><span class="n">MS</span><span class="p">,</span>
     <span class="n">target_time_unit</span><span class="p">:</span> <span class="n">Timescale</span> <span class="o">=</span> <span class="n">Timescale</span><span class="o">.</span><span class="n">S</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Get integral of the value over time using the trapezoidal rule.</span>
 
 <span class="sd">    Parameters</span>
@@ -346,7 +346,7 @@
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
 <span class="sd">    Uses numpy.trapezoid (trapezoidal rule) for numerical integration of discrete data.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_instance</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
         <span class="k">return</span> <span class="mf">0.0</span>
 
@@ -387,7 +387,7 @@
     <span class="n">source_time_unit</span><span class="p">:</span> <span class="n">Timescale</span> <span class="o">=</span> <span class="n">Timescale</span><span class="o">.</span><span class="n">MS</span><span class="p">,</span>
     <span class="n">target_time_unit</span><span class="p">:</span> <span class="n">Timescale</span> <span class="o">=</span> <span class="n">Timescale</span><span class="o">.</span><span class="n">S</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Get average value over time using integral divided by time range.</span>
 
 <span class="sd">    Parameters</span>
@@ -411,7 +411,7 @@
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
 <span class="sd">    Uses numpy.trapezoid (trapezoidal rule) for numerical integration of discrete data.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_instance</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">data_instance</span><span class="o">.</span><span class="n">value_np</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 
@@ -439,7 +439,7 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">get_data_slice_by_timestamp</span><span class="p">(</span>
     <span class="n">original_instance</span><span class="p">:</span> <span class="n">DataInstance</span><span class="p">,</span> <span class="n">start_time</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">end_time</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataInstance</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Get a new DataInstance with data in [start_time, end_time).</span>
 
 <span class="sd">    Parameters</span>
@@ -455,7 +455,7 @@
 <span class="sd">    -------</span>
 <span class="sd">    DataInstance</span>
 <span class="sd">        New DataInstance containing only data within the specified time range</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">end_time</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="n">mask</span> <span class="o">=</span> <span class="n">original_instance</span><span class="o">.</span><span class="n">timestamp_np</span> <span class="o">&gt;=</span> <span class="n">start_time</span>
     <span class="k">else</span><span class="p">:</span>
@@ -482,7 +482,7 @@
     <span class="n">smoothing_window_len</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">11</span><span class="p">,</span>
     <span class="n">smoothing_poly_order</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Integrate a time-series signal after outlier removal and smoothing.</span>
+<span class="w">    </span><span class="sd">"""Integrate a time-series signal after outlier removal and smoothing.</span>
 
 <span class="sd">    Cleans spikes via rolling MAD-based outlier detection, applies Savitzky-Golay</span>
 <span class="sd">    smoothing, then computes the cumulative trapezoidal integral over time.</span>
@@ -509,7 +509,7 @@
 <span class="sd">    tuple[NDArray[Float64], NDArray[Float64], NDArray[Float64]]</span>
 <span class="sd">        A tuple of (timestamps, smoothed values, cumulative integral), all of the</span>
 <span class="sd">        same length as the input signal.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">v_np</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">value_np</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
     <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
     <span class="n">v_series</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">v_np</span><span class="p">)</span>

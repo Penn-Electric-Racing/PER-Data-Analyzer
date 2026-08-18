@@ -318,7 +318,7 @@
 <div class="viewcode-block" id="ServerClient">
 <a class="viewcode-back" href="../../../_autosummary/perda.server.client.html#perda.server.client.ServerClient">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ServerClient</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Client for accessing log data from the PER data server.</span>
+<span class="w">    </span><span class="sd">"""Client for accessing log data from the PER data server.</span>
 
 <span class="sd">    Authenticates with the gateway, browses available logs with metadata,</span>
 <span class="sd">    and downloads CSV files directly from S3 for analysis.</span>
@@ -326,7 +326,7 @@
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    url : str</span>
-<span class="sd">        Base URL of the data server (e.g. ``&quot;https://data.example.com&quot;``)</span>
+<span class="sd">        Base URL of the data server (e.g. ``"https://data.example.com"``)</span>
 <span class="sd">    cache_dir : str | None</span>
 <span class="sd">        Local directory for caching downloaded logs. When set, repeated</span>
 <span class="sd">        ``load()`` calls for the same log skip the download. ``None``</span>
@@ -334,15 +334,15 @@
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
-<span class="sd">    &gt;&gt;&gt; client = ServerClient(&quot;https://data.example.com&quot;)</span>
-<span class="sd">    &gt;&gt;&gt; client.login(&quot;password&quot;)</span>
-<span class="sd">    &gt;&gt;&gt; logs = client.list_logs(&quot;REV 11/&quot;)</span>
-<span class="sd">    &gt;&gt;&gt; aly = client.load(&quot;REV 11/2026-04-01/test.csv&quot;)</span>
-<span class="sd">    &gt;&gt;&gt; aly.plot(&quot;ams.pack.voltage&quot;)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    &gt;&gt;&gt; client = ServerClient("https://data.example.com")</span>
+<span class="sd">    &gt;&gt;&gt; client.login("password")</span>
+<span class="sd">    &gt;&gt;&gt; logs = client.list_logs("REV 11/")</span>
+<span class="sd">    &gt;&gt;&gt; aly = client.load("REV 11/2026-04-01/test.csv")</span>
+<span class="sd">    &gt;&gt;&gt; aly.plot("ams.pack.voltage")</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">cache_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_url</span> <span class="o">=</span> <span class="n">url</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_url</span> <span class="o">=</span> <span class="n">url</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_session</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">Session</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_s3_credentials</span><span class="p">:</span> <span class="n">S3Credentials</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 
@@ -354,7 +354,7 @@
 <div class="viewcode-block" id="ServerClient.login">
 <a class="viewcode-back" href="../../../_autosummary/perda.server.client.html#perda.server.client.ServerClient.login">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">login</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">password</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Authenticate with the data server.</span>
+<span class="w">        </span><span class="sd">"""Authenticate with the data server.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -365,27 +365,27 @@
 <span class="sd">        ------</span>
 <span class="sd">        ConnectionError</span>
 <span class="sd">            If login fails or the server is unreachable.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">resp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_url</span><span class="si">}</span><span class="s2">/api/v1/auth/login&quot;</span><span class="p">,</span>
-            <span class="n">json</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;password&quot;</span><span class="p">:</span> <span class="n">password</span><span class="p">},</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_url</span><span class="si">}</span><span class="s2">/api/v1/auth/login"</span><span class="p">,</span>
+            <span class="n">json</span><span class="o">=</span><span class="p">{</span><span class="s2">"password"</span><span class="p">:</span> <span class="n">password</span><span class="p">},</span>
         <span class="p">)</span>
         <span class="k">if</span> <span class="n">resp</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ConnectionError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Login failed (HTTP </span><span class="si">{</span><span class="n">resp</span><span class="o">.</span><span class="n">status_code</span><span class="si">}</span><span class="s2">): </span><span class="si">{</span><span class="n">resp</span><span class="o">.</span><span class="n">text</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">"Login failed (HTTP </span><span class="si">{</span><span class="n">resp</span><span class="o">.</span><span class="n">status_code</span><span class="si">}</span><span class="s2">): </span><span class="si">{</span><span class="n">resp</span><span class="o">.</span><span class="n">text</span><span class="si">}</span><span class="s2">"</span>
             <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="ServerClient.list_logs">
 <a class="viewcode-back" href="../../../_autosummary/perda.server.client.html#perda.server.client.ServerClient.list_logs">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">list_logs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">LogEntry</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;List available logs under an S3 prefix, with metadata.</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">list_logs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">LogEntry</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""List available logs under an S3 prefix, with metadata.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        prefix : str</span>
-<span class="sd">            S3 key prefix to browse (e.g. ``&quot;REV 11/&quot;``).</span>
-<span class="sd">            Use ``&quot;&quot;`` for the bucket root.</span>
+<span class="sd">            S3 key prefix to browse (e.g. ``"REV 11/"``).</span>
+<span class="sd">            Use ``""`` for the bucket root.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -394,49 +394,49 @@
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
-<span class="sd">        &gt;&gt;&gt; logs = client.list_logs(&quot;REV 11/&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; logs = client.list_logs("REV 11/")</span>
 <span class="sd">        &gt;&gt;&gt; for log in logs:</span>
 <span class="sd">        ...     print(log)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">objects</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_list_s3_objects</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span>
         <span class="n">metadata_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_page_metadata</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span>
 
         <span class="c1"># Index metadata by log_key for fast lookup</span>
-        <span class="n">meta_by_key</span> <span class="o">=</span> <span class="p">{</span><span class="n">m</span><span class="p">[</span><span class="s2">&quot;log_key&quot;</span><span class="p">]:</span> <span class="n">m</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">metadata_list</span><span class="p">}</span>
+        <span class="n">meta_by_key</span> <span class="o">=</span> <span class="p">{</span><span class="n">m</span><span class="p">[</span><span class="s2">"log_key"</span><span class="p">]:</span> <span class="n">m</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">metadata_list</span><span class="p">}</span>
 
         <span class="n">entries</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">LogEntry</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">objects</span><span class="p">:</span>
-            <span class="n">meta</span> <span class="o">=</span> <span class="n">meta_by_key</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">obj</span><span class="p">[</span><span class="s2">&quot;key&quot;</span><span class="p">],</span> <span class="p">{})</span>
+            <span class="n">meta</span> <span class="o">=</span> <span class="n">meta_by_key</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">obj</span><span class="p">[</span><span class="s2">"key"</span><span class="p">],</span> <span class="p">{})</span>
             <span class="n">entries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                 <span class="n">LogEntry</span><span class="p">(</span>
-                    <span class="n">key</span><span class="o">=</span><span class="n">obj</span><span class="p">[</span><span class="s2">&quot;key&quot;</span><span class="p">],</span>
-                    <span class="n">name</span><span class="o">=</span><span class="n">obj</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">],</span>
-                    <span class="n">is_folder</span><span class="o">=</span><span class="n">obj</span><span class="p">[</span><span class="s2">&quot;isFolder&quot;</span><span class="p">],</span>
-                    <span class="n">size</span><span class="o">=</span><span class="n">obj</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;size&quot;</span><span class="p">),</span>
-                    <span class="n">last_modified</span><span class="o">=</span><span class="n">obj</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;lastModified&quot;</span><span class="p">),</span>
-                    <span class="n">title</span><span class="o">=</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
-                    <span class="n">description</span><span class="o">=</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;description&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
-                    <span class="n">tags</span><span class="o">=</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;tags&quot;</span><span class="p">,</span> <span class="p">[]),</span>
-                    <span class="n">string_metadata</span><span class="o">=</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;string_metadata&quot;</span><span class="p">,</span> <span class="p">{}),</span>
-                    <span class="n">numeric_metadata</span><span class="o">=</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;numeric_metadata&quot;</span><span class="p">,</span> <span class="p">{}),</span>
+                    <span class="n">key</span><span class="o">=</span><span class="n">obj</span><span class="p">[</span><span class="s2">"key"</span><span class="p">],</span>
+                    <span class="n">name</span><span class="o">=</span><span class="n">obj</span><span class="p">[</span><span class="s2">"name"</span><span class="p">],</span>
+                    <span class="n">is_folder</span><span class="o">=</span><span class="n">obj</span><span class="p">[</span><span class="s2">"isFolder"</span><span class="p">],</span>
+                    <span class="n">size</span><span class="o">=</span><span class="n">obj</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"size"</span><span class="p">),</span>
+                    <span class="n">last_modified</span><span class="o">=</span><span class="n">obj</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"lastModified"</span><span class="p">),</span>
+                    <span class="n">title</span><span class="o">=</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"title"</span><span class="p">,</span> <span class="s2">""</span><span class="p">),</span>
+                    <span class="n">description</span><span class="o">=</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"description"</span><span class="p">,</span> <span class="s2">""</span><span class="p">),</span>
+                    <span class="n">tags</span><span class="o">=</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"tags"</span><span class="p">,</span> <span class="p">[]),</span>
+                    <span class="n">string_metadata</span><span class="o">=</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"string_metadata"</span><span class="p">,</span> <span class="p">{}),</span>
+                    <span class="n">numeric_metadata</span><span class="o">=</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"numeric_metadata"</span><span class="p">,</span> <span class="p">{}),</span>
                 <span class="p">)</span>
             <span class="p">)</span>
         <span class="k">return</span> <span class="n">entries</span></div>
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_download</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">log_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Download a log CSV from S3.</span>
+<span class="w">        </span><span class="sd">"""Download a log CSV from S3.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        log_key : str</span>
-<span class="sd">            Full S3 key of the log file (e.g. ``&quot;REV 11/2026-04-01/test.csv&quot;``)</span>
+<span class="sd">            Full S3 key of the log file (e.g. ``"REV 11/2026-04-01/test.csv"``)</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        str</span>
 <span class="sd">            Local file path to the downloaded CSV.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="c1"># Check cache first</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cache_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">cached_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cache_dir</span> <span class="o">/</span> <span class="n">log_key</span>
@@ -446,7 +446,7 @@
         <span class="c1"># Download from S3 with progress bar</span>
         <span class="n">creds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_s3_credentials</span><span class="p">()</span>
         <span class="n">s3</span> <span class="o">=</span> <span class="n">boto3</span><span class="o">.</span><span class="n">client</span><span class="p">(</span>
-            <span class="s2">&quot;s3&quot;</span><span class="p">,</span>
+            <span class="s2">"s3"</span><span class="p">,</span>
             <span class="n">aws_access_key_id</span><span class="o">=</span><span class="n">creds</span><span class="o">.</span><span class="n">access_key</span><span class="p">,</span>
             <span class="n">aws_secret_access_key</span><span class="o">=</span><span class="n">creds</span><span class="o">.</span><span class="n">secret_key</span><span class="p">,</span>
             <span class="n">endpoint_url</span><span class="o">=</span><span class="n">creds</span><span class="o">.</span><span class="n">endpoint</span><span class="p">,</span>
@@ -457,17 +457,17 @@
             <span class="n">dest</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">tmp</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">NamedTemporaryFile</span><span class="p">(</span>
-                <span class="n">suffix</span><span class="o">=</span><span class="s2">&quot;.csv&quot;</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;perda_&quot;</span><span class="p">,</span> <span class="n">delete</span><span class="o">=</span><span class="kc">False</span>
+                <span class="n">suffix</span><span class="o">=</span><span class="s2">".csv"</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">"perda_"</span><span class="p">,</span> <span class="n">delete</span><span class="o">=</span><span class="kc">False</span>
             <span class="p">)</span>
             <span class="n">tmp</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
             <span class="n">dest</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">tmp</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
 
         <span class="n">head</span> <span class="o">=</span> <span class="n">s3</span><span class="o">.</span><span class="n">head_object</span><span class="p">(</span><span class="n">Bucket</span><span class="o">=</span><span class="n">creds</span><span class="o">.</span><span class="n">bucket_name</span><span class="p">,</span> <span class="n">Key</span><span class="o">=</span><span class="n">log_key</span><span class="p">)</span>
-        <span class="n">total_bytes</span> <span class="o">=</span> <span class="n">head</span><span class="p">[</span><span class="s2">&quot;ContentLength&quot;</span><span class="p">]</span>
-        <span class="n">filename</span> <span class="o">=</span> <span class="n">log_key</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">total_bytes</span> <span class="o">=</span> <span class="n">head</span><span class="p">[</span><span class="s2">"ContentLength"</span><span class="p">]</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="n">log_key</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s2">"/"</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 
         <span class="k">with</span> <span class="n">tqdm</span><span class="p">(</span>
-            <span class="n">total</span><span class="o">=</span><span class="n">total_bytes</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="n">unit_scale</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Downloading </span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">total</span><span class="o">=</span><span class="n">total_bytes</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">"B"</span><span class="p">,</span> <span class="n">unit_scale</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Downloading </span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">"</span>
         <span class="p">)</span> <span class="k">as</span> <span class="n">pbar</span><span class="p">:</span>
             <span class="n">s3</span><span class="o">.</span><span class="n">download_file</span><span class="p">(</span>
                 <span class="n">creds</span><span class="o">.</span><span class="n">bucket_name</span><span class="p">,</span> <span class="n">log_key</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">dest</span><span class="p">),</span> <span class="n">Callback</span><span class="o">=</span><span class="n">pbar</span><span class="o">.</span><span class="n">update</span>
@@ -482,7 +482,7 @@
         <span class="n">ts_offset</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
         <span class="n">parsing_errors_limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Analyzer</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Download a log from S3 and return an Analyzer instance.</span>
+<span class="w">        </span><span class="sd">"""Download a log from S3 and return an Analyzer instance.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -500,9 +500,9 @@
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
-<span class="sd">        &gt;&gt;&gt; aly = client.load(&quot;REV 11/2026-04-01/test.csv&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; aly = client.load("REV 11/2026-04-01/test.csv")</span>
 <span class="sd">        &gt;&gt;&gt; print(aly)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">local_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_download</span><span class="p">(</span><span class="n">log_key</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">Analyzer</span><span class="p">(</span>
@@ -517,38 +517,38 @@
 
 <div class="viewcode-block" id="ServerClient.print_logs">
 <a class="viewcode-back" href="../../../_autosummary/perda.server.client.html#perda.server.client.ServerClient.print_logs">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">print_logs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Print a formatted listing of available logs.</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">print_logs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Print a formatted listing of available logs.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        prefix : str</span>
-<span class="sd">            S3 key prefix to browse. Default is ``&quot;&quot;`` (bucket root).</span>
+<span class="sd">            S3 key prefix to browse. Default is ``""`` (bucket root).</span>
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
-<span class="sd">        &gt;&gt;&gt; client.print_logs(&quot;REV 11/&quot;)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        &gt;&gt;&gt; client.print_logs("REV 11/")</span>
+<span class="sd">        """</span>
         <span class="n">entries</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">list_logs</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Logs under &quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Logs under "</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s1">"'</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">DELIMITER</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">entries</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">DELIMITER</span><span class="p">)</span>
         <span class="n">file_count</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">entries</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">e</span><span class="o">.</span><span class="n">is_folder</span><span class="p">)</span>
         <span class="n">folder_count</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">entries</span> <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">is_folder</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">folder_count</span><span class="si">}</span><span class="s2"> folders, </span><span class="si">{</span><span class="n">file_count</span><span class="si">}</span><span class="s2"> files&quot;</span><span class="p">)</span></div>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">folder_count</span><span class="si">}</span><span class="s2"> folders, </span><span class="si">{</span><span class="n">file_count</span><span class="si">}</span><span class="s2"> files"</span><span class="p">)</span></div>
 
 
     <span class="c1"># ── Private helpers ──────────────────────────────────────────────</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_api_get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">requests</span><span class="o">.</span><span class="n">Response</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Send an authenticated GET request to the gateway.</span>
+<span class="w">        </span><span class="sd">"""Send an authenticated GET request to the gateway.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        path : str</span>
-<span class="sd">            API path (e.g. ``&quot;/api/v1/metadata/some_key&quot;``)</span>
+<span class="sd">            API path (e.g. ``"/api/v1/metadata/some_key"``)</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -559,21 +559,21 @@
 <span class="sd">        ------</span>
 <span class="sd">        ConnectionError</span>
 <span class="sd">            If the request fails with a non-2xx status.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">resp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_url</span><span class="si">}{</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="sd">        """</span>
+        <span class="n">resp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_url</span><span class="si">}{</span><span class="n">path</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">resp</span><span class="o">.</span><span class="n">ok</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ConnectionError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;GET </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2"> failed (HTTP </span><span class="si">{</span><span class="n">resp</span><span class="o">.</span><span class="n">status_code</span><span class="si">}</span><span class="s2">): </span><span class="si">{</span><span class="n">resp</span><span class="o">.</span><span class="n">text</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">"GET </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2"> failed (HTTP </span><span class="si">{</span><span class="n">resp</span><span class="o">.</span><span class="n">status_code</span><span class="si">}</span><span class="s2">): </span><span class="si">{</span><span class="n">resp</span><span class="o">.</span><span class="n">text</span><span class="si">}</span><span class="s2">"</span>
             <span class="p">)</span>
         <span class="k">return</span> <span class="n">resp</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_api_post</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">json</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">requests</span><span class="o">.</span><span class="n">Response</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Send an authenticated POST request to the gateway.</span>
+<span class="w">        </span><span class="sd">"""Send an authenticated POST request to the gateway.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        path : str</span>
-<span class="sd">            API path (e.g. ``&quot;/api/v1/s3/list&quot;``)</span>
+<span class="sd">            API path (e.g. ``"/api/v1/s3/list"``)</span>
 <span class="sd">        json : dict | None</span>
 <span class="sd">            JSON payload.</span>
 
@@ -586,29 +586,29 @@
 <span class="sd">        ------</span>
 <span class="sd">        ConnectionError</span>
 <span class="sd">            If the request fails with a non-2xx status.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">resp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_url</span><span class="si">}{</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="n">json</span> <span class="ow">or</span> <span class="p">{})</span>
+<span class="sd">        """</span>
+        <span class="n">resp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_url</span><span class="si">}{</span><span class="n">path</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="n">json</span> <span class="ow">or</span> <span class="p">{})</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">resp</span><span class="o">.</span><span class="n">ok</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ConnectionError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;POST </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2"> failed (HTTP </span><span class="si">{</span><span class="n">resp</span><span class="o">.</span><span class="n">status_code</span><span class="si">}</span><span class="s2">): </span><span class="si">{</span><span class="n">resp</span><span class="o">.</span><span class="n">text</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">"POST </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2"> failed (HTTP </span><span class="si">{</span><span class="n">resp</span><span class="o">.</span><span class="n">status_code</span><span class="si">}</span><span class="s2">): </span><span class="si">{</span><span class="n">resp</span><span class="o">.</span><span class="n">text</span><span class="si">}</span><span class="s2">"</span>
             <span class="p">)</span>
         <span class="k">return</span> <span class="n">resp</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_get_s3_credentials</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">S3Credentials</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch and cache read-only S3 credentials from the gateway.</span>
+<span class="w">        </span><span class="sd">"""Fetch and cache read-only S3 credentials from the gateway.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        S3Credentials</span>
 <span class="sd">            Credentials for direct S3 access.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_s3_credentials</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">resp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_post</span><span class="p">(</span><span class="s2">&quot;/api/v1/s3/credentials&quot;</span><span class="p">)</span>
+            <span class="n">resp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_post</span><span class="p">(</span><span class="s2">"/api/v1/s3/credentials"</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_s3_credentials</span> <span class="o">=</span> <span class="n">S3Credentials</span><span class="p">(</span><span class="o">**</span><span class="n">resp</span><span class="o">.</span><span class="n">json</span><span class="p">())</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_s3_credentials</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_list_s3_objects</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Call the gateway S3 list endpoint.</span>
+<span class="w">        </span><span class="sd">"""Call the gateway S3 list endpoint.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -619,12 +619,12 @@
 <span class="sd">        -------</span>
 <span class="sd">        list</span>
 <span class="sd">            Raw list of S3 object dicts from the server.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">resp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_post</span><span class="p">(</span><span class="s2">&quot;/api/v1/s3/list&quot;</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;prefix&quot;</span><span class="p">:</span> <span class="n">prefix</span><span class="p">})</span>
+<span class="sd">        """</span>
+        <span class="n">resp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_post</span><span class="p">(</span><span class="s2">"/api/v1/s3/list"</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="p">{</span><span class="s2">"prefix"</span><span class="p">:</span> <span class="n">prefix</span><span class="p">})</span>
         <span class="k">return</span> <span class="n">resp</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_get_page_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch metadata for direct children of a path.</span>
+<span class="w">        </span><span class="sd">"""Fetch metadata for direct children of a path.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -635,8 +635,8 @@
 <span class="sd">        -------</span>
 <span class="sd">        list</span>
 <span class="sd">            List of metadata dicts from the server.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">resp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_post</span><span class="p">(</span><span class="s2">&quot;/api/v1/metadata/page&quot;</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;path&quot;</span><span class="p">:</span> <span class="n">path</span><span class="p">})</span>
+<span class="sd">        """</span>
+        <span class="n">resp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_post</span><span class="p">(</span><span class="s2">"/api/v1/metadata/page"</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="p">{</span><span class="s2">"path"</span><span class="p">:</span> <span class="n">path</span><span class="p">})</span>
         <span class="k">return</span> <span class="n">resp</span><span class="o">.</span><span class="n">json</span><span class="p">()</span></div>
 
 </pre></div>

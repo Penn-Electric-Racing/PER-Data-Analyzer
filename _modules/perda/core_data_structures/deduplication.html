@@ -310,7 +310,7 @@
 <div class="viewcode-block" id="deduplicate">
 <a class="viewcode-back" href="../../../_autosummary/perda.core_data_structures.deduplication.html#perda.core_data_structures.deduplication.deduplicate">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">deduplicate</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">DataInstance</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataInstance</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Remove consecutive duplicate values from a DataInstance.</span>
 
 <span class="sd">    Parameters</span>
@@ -323,8 +323,8 @@
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
-<span class="sd">    &gt;&gt;&gt; gps_deduped = deduplicate(analyzer.data[&quot;gps.lat&quot;])</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    &gt;&gt;&gt; gps_deduped = deduplicate(analyzer.data["gps.lat"])</span>
+<span class="sd">    """</span>
     <span class="n">src_v</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">value_np</span>
     <span class="n">keep</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(([</span><span class="kc">True</span><span class="p">],</span> <span class="n">src_v</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">!=</span> <span class="n">src_v</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
     <span class="k">return</span> <span class="n">DataInstance</span><span class="p">(</span>
