@@ -5,7 +5,7 @@ repos:
       - id: nbstripout
         args:
           - --extra-keys
-          - metadata.kernelspec.display_name metadata.kernelspec.name metadata.language_info.version
+          - metadata.kernelspec metadata.language_info.version
 
   - repo: https://github.com/PyCQA/autoflake
     rev: v2.3.1

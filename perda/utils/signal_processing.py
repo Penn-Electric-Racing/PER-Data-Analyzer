@@ -8,7 +8,7 @@ from scipy.ndimage import uniform_filter1d
 from scipy.signal import butter, sosfiltfilt
 
 from ..core_data_structures.data_instance import DataInstance, left_join_data_instances
-from ..units import Timescale, _to_seconds
+from ..units import Timescale, to_seconds
 
 
 def apply_sos_filter(
@@ -92,7 +92,7 @@ def lowpass_filter(
     results: list[DataInstance] = []
 
     for instance in di_list:
-        ts_s = _to_seconds(instance.timestamp_np.astype(np.float64), source_time_unit)
+        ts_s = to_seconds(instance.timestamp_np.astype(np.float64), source_time_unit)
         dt = float(np.median(np.diff(ts_s)))
         if dt <= 0 or not np.isfinite(dt):
             raise ValueError(
@@ -259,7 +259,7 @@ def zscore_filter(
     results: list[DataInstance] = []
 
     for instance in di_list:
-        ts_s = _to_seconds(instance.timestamp_np.astype(np.float64), source_time_unit)
+        ts_s = to_seconds(instance.timestamp_np.astype(np.float64), source_time_unit)
         dt = float(np.median(np.diff(ts_s)))
         if dt <= 0:
             raise ValueError(
@@ -363,7 +363,7 @@ def compute_fft(
             )
         dx = float(np.median(positive_diffs))
     else:
-        ts_s = _to_seconds(di.timestamp_np.astype(np.float64), source_time_unit)
+        ts_s = to_seconds(di.timestamp_np.astype(np.float64), source_time_unit)
         dt = float(np.median(np.diff(ts_s)))
         if dt <= 0:
             raise ValueError(
