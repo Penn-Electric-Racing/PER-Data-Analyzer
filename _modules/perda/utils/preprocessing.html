@@ -302,7 +302,9 @@
                 <article class="bd-article">
                   
   <h1>Source code for perda.utils.preprocessing</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Union</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">overload</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="kn">import</span> <span class="n">float64</span>
@@ -342,13 +344,18 @@
     <span class="p">(</span><span class="mf">3.96</span><span class="p">,</span> <span class="mf">97.0</span><span class="p">),</span>  <span class="c1"># max right</span>
 <span class="p">)</span>
 
-<span class="c1"># Type alias for a preprocessing step function that takes and returns a SingleRunData instance.</span>
 <span class="n">PreprocessingStep</span> <span class="o">=</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">SingleRunData</span><span class="p">],</span> <span class="n">SingleRunData</span><span class="p">]</span>
 
+<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">"T"</span><span class="p">)</span>
 
-<div class="viewcode-block" id="PatchNedVelocityLambda">
-<a class="viewcode-back" href="../../../_autosummary/perda.utils.preprocessing.html#perda.utils.preprocessing.PatchNedVelocityLambda">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">PatchNedVelocityLambda</span><span class="p">:</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_keep_current_if_unset</span><span class="p">(</span><span class="n">supplied_value</span><span class="p">:</span> <span class="n">T</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">current_value</span><span class="p">:</span> <span class="n">T</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">current_value</span> <span class="k">if</span> <span class="n">supplied_value</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">supplied_value</span>
+
+
+<div class="viewcode-block" id="PatchNedVelocity">
+<a class="viewcode-back" href="../../../_autosummary/perda.utils.preprocessing.html#perda.utils.preprocessing.PatchNedVelocity">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">PatchNedVelocity</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""Backing class for the ``patch_ned_velocity`` preprocessing step."""</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -369,9 +376,28 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">ned_vel_e</span> <span class="o">=</span> <span class="n">ned_vel_e</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ned_vel_d</span> <span class="o">=</span> <span class="n">ned_vel_d</span>
 
+    <span class="nd">@overload</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">SingleRunData</span><span class="p">,</span> <span class="o">/</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SingleRunData</span><span class="p">:</span> <span class="o">...</span>
+
+    <span class="nd">@overload</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">data</span><span class="p">:</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">/</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">body_vel_x</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+        <span class="n">body_vel_y</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+        <span class="n">body_vel_z</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+        <span class="n">yaw</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+        <span class="n">ned_vel_n</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+        <span class="n">ned_vel_e</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+        <span class="n">ned_vel_d</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PatchNedVelocity</span><span class="p">:</span> <span class="o">...</span>
+
     <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">data</span><span class="p">:</span> <span class="n">SingleRunData</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">/</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">body_vel_x</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">body_vel_y</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -380,7 +406,7 @@
         <span class="n">ned_vel_n</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">ned_vel_e</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">ned_vel_d</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">SingleRunData</span><span class="p">,</span> <span class="s2">"PatchNedVelocityLambda"</span><span class="p">]:</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SingleRunData</span> <span class="o">|</span> <span class="n">PatchNedVelocity</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""Apply the step to ``data``, or return a reconfigured copy when called with keyword args.</span>
 
 <span class="sd">        Parameters</span>
@@ -404,32 +430,20 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        SingleRunData or PatchNedVelocityLambda</span>
+<span class="sd">        SingleRunData or PatchNedVelocity</span>
 <span class="sd">            Transformed data when ``data`` is passed; reconfigured step otherwise.</span>
 <span class="sd">        """</span>
-        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span>
-            <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-            <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="p">(</span>
-                <span class="n">body_vel_x</span><span class="p">,</span>
-                <span class="n">body_vel_y</span><span class="p">,</span>
-                <span class="n">body_vel_z</span><span class="p">,</span>
-                <span class="n">yaw</span><span class="p">,</span>
-                <span class="n">ned_vel_n</span><span class="p">,</span>
-                <span class="n">ned_vel_e</span><span class="p">,</span>
-                <span class="n">ned_vel_d</span><span class="p">,</span>
-            <span class="p">)</span>
-        <span class="p">):</span>
-            <span class="k">return</span> <span class="n">PatchNedVelocityLambda</span><span class="p">(</span>
-                <span class="n">body_vel_x</span><span class="o">=</span><span class="n">body_vel_x</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">body_vel_x</span><span class="p">,</span>
-                <span class="n">body_vel_y</span><span class="o">=</span><span class="n">body_vel_y</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">body_vel_y</span><span class="p">,</span>
-                <span class="n">body_vel_z</span><span class="o">=</span><span class="n">body_vel_z</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">body_vel_z</span><span class="p">,</span>
-                <span class="n">yaw</span><span class="o">=</span><span class="n">yaw</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">yaw</span><span class="p">,</span>
-                <span class="n">ned_vel_n</span><span class="o">=</span><span class="n">ned_vel_n</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">ned_vel_n</span><span class="p">,</span>
-                <span class="n">ned_vel_e</span><span class="o">=</span><span class="n">ned_vel_e</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">ned_vel_e</span><span class="p">,</span>
-                <span class="n">ned_vel_d</span><span class="o">=</span><span class="n">ned_vel_d</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">ned_vel_d</span><span class="p">,</span>
+        <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">PatchNedVelocity</span><span class="p">(</span>
+                <span class="n">body_vel_x</span><span class="o">=</span><span class="n">_keep_current_if_unset</span><span class="p">(</span><span class="n">body_vel_x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">body_vel_x</span><span class="p">),</span>
+                <span class="n">body_vel_y</span><span class="o">=</span><span class="n">_keep_current_if_unset</span><span class="p">(</span><span class="n">body_vel_y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">body_vel_y</span><span class="p">),</span>
+                <span class="n">body_vel_z</span><span class="o">=</span><span class="n">_keep_current_if_unset</span><span class="p">(</span><span class="n">body_vel_z</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">body_vel_z</span><span class="p">),</span>
+                <span class="n">yaw</span><span class="o">=</span><span class="n">_keep_current_if_unset</span><span class="p">(</span><span class="n">yaw</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">yaw</span><span class="p">),</span>
+                <span class="n">ned_vel_n</span><span class="o">=</span><span class="n">_keep_current_if_unset</span><span class="p">(</span><span class="n">ned_vel_n</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ned_vel_n</span><span class="p">),</span>
+                <span class="n">ned_vel_e</span><span class="o">=</span><span class="n">_keep_current_if_unset</span><span class="p">(</span><span class="n">ned_vel_e</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ned_vel_e</span><span class="p">),</span>
+                <span class="n">ned_vel_d</span><span class="o">=</span><span class="n">_keep_current_if_unset</span><span class="p">(</span><span class="n">ned_vel_d</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ned_vel_d</span><span class="p">),</span>
             <span class="p">)</span>
 
-        <span class="k">assert</span> <span class="n">data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="n">required</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">body_vel_x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">body_vel_y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">body_vel_z</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">yaw</span><span class="p">]</span>
         <span class="n">missing</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">required</span> <span class="k">if</span> <span class="n">v</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">missing</span><span class="p">:</span>
@@ -485,9 +499,9 @@
 
 
 
-<div class="viewcode-block" id="ConvertWheelspeedsToMPerSLambda">
-<a class="viewcode-back" href="../../../_autosummary/perda.utils.preprocessing.html#perda.utils.preprocessing.ConvertWheelspeedsToMPerSLambda">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">ConvertWheelspeedsToMPerSLambda</span><span class="p">:</span>
+<div class="viewcode-block" id="ConvertWheelspeedsToMPerS">
+<a class="viewcode-back" href="../../../_autosummary/perda.utils.preprocessing.html#perda.utils.preprocessing.ConvertWheelspeedsToMPerS">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ConvertWheelspeedsToMPerS</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""Backing class for the ``convert_wheelspeeds_to_m_per_s`` preprocessing step."""</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -502,15 +516,31 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">wheelspeed_rr</span> <span class="o">=</span> <span class="n">wheelspeed_rr</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">wheelspeed_rl</span> <span class="o">=</span> <span class="n">wheelspeed_rl</span>
 
+    <span class="nd">@overload</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">SingleRunData</span><span class="p">,</span> <span class="o">/</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SingleRunData</span><span class="p">:</span> <span class="o">...</span>
+
+    <span class="nd">@overload</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">data</span><span class="p">:</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">/</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">wheelspeed_fr</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+        <span class="n">wheelspeed_fl</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+        <span class="n">wheelspeed_rr</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+        <span class="n">wheelspeed_rl</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ConvertWheelspeedsToMPerS</span><span class="p">:</span> <span class="o">...</span>
+
     <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">data</span><span class="p">:</span> <span class="n">SingleRunData</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">/</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">wheelspeed_fr</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">wheelspeed_fl</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">wheelspeed_rr</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">wheelspeed_rl</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">SingleRunData</span><span class="p">,</span> <span class="s2">"ConvertWheelspeedsToMPerSLambda"</span><span class="p">]:</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SingleRunData</span> <span class="o">|</span> <span class="n">ConvertWheelspeedsToMPerS</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""Apply the step to ``data``, or return a reconfigured copy when called with keyword args.</span>
 
 <span class="sd">        Parameters</span>
@@ -528,21 +558,17 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        SingleRunData or ConvertWheelspeedsToMPerSLambda</span>
+<span class="sd">        SingleRunData or ConvertWheelspeedsToMPerS</span>
 <span class="sd">            Transformed data when ``data`` is passed; reconfigured step otherwise.</span>
 <span class="sd">        """</span>
-        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span>
-            <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-            <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="p">(</span><span class="n">wheelspeed_fr</span><span class="p">,</span> <span class="n">wheelspeed_fl</span><span class="p">,</span> <span class="n">wheelspeed_rr</span><span class="p">,</span> <span class="n">wheelspeed_rl</span><span class="p">)</span>
-        <span class="p">):</span>
-            <span class="k">return</span> <span class="n">ConvertWheelspeedsToMPerSLambda</span><span class="p">(</span>
-                <span class="n">wheelspeed_fr</span><span class="o">=</span><span class="n">wheelspeed_fr</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">wheelspeed_fr</span><span class="p">,</span>
-                <span class="n">wheelspeed_fl</span><span class="o">=</span><span class="n">wheelspeed_fl</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">wheelspeed_fl</span><span class="p">,</span>
-                <span class="n">wheelspeed_rr</span><span class="o">=</span><span class="n">wheelspeed_rr</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">wheelspeed_rr</span><span class="p">,</span>
-                <span class="n">wheelspeed_rl</span><span class="o">=</span><span class="n">wheelspeed_rl</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">wheelspeed_rl</span><span class="p">,</span>
+        <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">ConvertWheelspeedsToMPerS</span><span class="p">(</span>
+                <span class="n">wheelspeed_fr</span><span class="o">=</span><span class="n">_keep_current_if_unset</span><span class="p">(</span><span class="n">wheelspeed_fr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">wheelspeed_fr</span><span class="p">),</span>
+                <span class="n">wheelspeed_fl</span><span class="o">=</span><span class="n">_keep_current_if_unset</span><span class="p">(</span><span class="n">wheelspeed_fl</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">wheelspeed_fl</span><span class="p">),</span>
+                <span class="n">wheelspeed_rr</span><span class="o">=</span><span class="n">_keep_current_if_unset</span><span class="p">(</span><span class="n">wheelspeed_rr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">wheelspeed_rr</span><span class="p">),</span>
+                <span class="n">wheelspeed_rl</span><span class="o">=</span><span class="n">_keep_current_if_unset</span><span class="p">(</span><span class="n">wheelspeed_rl</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">wheelspeed_rl</span><span class="p">),</span>
             <span class="p">)</span>
 
-        <span class="k">assert</span> <span class="n">data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">wheelspeed_fr</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">wheelspeed_fl</span><span class="p">,</span>
@@ -580,9 +606,9 @@
 
 
 
-<div class="viewcode-block" id="CorrectMotorDataLambda">
-<a class="viewcode-back" href="../../../_autosummary/perda.utils.preprocessing.html#perda.utils.preprocessing.CorrectMotorDataLambda">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">CorrectMotorDataLambda</span><span class="p">:</span>
+<div class="viewcode-block" id="CorrectMotorData">
+<a class="viewcode-back" href="../../../_autosummary/perda.utils.preprocessing.html#perda.utils.preprocessing.CorrectMotorData">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CorrectMotorData</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""Backing class for the ``correct_motor_data`` preprocessing step."""</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -597,15 +623,31 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">motor_rpm</span> <span class="o">=</span> <span class="n">motor_rpm</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">motor_wheelspeed</span> <span class="o">=</span> <span class="n">motor_wheelspeed</span>
 
+    <span class="nd">@overload</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">SingleRunData</span><span class="p">,</span> <span class="o">/</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SingleRunData</span><span class="p">:</span> <span class="o">...</span>
+
+    <span class="nd">@overload</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">data</span><span class="p">:</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">/</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">gear_ratio</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+        <span class="n">tire_radius_in</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+        <span class="n">motor_rpm</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+        <span class="n">motor_wheelspeed</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CorrectMotorData</span><span class="p">:</span> <span class="o">...</span>
+
     <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">data</span><span class="p">:</span> <span class="n">SingleRunData</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">/</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">gear_ratio</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">tire_radius_in</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">motor_rpm</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">motor_wheelspeed</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">SingleRunData</span><span class="p">,</span> <span class="s2">"CorrectMotorDataLambda"</span><span class="p">]:</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SingleRunData</span> <span class="o">|</span> <span class="n">CorrectMotorData</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""Apply the step to ``data``, or return a reconfigured copy when called with keyword args.</span>
 
 <span class="sd">        Parameters</span>
@@ -623,25 +665,21 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        SingleRunData or CorrectMotorDataLambda</span>
+<span class="sd">        SingleRunData or CorrectMotorData</span>
 <span class="sd">            Transformed data when ``data`` is passed; reconfigured step otherwise.</span>
 <span class="sd">        """</span>
-        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span>
-            <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-            <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="p">(</span><span class="n">gear_ratio</span><span class="p">,</span> <span class="n">tire_radius_in</span><span class="p">,</span> <span class="n">motor_rpm</span><span class="p">,</span> <span class="n">motor_wheelspeed</span><span class="p">)</span>
-        <span class="p">):</span>
-            <span class="k">return</span> <span class="n">CorrectMotorDataLambda</span><span class="p">(</span>
-                <span class="n">gear_ratio</span><span class="o">=</span><span class="n">gear_ratio</span> <span class="k">if</span> <span class="n">gear_ratio</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">gear_ratio</span><span class="p">,</span>
-                <span class="n">tire_radius_in</span><span class="o">=</span><span class="p">(</span>
-                    <span class="n">tire_radius_in</span>
-                    <span class="k">if</span> <span class="n">tire_radius_in</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-                    <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">tire_radius_in</span>
+        <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">CorrectMotorData</span><span class="p">(</span>
+                <span class="n">gear_ratio</span><span class="o">=</span><span class="n">_keep_current_if_unset</span><span class="p">(</span><span class="n">gear_ratio</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gear_ratio</span><span class="p">),</span>
+                <span class="n">tire_radius_in</span><span class="o">=</span><span class="n">_keep_current_if_unset</span><span class="p">(</span>
+                    <span class="n">tire_radius_in</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tire_radius_in</span>
                 <span class="p">),</span>
-                <span class="n">motor_rpm</span><span class="o">=</span><span class="n">motor_rpm</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">motor_rpm</span><span class="p">,</span>
-                <span class="n">motor_wheelspeed</span><span class="o">=</span><span class="n">motor_wheelspeed</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">motor_wheelspeed</span><span class="p">,</span>
+                <span class="n">motor_rpm</span><span class="o">=</span><span class="n">_keep_current_if_unset</span><span class="p">(</span><span class="n">motor_rpm</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">motor_rpm</span><span class="p">),</span>
+                <span class="n">motor_wheelspeed</span><span class="o">=</span><span class="n">_keep_current_if_unset</span><span class="p">(</span>
+                    <span class="n">motor_wheelspeed</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">motor_wheelspeed</span>
+                <span class="p">),</span>
             <span class="p">)</span>
 
-        <span class="k">assert</span> <span class="n">data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">motor_rpm</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">"WARNING: correct_motor_data skipped — missing variable: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">motor_rpm</span><span class="si">}</span><span class="s2">"</span>
@@ -687,9 +725,9 @@
 
 
 
-<div class="viewcode-block" id="CorrectSteeringAngleLambda">
-<a class="viewcode-back" href="../../../_autosummary/perda.utils.preprocessing.html#perda.utils.preprocessing.CorrectSteeringAngleLambda">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">CorrectSteeringAngleLambda</span><span class="p">:</span>
+<div class="viewcode-block" id="CorrectSteeringAngle">
+<a class="viewcode-back" href="../../../_autosummary/perda.utils.preprocessing.html#perda.utils.preprocessing.CorrectSteeringAngle">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CorrectSteeringAngle</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Backing class for the ``correct_steering_angle`` preprocessing step.</span>
 
@@ -715,14 +753,29 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">deg</span> <span class="o">=</span> <span class="mi">2</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">pts</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">3</span> <span class="k">else</span> <span class="mi">1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">coeffs</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">polyfit</span><span class="p">(</span><span class="n">volts</span><span class="p">,</span> <span class="n">angles</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">deg</span><span class="p">)</span>
 
+    <span class="nd">@overload</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">SingleRunData</span><span class="p">,</span> <span class="o">/</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SingleRunData</span><span class="p">:</span> <span class="o">...</span>
+
+    <span class="nd">@overload</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">data</span><span class="p">:</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">/</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">calibration</span><span class="p">:</span> <span class="n">SteeringCalibration</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+        <span class="n">steering_raw</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+        <span class="n">steering_angle</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CorrectSteeringAngle</span><span class="p">:</span> <span class="o">...</span>
+
     <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">data</span><span class="p">:</span> <span class="n">SingleRunData</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">/</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">calibration</span><span class="p">:</span> <span class="n">SteeringCalibration</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">steering_raw</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">steering_angle</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">SingleRunData</span><span class="p">,</span> <span class="s2">"CorrectSteeringAngleLambda"</span><span class="p">]:</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SingleRunData</span> <span class="o">|</span> <span class="n">CorrectSteeringAngle</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""Apply the step to ``data``, or return a reconfigured copy when called with keyword args.</span>
 
 <span class="sd">        Parameters</span>
@@ -740,17 +793,18 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        SingleRunData or CorrectSteeringAngleLambda</span>
+<span class="sd">        SingleRunData or CorrectSteeringAngle</span>
 <span class="sd">            Transformed data when ``data`` is passed; reconfigured step otherwise.</span>
 <span class="sd">        """</span>
-        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="p">(</span><span class="n">calibration</span><span class="p">,</span> <span class="n">steering_raw</span><span class="p">,</span> <span class="n">steering_angle</span><span class="p">)):</span>
-            <span class="k">return</span> <span class="n">CorrectSteeringAngleLambda</span><span class="p">(</span>
-                <span class="n">calibration</span><span class="o">=</span><span class="n">calibration</span> <span class="ow">or</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pts</span><span class="p">),</span>
-                <span class="n">steering_raw</span><span class="o">=</span><span class="n">steering_raw</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">steering_raw</span><span class="p">,</span>
-                <span class="n">steering_angle</span><span class="o">=</span><span class="n">steering_angle</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">steering_angle</span><span class="p">,</span>
+        <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">CorrectSteeringAngle</span><span class="p">(</span>
+                <span class="n">calibration</span><span class="o">=</span><span class="n">_keep_current_if_unset</span><span class="p">(</span><span class="n">calibration</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pts</span><span class="p">)),</span>
+                <span class="n">steering_raw</span><span class="o">=</span><span class="n">_keep_current_if_unset</span><span class="p">(</span><span class="n">steering_raw</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">steering_raw</span><span class="p">),</span>
+                <span class="n">steering_angle</span><span class="o">=</span><span class="n">_keep_current_if_unset</span><span class="p">(</span>
+                    <span class="n">steering_angle</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">steering_angle</span>
+                <span class="p">),</span>
             <span class="p">)</span>
 
-        <span class="k">assert</span> <span class="n">data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">steering_raw</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">"WARNING: correct_steering_angle skipped — missing variable: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">steering_raw</span><span class="si">}</span><span class="s2">"</span>
@@ -789,7 +843,7 @@
 
 
 
-<span class="n">patch_ned_velocity</span> <span class="o">=</span> <span class="n">PatchNedVelocityLambda</span><span class="p">()</span>
+<span class="n">patch_ned_velocity</span> <span class="o">=</span> <span class="n">PatchNedVelocity</span><span class="p">()</span>
 <span class="sd">"""Preprocessing step: fix VectorNav NED-in-body-frame bug.</span>
 
 <span class="sd">Corrects a firmware bug where ``velocityBody.x/y/z`` contains NED-frame velocities instead of</span>
@@ -807,7 +861,7 @@
 <span class="sd">&gt;&gt;&gt; Analyzer(preprocessing=[patch_ned_velocity(body_vel_x="my.vel.x", ned_vel_n="my.ned.n")])</span>
 <span class="sd">"""</span>
 
-<span class="n">convert_wheelspeeds_to_m_per_s</span> <span class="o">=</span> <span class="n">ConvertWheelspeedsToMPerSLambda</span><span class="p">()</span>
+<span class="n">convert_wheelspeeds_to_m_per_s</span> <span class="o">=</span> <span class="n">ConvertWheelspeedsToMPerS</span><span class="p">()</span>
 <span class="sd">"""Preprocessing step: convert all four wheel speed channels from mph to m/s.</span>
 
 <span class="sd">Each channel is converted in-place; the original mph values are preserved as</span>
@@ -822,7 +876,7 @@
 <span class="sd">&gt;&gt;&gt; Analyzer(preprocessing=[convert_wheelspeeds_to_m_per_s(wheelspeed_fr="my.ws.fr")])</span>
 <span class="sd">"""</span>
 
-<span class="n">correct_motor_data</span> <span class="o">=</span> <span class="n">CorrectMotorDataLambda</span><span class="p">()</span>
+<span class="n">correct_motor_data</span> <span class="o">=</span> <span class="n">CorrectMotorData</span><span class="p">()</span>
 <span class="sd">"""Preprocessing step: flip motor RPM sign and derive driven wheel speed.</span>
 
 <span class="sd">The motor reports RPM with the sign inverted (negative when driving forward). This step:</span>
@@ -841,7 +895,7 @@
 <span class="sd">&gt;&gt;&gt; Analyzer(preprocessing=[correct_motor_data(gear_ratio=6.2, tire_radius_in=8.0)])</span>
 <span class="sd">"""</span>
 
-<span class="n">correct_steering_angle</span> <span class="o">=</span> <span class="n">CorrectSteeringAngleLambda</span><span class="p">()</span>
+<span class="n">correct_steering_angle</span> <span class="o">=</span> <span class="n">CorrectSteeringAngle</span><span class="p">()</span>
 <span class="sd">"""Preprocessing step: recompute steering angle from raw potentiometer voltage.</span>
 
 <span class="sd">Fits a polynomial through a set of ``(voltage, angle_deg)`` calibration points, then evaluates</span>

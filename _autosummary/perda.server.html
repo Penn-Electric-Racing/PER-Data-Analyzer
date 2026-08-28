@@ -50,7 +50,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/perda.server';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="perda.server.client" href="perda.server.client.html" />
+    <link rel="next" title="perda.units" href="perda.units.html" />
     <link rel="prev" title="perda.plotting.subplots" href="perda.plotting.subplots.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -293,11 +293,7 @@
 <li class="toctree-l3"><a class="reference internal" href="perda.plotting.subplots.html">perda.plotting.subplots</a></li>
 </ul>
 </details></li>
-<li class="toctree-l2 current active has-children"><a class="current reference internal" href="#">perda.server</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="perda.server.client.html">perda.server.client</a></li>
-<li class="toctree-l3"><a class="reference internal" href="perda.server.config.html">perda.server.config</a></li>
-</ul>
-</details></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">perda.server</a></li>
 <li class="toctree-l2"><a class="reference internal" href="perda.units.html">perda.units</a></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="perda.utils.html">perda.utils</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.accel_calculator.html">perda.utils.accel_calculator</a></li>
@@ -379,18 +375,32 @@
                   
   <section id="module-perda.server">
 <span id="perda-server"></span><h1>perda.server<a class="headerlink" href="#module-perda.server" title="Link to this heading">#</a></h1>
-<p class="rubric">Modules</p>
-<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="perda.server.client.html#module-perda.server.client" title="perda.server.client"><code class="xref py py-obj docutils literal notranslate"><span class="pre">client</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="perda.server.config.html#module-perda.server.config" title="perda.server.config"><code class="xref py py-obj docutils literal notranslate"><span class="pre">config</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-</tbody>
-</table>
+<dl class="py function">
+<dt class="sig sig-object py" id="perda.server.access_remote_log">
+<span class="sig-prename descclassname"><span class="pre">perda.server.</span></span><span class="sig-name descname"><span class="pre">access_remote_log</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">password</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_path</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/server.html#access_remote_log"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.server.access_remote_log" title="Link to this definition">#</a></dt>
+<dd><p>Construct an Analyzer from a log file stored on the data server.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>password</strong> (<em>str</em>) – Team-internal programmatic password.</p></li>
+<li><p><strong>log_path</strong> (<em>str</em>) – Path to the log file, relative to the bucket root, e.g.
+<code class="docutils literal notranslate"><span class="pre">&quot;REV</span> <span class="pre">11/2026-04-01/test.csv&quot;</span></code>.</p></li>
+<li><p><strong>**kwargs</strong> – Additional keyword arguments passed to the Analyzer constructor.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Analyzer loaded with the downloaded log.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="perda.analyzer.analyzer.html#perda.analyzer.analyzer.Analyzer" title="perda.analyzer.analyzer.Analyzer">Analyzer</a></p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">aly</span> <span class="o">=</span> <span class="n">access_remote_log</span><span class="p">(</span><span class="s2">"password"</span><span class="p">,</span> <span class="s2">"REV 11/2026-04-01/test.csv"</span><span class="p">)</span>
+</pre></div>
 </div>
+</dd></dl>
+
 </section>
 
 
@@ -413,11 +423,11 @@
       </div>
     </a>
     <a class="right-next"
-       href="perda.server.client.html"
+       href="perda.units.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">perda.server.client</p>
+        <p class="prev-next-title">perda.units</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -431,6 +441,18 @@
                 <dialog id="pst-secondary-sidebar-modal"></dialog>
                 <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
 
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.server.access_remote_log"><code class="docutils literal notranslate"><span class="pre">access_remote_log()</span></code></a></li>
+</ul>
+  </nav></div>
 
   <div class="sidebar-secondary-item">
   <div role="note" aria-label="source link">

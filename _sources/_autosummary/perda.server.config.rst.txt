@@ -1,8 +1,0 @@
-perda.server.config
-===================
-
-.. automodule:: perda.server.config
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
