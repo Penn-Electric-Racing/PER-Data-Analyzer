@@ -1,4 +1,6 @@
-from typing import Callable, Union
+from __future__ import annotations
+
+from typing import Callable, TypeVar, overload
 
 import numpy as np
 from numpy import float64
@@ -38,11 +40,16 @@ DEFAULT_STEERING_CALIBRATION: SteeringCalibration = (
     (3.96, 97.0),  # max right
 )
 
-# Type alias for a preprocessing step function that takes and returns a SingleRunData instance.
 PreprocessingStep = Callable[[SingleRunData], SingleRunData]
 
+T = TypeVar("T")
 
-class PatchNedVelocityLambda:
+
+def _keep_current_if_unset(supplied_value: T | None, current_value: T) -> T:
+    return current_value if supplied_value is None else supplied_value
+
+
+class PatchNedVelocity:
     """Backing class for the ``patch_ned_velocity`` preprocessing step."""
 
     def __init__(
@@ -63,9 +70,28 @@ class PatchNedVelocityLambda:
         self.ned_vel_e = ned_vel_e
         self.ned_vel_d = ned_vel_d
 
+    @overload
+    def __call__(self, data: SingleRunData, /) -> SingleRunData: ...
+
+    @overload
+    def __call__(
+        self,
+        data: None = None,
+        /,
+        *,
+        body_vel_x: str = ...,
+        body_vel_y: str = ...,
+        body_vel_z: str = ...,
+        yaw: str = ...,
+        ned_vel_n: str = ...,
+        ned_vel_e: str = ...,
+        ned_vel_d: str = ...,
+    ) -> PatchNedVelocity: ...
+
     def __call__(
         self,
         data: SingleRunData | None = None,
+        /,
         *,
         body_vel_x: str | None = None,
         body_vel_y: str | None = None,
@@ -74,7 +100,7 @@ class PatchNedVelocityLambda:
         ned_vel_n: str | None = None,
         ned_vel_e: str | None = None,
         ned_vel_d: str | None = None,
-    ) -> Union[SingleRunData, "PatchNedVelocityLambda"]:
+    ) -> SingleRunData | PatchNedVelocity:
         """Apply the step to ``data``, or return a reconfigured copy when called with keyword args.
 
         Parameters
@@ -98,32 +124,20 @@ class PatchNedVelocityLambda:
 
         Returns
         -------
-        SingleRunData or PatchNedVelocityLambda
+        SingleRunData or PatchNedVelocity
             Transformed data when ``data`` is passed; reconfigured step otherwise.
         """
-        if any(
-            v is not None
-            for v in (
-                body_vel_x,
-                body_vel_y,
-                body_vel_z,
-                yaw,
-                ned_vel_n,
-                ned_vel_e,
-                ned_vel_d,
-            )
-        ):
-            return PatchNedVelocityLambda(
-                body_vel_x=body_vel_x or self.body_vel_x,
-                body_vel_y=body_vel_y or self.body_vel_y,
-                body_vel_z=body_vel_z or self.body_vel_z,
-                yaw=yaw or self.yaw,
-                ned_vel_n=ned_vel_n or self.ned_vel_n,
-                ned_vel_e=ned_vel_e or self.ned_vel_e,
-                ned_vel_d=ned_vel_d or self.ned_vel_d,
+        if data is None:
+            return PatchNedVelocity(
+                body_vel_x=_keep_current_if_unset(body_vel_x, self.body_vel_x),
+                body_vel_y=_keep_current_if_unset(body_vel_y, self.body_vel_y),
+                body_vel_z=_keep_current_if_unset(body_vel_z, self.body_vel_z),
+                yaw=_keep_current_if_unset(yaw, self.yaw),
+                ned_vel_n=_keep_current_if_unset(ned_vel_n, self.ned_vel_n),
+                ned_vel_e=_keep_current_if_unset(ned_vel_e, self.ned_vel_e),
+                ned_vel_d=_keep_current_if_unset(ned_vel_d, self.ned_vel_d),
             )
 
-        assert data is not None
         required = [self.body_vel_x, self.body_vel_y, self.body_vel_z, self.yaw]
         missing = [v for v in required if v not in data]
         if missing:
@@ -178,7 +192,7 @@ class PatchNedVelocityLambda:
         return data
 
 
-class ConvertWheelspeedsToMPerSLambda:
+class ConvertWheelspeedsToMPerS:
     """Backing class for the ``convert_wheelspeeds_to_m_per_s`` preprocessing step."""
 
     def __init__(
@@ -193,15 +207,31 @@ class ConvertWheelspeedsToMPerSLambda:
         self.wheelspeed_rr = wheelspeed_rr
         self.wheelspeed_rl = wheelspeed_rl
 
+    @overload
+    def __call__(self, data: SingleRunData, /) -> SingleRunData: ...
+
+    @overload
+    def __call__(
+        self,
+        data: None = None,
+        /,
+        *,
+        wheelspeed_fr: str = ...,
+        wheelspeed_fl: str = ...,
+        wheelspeed_rr: str = ...,
+        wheelspeed_rl: str = ...,
+    ) -> ConvertWheelspeedsToMPerS: ...
+
     def __call__(
         self,
         data: SingleRunData | None = None,
+        /,
         *,
         wheelspeed_fr: str | None = None,
         wheelspeed_fl: str | None = None,
         wheelspeed_rr: str | None = None,
         wheelspeed_rl: str | None = None,
-    ) -> Union[SingleRunData, "ConvertWheelspeedsToMPerSLambda"]:
+    ) -> SingleRunData | ConvertWheelspeedsToMPerS:
         """Apply the step to ``data``, or return a reconfigured copy when called with keyword args.
 
         Parameters
@@ -219,21 +249,17 @@ class ConvertWheelspeedsToMPerSLambda:
 
         Returns
         -------
-        SingleRunData or ConvertWheelspeedsToMPerSLambda
+        SingleRunData or ConvertWheelspeedsToMPerS
             Transformed data when ``data`` is passed; reconfigured step otherwise.
         """
-        if any(
-            v is not None
-            for v in (wheelspeed_fr, wheelspeed_fl, wheelspeed_rr, wheelspeed_rl)
-        ):
-            return ConvertWheelspeedsToMPerSLambda(
-                wheelspeed_fr=wheelspeed_fr or self.wheelspeed_fr,
-                wheelspeed_fl=wheelspeed_fl or self.wheelspeed_fl,
-                wheelspeed_rr=wheelspeed_rr or self.wheelspeed_rr,
-                wheelspeed_rl=wheelspeed_rl or self.wheelspeed_rl,
+        if data is None:
+            return ConvertWheelspeedsToMPerS(
+                wheelspeed_fr=_keep_current_if_unset(wheelspeed_fr, self.wheelspeed_fr),
+                wheelspeed_fl=_keep_current_if_unset(wheelspeed_fl, self.wheelspeed_fl),
+                wheelspeed_rr=_keep_current_if_unset(wheelspeed_rr, self.wheelspeed_rr),
+                wheelspeed_rl=_keep_current_if_unset(wheelspeed_rl, self.wheelspeed_rl),
             )
 
-        assert data is not None
         cols = [
             self.wheelspeed_fr,
             self.wheelspeed_fl,
@@ -270,7 +296,7 @@ class ConvertWheelspeedsToMPerSLambda:
         return data
 
 
-class CorrectMotorDataLambda:
+class CorrectMotorData:
     """Backing class for the ``correct_motor_data`` preprocessing step."""
 
     def __init__(
@@ -285,15 +311,31 @@ class CorrectMotorDataLambda:
         self.motor_rpm = motor_rpm
         self.motor_wheelspeed = motor_wheelspeed
 
+    @overload
+    def __call__(self, data: SingleRunData, /) -> SingleRunData: ...
+
+    @overload
+    def __call__(
+        self,
+        data: None = None,
+        /,
+        *,
+        gear_ratio: float = ...,
+        tire_radius_in: float = ...,
+        motor_rpm: str = ...,
+        motor_wheelspeed: str = ...,
+    ) -> CorrectMotorData: ...
+
     def __call__(
         self,
         data: SingleRunData | None = None,
+        /,
         *,
         gear_ratio: float | None = None,
         tire_radius_in: float | None = None,
         motor_rpm: str | None = None,
         motor_wheelspeed: str | None = None,
-    ) -> Union[SingleRunData, "CorrectMotorDataLambda"]:
+    ) -> SingleRunData | CorrectMotorData:
         """Apply the step to ``data``, or return a reconfigured copy when called with keyword args.
 
         Parameters
@@ -311,25 +353,21 @@ class CorrectMotorDataLambda:
 
         Returns
         -------
-        SingleRunData or CorrectMotorDataLambda
+        SingleRunData or CorrectMotorData
             Transformed data when ``data`` is passed; reconfigured step otherwise.
         """
-        if any(
-            v is not None
-            for v in (gear_ratio, tire_radius_in, motor_rpm, motor_wheelspeed)
-        ):
-            return CorrectMotorDataLambda(
-                gear_ratio=gear_ratio if gear_ratio is not None else self.gear_ratio,
-                tire_radius_in=(
-                    tire_radius_in
-                    if tire_radius_in is not None
-                    else self.tire_radius_in
+        if data is None:
+            return CorrectMotorData(
+                gear_ratio=_keep_current_if_unset(gear_ratio, self.gear_ratio),
+                tire_radius_in=_keep_current_if_unset(
+                    tire_radius_in, self.tire_radius_in
                 ),
-                motor_rpm=motor_rpm or self.motor_rpm,
-                motor_wheelspeed=motor_wheelspeed or self.motor_wheelspeed,
+                motor_rpm=_keep_current_if_unset(motor_rpm, self.motor_rpm),
+                motor_wheelspeed=_keep_current_if_unset(
+                    motor_wheelspeed, self.motor_wheelspeed
+                ),
             )
 
-        assert data is not None
         if self.motor_rpm not in data:
             print(
                 f"WARNING: correct_motor_data skipped — missing variable: {self.motor_rpm}"
@@ -374,7 +412,7 @@ class CorrectMotorDataLambda:
         return data
 
 
-class CorrectSteeringAngleLambda:
+class CorrectSteeringAngle:
     """
     Backing class for the ``correct_steering_angle`` preprocessing step.
 
@@ -400,14 +438,29 @@ class CorrectSteeringAngleLambda:
         self.deg = 2 if len(pts) >= 3 else 1
         self.coeffs: NDArray[float64] = np.polyfit(volts, angles, self.deg)
 
+    @overload
+    def __call__(self, data: SingleRunData, /) -> SingleRunData: ...
+
+    @overload
+    def __call__(
+        self,
+        data: None = None,
+        /,
+        *,
+        calibration: SteeringCalibration = ...,
+        steering_raw: str = ...,
+        steering_angle: str = ...,
+    ) -> CorrectSteeringAngle: ...
+
     def __call__(
         self,
         data: SingleRunData | None = None,
+        /,
         *,
         calibration: SteeringCalibration | None = None,
         steering_raw: str | None = None,
         steering_angle: str | None = None,
-    ) -> Union[SingleRunData, "CorrectSteeringAngleLambda"]:
+    ) -> SingleRunData | CorrectSteeringAngle:
         """Apply the step to ``data``, or return a reconfigured copy when called with keyword args.
 
         Parameters
@@ -425,17 +478,18 @@ class CorrectSteeringAngleLambda:
 
         Returns
         -------
-        SingleRunData or CorrectSteeringAngleLambda
+        SingleRunData or CorrectSteeringAngle
             Transformed data when ``data`` is passed; reconfigured step otherwise.
         """
-        if any(v is not None for v in (calibration, steering_raw, steering_angle)):
-            return CorrectSteeringAngleLambda(
-                calibration=calibration or tuple(self.pts),
-                steering_raw=steering_raw or self.steering_raw,
-                steering_angle=steering_angle or self.steering_angle,
+        if data is None:
+            return CorrectSteeringAngle(
+                calibration=_keep_current_if_unset(calibration, tuple(self.pts)),
+                steering_raw=_keep_current_if_unset(steering_raw, self.steering_raw),
+                steering_angle=_keep_current_if_unset(
+                    steering_angle, self.steering_angle
+                ),
             )
 
-        assert data is not None
         if self.steering_raw not in data:
             print(
                 f"WARNING: correct_steering_angle skipped — missing variable: {self.steering_raw}"
@@ -473,7 +527,7 @@ class CorrectSteeringAngleLambda:
         return data
 
 
-patch_ned_velocity = PatchNedVelocityLambda()
+patch_ned_velocity = PatchNedVelocity()
 """Preprocessing step: fix VectorNav NED-in-body-frame bug.
 
 Corrects a firmware bug where ``velocityBody.x/y/z`` contains NED-frame velocities instead of
@@ -491,7 +545,7 @@ Examples
 >>> Analyzer(preprocessing=[patch_ned_velocity(body_vel_x="my.vel.x", ned_vel_n="my.ned.n")])
 """
 
-convert_wheelspeeds_to_m_per_s = ConvertWheelspeedsToMPerSLambda()
+convert_wheelspeeds_to_m_per_s = ConvertWheelspeedsToMPerS()
 """Preprocessing step: convert all four wheel speed channels from mph to m/s.
 
 Each channel is converted in-place; the original mph values are preserved as
@@ -506,7 +560,7 @@ Examples
 >>> Analyzer(preprocessing=[convert_wheelspeeds_to_m_per_s(wheelspeed_fr="my.ws.fr")])
 """
 
-correct_motor_data = CorrectMotorDataLambda()
+correct_motor_data = CorrectMotorData()
 """Preprocessing step: flip motor RPM sign and derive driven wheel speed.
 
 The motor reports RPM with the sign inverted (negative when driving forward). This step:
@@ -525,7 +579,7 @@ Examples
 >>> Analyzer(preprocessing=[correct_motor_data(gear_ratio=6.2, tire_radius_in=8.0)])
 """
 
-correct_steering_angle = CorrectSteeringAngleLambda()
+correct_steering_angle = CorrectSteeringAngle()
 """Preprocessing step: recompute steering angle from raw potentiometer voltage.
 
 Fits a polynomial through a set of ``(voltage, angle_deg)`` calibration points, then evaluates
