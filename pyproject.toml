@@ -19,7 +19,6 @@ notebook = [
     "ipykernel",
     "ipywidgets",
     "nbformat",
-    "nbstripout",
 ]
 docs = [
     "autodoc-pydantic==2.2.0",
