@@ -1,6 +1,6 @@
 import io
 import sys
-from typing import List, Union
+from collections.abc import Sequence
 
 from plotly import graph_objects as go
 
@@ -18,6 +18,9 @@ from ..utils.integrate import smoothed_filtered_integration
 from ..utils.preprocessing import PreprocessingStep, apply_preprocessing
 from ..utils.search import SearchResult, search
 from .csv import *
+
+VariableInput = str | int | DataInstance
+VariableInputs = VariableInput | Sequence[VariableInput]
 
 
 class Analyzer:
@@ -156,10 +159,8 @@ class Analyzer:
 
     def plot(
         self,
-        var_1: Union[str, int, DataInstance, List[Union[str, int, DataInstance]]],
-        var_2: (
-            Union[str, int, DataInstance, List[Union[str, int, DataInstance]]] | None
-        ) = None,
+        var_1: VariableInputs,
+        var_2: VariableInputs | None = None,
         ts_start: float | None = None,
         ts_end: float | None = None,
         title: str | None = None,
@@ -178,9 +179,9 @@ class Analyzer:
 
         Parameters
         ----------
-        var_1 : Union[str, int, DataInstance, List[Union[str, int, DataInstance]]]
+        var_1 : str | int | DataInstance | Sequence[str | int | DataInstance]
             Variable(s) to plot on the left y-axis. Can be variable name(s), variable ID(s), or DataInstance(s)
-        var_2 : Union[str, int, DataInstance, List[Union[str, int, DataInstance]]] | None, optional
+        var_2 : str | int | DataInstance | Sequence[str | int | DataInstance] | None, optional
             Optional variable(s) to plot on the right y-axis. Can be variable name(s), variable ID(s), or DataInstance(s).
         ts_start : float | None, optional
             Start of the time window in seconds. Data points before this time are excluded. Default is None (no lower bound).
@@ -212,8 +213,8 @@ class Analyzer:
         >>> fig = aly.plot(avg_speed)
         >>> fig.show()
         """
-        # Normalize left input to List[DataInstance]
         var_1_norm = self._normalize_input(var_1)
+        var_2_norm = self._normalize_input(var_2) if var_2 is not None else None
 
         unit = self.data.timestamp_unit
 
@@ -227,13 +228,10 @@ class Analyzer:
             start_raw = from_seconds(ts_start, unit) if ts_start is not None else None
             end_raw = from_seconds(ts_end, unit) if ts_end is not None else None
             var_1_norm = [di.trim(start_raw, end_raw) for di in var_1_norm]
-
-        if var_2 is not None:
-            # Normalize right input to List[DataInstance]
-            var_2_norm = self._normalize_input(var_2)
-            if ts_start is not None or ts_end is not None:
+            if var_2_norm is not None:
                 var_2_norm = [di.trim(start_raw, end_raw) for di in var_2_norm]
 
+        if var_2_norm is not None:
             return plot_dual_axis(
                 left_data_instances=var_1_norm,
                 right_data_instances=var_2_norm,
@@ -264,14 +262,7 @@ class Analyzer:
 
     def subplots(
         self,
-        rows: List[
-            Union[
-                str,
-                int,
-                DataInstance,
-                List[Union[str, int, DataInstance]],
-            ]
-        ],
+        rows: Sequence[VariableInputs],
         title: str | None = None,
         row_y_labels: List[str | None] | None = None,
         ts_start: float | None = None,
@@ -289,7 +280,7 @@ class Analyzer:
 
         Parameters
         ----------
-        rows : List[str | int | DataInstance | List[str | int | DataInstance]]
+        rows : Sequence[str | int | DataInstance | Sequence[str | int | DataInstance]]
             One entry per subplot row (top to bottom). Each entry may be a
             single variable (name, ID, or DataInstance) or a list of variables
             to overlay on that row.
@@ -336,7 +327,7 @@ class Analyzer:
         start_raw = from_seconds(ts_start, unit) if ts_start is not None else None
         end_raw = from_seconds(ts_end, unit) if ts_end is not None else None
 
-        normalized_rows: List[List[DataInstance]] = []
+        normalized_rows: list[list[DataInstance]] = []
         for row_entry in rows:
             row_dis = self._normalize_input(row_entry)
             if start_raw is not None or end_raw is not None:
@@ -399,7 +390,7 @@ class Analyzer:
 
     def analyze_frequency(
         self,
-        var: Union[str, int],
+        var: str | int,
         expected_frequency_hz: float | None = None,
         gap_threshold_multiplier: float = 2.0,
         font_config: FontConfig = DEFAULT_FONT_CONFIG,
@@ -450,20 +441,20 @@ class Analyzer:
 
     def _normalize_input(
         self,
-        input_data: Union[str, int, DataInstance, List[Union[str, int, DataInstance]]],
-    ) -> List[DataInstance]:
+        input_data: VariableInputs,
+    ) -> list[DataInstance]:
         """
         Normalize various input types to a list of DataInstances.
         """
         if isinstance(input_data, DataInstance):
             return [input_data]
-        elif isinstance(input_data, list):
+        elif isinstance(input_data, (str, int)):
+            return [self.data[input_data]]
+        else:
             return [
                 item if isinstance(item, DataInstance) else self.data[item]
                 for item in input_data
             ]
-        else:
-            return [self.data[input_data]]
 
     def get_accel_times(self) -> list[AccelSegmentResult]:
         """
