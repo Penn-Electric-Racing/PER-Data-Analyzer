@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Callable, TypeVar, overload
+from typing import Callable, Literal, TypeVar, overload
 
 import numpy as np
 from numpy import float64
@@ -28,6 +28,9 @@ DEFAULT_WHEELSPEED_RL = "pcm.wheelSpeeds.backLeft"
 
 DEFAULT_MOTOR_RPM = "pcm.moc.motor.angularSpeed"
 DEFAULT_MOTOR_WHEELSPEED = "pcm.moc.motor.wheelSpeed"
+
+MotorRpmInversion = bool | Literal["auto"]
+DEFAULT_MOTOR_RPM_INVERSION: MotorRpmInversion = "auto"
 
 DEFAULT_STEERING_RAW = "ludwig.steeringWheel.raw"
 DEFAULT_STEERING_ANGLE = "ludwig.steeringWheel.angle"
@@ -305,11 +308,13 @@ class CorrectMotorData:
         tire_radius_in: float = DEFAULT_TIRE_RADIUS_IN,
         motor_rpm: str = DEFAULT_MOTOR_RPM,
         motor_wheelspeed: str = DEFAULT_MOTOR_WHEELSPEED,
+        invert_rpm: MotorRpmInversion = DEFAULT_MOTOR_RPM_INVERSION,
     ) -> None:
         self.gear_ratio = gear_ratio
         self.tire_radius_in = tire_radius_in
         self.motor_rpm = motor_rpm
         self.motor_wheelspeed = motor_wheelspeed
+        self.invert_rpm = invert_rpm
 
     @overload
     def __call__(self, data: SingleRunData, /) -> SingleRunData: ...
@@ -324,6 +329,7 @@ class CorrectMotorData:
         tire_radius_in: float = ...,
         motor_rpm: str = ...,
         motor_wheelspeed: str = ...,
+        invert_rpm: MotorRpmInversion = ...,
     ) -> CorrectMotorData: ...
 
     def __call__(
@@ -335,6 +341,7 @@ class CorrectMotorData:
         tire_radius_in: float | None = None,
         motor_rpm: str | None = None,
         motor_wheelspeed: str | None = None,
+        invert_rpm: MotorRpmInversion | None = None,
     ) -> SingleRunData | CorrectMotorData:
         """Apply the step to ``data``, or return a reconfigured copy when called with keyword args.
 
@@ -350,6 +357,9 @@ class CorrectMotorData:
             Variable name for the motor angular speed channel.
         motor_wheelspeed : str, optional
             Variable name to write the derived driven-wheel linear speed (m/s).
+        invert_rpm : bool or {'auto'}, optional
+            Whether to flip the RPM sign. ``'auto'`` flips only when more samples are
+            negative than positive
 
         Returns
         -------
@@ -366,6 +376,7 @@ class CorrectMotorData:
                 motor_wheelspeed=_keep_current_if_unset(
                     motor_wheelspeed, self.motor_wheelspeed
                 ),
+                invert_rpm=_keep_current_if_unset(invert_rpm, self.invert_rpm),
             )
 
         if self.motor_rpm not in data:
@@ -382,21 +393,26 @@ class CorrectMotorData:
             data[backup_name] = DataInstance(
                 timestamp_np=di.timestamp_np,
                 value_np=raw_rpm.copy(),
-                label="Motor RPM raw (pre-flip)",
+                label="Motor RPM raw (pre-correction)",
                 cpp_name=backup_name,
             )
 
-        flipped = -raw_rpm
+        should_invert = (
+            bool(self.invert_rpm)
+            if self.invert_rpm != "auto"
+            else bool(np.count_nonzero(raw_rpm < 0.0) > np.count_nonzero(raw_rpm > 0.0))
+        )
+        corrected_rpm = -raw_rpm if should_invert else raw_rpm
         data[self.motor_rpm] = DataInstance(
             timestamp_np=di.timestamp_np,
-            value_np=flipped,
+            value_np=corrected_rpm,
             label=di.label,
             cpp_name=self.motor_rpm,
         )
 
         tire_radius_m = in_to_m(self.tire_radius_in)
         wheel_speed: NDArray[float64] = (
-            flipped * 2.0 * np.pi * tire_radius_m / (60.0 * self.gear_ratio)
+            corrected_rpm * 2.0 * np.pi * tire_radius_m / (60.0 * self.gear_ratio)
         )
         data[self.motor_wheelspeed] = DataInstance(
             timestamp_np=di.timestamp_np,
@@ -406,7 +422,8 @@ class CorrectMotorData:
         )
 
         print(
-            f"correct_motor_data: flipped {self.motor_rpm} sign, added {self.motor_wheelspeed} "
+            f"correct_motor_data: {'flipped' if should_invert else 'kept'} {self.motor_rpm} sign, "
+            f"added {self.motor_wheelspeed} "
             f"(ratio={self.gear_ratio}, r={self.tire_radius_in} in)"
         )
         return data
@@ -563,10 +580,11 @@ Examples
 correct_motor_data = CorrectMotorData()
 """Preprocessing step: flip motor RPM sign and derive driven wheel speed.
 
-The motor reports RPM with the sign inverted (negative when driving forward). This step:
+Some logs report RPM with the sign inverted (negative when driving forward). This step:
 
 1. Preserves the original RPM as ``<motor_rpm>_raw``.
-2. Flips the sign of the RPM channel in-place.
+2. Flips the sign of the RPM channel in-place.  By default (``invert_rpm='auto'``) the
+   sign is flipped only if more samples are negative than positive.
 3. Derives a driven wheel linear speed (m/s) from RPM, gear ratio, and tire radius,
    and writes it to ``motor_wheelspeed``.
 
@@ -577,6 +595,7 @@ Examples
 --------
 >>> Analyzer(preprocessing=[correct_motor_data])
 >>> Analyzer(preprocessing=[correct_motor_data(gear_ratio=6.2, tire_radius_in=8.0)])
+>>> Analyzer(preprocessing=[correct_motor_data(invert_rpm=False)])
 """
 
 correct_steering_angle = CorrectSteeringAngle()

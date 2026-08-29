@@ -80,6 +80,38 @@ def test_motor_data_flips_rpm_sign(motor_srd):
     )
 
 
+def test_motor_data_keeps_sign_when_rpm_already_positive(motor_srd):
+    motor_srd["pcm.moc.motor.angularSpeed"] = -motor_srd["pcm.moc.motor.angularSpeed"]
+    already_positive = motor_srd["pcm.moc.motor.angularSpeed"].value_np.copy()
+    result = apply_preprocessing(motor_srd, [correct_motor_data])
+    np.testing.assert_array_almost_equal(
+        result["pcm.moc.motor.angularSpeed"].value_np, already_positive
+    )
+
+
+def test_motor_data_auto_inversion_ignores_negative_outlier(motor_srd):
+    rpm = motor_srd["pcm.moc.motor.angularSpeed"]
+    motor_srd["pcm.moc.motor.angularSpeed"] = DataInstance(
+        timestamp_np=rpm.timestamp_np,
+        value_np=np.array([1000.0, 2000.0, 3000.0, -99000.0]),
+        label=rpm.label,
+        cpp_name="pcm.moc.motor.angularSpeed",
+    )
+    result = apply_preprocessing(motor_srd, [correct_motor_data])
+    np.testing.assert_array_almost_equal(
+        result["pcm.moc.motor.angularSpeed"].value_np,
+        [1000.0, 2000.0, 3000.0, -99000.0],
+    )
+
+
+def test_motor_data_inversion_can_be_forced_off(motor_srd):
+    original = motor_srd["pcm.moc.motor.angularSpeed"].value_np.copy()
+    result = correct_motor_data(invert_rpm=False)(motor_srd)
+    np.testing.assert_array_almost_equal(
+        result["pcm.moc.motor.angularSpeed"].value_np, original
+    )
+
+
 def test_motor_data_backup_is_original(motor_srd):
     original = motor_srd["pcm.moc.motor.angularSpeed"].value_np.copy()
     result = apply_preprocessing(motor_srd, [correct_motor_data])
