@@ -304,7 +304,7 @@
   <h1>Source code for perda.utils.preprocessing</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">overload</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">overload</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="kn">import</span> <span class="n">float64</span>
@@ -332,6 +332,9 @@
 
 <span class="n">DEFAULT_MOTOR_RPM</span> <span class="o">=</span> <span class="s2">"pcm.moc.motor.angularSpeed"</span>
 <span class="n">DEFAULT_MOTOR_WHEELSPEED</span> <span class="o">=</span> <span class="s2">"pcm.moc.motor.wheelSpeed"</span>
+
+<span class="n">MotorRpmInversion</span> <span class="o">=</span> <span class="nb">bool</span> <span class="o">|</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"auto"</span><span class="p">]</span>
+<span class="n">DEFAULT_MOTOR_RPM_INVERSION</span><span class="p">:</span> <span class="n">MotorRpmInversion</span> <span class="o">=</span> <span class="s2">"auto"</span>
 
 <span class="n">DEFAULT_STEERING_RAW</span> <span class="o">=</span> <span class="s2">"ludwig.steeringWheel.raw"</span>
 <span class="n">DEFAULT_STEERING_ANGLE</span> <span class="o">=</span> <span class="s2">"ludwig.steeringWheel.angle"</span>
@@ -617,11 +620,13 @@
         <span class="n">tire_radius_in</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">DEFAULT_TIRE_RADIUS_IN</span><span class="p">,</span>
         <span class="n">motor_rpm</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">DEFAULT_MOTOR_RPM</span><span class="p">,</span>
         <span class="n">motor_wheelspeed</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">DEFAULT_MOTOR_WHEELSPEED</span><span class="p">,</span>
+        <span class="n">invert_rpm</span><span class="p">:</span> <span class="n">MotorRpmInversion</span> <span class="o">=</span> <span class="n">DEFAULT_MOTOR_RPM_INVERSION</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">gear_ratio</span> <span class="o">=</span> <span class="n">gear_ratio</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tire_radius_in</span> <span class="o">=</span> <span class="n">tire_radius_in</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">motor_rpm</span> <span class="o">=</span> <span class="n">motor_rpm</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">motor_wheelspeed</span> <span class="o">=</span> <span class="n">motor_wheelspeed</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">invert_rpm</span> <span class="o">=</span> <span class="n">invert_rpm</span>
 
     <span class="nd">@overload</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">SingleRunData</span><span class="p">,</span> <span class="o">/</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SingleRunData</span><span class="p">:</span> <span class="o">...</span>
@@ -636,6 +641,7 @@
         <span class="n">tire_radius_in</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
         <span class="n">motor_rpm</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
         <span class="n">motor_wheelspeed</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+        <span class="n">invert_rpm</span><span class="p">:</span> <span class="n">MotorRpmInversion</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CorrectMotorData</span><span class="p">:</span> <span class="o">...</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span>
@@ -647,6 +653,7 @@
         <span class="n">tire_radius_in</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">motor_rpm</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">motor_wheelspeed</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">invert_rpm</span><span class="p">:</span> <span class="n">MotorRpmInversion</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SingleRunData</span> <span class="o">|</span> <span class="n">CorrectMotorData</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""Apply the step to ``data``, or return a reconfigured copy when called with keyword args.</span>
 
@@ -662,6 +669,9 @@
 <span class="sd">            Variable name for the motor angular speed channel.</span>
 <span class="sd">        motor_wheelspeed : str, optional</span>
 <span class="sd">            Variable name to write the derived driven-wheel linear speed (m/s).</span>
+<span class="sd">        invert_rpm : bool or {'auto'}, optional</span>
+<span class="sd">            Whether to flip the RPM sign. ``'auto'`` flips only when more samples are</span>
+<span class="sd">            negative than positive</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -678,6 +688,7 @@
                 <span class="n">motor_wheelspeed</span><span class="o">=</span><span class="n">_keep_current_if_unset</span><span class="p">(</span>
                     <span class="n">motor_wheelspeed</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">motor_wheelspeed</span>
                 <span class="p">),</span>
+                <span class="n">invert_rpm</span><span class="o">=</span><span class="n">_keep_current_if_unset</span><span class="p">(</span><span class="n">invert_rpm</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">invert_rpm</span><span class="p">),</span>
             <span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">motor_rpm</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
@@ -694,21 +705,26 @@
             <span class="n">data</span><span class="p">[</span><span class="n">backup_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">DataInstance</span><span class="p">(</span>
                 <span class="n">timestamp_np</span><span class="o">=</span><span class="n">di</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">,</span>
                 <span class="n">value_np</span><span class="o">=</span><span class="n">raw_rpm</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
-                <span class="n">label</span><span class="o">=</span><span class="s2">"Motor RPM raw (pre-flip)"</span><span class="p">,</span>
+                <span class="n">label</span><span class="o">=</span><span class="s2">"Motor RPM raw (pre-correction)"</span><span class="p">,</span>
                 <span class="n">cpp_name</span><span class="o">=</span><span class="n">backup_name</span><span class="p">,</span>
             <span class="p">)</span>
 
-        <span class="n">flipped</span> <span class="o">=</span> <span class="o">-</span><span class="n">raw_rpm</span>
+        <span class="n">should_invert</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">invert_rpm</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">invert_rpm</span> <span class="o">!=</span> <span class="s2">"auto"</span>
+            <span class="k">else</span> <span class="nb">bool</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">raw_rpm</span> <span class="o">&lt;</span> <span class="mf">0.0</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">raw_rpm</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">))</span>
+        <span class="p">)</span>
+        <span class="n">corrected_rpm</span> <span class="o">=</span> <span class="o">-</span><span class="n">raw_rpm</span> <span class="k">if</span> <span class="n">should_invert</span> <span class="k">else</span> <span class="n">raw_rpm</span>
         <span class="n">data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">motor_rpm</span><span class="p">]</span> <span class="o">=</span> <span class="n">DataInstance</span><span class="p">(</span>
             <span class="n">timestamp_np</span><span class="o">=</span><span class="n">di</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">,</span>
-            <span class="n">value_np</span><span class="o">=</span><span class="n">flipped</span><span class="p">,</span>
+            <span class="n">value_np</span><span class="o">=</span><span class="n">corrected_rpm</span><span class="p">,</span>
             <span class="n">label</span><span class="o">=</span><span class="n">di</span><span class="o">.</span><span class="n">label</span><span class="p">,</span>
             <span class="n">cpp_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">motor_rpm</span><span class="p">,</span>
         <span class="p">)</span>
 
         <span class="n">tire_radius_m</span> <span class="o">=</span> <span class="n">in_to_m</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tire_radius_in</span><span class="p">)</span>
         <span class="n">wheel_speed</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">flipped</span> <span class="o">*</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">tire_radius_m</span> <span class="o">/</span> <span class="p">(</span><span class="mf">60.0</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">gear_ratio</span><span class="p">)</span>
+            <span class="n">corrected_rpm</span> <span class="o">*</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">tire_radius_m</span> <span class="o">/</span> <span class="p">(</span><span class="mf">60.0</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">gear_ratio</span><span class="p">)</span>
         <span class="p">)</span>
         <span class="n">data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">motor_wheelspeed</span><span class="p">]</span> <span class="o">=</span> <span class="n">DataInstance</span><span class="p">(</span>
             <span class="n">timestamp_np</span><span class="o">=</span><span class="n">di</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">,</span>
@@ -718,7 +734,8 @@
         <span class="p">)</span>
 
         <span class="nb">print</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">"correct_motor_data: flipped </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">motor_rpm</span><span class="si">}</span><span class="s2"> sign, added </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">motor_wheelspeed</span><span class="si">}</span><span class="s2"> "</span>
+            <span class="sa">f</span><span class="s2">"correct_motor_data: </span><span class="si">{</span><span class="s1">'flipped'</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">should_invert</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">'kept'</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">motor_rpm</span><span class="si">}</span><span class="s2"> sign, "</span>
+            <span class="sa">f</span><span class="s2">"added </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">motor_wheelspeed</span><span class="si">}</span><span class="s2"> "</span>
             <span class="sa">f</span><span class="s2">"(ratio=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">gear_ratio</span><span class="si">}</span><span class="s2">, r=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tire_radius_in</span><span class="si">}</span><span class="s2"> in)"</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">data</span></div>
@@ -879,10 +896,11 @@
 <span class="n">correct_motor_data</span> <span class="o">=</span> <span class="n">CorrectMotorData</span><span class="p">()</span>
 <span class="sd">"""Preprocessing step: flip motor RPM sign and derive driven wheel speed.</span>
 
-<span class="sd">The motor reports RPM with the sign inverted (negative when driving forward). This step:</span>
+<span class="sd">Some logs report RPM with the sign inverted (negative when driving forward). This step:</span>
 
 <span class="sd">1. Preserves the original RPM as ``&lt;motor_rpm&gt;_raw``.</span>
-<span class="sd">2. Flips the sign of the RPM channel in-place.</span>
+<span class="sd">2. Flips the sign of the RPM channel in-place.  By default (``invert_rpm='auto'``) the</span>
+<span class="sd">   sign is flipped only if more samples are negative than positive.</span>
 <span class="sd">3. Derives a driven wheel linear speed (m/s) from RPM, gear ratio, and tire radius,</span>
 <span class="sd">   and writes it to ``motor_wheelspeed``.</span>
 
@@ -893,6 +911,7 @@
 <span class="sd">--------</span>
 <span class="sd">&gt;&gt;&gt; Analyzer(preprocessing=[correct_motor_data])</span>
 <span class="sd">&gt;&gt;&gt; Analyzer(preprocessing=[correct_motor_data(gear_ratio=6.2, tire_radius_in=8.0)])</span>
+<span class="sd">&gt;&gt;&gt; Analyzer(preprocessing=[correct_motor_data(invert_rpm=False)])</span>
 <span class="sd">"""</span>
 
 <span class="n">correct_steering_angle</span> <span class="o">=</span> <span class="n">CorrectSteeringAngle</span><span class="p">()</span>

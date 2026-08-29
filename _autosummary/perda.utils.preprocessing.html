@@ -397,7 +397,7 @@
 
 <dl class="py class">
 <dt class="sig sig-object py" id="perda.utils.preprocessing.CorrectMotorData">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">perda.utils.preprocessing.</span></span><span class="sig-name descname"><span class="pre">CorrectMotorData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gear_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5.6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tire_radius_in</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">7.85</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">motor_rpm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pcm.moc.motor.angularSpeed'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">motor_wheelspeed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pcm.moc.motor.wheelSpeed'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/utils/preprocessing.html#CorrectMotorData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.utils.preprocessing.CorrectMotorData" title="Link to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">perda.utils.preprocessing.</span></span><span class="sig-name descname"><span class="pre">CorrectMotorData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gear_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5.6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tire_radius_in</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">7.85</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">motor_rpm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pcm.moc.motor.angularSpeed'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">motor_wheelspeed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pcm.moc.motor.wheelSpeed'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">invert_rpm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/utils/preprocessing.html#CorrectMotorData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.utils.preprocessing.CorrectMotorData" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Backing class for the <code class="docutils literal notranslate"><span class="pre">correct_motor_data</span></code> preprocessing step.</p>
 <dl class="field-list simple">
@@ -407,6 +407,7 @@
 <li><p><strong>tire_radius_in</strong> (<em>float</em>)</p></li>
 <li><p><strong>motor_rpm</strong> (<em>str</em>)</p></li>
 <li><p><strong>motor_wheelspeed</strong> (<em>str</em>)</p></li>
+<li><p><strong>invert_rpm</strong> (<em>MotorRpmInversion</em>)</p></li>
 </ul>
 </dd>
 </dl>
@@ -514,10 +515,11 @@ copy that operates on non-default variable names.</p>
 <dt class="sig sig-object py" id="perda.utils.preprocessing.correct_motor_data">
 <span class="sig-prename descclassname"><span class="pre">perda.utils.preprocessing.</span></span><span class="sig-name descname"><span class="pre">correct_motor_data</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;perda.utils.preprocessing.CorrectMotorData</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#perda.utils.preprocessing.correct_motor_data" title="Link to this definition">#</a></dt>
 <dd><p>flip motor RPM sign and derive driven wheel speed.</p>
-<p>The motor reports RPM with the sign inverted (negative when driving forward). This step:</p>
+<p>Some logs report RPM with the sign inverted (negative when driving forward). This step:</p>
 <ol class="arabic simple">
 <li><p>Preserves the original RPM as <code class="docutils literal notranslate"><span class="pre">&lt;motor_rpm&gt;_raw</span></code>.</p></li>
-<li><p>Flips the sign of the RPM channel in-place.</p></li>
+<li><p>Flips the sign of the RPM channel in-place.  By default (<code class="docutils literal notranslate"><span class="pre">invert_rpm='auto'</span></code>) the
+sign is flipped only if more samples are negative than positive.</p></li>
 <li><p>Derives a driven wheel linear speed (m/s) from RPM, gear ratio, and tire radius,
 and writes it to <code class="docutils literal notranslate"><span class="pre">motor_wheelspeed</span></code>.</p></li>
 </ol>
@@ -526,6 +528,7 @@ copy with different physical constants or variable names.</p>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Analyzer</span><span class="p">(</span><span class="n">preprocessing</span><span class="o">=</span><span class="p">[</span><span class="n">correct_motor_data</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">Analyzer</span><span class="p">(</span><span class="n">preprocessing</span><span class="o">=</span><span class="p">[</span><span class="n">correct_motor_data</span><span class="p">(</span><span class="n">gear_ratio</span><span class="o">=</span><span class="mf">6.2</span><span class="p">,</span> <span class="n">tire_radius_in</span><span class="o">=</span><span class="mf">8.0</span><span class="p">)])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Analyzer</span><span class="p">(</span><span class="n">preprocessing</span><span class="o">=</span><span class="p">[</span><span class="n">correct_motor_data</span><span class="p">(</span><span class="n">invert_rpm</span><span class="o">=</span><span class="kc">False</span><span class="p">)])</span>
 </pre></div>
 </div>
 <dl class="field-list simple">
@@ -539,6 +542,7 @@ copy with different physical constants or variable names.</p>
 <li><p><strong>tire_radius_in</strong> (<em>float</em><em> | </em><em>None</em>)</p></li>
 <li><p><strong>motor_rpm</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
 <li><p><strong>motor_wheelspeed</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>invert_rpm</strong> (<em>MotorRpmInversion</em><em> | </em><em>None</em>)</p></li>
 </ul>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
