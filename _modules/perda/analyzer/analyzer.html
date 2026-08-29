@@ -304,7 +304,7 @@
   <h1>Source code for perda.analyzer.analyzer</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">io</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Sequence</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">plotly</span><span class="w"> </span><span class="kn">import</span> <span class="n">graph_objects</span> <span class="k">as</span> <span class="n">go</span>
 
@@ -322,6 +322,9 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">..utils.preprocessing</span><span class="w"> </span><span class="kn">import</span> <span class="n">PreprocessingStep</span><span class="p">,</span> <span class="n">apply_preprocessing</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..utils.search</span><span class="w"> </span><span class="kn">import</span> <span class="n">SearchResult</span><span class="p">,</span> <span class="n">search</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.csv</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+
+<span class="n">VariableInput</span> <span class="o">=</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">DataInstance</span>
+<span class="n">VariableInputs</span> <span class="o">=</span> <span class="n">VariableInput</span> <span class="o">|</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">VariableInput</span><span class="p">]</span>
 
 
 <div class="viewcode-block" id="Analyzer">
@@ -467,10 +470,8 @@
 <a class="viewcode-back" href="../../../_autosummary/perda.analyzer.analyzer.html#perda.analyzer.analyzer.Analyzer.plot">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">plot</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">var_1</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">DataInstance</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">DataInstance</span><span class="p">]]],</span>
-        <span class="n">var_2</span><span class="p">:</span> <span class="p">(</span>
-            <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">DataInstance</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">DataInstance</span><span class="p">]]]</span> <span class="o">|</span> <span class="kc">None</span>
-        <span class="p">)</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">var_1</span><span class="p">:</span> <span class="n">VariableInputs</span><span class="p">,</span>
+        <span class="n">var_2</span><span class="p">:</span> <span class="n">VariableInputs</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">ts_start</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">ts_end</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -489,9 +490,9 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        var_1 : Union[str, int, DataInstance, List[Union[str, int, DataInstance]]]</span>
+<span class="sd">        var_1 : str | int | DataInstance | Sequence[str | int | DataInstance]</span>
 <span class="sd">            Variable(s) to plot on the left y-axis. Can be variable name(s), variable ID(s), or DataInstance(s)</span>
-<span class="sd">        var_2 : Union[str, int, DataInstance, List[Union[str, int, DataInstance]]] | None, optional</span>
+<span class="sd">        var_2 : str | int | DataInstance | Sequence[str | int | DataInstance] | None, optional</span>
 <span class="sd">            Optional variable(s) to plot on the right y-axis. Can be variable name(s), variable ID(s), or DataInstance(s).</span>
 <span class="sd">        ts_start : float | None, optional</span>
 <span class="sd">            Start of the time window in seconds. Data points before this time are excluded. Default is None (no lower bound).</span>
@@ -523,8 +524,8 @@
 <span class="sd">        &gt;&gt;&gt; fig = aly.plot(avg_speed)</span>
 <span class="sd">        &gt;&gt;&gt; fig.show()</span>
 <span class="sd">        """</span>
-        <span class="c1"># Normalize left input to List[DataInstance]</span>
         <span class="n">var_1_norm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_normalize_input</span><span class="p">(</span><span class="n">var_1</span><span class="p">)</span>
+        <span class="n">var_2_norm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_normalize_input</span><span class="p">(</span><span class="n">var_2</span><span class="p">)</span> <span class="k">if</span> <span class="n">var_2</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
 
         <span class="n">unit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">timestamp_unit</span>
 
@@ -538,13 +539,10 @@
             <span class="n">start_raw</span> <span class="o">=</span> <span class="n">from_seconds</span><span class="p">(</span><span class="n">ts_start</span><span class="p">,</span> <span class="n">unit</span><span class="p">)</span> <span class="k">if</span> <span class="n">ts_start</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
             <span class="n">end_raw</span> <span class="o">=</span> <span class="n">from_seconds</span><span class="p">(</span><span class="n">ts_end</span><span class="p">,</span> <span class="n">unit</span><span class="p">)</span> <span class="k">if</span> <span class="n">ts_end</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
             <span class="n">var_1_norm</span> <span class="o">=</span> <span class="p">[</span><span class="n">di</span><span class="o">.</span><span class="n">trim</span><span class="p">(</span><span class="n">start_raw</span><span class="p">,</span> <span class="n">end_raw</span><span class="p">)</span> <span class="k">for</span> <span class="n">di</span> <span class="ow">in</span> <span class="n">var_1_norm</span><span class="p">]</span>
-
-        <span class="k">if</span> <span class="n">var_2</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="c1"># Normalize right input to List[DataInstance]</span>
-            <span class="n">var_2_norm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_normalize_input</span><span class="p">(</span><span class="n">var_2</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">ts_start</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">ts_end</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">var_2_norm</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">var_2_norm</span> <span class="o">=</span> <span class="p">[</span><span class="n">di</span><span class="o">.</span><span class="n">trim</span><span class="p">(</span><span class="n">start_raw</span><span class="p">,</span> <span class="n">end_raw</span><span class="p">)</span> <span class="k">for</span> <span class="n">di</span> <span class="ow">in</span> <span class="n">var_2_norm</span><span class="p">]</span>
 
+        <span class="k">if</span> <span class="n">var_2_norm</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">plot_dual_axis</span><span class="p">(</span>
                 <span class="n">left_data_instances</span><span class="o">=</span><span class="n">var_1_norm</span><span class="p">,</span>
                 <span class="n">right_data_instances</span><span class="o">=</span><span class="n">var_2_norm</span><span class="p">,</span>
@@ -578,14 +576,7 @@
 <a class="viewcode-back" href="../../../_autosummary/perda.analyzer.analyzer.html#perda.analyzer.analyzer.Analyzer.subplots">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">subplots</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">rows</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span>
-            <span class="n">Union</span><span class="p">[</span>
-                <span class="nb">str</span><span class="p">,</span>
-                <span class="nb">int</span><span class="p">,</span>
-                <span class="n">DataInstance</span><span class="p">,</span>
-                <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">DataInstance</span><span class="p">]],</span>
-            <span class="p">]</span>
-        <span class="p">],</span>
+        <span class="n">rows</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">VariableInputs</span><span class="p">],</span>
         <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">row_y_labels</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">ts_start</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -603,7 +594,7 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        rows : List[str | int | DataInstance | List[str | int | DataInstance]]</span>
+<span class="sd">        rows : Sequence[str | int | DataInstance | Sequence[str | int | DataInstance]]</span>
 <span class="sd">            One entry per subplot row (top to bottom). Each entry may be a</span>
 <span class="sd">            single variable (name, ID, or DataInstance) or a list of variables</span>
 <span class="sd">            to overlay on that row.</span>
@@ -650,7 +641,7 @@
         <span class="n">start_raw</span> <span class="o">=</span> <span class="n">from_seconds</span><span class="p">(</span><span class="n">ts_start</span><span class="p">,</span> <span class="n">unit</span><span class="p">)</span> <span class="k">if</span> <span class="n">ts_start</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
         <span class="n">end_raw</span> <span class="o">=</span> <span class="n">from_seconds</span><span class="p">(</span><span class="n">ts_end</span><span class="p">,</span> <span class="n">unit</span><span class="p">)</span> <span class="k">if</span> <span class="n">ts_end</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
 
-        <span class="n">normalized_rows</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">DataInstance</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">normalized_rows</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">DataInstance</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">row_entry</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
             <span class="n">row_dis</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_normalize_input</span><span class="p">(</span><span class="n">row_entry</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">start_raw</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">end_raw</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -719,7 +710,7 @@
 <a class="viewcode-back" href="../../../_autosummary/perda.analyzer.analyzer.html#perda.analyzer.analyzer.Analyzer.analyze_frequency">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">analyze_frequency</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">var</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span>
+        <span class="n">var</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">expected_frequency_hz</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">gap_threshold_multiplier</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">,</span>
         <span class="n">font_config</span><span class="p">:</span> <span class="n">FontConfig</span> <span class="o">=</span> <span class="n">DEFAULT_FONT_CONFIG</span><span class="p">,</span>
@@ -771,20 +762,20 @@
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_normalize_input</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">input_data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">DataInstance</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">DataInstance</span><span class="p">]]],</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">DataInstance</span><span class="p">]:</span>
+        <span class="n">input_data</span><span class="p">:</span> <span class="n">VariableInputs</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">DataInstance</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Normalize various input types to a list of DataInstances.</span>
 <span class="sd">        """</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_data</span><span class="p">,</span> <span class="n">DataInstance</span><span class="p">):</span>
             <span class="k">return</span> <span class="p">[</span><span class="n">input_data</span><span class="p">]</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_data</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_data</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">)):</span>
+            <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">input_data</span><span class="p">]]</span>
+        <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">[</span>
                 <span class="n">item</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">DataInstance</span><span class="p">)</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">item</span><span class="p">]</span>
                 <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">input_data</span>
             <span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">input_data</span><span class="p">]]</span>
 
 <div class="viewcode-block" id="Analyzer.get_accel_times">
 <a class="viewcode-back" href="../../../_autosummary/perda.analyzer.analyzer.html#perda.analyzer.analyzer.Analyzer.get_accel_times">[docs]</a>
