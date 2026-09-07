@@ -1,15 +1,66 @@
+from __future__ import annotations
+
 import re
 from datetime import datetime
-from typing import cast
+from typing import TextIO, cast
 
 import numpy as np
 import polars as pl
 from numpy.typing import NDArray
+from pydantic import BaseModel, ConfigDict, Field
 from tqdm import tqdm
 
 from ..core_data_structures.data_instance import DataInstance
 from ..core_data_structures.single_run_data import SingleRunData
 from ..units import Timescale
+from ..utils.search import build_semantic_index
+
+DATA_COLUMN_NAMES = ["timestamp", "var_id", "value"]
+DATA_COLUMN_SCHEMA = {
+    "column_1": pl.Int64,
+    "column_2": pl.Int32,
+    "column_3": pl.Float64,
+}
+VALUE_LINE_PREFIX = "Value "
+MICROSECOND_HEADER_SUFFIX = "v2.0"
+VARIABLE_LINE_PATTERN = re.compile(
+    rf"""
+    ^{re.escape(VALUE_LINE_PREFIX)}\s*      # prefix marking a variable declaration
+    (?P<description>.*?)                    # free-form description
+    \s*
+    \(\s*(?P<cpp_name>[^()]+?)\s*\)         # parenthesised C++ name
+    \s*:\s*                                 # separator before the variable ID
+    (?P<var_id>\d+)\s*$                     # variable ID
+    """,
+    re.VERBOSE,
+)
+
+
+class ParsedVariableLine(BaseModel):
+    cpp_name: str = Field(description="C++ name of the variable")
+    description: str = Field(description="Human readable description of the variable")
+    var_id: int = Field(description="Numeric ID the data rows refer to")
+
+
+class VariableMappings(BaseModel):
+    id_to_cpp_name: dict[int, str] = Field(
+        description="Mapping from variable ID to variable name"
+    )
+    id_to_descript: dict[int, str] = Field(
+        description="Mapping from variable ID to variable description"
+    )
+    skip_rows: int = Field(
+        description="Number of leading rows before the numeric data section"
+    )
+
+
+class ParsedDataFrame(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
+    data_frame: pl.DataFrame = Field(
+        description="Data sorted by variable ID then timestamp"
+    )
+    parsing_errors: int = Field(description="Number of rows dropped as unparseable")
 
 
 def parse_header_creation_time(header_line: str) -> datetime | None:
@@ -33,6 +84,96 @@ def parse_header_creation_time(header_line: str) -> datetime | None:
         return datetime.strptime(match.group(1).strip(), "%a %b %d %H:%M:%S %Y")
     except ValueError:
         return None
+
+
+def parse_variable_mapping_line(line: str) -> ParsedVariableLine:
+    """
+    Parse one variable declaration line into its three fields.
+
+    Parameters
+    ----------
+    line : str
+        Declaration line, e.g. ``"Value pack voltage (ams.pack.voltage): 1"``.
+
+    Returns
+    -------
+    ParsedVariableLine
+        The variable's C++ name, description, and ID.
+    """
+    match = VARIABLE_LINE_PATTERN.match(line)
+    if match is None:
+        raise ValueError(f"Malformed variable declaration line: {line.strip()}")
+
+    return ParsedVariableLine(
+        cpp_name=match.group("cpp_name").strip(),
+        description=match.group("description").strip(),
+        var_id=int(match.group("var_id")),
+    )
+
+
+def parse_variable_id_mappings(
+    file_handle: TextIO, verbose: int = 1
+) -> VariableMappings:
+    """
+    Read the variable ID and name mapping lines that follow the file header.
+
+    Parameters
+    ----------
+    file_handle : TextIO
+        Open log file positioned just after the header line.
+    verbose : int, optional
+        Verbosity level. 0 for no output, 1 for warnings, 2 for progress bars. Default is 1.
+
+    Returns
+    -------
+    VariableMappings
+        Parsed lookup tables and the row offset where numeric data begins.
+    """
+    id_to_cpp_name: dict[int, str] = {}
+    id_to_descript: dict[int, str] = {}
+
+    progress_bar = (
+        tqdm(desc="Reading variable ID mappings", unit=" lines", initial=2)
+        if verbose >= 2
+        else None
+    )
+
+    skip_rows = 1  # header line
+    line_number = 1
+    line = file_handle.readline()
+
+    while line and line.startswith(VALUE_LINE_PREFIX):
+        if progress_bar is not None:
+            progress_bar.update(1)
+        skip_rows += 1
+        line_number += 1
+
+        try:
+            parsed_line = parse_variable_mapping_line(line)
+
+            if parsed_line.var_id in id_to_cpp_name and verbose >= 1:
+                print(
+                    f"Warning: Duplicate variable ID {parsed_line.var_id} at line "
+                    f"{line_number}. Overwriting previous name."
+                )
+
+            id_to_cpp_name[parsed_line.var_id] = parsed_line.cpp_name
+            id_to_descript[parsed_line.var_id] = parsed_line.description
+
+        except ValueError as e:
+            if verbose >= 1:
+                print(f"Error parsing variable ID/Name pair at line {line_number}: {e}")
+
+        line = file_handle.readline()
+
+    if progress_bar is not None:
+        progress_bar.close()
+
+    return VariableMappings(
+        id_to_cpp_name=id_to_cpp_name,
+        id_to_descript=id_to_descript,
+        skip_rows=skip_rows,
+    )
 
 
 def _find_start_end_indices_for_each_unique_value(
@@ -70,109 +211,43 @@ def _find_start_end_indices_for_each_unique_value(
     }
 
 
-def parse_csv(
+def read_and_sort_data(
     file_path: str,
+    skip_rows: int,
     ts_offset: int = 0,
     parsing_errors_limit: int = 100,
     verbose: int = 1,
-) -> SingleRunData:
+) -> ParsedDataFrame:
     """
-    Parse CSV file and return SingleRunData model.
+    Read the numeric data section and sort it by variable ID then timestamp.
 
     Parameters
     ----------
     file_path : str
-        Path to the CSV file to parse
+        Path to the CSV file to read.
+    skip_rows : int
+        Number of leading rows to skip before the numeric data.
+    ts_offset : int, optional
+        Timestamp offset applied to all data points. Default is 0.
     parsing_errors_limit : int, optional
-        Maximum number of parsing errors before stopping. -1 for no limit. Default is 100
-    parse_unit : Timescale | str | None, optional
-        Logging timestamp unit. If None, auto-detects using header suffix "v2.0" (us) or defaults to ms.
+        Maximum number of malformed rows tolerated. -1 for no limit. Default is 100.
     verbose : int, optional
-        Verbosity level. 0 for no output, 1 for basic output, 2 for detailed output. Default is 1.
+        Verbosity level. 0 for no output, 1 or higher for status. Default is 1.
 
     Returns
     -------
-    SingleRunData
-        Parsed data structure containing all variables
+    ParsedDataFrame
+        Sorted data and the count of malformed rows dropped.
     """
-    # Maps variable ID to variable name
-    id_to_cpp_name: dict[int, str] = {}
-    id_to_descript: dict[int, str] = {}
-
-    with open(file_path, "r") as f:
-        # Parse and print first line (header)
-        header_line = f.readline()
-        parse_unit = (
-            Timescale.US if header_line.rstrip().endswith("v2.0") else Timescale.MS
-        )
-
-        creation_time = parse_header_creation_time(header_line)
-
-        if verbose >= 1:
-            print(f"Header: {header_line.rstrip()}")
-            print(f"Timestamp unit: {parse_unit.value}")
-            if creation_time:
-                print(f"Log recorded on: {creation_time}")
-
-        # Block 1: Variable ID/Name pairs
-        if verbose >= 2:
-            pbar = tqdm(desc="Reading variable ID mappings", unit=" lines", initial=2)
-        skip_rows = 1  # header line
-        line = f.readline()
-        while line and line.startswith("Value "):
-            if verbose >= 2:
-                pbar.update(1)
-            skip_rows += 1
-
-            # Remove "Value " prefix, separate into variable name and ID
-            identifier = line[6:].strip().split(": ")
-
-            try:
-                var_id = int(identifier[1])
-                name_part = identifier[0]
-
-                # Check format: Value Desc (cpp.name): id | Value cpp.name: id
-                if "(" in name_part and ")" in name_part:
-                    open_idx = name_part.rfind("(")
-                    close_idx = name_part.rfind(")")
-                    if open_idx < close_idx:
-                        cpp_name = name_part[open_idx + 1 : close_idx].strip()
-                        descript = name_part[:open_idx].strip()
-                    else:
-                        cpp_name = name_part.strip()
-                        descript = ""
-                else:
-                    cpp_name = name_part.strip()
-                    descript = ""
-                if not cpp_name:
-                    raise ValueError(f"Empty cpp_name in mapping line: {line.strip()}")
-
-                # Store variable ID to name mapping
-                if var_id in id_to_cpp_name:
-                    if verbose >= 1:
-                        print(
-                            f"Warning: Duplicate variable ID {var_id} at line {pbar.n}. Overwriting previous name."
-                        )
-                id_to_cpp_name[var_id] = cpp_name
-                id_to_descript[var_id] = descript
-
-            except Exception as e:
-                if verbose >= 1:
-                    print(f"Error parsing variable ID/Name pair at line {pbar.n}: {e}")
-
-            line = f.readline()
-        if verbose >= 2:
-            pbar.close()
-
-    # Block 2: Read data with Polars, Block 3: Sort — all in one step
     if verbose >= 1:
         print("Reading and sorting data...")
+
     df = pl.read_csv(
         file_path,
         skip_rows=skip_rows,
         has_header=False,
-        new_columns=["timestamp", "var_id", "value"],
-        schema={"column_1": pl.Int64, "column_2": pl.Int32, "column_3": pl.Float64},
+        new_columns=DATA_COLUMN_NAMES,
+        schema=DATA_COLUMN_SCHEMA,
         ignore_errors=True,
         glob=False,
     )
@@ -194,28 +269,48 @@ def parse_csv(
     if df.is_empty():
         raise Exception("No valid data points found after parsing.")
 
-    total_data_points = len(df)
-    data_start_time = int(cast(int, df["timestamp"].min()))
-    data_end_time = int(cast(int, df["timestamp"].max()))
+    return ParsedDataFrame(data_frame=df, parsing_errors=parsing_errors)
 
-    # Extract sorted columns to main numpy arrays
-    var_ids = df["var_id"].to_numpy()
-    timestamps_all = df["timestamp"].to_numpy()
-    values_all = df["value"].to_numpy()
 
-    # Fast O(N) boundary scan using helper function
+def build_data_instances(
+    mappings: VariableMappings, data_frame: pl.DataFrame, verbose: int = 1
+) -> dict[int, DataInstance]:
+    """
+    Slice the sorted data into one DataInstance per variable.
+
+    Parameters
+    ----------
+    mappings : VariableMappings
+        Variable ID lookup tables.
+    data_frame : pl.DataFrame
+        Data sorted by variable ID then timestamp.
+    verbose : int, optional
+        Verbosity level. 0 for no output, 2 for progress bars. Default is 1.
+
+    Returns
+    -------
+    dict[int, DataInstance]
+        Mapping from variable ID to its DataInstance.
+
+    Notes
+    -----
+    Slicing the shared arrays yields zero-copy numpy views rather than duplicating data.
+    Variables declared in the mapping lines but absent from the data get empty arrays.
+    """
+    var_ids = data_frame["var_id"].to_numpy()
+    timestamps_all = data_frame["timestamp"].to_numpy()
+    values_all = data_frame["value"].to_numpy()
+
     slice_map = _find_start_end_indices_for_each_unique_value(var_ids)
 
-    # Format data as DataInstances (zero-copy slicing views)
     id_to_instance: dict[int, DataInstance] = {}
-    cpp_name_to_id: dict[str, int] = {}
-    if verbose >= 2:
-        di_pbar = tqdm(desc="Creating DataInstances", total=len(id_to_cpp_name))
-    for var_id in id_to_cpp_name:
-        name = id_to_cpp_name[var_id]
-        descript = id_to_descript[var_id]
-        cpp_name_to_id[name] = var_id
+    progress_bar = (
+        tqdm(desc="Creating DataInstances", total=len(mappings.id_to_cpp_name))
+        if verbose >= 2
+        else None
+    )
 
+    for var_id, cpp_name in mappings.id_to_cpp_name.items():
         if var_id in slice_map:
             start, end = slice_map[var_id]
             timestamps_np = timestamps_all[start:end]
@@ -227,26 +322,100 @@ def parse_csv(
         id_to_instance[var_id] = DataInstance(
             timestamp_np=timestamps_np,
             value_np=values_np,
-            label=descript,
+            label=mappings.id_to_descript[var_id],
             var_id=var_id,
-            cpp_name=name,
+            cpp_name=cpp_name,
         )
-        if verbose >= 2:
-            di_pbar.update(1)
-    if verbose >= 2:
-        di_pbar.close()
+        if progress_bar is not None:
+            progress_bar.update(1)
 
-    # Create and return SingleRunData model
+    if progress_bar is not None:
+        progress_bar.close()
+
+    return id_to_instance
+
+
+def parse_csv(
+    file_path: str,
+    ts_offset: int = 0,
+    parsing_errors_limit: int = 100,
+    verbose: int = 1,
+    build_search_index: bool = False,
+) -> SingleRunData:
+    """
+    Parse CSV file and return SingleRunData model.
+
+    Parameters
+    ----------
+    file_path : str
+        Path to the CSV file to parse.
+    ts_offset : int, optional
+        Timestamp offset applied to all data points. Default is 0.
+    parsing_errors_limit : int, optional
+        Maximum number of parsing errors before stopping. -1 for no limit. Default is 100.
+    verbose : int, optional
+        Verbosity level. 0 for no output, 1 for basic output, 2 for detailed output. Default is 1.
+    build_search_index : bool, optional
+        Whether to vectorize variable descriptions for semantic search. Requires the
+        ``semantic`` extra and adds noticeable time to parsing. Default is False.
+
+    Returns
+    -------
+    SingleRunData
+        Parsed data structure containing all variables.
+
+    Notes
+    -----
+    The timestamp unit is auto-detected from the header suffix: "v2.0" means
+    microseconds, anything else means milliseconds.
+    """
+    with open(file_path, "r") as f:
+        header_line = f.readline()
+        parse_unit = (
+            Timescale.US
+            if header_line.rstrip().endswith(MICROSECOND_HEADER_SUFFIX)
+            else Timescale.MS
+        )
+        creation_time = parse_header_creation_time(header_line)
+
+        if verbose >= 1:
+            print(f"Header: {header_line.rstrip()}")
+            print(f"Timestamp unit: {parse_unit.value}")
+            if creation_time:
+                print(f"Log recorded on: {creation_time}")
+
+        mappings = parse_variable_id_mappings(f, verbose=verbose)
+
+    parsed = read_and_sort_data(
+        file_path,
+        mappings.skip_rows,
+        ts_offset=ts_offset,
+        parsing_errors_limit=parsing_errors_limit,
+        verbose=verbose,
+    )
+
+    semantic_index = (
+        build_semantic_index(mappings.id_to_descript, verbose=verbose)
+        if build_search_index
+        else None
+    )
+
+    id_to_instance = build_data_instances(mappings, parsed.data_frame, verbose=verbose)
+
     if verbose >= 1:
-        print(f"CSV parsing complete with {parsing_errors} parsing errors.")
+        print(f"CSV parsing complete with {parsed.parsing_errors} parsing errors.")
+
     return SingleRunData(
         id_to_instance=id_to_instance,
-        cpp_name_to_id=cpp_name_to_id,
-        id_to_cpp_name=id_to_cpp_name,
-        id_to_descript=id_to_descript,
+        cpp_name_to_id={
+            cpp_name: var_id for var_id, cpp_name in mappings.id_to_cpp_name.items()
+        },
+        id_to_cpp_name=mappings.id_to_cpp_name,
+        id_to_descript=mappings.id_to_descript,
         creation_time=creation_time,
-        total_data_points=total_data_points,
-        data_start_time=data_start_time,
-        data_end_time=data_end_time,
+        total_data_points=len(parsed.data_frame),
+        data_start_time=int(cast(int, parsed.data_frame["timestamp"].min())),
+        data_end_time=int(cast(int, parsed.data_frame["timestamp"].max())),
         timestamp_unit=parse_unit,
+        semantic_index=semantic_index,
     )

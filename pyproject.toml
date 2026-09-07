@@ -59,5 +59,13 @@ pythonpath = ["."]
 files = ["perda"]
 
 [[tool.mypy.overrides]]
-module = ["numba", "scipy.*", "plotly.*", "ipywidgets", "ipywidgets.*"]
+module = [
+    "numba",
+    "scipy.*",
+    "plotly.*",
+    "ipywidgets",
+    "ipywidgets.*",
+    "faiss",
+    "sentence_transformers",
+]
 ignore_missing_imports = true

@@ -113,12 +113,19 @@ library in external environments like Google Colab.
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 The default installation supports keyword-based search. To also enable semantic (AI-powered) search,
-install the ``full`` extra instead. This pulls in ``sentence-transformers`` and its dependencies
-(including PyTorch), so expect a larger download.
+install the ``full`` extra instead. This pulls in ``sentence-transformers`` along with
+its dependencies (including PyTorch), so expect a larger download.
 
 .. code-block:: none
 
 	!pip install "perda[full] @ git+https://github.com/Penn-Electric-Racing/PER-Data-Analyzer.git@main"
 
-When the semantic model is available, :func:`perda.utils.search.search` automatically uses it.
-If it is not installed, search falls back to keyword-only scoring with no error.
+Semantic search is opt-in per Analyzer, since building the index adds time to loading:
+
+.. code-block:: python
+
+	aly = Analyzer("path/to/log.csv", semantic_search=True)
+	aly.search("battery current limit")
+
+If the packages or the model are unavailable, the index is skipped and
+:func:`perda.utils.search.search` falls back to keyword-only scoring with no error.

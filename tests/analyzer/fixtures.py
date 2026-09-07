@@ -59,11 +59,11 @@ def two_var_csv(tmp_path):
 
 @pytest.fixture
 def no_descript_csv(tmp_path):
-    """CSV where variable name has no parenthesised description."""
+    """CSV where the variable declaration carries no description."""
     content = textwrap.dedent(
         """\
         Log file header
-        Value ams.pack.voltage: 1
+        Value (ams.pack.voltage): 1
         0,1,3.7
         500,1,3.8
     """
