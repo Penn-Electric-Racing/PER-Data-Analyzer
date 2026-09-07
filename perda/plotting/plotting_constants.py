@@ -72,10 +72,8 @@ class GpsMapConfig(BaseModel):
 
     Parameters
     ----------
-    mapbox_style : str
-        Mapbox tile style. ``"carto-positron"`` is free and requires no token.
-    mapbox_token : str
-        Mapbox access token. Only needed for Mapbox-hosted styles.
+    map_style : str
+        MapLibre base map style. ``"open-street-map"`` requires no API key.
     marker_size : int
         Marker size on GPS traces.
     line_width : int
@@ -94,8 +92,7 @@ class GpsMapConfig(BaseModel):
         Set to ``float("inf")`` to disable.
     """
 
-    mapbox_style: str = "carto-positron"
-    mapbox_token: str = ""
+    map_style: str = "open-street-map"
     marker_size: int = 3
     line_width: int = 2
     line_color: str = "red"

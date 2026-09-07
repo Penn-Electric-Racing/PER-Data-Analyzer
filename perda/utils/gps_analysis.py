@@ -256,7 +256,7 @@ def create_representative_gps_image(
     Generate a GPS trace on an interactive map background.
 
     Outliers (large radius from centroid or sudden jumps) are removed via
-    :func:`filter_gps_cartesian`.  Uses CARTO Positron tiles by default
+    :func:`filter_gps_cartesian`.  Uses OpenStreetMap tiles by default
     (free, no API key required).
 
     Parameters
@@ -318,7 +318,7 @@ def create_representative_gps_image(
 
     fig = go.Figure()
     fig.add_trace(
-        go.Scattermapbox(
+        go.Scattermap(
             lat=lat_filtered,
             lon=lon_filtered,
             mode="lines+markers",
@@ -338,14 +338,6 @@ def create_representative_gps_image(
     max_span = max(lat_span, lon_span) * (1 + gps_map_config.zoom_padding)
     zoom = np.log2(360 / max_span) if max_span > 0 else 15
 
-    mapbox_kwargs: dict[str, object] = dict(
-        style=gps_map_config.mapbox_style,
-        center=dict(lat=float(center_lat), lon=float(center_lon)),
-        zoom=float(zoom),
-    )
-    if gps_map_config.mapbox_token:
-        mapbox_kwargs["accesstoken"] = gps_map_config.mapbox_token
-
     fig.update_layout(
         title=dict(
             text=title,
@@ -354,7 +346,11 @@ def create_representative_gps_image(
             yanchor=layout_config.title_yanchor,
             font=dict(size=font_config.large),
         ),
-        mapbox=mapbox_kwargs,
+        map=dict(
+            style=gps_map_config.map_style,
+            center=dict(lat=float(center_lat), lon=float(center_lon)),
+            zoom=float(zoom),
+        ),
         showlegend=False,
         width=int(layout_config.height),
         height=int(layout_config.height),
