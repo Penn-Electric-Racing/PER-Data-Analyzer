@@ -1,4 +1,5 @@
 # Data Processing
+faiss-cpu
 numba
 numpy
 polars

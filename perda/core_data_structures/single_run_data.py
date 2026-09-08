@@ -1,12 +1,16 @@
-from datetime import datetime
-from typing import Dict, List, Optional, Union
+from __future__ import annotations
 
-import numpy as np
-from numpy.typing import NDArray
-from pydantic import BaseModel, ConfigDict, Field, PrivateAttr
+from datetime import datetime
+
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from ..units import Timescale
 from .data_instance import DataInstance
+from .search_indexes import (
+    VariableKeywordIndex,
+    VariableSemanticIndex,
+    variable_keyword_index_from_csv_mappings,
+)
 
 
 class SingleRunData(BaseModel):
@@ -14,26 +18,22 @@ class SingleRunData(BaseModel):
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
-    # Private caches (excluded from Pydantic serialization)
-    _search_deck: Optional[list] = PrivateAttr(default=None)
-    _search_embeddings: Optional[NDArray[np.float32]] = PrivateAttr(default=None)
-
     # Core data storage
-    id_to_instance: Dict[int, DataInstance] = Field(
+    id_to_instance: dict[int, DataInstance] = Field(
         description="Mapping from variable ID to DataInstance"
     )
-    cpp_name_to_id: Dict[str, int] = Field(
+    cpp_name_to_id: dict[str, int] = Field(
         description="Mapping from variable name to variable ID"
     )
-    id_to_cpp_name: Dict[int, str] = Field(
+    id_to_cpp_name: dict[int, str] = Field(
         description="Mapping from variable ID to variable name"
     )
-    id_to_descript: Dict[int, str] = Field(
+    id_to_descript: dict[int, str] = Field(
         description="Mapping from variable ID to variable description"
     )
 
     # Metadata
-    creation_time: Optional[datetime] = Field(
+    creation_time: datetime | None = Field(
         default=None,
         description="Timestamp when this run log was recorded",
     )
@@ -46,20 +46,36 @@ class SingleRunData(BaseModel):
         default=Timescale.MS,
         description="Timestamp logging unit for this run (ms/us)",
     )
-    concat_boundaries: List[int] = Field(
+    concat_boundaries: list[int] = Field(
         default_factory=list,
         description="Timestamps where concatenated runs begin (post-shift)",
     )
+    semantic_index: VariableSemanticIndex | None = Field(
+        default=None,
+        description="Vector index over variable descriptions. None when semantic search is disabled or unavailable",
+    )
+    keyword_index: VariableKeywordIndex = Field(
+        default_factory=lambda: VariableKeywordIndex(
+            row_to_var_id=[], normalized_text=[]
+        ),
+        description="Normalized name and description text backing keyword search",
+    )
 
-    def __getitem__(
-        self, input_var_id_name: Union[str, int, DataInstance]
-    ) -> DataInstance:
+    @model_validator(mode="after")
+    def _build_keyword_index(self) -> SingleRunData:
+        if not self.keyword_index.row_to_var_id:
+            self.keyword_index = variable_keyword_index_from_csv_mappings(
+                self.id_to_cpp_name, self.id_to_descript
+            )
+        return self
+
+    def __getitem__(self, input_var_id_name: str | int | DataInstance) -> DataInstance:
         """
         Dictionary-like access to DataInstance by variable ID or variable name.
 
         Parameters
         ----------
-        input_var_id_name : Union[str, int, DataInstance]
+        input_var_id_name : str | int | DataInstance
             Variable ID (int), variable name (str), or DataInstance to retrieve
 
         Returns
@@ -141,8 +157,6 @@ class SingleRunData(BaseModel):
         self.cpp_name_to_id[cpp_name] = synthetic_id
         self.id_to_cpp_name[synthetic_id] = cpp_name
         self.id_to_descript[synthetic_id] = di.label or ""
-        self._search_deck = None
-        self._search_embeddings = None
 
     def replace(self, cpp_name: str, di: DataInstance) -> None:
         """
@@ -177,16 +191,14 @@ class SingleRunData(BaseModel):
             var_id=old.var_id,
             cpp_name=old.cpp_name,
         )
-        self._search_deck = None
-        self._search_embeddings = None
 
-    def __contains__(self, input_var_id_name: Union[str, int]) -> bool:
+    def __contains__(self, input_var_id_name: str | int) -> bool:
         """
         Check if variable ID or variable name exists in the data.
 
         Parameters
         ----------
-        input_var_id_name : Union[str, int]
+        input_var_id_name : str | int
             Variable ID or variable name to check
 
         Returns

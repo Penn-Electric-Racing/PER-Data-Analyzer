@@ -73,6 +73,7 @@ class Analyzer:
         parsing_errors_limit: int = 100,
         verbose: int = 1,
         preprocessing: list[PreprocessingStep] | None = None,
+        semantic_search: bool = False,
     ) -> None:
         """
         Initialize a new analyzer instance.
@@ -89,6 +90,11 @@ class Analyzer:
             Ordered list of post-parse preprocessing steps to apply. Each step
             is a ``SingleRunData -> SingleRunData`` callable. Steps are skipped
             with a warning if required variables are absent. Default is None.
+        semantic_search : bool, optional
+            Whether to vectorize variable descriptions so that ``search`` ranks by
+            meaning rather than keywords. Requires the ``semantic`` extra and adds
+            noticeable time to loading. Falls back to keyword search if the
+            dependencies or model are unavailable. Default is False.
 
         Examples
         --------
@@ -105,6 +111,7 @@ class Analyzer:
             ts_offset,
             parsing_errors_limit=parsing_errors_limit,
             verbose=verbose,
+            build_search_index=semantic_search,
         )
         if preprocessing:
             self.data = apply_preprocessing(self.data, preprocessing)
@@ -125,9 +132,7 @@ class Analyzer:
 
         return output
 
-    def search(
-        self, query: str, top_n: int = 10, semantic: bool = False
-    ) -> list[SearchResult]:
+    def search(self, query: str, top_n: int = 10) -> list[SearchResult]:
         """
         Natural language search for available variables in the parsed data.
 
@@ -139,8 +144,6 @@ class Analyzer:
             Free-text search query (e.g. "front wheel speed").
         top_n : int
             Maximum number of results to return and display (default 10).
-        semantic : bool
-            Whether to use semantic search embeddings (default False).
 
         Returns
         -------
@@ -149,13 +152,18 @@ class Analyzer:
             Each entry has ``rank``, ``score``, ``var_id``, ``cpp_name``,
             and ``descript``.
 
+        Notes
+        -----
+        Ranks by meaning when the Analyzer was created with ``semantic_search=True``,
+        and by fuzzy keyword matching otherwise.
+
         Examples
         --------
         >>> results = aly.search("front wheel speed")
-        >>> results = aly.search("front wheel speed", top_n=5, semantic=True)
+        >>> results = aly.search("front wheel speed", top_n=5)
         >>> names = [r.cpp_name for r in results]
         """
-        return search(self.data, query, top_n, semantic)
+        return search(self.data, query, top_n)
 
     def plot(
         self,
