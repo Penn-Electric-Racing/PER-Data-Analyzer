@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>perda.plotting.diff_plotter &#8212; PERDA</title>
+    <title>perda.core_data_structures.search_indexes &#8212; PERDA</title>
   
   
   
@@ -47,11 +47,11 @@
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=f281be69"></script>
     <script src="../_static/design-tabs.js?v=f930bc37"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/perda.plotting.diff_plotter';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/perda.core_data_structures.search_indexes';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="perda.plotting.fft_plotter" href="perda.plotting.fft_plotter.html" />
-    <link rel="prev" title="perda.plotting.data_instance_plotter" href="perda.plotting.data_instance_plotter.html" />
+    <link rel="next" title="perda.core_data_structures.single_run_data" href="perda.core_data_structures.single_run_data.html" />
+    <link rel="prev" title="perda.core_data_structures.resampling" href="perda.core_data_structures.resampling.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
@@ -268,13 +268,13 @@
 </ul>
 </details></li>
 <li class="toctree-l2"><a class="reference internal" href="perda.constants.html">perda.constants</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="perda.core_data_structures.html">perda.core_data_structures</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="perda.core_data_structures.html">perda.core_data_structures</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.data_instance.html">perda.core_data_structures.data_instance</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.deduplication.html">perda.core_data_structures.deduplication</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.joins.html">perda.core_data_structures.joins</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.masking.html">perda.core_data_structures.masking</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.resampling.html">perda.core_data_structures.resampling</a></li>
-<li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.search_indexes.html">perda.core_data_structures.search_indexes</a></li>
+<li class="toctree-l3 current active"><a class="current reference internal" href="#">perda.core_data_structures.search_indexes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.single_run_data.html">perda.core_data_structures.single_run_data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.split_helpers.html">perda.core_data_structures.split_helpers</a></li>
 </ul>
@@ -284,9 +284,9 @@
 <li class="toctree-l3"><a class="reference internal" href="perda.live.live_analyzer.html">perda.live.live_analyzer</a></li>
 </ul>
 </details></li>
-<li class="toctree-l2 current active has-children"><a class="reference internal" href="perda.plotting.html">perda.plotting</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 has-children"><a class="reference internal" href="perda.plotting.html">perda.plotting</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="perda.plotting.data_instance_plotter.html">perda.plotting.data_instance_plotter</a></li>
-<li class="toctree-l3 current active"><a class="current reference internal" href="#">perda.plotting.diff_plotter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.plotting.diff_plotter.html">perda.plotting.diff_plotter</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.plotting.fft_plotter.html">perda.plotting.fft_plotter</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.plotting.parametric_plot.html">perda.plotting.parametric_plot</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.plotting.plotting_constants.html">perda.plotting.plotting_constants</a></li>
@@ -358,9 +358,9 @@
     <li class="breadcrumb-item"><a href="perda.html" class="nav-link">perda</a></li>
     
     
-    <li class="breadcrumb-item"><a href="perda.plotting.html" class="nav-link">perda.plotting</a></li>
+    <li class="breadcrumb-item"><a href="perda.core_data_structures.html" class="nav-link">perda.core_data_structures</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">perda.plotting.diff_plotter</span></li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">perda.core_data_structures.search_indexes</span></li>
   </ul>
 </nav>
 </div>
@@ -377,32 +377,101 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="module-perda.plotting.diff_plotter">
-<span id="perda-plotting-diff-plotter"></span><h1>perda.plotting.diff_plotter<a class="headerlink" href="#module-perda.plotting.diff_plotter" title="Link to this heading">#</a></h1>
+  <section id="module-perda.core_data_structures.search_indexes">
+<span id="perda-core-data-structures-search-indexes"></span><h1>perda.core_data_structures.search_indexes<a class="headerlink" href="#module-perda.core_data_structures.search_indexes" title="Link to this heading">#</a></h1>
+<dl class="py class pydantic_model">
+<dt class="sig sig-object py" id="perda.core_data_structures.search_indexes.VariableKeywordIndex">
+<em class="property"><span class="pre">pydantic</span> <span class="pre">model</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">perda.core_data_structures.search_indexes.</span></span><span class="sig-name descname"><span class="pre">VariableKeywordIndex</span></span><a class="reference internal" href="../_modules/perda/core_data_structures/search_indexes.html#VariableKeywordIndex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.core_data_structures.search_indexes.VariableKeywordIndex" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<p>Normalized searchable text per variable, built once at parse time.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Fields<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><a class="reference internal" href="#perda.core_data_structures.search_indexes.VariableKeywordIndex.normalized_text" title="perda.core_data_structures.search_indexes.VariableKeywordIndex.normalized_text"><code class="xref py py-obj docutils literal notranslate"><span class="pre">normalized_text</span> <span class="pre">(list[str])</span></code></a></p></li>
+<li><p><a class="reference internal" href="#perda.core_data_structures.search_indexes.VariableKeywordIndex.row_to_var_id" title="perda.core_data_structures.search_indexes.VariableKeywordIndex.row_to_var_id"><code class="xref py py-obj docutils literal notranslate"><span class="pre">row_to_var_id</span> <span class="pre">(list[int])</span></code></a></p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="perda.core_data_structures.search_indexes.VariableKeywordIndex.row_to_var_id">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">row_to_var_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code><span class="pre">[</span><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code><span class="pre">]</span></em><em class="property"> <span class="pre">[Required]</span></em><a class="headerlink" href="#perda.core_data_structures.search_indexes.VariableKeywordIndex.row_to_var_id" title="Link to this definition">#</a></dt>
+<dd><p>Maps index row position to variable ID</p>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="perda.core_data_structures.search_indexes.VariableKeywordIndex.normalized_text">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">normalized_text</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code><span class="pre">[</span><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><span class="pre">]</span></em><em class="property"> <span class="pre">[Required]</span></em><a class="headerlink" href="#perda.core_data_structures.search_indexes.VariableKeywordIndex.normalized_text" title="Link to this definition">#</a></dt>
+<dd><p>Lower-cased text of each variable’s name and description, with camelCase and period boundaries split into separate words</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class pydantic_model">
+<dt class="sig sig-object py" id="perda.core_data_structures.search_indexes.VariableSemanticIndex">
+<em class="property"><span class="pre">pydantic</span> <span class="pre">model</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">perda.core_data_structures.search_indexes.</span></span><span class="sig-name descname"><span class="pre">VariableSemanticIndex</span></span><a class="reference internal" href="../_modules/perda/core_data_structures/search_indexes.html#VariableSemanticIndex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.core_data_structures.search_indexes.VariableSemanticIndex" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<p>Vector index over variable description embeddings, built once at parse time.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Config<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>arbitrary_types_allowed</strong>: <em>bool = True</em></p></li>
+</ul>
+</dd>
+<dt class="field-even">Fields<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><a class="reference internal" href="#perda.core_data_structures.search_indexes.VariableSemanticIndex.faiss_index" title="perda.core_data_structures.search_indexes.VariableSemanticIndex.faiss_index"><code class="xref py py-obj docutils literal notranslate"><span class="pre">faiss_index</span> <span class="pre">(faiss.swigfaiss.IndexFlatIP)</span></code></a></p></li>
+<li><p><a class="reference internal" href="#perda.core_data_structures.search_indexes.VariableSemanticIndex.row_to_var_id" title="perda.core_data_structures.search_indexes.VariableSemanticIndex.row_to_var_id"><code class="xref py py-obj docutils literal notranslate"><span class="pre">row_to_var_id</span> <span class="pre">(list[int])</span></code></a></p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="perda.core_data_structures.search_indexes.VariableSemanticIndex.faiss_index">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">faiss_index</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">IndexFlatIP</span></code></em><em class="property"> <span class="pre">[Required]</span></em><a class="headerlink" href="#perda.core_data_structures.search_indexes.VariableSemanticIndex.faiss_index" title="Link to this definition">#</a></dt>
+<dd><p>Inner-product index holding L2-normalized description vectors</p>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="perda.core_data_structures.search_indexes.VariableSemanticIndex.row_to_var_id">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">row_to_var_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code><span class="pre">[</span><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code><span class="pre">]</span></em><em class="property"> <span class="pre">[Required]</span></em><a class="headerlink" href="#perda.core_data_structures.search_indexes.VariableSemanticIndex.row_to_var_id" title="Link to this definition">#</a></dt>
+<dd><p>Maps index row position to variable ID</p>
+</dd></dl>
+
+</dd></dl>
+
 <dl class="py function">
-<dt class="sig sig-object py" id="perda.plotting.diff_plotter.plot_diff_bars">
-<span class="sig-prename descclassname"><span class="pre">perda.plotting.diff_plotter.</span></span><span class="sig-name descname"><span class="pre">plot_diff_bars</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base_extra_ts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">incom_extra_ts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value_mismatch_ts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_present_ts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Diff</span> <span class="pre">Counts</span> <span class="pre">Over</span> <span class="pre">Time</span> <span class="pre">(bucketed)'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_axis_title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Event</span> <span class="pre">Count'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_legend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diff_plot_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">DiffPlotConfig(bucket_size_s=1.0,</span> <span class="pre">color_base_extra='blue',</span> <span class="pre">color_incom_extra='darkorange',</span> <span class="pre">color_value_mismatch='crimson',</span> <span class="pre">color_total='gray')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layout_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">LayoutConfig(width=1200,</span> <span class="pre">height=700,</span> <span class="pre">margin={'l':</span> <span class="pre">70,</span> <span class="pre">'r':</span> <span class="pre">50,</span> <span class="pre">'t':</span> <span class="pre">90,</span> <span class="pre">'b':</span> <span class="pre">70},</span> <span class="pre">plot_bgcolor='white',</span> <span class="pre">title_x=0.5,</span> <span class="pre">title_xanchor='center',</span> <span class="pre">title_yanchor='top',</span> <span class="pre">grid_width_per_col=400,</span> <span class="pre">grid_height_per_row=350,</span> <span class="pre">grid_horizontal_spacing=0.08,</span> <span class="pre">grid_vertical_spacing=0.12,</span> <span class="pre">max_display_resolution=50)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">font_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">FontConfig(large=20,</span> <span class="pre">medium=14,</span> <span class="pre">small=10)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/plotting/diff_plotter.html#plot_diff_bars"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.plotting.diff_plotter.plot_diff_bars" title="Link to this definition">#</a></dt>
-<dd><p>Plot diff results as bucketed bar charts.</p>
-<p>Renders four overlaid bar traces — total datapoints present (background),
-base-only extras, incoming-only extras, and value mismatches — bucketed
-into fixed-width time windows.</p>
+<dt class="sig sig-object py" id="perda.core_data_structures.search_indexes.normalize_search_text">
+<span class="sig-prename descclassname"><span class="pre">perda.core_data_structures.search_indexes.</span></span><span class="sig-name descname"><span class="pre">normalize_search_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/core_data_structures/search_indexes.html#normalize_search_text"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.core_data_structures.search_indexes.normalize_search_text" title="Link to this definition">#</a></dt>
+<dd><p>Lower-case text and split camelCase and period boundaries into separate words.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>text</strong> (<em>str</em>) – Raw text, such as a C++ variable name joined with its description.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Normalized text, e.g. “pcm.wheelSpeeds.frontRight” becomes
+“pcm wheel speeds front right”.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="perda.core_data_structures.search_indexes.variable_keyword_index_from_csv_mappings">
+<span class="sig-prename descclassname"><span class="pre">perda.core_data_structures.search_indexes.</span></span><span class="sig-name descname"><span class="pre">variable_keyword_index_from_csv_mappings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id_to_cpp_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id_to_descript</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/core_data_structures/search_indexes.html#variable_keyword_index_from_csv_mappings"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.core_data_structures.search_indexes.variable_keyword_index_from_csv_mappings" title="Link to this definition">#</a></dt>
+<dd><p>Normalize every variable’s name and description into searchable text.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>base_extra_ts</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenericAlias</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float64</span></code>]</span>) – Timestamps (seconds) of datapoints present only in the base run.</p></li>
-<li><p><strong>incom_extra_ts</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenericAlias</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float64</span></code>]</span>) – Timestamps (seconds) of datapoints present only in the incoming run.</p></li>
-<li><p><strong>value_mismatch_ts</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenericAlias</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float64</span></code>]</span>) – Timestamps (seconds) of matched points whose values differ.</p></li>
-<li><p><strong>total_present_ts</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenericAlias</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float64</span></code>]</span>) – Timestamps (seconds) of all datapoints seen in either run.</p></li>
-<li><p><strong>title</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – Plot title.</p></li>
-<li><p><strong>y_axis_title</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – Label for the y-axis.</p></li>
-<li><p><strong>show_legend</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></span>) – Whether to show the legend.</p></li>
-<li><p><strong>diff_plot_config</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.DiffPlotConfig" title="perda.plotting.plotting_constants.DiffPlotConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">DiffPlotConfig</span></code></a></span>) – Colors and bucket size configuration.</p></li>
-<li><p><strong>layout_config</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.LayoutConfig" title="perda.plotting.plotting_constants.LayoutConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">LayoutConfig</span></code></a></span>) – Plot dimensions and margin configuration.</p></li>
-<li><p><strong>font_config</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.FontConfig" title="perda.plotting.plotting_constants.FontConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">FontConfig</span></code></a></span>) – Font sizes for titles, labels, and ticks.</p></li>
+<li><p><strong>id_to_cpp_name</strong> (<em>dict</em><em>[</em><em>int</em><em>, </em><em>str</em><em>]</em>) – Mapping from variable ID to its C++ variable name.</p></li>
+<li><p><strong>id_to_descript</strong> (<em>dict</em><em>[</em><em>int</em><em>, </em><em>str</em><em>]</em>) – Mapping from variable ID to its human-readable description.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>go.Figure</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Normalized text for each variable, aligned with <code class="docutils literal notranslate"><span class="pre">row_to_var_id</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#perda.core_data_structures.search_indexes.VariableKeywordIndex" title="perda.core_data_structures.search_indexes.VariableKeywordIndex">VariableKeywordIndex</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -420,20 +489,20 @@ into fixed-width time windows.</p>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="perda.plotting.data_instance_plotter.html"
+       href="perda.core_data_structures.resampling.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">perda.plotting.data_instance_plotter</p>
+        <p class="prev-next-title">perda.core_data_structures.resampling</p>
       </div>
     </a>
     <a class="right-next"
-       href="perda.plotting.fft_plotter.html"
+       href="perda.core_data_structures.single_run_data.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">perda.plotting.fft_plotter</p>
+        <p class="prev-next-title">perda.core_data_structures.single_run_data</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -456,7 +525,18 @@ into fixed-width time windows.</p>
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.plotting.diff_plotter.plot_diff_bars"><code class="docutils literal notranslate"><span class="pre">plot_diff_bars()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.core_data_structures.search_indexes.VariableKeywordIndex"><code class="docutils literal notranslate"><span class="pre">VariableKeywordIndex</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.core_data_structures.search_indexes.VariableKeywordIndex.row_to_var_id"><code class="docutils literal notranslate"><span class="pre">VariableKeywordIndex.row_to_var_id</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.core_data_structures.search_indexes.VariableKeywordIndex.normalized_text"><code class="docutils literal notranslate"><span class="pre">VariableKeywordIndex.normalized_text</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.core_data_structures.search_indexes.VariableSemanticIndex"><code class="docutils literal notranslate"><span class="pre">VariableSemanticIndex</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.core_data_structures.search_indexes.VariableSemanticIndex.faiss_index"><code class="docutils literal notranslate"><span class="pre">VariableSemanticIndex.faiss_index</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.core_data_structures.search_indexes.VariableSemanticIndex.row_to_var_id"><code class="docutils literal notranslate"><span class="pre">VariableSemanticIndex.row_to_var_id</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.core_data_structures.search_indexes.normalize_search_text"><code class="docutils literal notranslate"><span class="pre">normalize_search_text()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.core_data_structures.search_indexes.variable_keyword_index_from_csv_mappings"><code class="docutils literal notranslate"><span class="pre">variable_keyword_index_from_csv_mappings()</span></code></a></li>
 </ul>
   </nav></div>
 
@@ -464,7 +544,7 @@ into fixed-width time windows.</p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="../_sources/_autosummary/perda.plotting.diff_plotter.rst.txt"
+      <li><a href="../_sources/_autosummary/perda.core_data_structures.search_indexes.rst.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div></div>

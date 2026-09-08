@@ -414,13 +414,18 @@ Append an exclamation mark and leave it in a normal code cell like below:</p>
 <section id="optional-enable-semantic-search">
 <h4>2. Optional: Enable semantic search<a class="headerlink" href="#optional-enable-semantic-search" title="Link to this heading">#</a></h4>
 <p>The default installation supports keyword-based search. To also enable semantic (AI-powered) search,
-install the <code class="docutils literal notranslate"><span class="pre">full</span></code> extra instead. This pulls in <code class="docutils literal notranslate"><span class="pre">sentence-transformers</span></code> and its dependencies
-(including PyTorch), so expect a larger download.</p>
+install the <code class="docutils literal notranslate"><span class="pre">full</span></code> extra instead. This pulls in <code class="docutils literal notranslate"><span class="pre">sentence-transformers</span></code> along with
+its dependencies (including PyTorch), so expect a larger download.</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>!pip install "perda[full] @ git+https://github.com/Penn-Electric-Racing/PER-Data-Analyzer.git@main"
 </pre></div>
 </div>
-<p>When the semantic model is available, <a class="reference internal" href="../_autosummary/perda.utils.search.html#perda.utils.search.search" title="perda.utils.search.search"><code class="xref py py-func docutils literal notranslate"><span class="pre">perda.utils.search.search()</span></code></a> automatically uses it.
-If it is not installed, search falls back to keyword-only scoring with no error.</p>
+<p>Semantic search is opt-in per Analyzer, since building the index adds time to loading:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">aly</span> <span class="o">=</span> <span class="n">Analyzer</span><span class="p">(</span><span class="s2">"path/to/log.csv"</span><span class="p">,</span> <span class="n">semantic_search</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">aly</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s2">"battery current limit"</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If the packages or the model are unavailable, the index is skipped and
+<a class="reference internal" href="../_autosummary/perda.utils.search.html#perda.utils.search.search" title="perda.utils.search.search"><code class="xref py py-func docutils literal notranslate"><span class="pre">perda.utils.search.search()</span></code></a> falls back to keyword-only scoring with no error.</p>
 </section>
 </section>
 </section>

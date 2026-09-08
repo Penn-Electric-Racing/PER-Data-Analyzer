@@ -302,18 +302,78 @@
                 <article class="bd-article">
                   
   <h1>Source code for perda.analyzer.csv</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">cast</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TextIO</span><span class="p">,</span> <span class="n">cast</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">polars</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pl</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">numpy.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">NDArray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">ConfigDict</span><span class="p">,</span> <span class="n">Field</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">tqdm</span><span class="w"> </span><span class="kn">import</span> <span class="n">tqdm</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">..core_data_structures.data_instance</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataInstance</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..core_data_structures.single_run_data</span><span class="w"> </span><span class="kn">import</span> <span class="n">SingleRunData</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..units</span><span class="w"> </span><span class="kn">import</span> <span class="n">Timescale</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..utils.search</span><span class="w"> </span><span class="kn">import</span> <span class="n">build_semantic_index</span>
+
+<span class="n">DATA_COLUMN_NAMES</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"timestamp"</span><span class="p">,</span> <span class="s2">"var_id"</span><span class="p">,</span> <span class="s2">"value"</span><span class="p">]</span>
+<span class="n">DATA_COLUMN_SCHEMA</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">"column_1"</span><span class="p">:</span> <span class="n">pl</span><span class="o">.</span><span class="n">Int64</span><span class="p">,</span>
+    <span class="s2">"column_2"</span><span class="p">:</span> <span class="n">pl</span><span class="o">.</span><span class="n">Int32</span><span class="p">,</span>
+    <span class="s2">"column_3"</span><span class="p">:</span> <span class="n">pl</span><span class="o">.</span><span class="n">Float64</span><span class="p">,</span>
+<span class="p">}</span>
+<span class="n">VALUE_LINE_PREFIX</span> <span class="o">=</span> <span class="s2">"Value "</span>
+<span class="n">MICROSECOND_HEADER_SUFFIX</span> <span class="o">=</span> <span class="s2">"v2.0"</span>
+<span class="n">VARIABLE_LINE_PATTERN</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+    <span class="sa">rf</span><span class="s2">"""</span>
+<span class="s2">    ^</span><span class="si">{</span><span class="n">re</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="n">VALUE_LINE_PREFIX</span><span class="p">)</span><span class="si">}</span><span class="s2">\s*      # prefix marking a variable declaration</span>
+<span class="s2">    (?P&lt;description&gt;.*?)                    # free-form description</span>
+<span class="s2">    \s*</span>
+<span class="s2">    \(\s*(?P&lt;cpp_name&gt;[^()]+?)\s*\)         # parenthesised C++ name</span>
+<span class="s2">    \s*:\s*                                 # separator before the variable ID</span>
+<span class="s2">    (?P&lt;var_id&gt;\d+)\s*$                     # variable ID</span>
+<span class="s2">    """</span><span class="p">,</span>
+    <span class="n">re</span><span class="o">.</span><span class="n">VERBOSE</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="ParsedVariableLine">
+<a class="viewcode-back" href="../../../_autosummary/perda.analyzer.csv.html#perda.analyzer.csv.ParsedVariableLine">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ParsedVariableLine</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">cpp_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">"C++ name of the variable"</span><span class="p">)</span>
+    <span class="n">description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">"Human readable description of the variable"</span><span class="p">)</span>
+    <span class="n">var_id</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">"Numeric ID the data rows refer to"</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="VariableMappings">
+<a class="viewcode-back" href="../../../_autosummary/perda.analyzer.csv.html#perda.analyzer.csv.VariableMappings">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">VariableMappings</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">id_to_cpp_name</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">"Mapping from variable ID to variable name"</span>
+    <span class="p">)</span>
+    <span class="n">id_to_descript</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">"Mapping from variable ID to variable description"</span>
+    <span class="p">)</span>
+    <span class="n">skip_rows</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">"Number of leading rows before the numeric data section"</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="ParsedDataFrame">
+<a class="viewcode-back" href="../../../_autosummary/perda.analyzer.csv.html#perda.analyzer.csv.ParsedDataFrame">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ParsedDataFrame</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span><span class="n">arbitrary_types_allowed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">data_frame</span><span class="p">:</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">"Data sorted by variable ID then timestamp"</span>
+    <span class="p">)</span>
+    <span class="n">parsing_errors</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">"Number of rows dropped as unparseable"</span><span class="p">)</span></div>
+
 
 
 <div class="viewcode-block" id="parse_header_creation_time">
@@ -339,6 +399,102 @@
         <span class="k">return</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span> <span class="s2">"</span><span class="si">%a</span><span class="s2"> %b </span><span class="si">%d</span><span class="s2"> %H:%M:%S %Y"</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">None</span></div>
+
+
+
+<div class="viewcode-block" id="parse_variable_mapping_line">
+<a class="viewcode-back" href="../../../_autosummary/perda.analyzer.csv.html#perda.analyzer.csv.parse_variable_mapping_line">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">parse_variable_mapping_line</span><span class="p">(</span><span class="n">line</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ParsedVariableLine</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Parse one variable declaration line into its three fields.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    line : str</span>
+<span class="sd">        Declaration line, e.g. ``"Value pack voltage (ams.pack.voltage): 1"``.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    ParsedVariableLine</span>
+<span class="sd">        The variable's C++ name, description, and ID.</span>
+<span class="sd">    """</span>
+    <span class="n">match</span> <span class="o">=</span> <span class="n">VARIABLE_LINE_PATTERN</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">match</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Malformed variable declaration line: </span><span class="si">{</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">ParsedVariableLine</span><span class="p">(</span>
+        <span class="n">cpp_name</span><span class="o">=</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">"cpp_name"</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span>
+        <span class="n">description</span><span class="o">=</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">"description"</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span>
+        <span class="n">var_id</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">"var_id"</span><span class="p">)),</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="parse_variable_id_mappings">
+<a class="viewcode-back" href="../../../_autosummary/perda.analyzer.csv.html#perda.analyzer.csv.parse_variable_id_mappings">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">parse_variable_id_mappings</span><span class="p">(</span>
+    <span class="n">file_handle</span><span class="p">:</span> <span class="n">TextIO</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">VariableMappings</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Read the variable ID and name mapping lines that follow the file header.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    file_handle : TextIO</span>
+<span class="sd">        Open log file positioned just after the header line.</span>
+<span class="sd">    verbose : int, optional</span>
+<span class="sd">        Verbosity level. 0 for no output, 1 for warnings, 2 for progress bars. Default is 1.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    VariableMappings</span>
+<span class="sd">        Parsed lookup tables and the row offset where numeric data begins.</span>
+<span class="sd">    """</span>
+    <span class="n">id_to_cpp_name</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">id_to_descript</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="n">progress_bar</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">tqdm</span><span class="p">(</span><span class="n">desc</span><span class="o">=</span><span class="s2">"Reading variable ID mappings"</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">" lines"</span><span class="p">,</span> <span class="n">initial</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">verbose</span> <span class="o">&gt;=</span> <span class="mi">2</span>
+        <span class="k">else</span> <span class="kc">None</span>
+    <span class="p">)</span>
+
+    <span class="n">skip_rows</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># header line</span>
+    <span class="n">line_number</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">line</span> <span class="o">=</span> <span class="n">file_handle</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+
+    <span class="k">while</span> <span class="n">line</span> <span class="ow">and</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">VALUE_LINE_PREFIX</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">progress_bar</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">progress_bar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">skip_rows</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">line_number</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">parsed_line</span> <span class="o">=</span> <span class="n">parse_variable_mapping_line</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">parsed_line</span><span class="o">.</span><span class="n">var_id</span> <span class="ow">in</span> <span class="n">id_to_cpp_name</span> <span class="ow">and</span> <span class="n">verbose</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">"Warning: Duplicate variable ID </span><span class="si">{</span><span class="n">parsed_line</span><span class="o">.</span><span class="n">var_id</span><span class="si">}</span><span class="s2"> at line "</span>
+                    <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">line_number</span><span class="si">}</span><span class="s2">. Overwriting previous name."</span>
+                <span class="p">)</span>
+
+            <span class="n">id_to_cpp_name</span><span class="p">[</span><span class="n">parsed_line</span><span class="o">.</span><span class="n">var_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">parsed_line</span><span class="o">.</span><span class="n">cpp_name</span>
+            <span class="n">id_to_descript</span><span class="p">[</span><span class="n">parsed_line</span><span class="o">.</span><span class="n">var_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">parsed_line</span><span class="o">.</span><span class="n">description</span>
+
+        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">verbose</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Error parsing variable ID/Name pair at line </span><span class="si">{</span><span class="n">line_number</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+
+        <span class="n">line</span> <span class="o">=</span> <span class="n">file_handle</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">progress_bar</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">progress_bar</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">VariableMappings</span><span class="p">(</span>
+        <span class="n">id_to_cpp_name</span><span class="o">=</span><span class="n">id_to_cpp_name</span><span class="p">,</span>
+        <span class="n">id_to_descript</span><span class="o">=</span><span class="n">id_to_descript</span><span class="p">,</span>
+        <span class="n">skip_rows</span><span class="o">=</span><span class="n">skip_rows</span><span class="p">,</span>
+    <span class="p">)</span></div>
 
 
 
@@ -377,111 +533,45 @@
     <span class="p">}</span>
 
 
-<div class="viewcode-block" id="parse_csv">
-<a class="viewcode-back" href="../../../_autosummary/perda.analyzer.csv.html#perda.analyzer.csv.parse_csv">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">parse_csv</span><span class="p">(</span>
+<div class="viewcode-block" id="read_and_sort_data">
+<a class="viewcode-back" href="../../../_autosummary/perda.analyzer.csv.html#perda.analyzer.csv.read_and_sort_data">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_and_sort_data</span><span class="p">(</span>
     <span class="n">file_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">skip_rows</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">ts_offset</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
     <span class="n">parsing_errors_limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
     <span class="n">verbose</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SingleRunData</span><span class="p">:</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ParsedDataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Parse CSV file and return SingleRunData model.</span>
+<span class="sd">    Read the numeric data section and sort it by variable ID then timestamp.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    file_path : str</span>
-<span class="sd">        Path to the CSV file to parse</span>
+<span class="sd">        Path to the CSV file to read.</span>
+<span class="sd">    skip_rows : int</span>
+<span class="sd">        Number of leading rows to skip before the numeric data.</span>
+<span class="sd">    ts_offset : int, optional</span>
+<span class="sd">        Timestamp offset applied to all data points. Default is 0.</span>
 <span class="sd">    parsing_errors_limit : int, optional</span>
-<span class="sd">        Maximum number of parsing errors before stopping. -1 for no limit. Default is 100</span>
-<span class="sd">    parse_unit : Timescale | str | None, optional</span>
-<span class="sd">        Logging timestamp unit. If None, auto-detects using header suffix "v2.0" (us) or defaults to ms.</span>
+<span class="sd">        Maximum number of malformed rows tolerated. -1 for no limit. Default is 100.</span>
 <span class="sd">    verbose : int, optional</span>
-<span class="sd">        Verbosity level. 0 for no output, 1 for basic output, 2 for detailed output. Default is 1.</span>
+<span class="sd">        Verbosity level. 0 for no output, 1 or higher for status. Default is 1.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    SingleRunData</span>
-<span class="sd">        Parsed data structure containing all variables</span>
+<span class="sd">    ParsedDataFrame</span>
+<span class="sd">        Sorted data and the count of malformed rows dropped.</span>
 <span class="sd">    """</span>
-    <span class="c1"># Maps variable ID to variable name</span>
-    <span class="n">id_to_cpp_name</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="n">id_to_descript</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
-
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="s2">"r"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-        <span class="c1"># Parse and print first line (header)</span>
-        <span class="n">header_line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
-        <span class="n">parse_unit</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">Timescale</span><span class="o">.</span><span class="n">US</span> <span class="k">if</span> <span class="n">header_line</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">"v2.0"</span><span class="p">)</span> <span class="k">else</span> <span class="n">Timescale</span><span class="o">.</span><span class="n">MS</span>
-        <span class="p">)</span>
-
-        <span class="n">creation_time</span> <span class="o">=</span> <span class="n">parse_header_creation_time</span><span class="p">(</span><span class="n">header_line</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">verbose</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Header: </span><span class="si">{</span><span class="n">header_line</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Timestamp unit: </span><span class="si">{</span><span class="n">parse_unit</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">creation_time</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Log recorded on: </span><span class="si">{</span><span class="n">creation_time</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-
-        <span class="c1"># Block 1: Variable ID/Name pairs</span>
-        <span class="k">if</span> <span class="n">verbose</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
-            <span class="n">pbar</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">desc</span><span class="o">=</span><span class="s2">"Reading variable ID mappings"</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">" lines"</span><span class="p">,</span> <span class="n">initial</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-        <span class="n">skip_rows</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># header line</span>
-        <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
-        <span class="k">while</span> <span class="n">line</span> <span class="ow">and</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"Value "</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">verbose</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
-                <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-            <span class="n">skip_rows</span> <span class="o">+=</span> <span class="mi">1</span>
-
-            <span class="c1"># Remove "Value " prefix, separate into variable name and ID</span>
-            <span class="n">identifier</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">6</span><span class="p">:]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">": "</span><span class="p">)</span>
-
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">var_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">identifier</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-                <span class="n">name_part</span> <span class="o">=</span> <span class="n">identifier</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-
-                <span class="c1"># Check format: Value Desc (cpp.name): id | Value cpp.name: id</span>
-                <span class="k">if</span> <span class="s2">"("</span> <span class="ow">in</span> <span class="n">name_part</span> <span class="ow">and</span> <span class="s2">")"</span> <span class="ow">in</span> <span class="n">name_part</span><span class="p">:</span>
-                    <span class="n">open_idx</span> <span class="o">=</span> <span class="n">name_part</span><span class="o">.</span><span class="n">rfind</span><span class="p">(</span><span class="s2">"("</span><span class="p">)</span>
-                    <span class="n">close_idx</span> <span class="o">=</span> <span class="n">name_part</span><span class="o">.</span><span class="n">rfind</span><span class="p">(</span><span class="s2">")"</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="n">open_idx</span> <span class="o">&lt;</span> <span class="n">close_idx</span><span class="p">:</span>
-                        <span class="n">cpp_name</span> <span class="o">=</span> <span class="n">name_part</span><span class="p">[</span><span class="n">open_idx</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">:</span> <span class="n">close_idx</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-                        <span class="n">descript</span> <span class="o">=</span> <span class="n">name_part</span><span class="p">[:</span><span class="n">open_idx</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-                    <span class="k">else</span><span class="p">:</span>
-                        <span class="n">cpp_name</span> <span class="o">=</span> <span class="n">name_part</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-                        <span class="n">descript</span> <span class="o">=</span> <span class="s2">""</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">cpp_name</span> <span class="o">=</span> <span class="n">name_part</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-                    <span class="n">descript</span> <span class="o">=</span> <span class="s2">""</span>
-                <span class="k">if</span> <span class="ow">not</span> <span class="n">cpp_name</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Empty cpp_name in mapping line: </span><span class="si">{</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-
-                <span class="c1"># Store variable ID to name mapping</span>
-                <span class="k">if</span> <span class="n">var_id</span> <span class="ow">in</span> <span class="n">id_to_cpp_name</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="n">verbose</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
-                        <span class="nb">print</span><span class="p">(</span>
-                            <span class="sa">f</span><span class="s2">"Warning: Duplicate variable ID </span><span class="si">{</span><span class="n">var_id</span><span class="si">}</span><span class="s2"> at line </span><span class="si">{</span><span class="n">pbar</span><span class="o">.</span><span class="n">n</span><span class="si">}</span><span class="s2">. Overwriting previous name."</span>
-                        <span class="p">)</span>
-                <span class="n">id_to_cpp_name</span><span class="p">[</span><span class="n">var_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">cpp_name</span>
-                <span class="n">id_to_descript</span><span class="p">[</span><span class="n">var_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">descript</span>
-
-            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">verbose</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
-                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Error parsing variable ID/Name pair at line </span><span class="si">{</span><span class="n">pbar</span><span class="o">.</span><span class="n">n</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-
-            <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">verbose</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
-            <span class="n">pbar</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-
-    <span class="c1"># Block 2: Read data with Polars, Block 3: Sort — all in one step</span>
     <span class="k">if</span> <span class="n">verbose</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">"Reading and sorting data..."</span><span class="p">)</span>
+
     <span class="n">df</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span>
         <span class="n">file_path</span><span class="p">,</span>
         <span class="n">skip_rows</span><span class="o">=</span><span class="n">skip_rows</span><span class="p">,</span>
         <span class="n">has_header</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">new_columns</span><span class="o">=</span><span class="p">[</span><span class="s2">"timestamp"</span><span class="p">,</span> <span class="s2">"var_id"</span><span class="p">,</span> <span class="s2">"value"</span><span class="p">],</span>
-        <span class="n">schema</span><span class="o">=</span><span class="p">{</span><span class="s2">"column_1"</span><span class="p">:</span> <span class="n">pl</span><span class="o">.</span><span class="n">Int64</span><span class="p">,</span> <span class="s2">"column_2"</span><span class="p">:</span> <span class="n">pl</span><span class="o">.</span><span class="n">Int32</span><span class="p">,</span> <span class="s2">"column_3"</span><span class="p">:</span> <span class="n">pl</span><span class="o">.</span><span class="n">Float64</span><span class="p">},</span>
+        <span class="n">new_columns</span><span class="o">=</span><span class="n">DATA_COLUMN_NAMES</span><span class="p">,</span>
+        <span class="n">schema</span><span class="o">=</span><span class="n">DATA_COLUMN_SCHEMA</span><span class="p">,</span>
         <span class="n">ignore_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">glob</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span>
@@ -503,28 +593,51 @@
     <span class="k">if</span> <span class="n">df</span><span class="o">.</span><span class="n">is_empty</span><span class="p">():</span>
         <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">"No valid data points found after parsing."</span><span class="p">)</span>
 
-    <span class="n">total_data_points</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
-    <span class="n">data_start_time</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">cast</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">df</span><span class="p">[</span><span class="s2">"timestamp"</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()))</span>
-    <span class="n">data_end_time</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">cast</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">df</span><span class="p">[</span><span class="s2">"timestamp"</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()))</span>
+    <span class="k">return</span> <span class="n">ParsedDataFrame</span><span class="p">(</span><span class="n">data_frame</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">parsing_errors</span><span class="o">=</span><span class="n">parsing_errors</span><span class="p">)</span></div>
 
-    <span class="c1"># Extract sorted columns to main numpy arrays</span>
-    <span class="n">var_ids</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">"var_id"</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
-    <span class="n">timestamps_all</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">"timestamp"</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
-    <span class="n">values_all</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">"value"</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
 
-    <span class="c1"># Fast O(N) boundary scan using helper function</span>
+
+<div class="viewcode-block" id="build_data_instances">
+<a class="viewcode-back" href="../../../_autosummary/perda.analyzer.csv.html#perda.analyzer.csv.build_data_instances">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">build_data_instances</span><span class="p">(</span>
+    <span class="n">mappings</span><span class="p">:</span> <span class="n">VariableMappings</span><span class="p">,</span> <span class="n">data_frame</span><span class="p">:</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">DataInstance</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Slice the sorted data into one DataInstance per variable.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    mappings : VariableMappings</span>
+<span class="sd">        Variable ID lookup tables.</span>
+<span class="sd">    data_frame : pl.DataFrame</span>
+<span class="sd">        Data sorted by variable ID then timestamp.</span>
+<span class="sd">    verbose : int, optional</span>
+<span class="sd">        Verbosity level. 0 for no output, 2 for progress bars. Default is 1.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict[int, DataInstance]</span>
+<span class="sd">        Mapping from variable ID to its DataInstance.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Slicing the shared arrays yields zero-copy numpy views rather than duplicating data.</span>
+<span class="sd">    Variables declared in the mapping lines but absent from the data get empty arrays.</span>
+<span class="sd">    """</span>
+    <span class="n">var_ids</span> <span class="o">=</span> <span class="n">data_frame</span><span class="p">[</span><span class="s2">"var_id"</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+    <span class="n">timestamps_all</span> <span class="o">=</span> <span class="n">data_frame</span><span class="p">[</span><span class="s2">"timestamp"</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+    <span class="n">values_all</span> <span class="o">=</span> <span class="n">data_frame</span><span class="p">[</span><span class="s2">"value"</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+
     <span class="n">slice_map</span> <span class="o">=</span> <span class="n">_find_start_end_indices_for_each_unique_value</span><span class="p">(</span><span class="n">var_ids</span><span class="p">)</span>
 
-    <span class="c1"># Format data as DataInstances (zero-copy slicing views)</span>
     <span class="n">id_to_instance</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">DataInstance</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="n">cpp_name_to_id</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="k">if</span> <span class="n">verbose</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
-        <span class="n">di_pbar</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">desc</span><span class="o">=</span><span class="s2">"Creating DataInstances"</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">id_to_cpp_name</span><span class="p">))</span>
-    <span class="k">for</span> <span class="n">var_id</span> <span class="ow">in</span> <span class="n">id_to_cpp_name</span><span class="p">:</span>
-        <span class="n">name</span> <span class="o">=</span> <span class="n">id_to_cpp_name</span><span class="p">[</span><span class="n">var_id</span><span class="p">]</span>
-        <span class="n">descript</span> <span class="o">=</span> <span class="n">id_to_descript</span><span class="p">[</span><span class="n">var_id</span><span class="p">]</span>
-        <span class="n">cpp_name_to_id</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">var_id</span>
+    <span class="n">progress_bar</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">tqdm</span><span class="p">(</span><span class="n">desc</span><span class="o">=</span><span class="s2">"Creating DataInstances"</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">mappings</span><span class="o">.</span><span class="n">id_to_cpp_name</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">verbose</span> <span class="o">&gt;=</span> <span class="mi">2</span>
+        <span class="k">else</span> <span class="kc">None</span>
+    <span class="p">)</span>
 
+    <span class="k">for</span> <span class="n">var_id</span><span class="p">,</span> <span class="n">cpp_name</span> <span class="ow">in</span> <span class="n">mappings</span><span class="o">.</span><span class="n">id_to_cpp_name</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="k">if</span> <span class="n">var_id</span> <span class="ow">in</span> <span class="n">slice_map</span><span class="p">:</span>
             <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="n">slice_map</span><span class="p">[</span><span class="n">var_id</span><span class="p">]</span>
             <span class="n">timestamps_np</span> <span class="o">=</span> <span class="n">timestamps_all</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]</span>
@@ -536,28 +649,105 @@
         <span class="n">id_to_instance</span><span class="p">[</span><span class="n">var_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">DataInstance</span><span class="p">(</span>
             <span class="n">timestamp_np</span><span class="o">=</span><span class="n">timestamps_np</span><span class="p">,</span>
             <span class="n">value_np</span><span class="o">=</span><span class="n">values_np</span><span class="p">,</span>
-            <span class="n">label</span><span class="o">=</span><span class="n">descript</span><span class="p">,</span>
+            <span class="n">label</span><span class="o">=</span><span class="n">mappings</span><span class="o">.</span><span class="n">id_to_descript</span><span class="p">[</span><span class="n">var_id</span><span class="p">],</span>
             <span class="n">var_id</span><span class="o">=</span><span class="n">var_id</span><span class="p">,</span>
-            <span class="n">cpp_name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">cpp_name</span><span class="o">=</span><span class="n">cpp_name</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="k">if</span> <span class="n">verbose</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
-            <span class="n">di_pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">verbose</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
-        <span class="n">di_pbar</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">progress_bar</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">progress_bar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 
-    <span class="c1"># Create and return SingleRunData model</span>
+    <span class="k">if</span> <span class="n">progress_bar</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">progress_bar</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">id_to_instance</span></div>
+
+
+
+<div class="viewcode-block" id="parse_csv">
+<a class="viewcode-back" href="../../../_autosummary/perda.analyzer.csv.html#perda.analyzer.csv.parse_csv">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">parse_csv</span><span class="p">(</span>
+    <span class="n">file_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">ts_offset</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="n">parsing_errors_limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
+    <span class="n">verbose</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">build_search_index</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SingleRunData</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Parse CSV file and return SingleRunData model.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    file_path : str</span>
+<span class="sd">        Path to the CSV file to parse.</span>
+<span class="sd">    ts_offset : int, optional</span>
+<span class="sd">        Timestamp offset applied to all data points. Default is 0.</span>
+<span class="sd">    parsing_errors_limit : int, optional</span>
+<span class="sd">        Maximum number of parsing errors before stopping. -1 for no limit. Default is 100.</span>
+<span class="sd">    verbose : int, optional</span>
+<span class="sd">        Verbosity level. 0 for no output, 1 for basic output, 2 for detailed output. Default is 1.</span>
+<span class="sd">    build_search_index : bool, optional</span>
+<span class="sd">        Whether to vectorize variable descriptions for semantic search. Requires the</span>
+<span class="sd">        ``semantic`` extra and adds noticeable time to parsing. Default is False.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    SingleRunData</span>
+<span class="sd">        Parsed data structure containing all variables.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    The timestamp unit is auto-detected from the header suffix: "v2.0" means</span>
+<span class="sd">    microseconds, anything else means milliseconds.</span>
+<span class="sd">    """</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="s2">"r"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">header_line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+        <span class="n">parse_unit</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">Timescale</span><span class="o">.</span><span class="n">US</span>
+            <span class="k">if</span> <span class="n">header_line</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">MICROSECOND_HEADER_SUFFIX</span><span class="p">)</span>
+            <span class="k">else</span> <span class="n">Timescale</span><span class="o">.</span><span class="n">MS</span>
+        <span class="p">)</span>
+        <span class="n">creation_time</span> <span class="o">=</span> <span class="n">parse_header_creation_time</span><span class="p">(</span><span class="n">header_line</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">verbose</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Header: </span><span class="si">{</span><span class="n">header_line</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Timestamp unit: </span><span class="si">{</span><span class="n">parse_unit</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">creation_time</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Log recorded on: </span><span class="si">{</span><span class="n">creation_time</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+
+        <span class="n">mappings</span> <span class="o">=</span> <span class="n">parse_variable_id_mappings</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+
+    <span class="n">parsed</span> <span class="o">=</span> <span class="n">read_and_sort_data</span><span class="p">(</span>
+        <span class="n">file_path</span><span class="p">,</span>
+        <span class="n">mappings</span><span class="o">.</span><span class="n">skip_rows</span><span class="p">,</span>
+        <span class="n">ts_offset</span><span class="o">=</span><span class="n">ts_offset</span><span class="p">,</span>
+        <span class="n">parsing_errors_limit</span><span class="o">=</span><span class="n">parsing_errors_limit</span><span class="p">,</span>
+        <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">semantic_index</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">build_semantic_index</span><span class="p">(</span><span class="n">mappings</span><span class="o">.</span><span class="n">id_to_descript</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">build_search_index</span>
+        <span class="k">else</span> <span class="kc">None</span>
+    <span class="p">)</span>
+
+    <span class="n">id_to_instance</span> <span class="o">=</span> <span class="n">build_data_instances</span><span class="p">(</span><span class="n">mappings</span><span class="p">,</span> <span class="n">parsed</span><span class="o">.</span><span class="n">data_frame</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+
     <span class="k">if</span> <span class="n">verbose</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"CSV parsing complete with </span><span class="si">{</span><span class="n">parsing_errors</span><span class="si">}</span><span class="s2"> parsing errors."</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"CSV parsing complete with </span><span class="si">{</span><span class="n">parsed</span><span class="o">.</span><span class="n">parsing_errors</span><span class="si">}</span><span class="s2"> parsing errors."</span><span class="p">)</span>
+
     <span class="k">return</span> <span class="n">SingleRunData</span><span class="p">(</span>
         <span class="n">id_to_instance</span><span class="o">=</span><span class="n">id_to_instance</span><span class="p">,</span>
-        <span class="n">cpp_name_to_id</span><span class="o">=</span><span class="n">cpp_name_to_id</span><span class="p">,</span>
-        <span class="n">id_to_cpp_name</span><span class="o">=</span><span class="n">id_to_cpp_name</span><span class="p">,</span>
-        <span class="n">id_to_descript</span><span class="o">=</span><span class="n">id_to_descript</span><span class="p">,</span>
+        <span class="n">cpp_name_to_id</span><span class="o">=</span><span class="p">{</span>
+            <span class="n">cpp_name</span><span class="p">:</span> <span class="n">var_id</span> <span class="k">for</span> <span class="n">var_id</span><span class="p">,</span> <span class="n">cpp_name</span> <span class="ow">in</span> <span class="n">mappings</span><span class="o">.</span><span class="n">id_to_cpp_name</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+        <span class="p">},</span>
+        <span class="n">id_to_cpp_name</span><span class="o">=</span><span class="n">mappings</span><span class="o">.</span><span class="n">id_to_cpp_name</span><span class="p">,</span>
+        <span class="n">id_to_descript</span><span class="o">=</span><span class="n">mappings</span><span class="o">.</span><span class="n">id_to_descript</span><span class="p">,</span>
         <span class="n">creation_time</span><span class="o">=</span><span class="n">creation_time</span><span class="p">,</span>
-        <span class="n">total_data_points</span><span class="o">=</span><span class="n">total_data_points</span><span class="p">,</span>
-        <span class="n">data_start_time</span><span class="o">=</span><span class="n">data_start_time</span><span class="p">,</span>
-        <span class="n">data_end_time</span><span class="o">=</span><span class="n">data_end_time</span><span class="p">,</span>
+        <span class="n">total_data_points</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">parsed</span><span class="o">.</span><span class="n">data_frame</span><span class="p">),</span>
+        <span class="n">data_start_time</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">cast</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">parsed</span><span class="o">.</span><span class="n">data_frame</span><span class="p">[</span><span class="s2">"timestamp"</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">())),</span>
+        <span class="n">data_end_time</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">cast</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">parsed</span><span class="o">.</span><span class="n">data_frame</span><span class="p">[</span><span class="s2">"timestamp"</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">())),</span>
         <span class="n">timestamp_unit</span><span class="o">=</span><span class="n">parse_unit</span><span class="p">,</span>
+        <span class="n">semantic_index</span><span class="o">=</span><span class="n">semantic_index</span><span class="p">,</span>
     <span class="p">)</span></div>
 
 </pre></div>

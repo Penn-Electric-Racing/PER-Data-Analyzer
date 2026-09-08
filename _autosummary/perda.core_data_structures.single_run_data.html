@@ -51,7 +51,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="perda.core_data_structures.split_helpers" href="perda.core_data_structures.split_helpers.html" />
-    <link rel="prev" title="perda.core_data_structures.resampling" href="perda.core_data_structures.resampling.html" />
+    <link rel="prev" title="perda.core_data_structures.search_indexes" href="perda.core_data_structures.search_indexes.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
@@ -274,6 +274,7 @@
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.joins.html">perda.core_data_structures.joins</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.masking.html">perda.core_data_structures.masking</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.resampling.html">perda.core_data_structures.resampling</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.search_indexes.html">perda.core_data_structures.search_indexes</a></li>
 <li class="toctree-l3 current active"><a class="current reference internal" href="#">perda.core_data_structures.single_run_data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.split_helpers.html">perda.core_data_structures.split_helpers</a></li>
 </ul>
@@ -391,77 +392,180 @@
 </dd>
 <dt class="field-even">Fields<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
-<li><p><a class="reference internal" href="#perda.core_data_structures.single_run_data.SingleRunData.concat_boundaries" title="perda.core_data_structures.single_run_data.SingleRunData.concat_boundaries"><code class="xref py py-obj docutils literal notranslate"><span class="pre">concat_boundaries</span> <span class="pre">(List[int])</span></code></a></p></li>
-<li><p><a class="reference internal" href="#perda.core_data_structures.single_run_data.SingleRunData.cpp_name_to_id" title="perda.core_data_structures.single_run_data.SingleRunData.cpp_name_to_id"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cpp_name_to_id</span> <span class="pre">(Dict[str,</span> <span class="pre">int])</span></code></a></p></li>
+<li><p><a class="reference internal" href="#perda.core_data_structures.single_run_data.SingleRunData.concat_boundaries" title="perda.core_data_structures.single_run_data.SingleRunData.concat_boundaries"><code class="xref py py-obj docutils literal notranslate"><span class="pre">concat_boundaries</span> <span class="pre">(list[int])</span></code></a></p></li>
+<li><p><a class="reference internal" href="#perda.core_data_structures.single_run_data.SingleRunData.cpp_name_to_id" title="perda.core_data_structures.single_run_data.SingleRunData.cpp_name_to_id"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cpp_name_to_id</span> <span class="pre">(dict[str,</span> <span class="pre">int])</span></code></a></p></li>
 <li><p><a class="reference internal" href="#perda.core_data_structures.single_run_data.SingleRunData.creation_time" title="perda.core_data_structures.single_run_data.SingleRunData.creation_time"><code class="xref py py-obj docutils literal notranslate"><span class="pre">creation_time</span> <span class="pre">(datetime.datetime</span> <span class="pre">|</span> <span class="pre">None)</span></code></a></p></li>
 <li><p><a class="reference internal" href="#perda.core_data_structures.single_run_data.SingleRunData.data_end_time" title="perda.core_data_structures.single_run_data.SingleRunData.data_end_time"><code class="xref py py-obj docutils literal notranslate"><span class="pre">data_end_time</span> <span class="pre">(int)</span></code></a></p></li>
 <li><p><a class="reference internal" href="#perda.core_data_structures.single_run_data.SingleRunData.data_start_time" title="perda.core_data_structures.single_run_data.SingleRunData.data_start_time"><code class="xref py py-obj docutils literal notranslate"><span class="pre">data_start_time</span> <span class="pre">(int)</span></code></a></p></li>
-<li><p><a class="reference internal" href="#perda.core_data_structures.single_run_data.SingleRunData.id_to_cpp_name" title="perda.core_data_structures.single_run_data.SingleRunData.id_to_cpp_name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">id_to_cpp_name</span> <span class="pre">(Dict[int,</span> <span class="pre">str])</span></code></a></p></li>
-<li><p><a class="reference internal" href="#perda.core_data_structures.single_run_data.SingleRunData.id_to_descript" title="perda.core_data_structures.single_run_data.SingleRunData.id_to_descript"><code class="xref py py-obj docutils literal notranslate"><span class="pre">id_to_descript</span> <span class="pre">(Dict[int,</span> <span class="pre">str])</span></code></a></p></li>
-<li><p><a class="reference internal" href="#perda.core_data_structures.single_run_data.SingleRunData.id_to_instance" title="perda.core_data_structures.single_run_data.SingleRunData.id_to_instance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">id_to_instance</span> <span class="pre">(Dict[int,</span> <span class="pre">perda.core_data_structures.data_instance.DataInstance])</span></code></a></p></li>
+<li><p><a class="reference internal" href="#perda.core_data_structures.single_run_data.SingleRunData.id_to_cpp_name" title="perda.core_data_structures.single_run_data.SingleRunData.id_to_cpp_name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">id_to_cpp_name</span> <span class="pre">(dict[int,</span> <span class="pre">str])</span></code></a></p></li>
+<li><p><a class="reference internal" href="#perda.core_data_structures.single_run_data.SingleRunData.id_to_descript" title="perda.core_data_structures.single_run_data.SingleRunData.id_to_descript"><code class="xref py py-obj docutils literal notranslate"><span class="pre">id_to_descript</span> <span class="pre">(dict[int,</span> <span class="pre">str])</span></code></a></p></li>
+<li><p><a class="reference internal" href="#perda.core_data_structures.single_run_data.SingleRunData.id_to_instance" title="perda.core_data_structures.single_run_data.SingleRunData.id_to_instance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">id_to_instance</span> <span class="pre">(dict[int,</span> <span class="pre">perda.core_data_structures.data_instance.DataInstance])</span></code></a></p></li>
+<li><p><a class="reference internal" href="#perda.core_data_structures.single_run_data.SingleRunData.keyword_index" title="perda.core_data_structures.single_run_data.SingleRunData.keyword_index"><code class="xref py py-obj docutils literal notranslate"><span class="pre">keyword_index</span> <span class="pre">(perda.core_data_structures.search_indexes.VariableKeywordIndex)</span></code></a></p></li>
+<li><p><a class="reference internal" href="#perda.core_data_structures.single_run_data.SingleRunData.semantic_index" title="perda.core_data_structures.single_run_data.SingleRunData.semantic_index"><code class="xref py py-obj docutils literal notranslate"><span class="pre">semantic_index</span> <span class="pre">(perda.core_data_structures.search_indexes.VariableSemanticIndex</span> <span class="pre">|</span> <span class="pre">None)</span></code></a></p></li>
 <li><p><a class="reference internal" href="#perda.core_data_structures.single_run_data.SingleRunData.timestamp_unit" title="perda.core_data_structures.single_run_data.SingleRunData.timestamp_unit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">timestamp_unit</span> <span class="pre">(perda.units.Timescale)</span></code></a></p></li>
 <li><p><a class="reference internal" href="#perda.core_data_structures.single_run_data.SingleRunData.total_data_points" title="perda.core_data_structures.single_run_data.SingleRunData.total_data_points"><code class="xref py py-obj docutils literal notranslate"><span class="pre">total_data_points</span> <span class="pre">(int)</span></code></a></p></li>
+</ul>
+</dd>
+<dt class="field-odd">Validators<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_build_keyword_index</span></code> » <code class="xref py py-obj docutils literal notranslate"><span class="pre">all</span> <span class="pre">fields</span></code></p></li>
 </ul>
 </dd>
 </dl>
 <dl class="py attribute pydantic_field">
 <dt class="sig sig-object py" id="perda.core_data_structures.single_run_data.SingleRunData.id_to_instance">
-<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">id_to_instance</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code><span class="pre">[</span><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code><span class="pre">,</span> <a class="reference internal" href="perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataInstance</span></code></a><span class="pre">]</span></em><em class="property"> <span class="pre">[Required]</span></em><a class="headerlink" href="#perda.core_data_structures.single_run_data.SingleRunData.id_to_instance" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">id_to_instance</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict[int,</span> <span class="pre">DataInstance]</span></em><em class="property"> <span class="pre">[Required]</span></em><a class="headerlink" href="#perda.core_data_structures.single_run_data.SingleRunData.id_to_instance" title="Link to this definition">#</a></dt>
 <dd><p>Mapping from variable ID to DataInstance</p>
+<dl class="field-list simple">
+<dt class="field-odd">Validated by<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_build_keyword_index</span></code></p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute pydantic_field">
 <dt class="sig sig-object py" id="perda.core_data_structures.single_run_data.SingleRunData.cpp_name_to_id">
-<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cpp_name_to_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code><span class="pre">[</span><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><span class="pre">,</span> <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code><span class="pre">]</span></em><em class="property"> <span class="pre">[Required]</span></em><a class="headerlink" href="#perda.core_data_structures.single_run_data.SingleRunData.cpp_name_to_id" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cpp_name_to_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict[str,</span> <span class="pre">int]</span></em><em class="property"> <span class="pre">[Required]</span></em><a class="headerlink" href="#perda.core_data_structures.single_run_data.SingleRunData.cpp_name_to_id" title="Link to this definition">#</a></dt>
 <dd><p>Mapping from variable name to variable ID</p>
+<dl class="field-list simple">
+<dt class="field-odd">Validated by<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_build_keyword_index</span></code></p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute pydantic_field">
 <dt class="sig sig-object py" id="perda.core_data_structures.single_run_data.SingleRunData.id_to_cpp_name">
-<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">id_to_cpp_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code><span class="pre">[</span><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code><span class="pre">,</span> <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><span class="pre">]</span></em><em class="property"> <span class="pre">[Required]</span></em><a class="headerlink" href="#perda.core_data_structures.single_run_data.SingleRunData.id_to_cpp_name" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">id_to_cpp_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict[int,</span> <span class="pre">str]</span></em><em class="property"> <span class="pre">[Required]</span></em><a class="headerlink" href="#perda.core_data_structures.single_run_data.SingleRunData.id_to_cpp_name" title="Link to this definition">#</a></dt>
 <dd><p>Mapping from variable ID to variable name</p>
+<dl class="field-list simple">
+<dt class="field-odd">Validated by<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_build_keyword_index</span></code></p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute pydantic_field">
 <dt class="sig sig-object py" id="perda.core_data_structures.single_run_data.SingleRunData.id_to_descript">
-<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">id_to_descript</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code><span class="pre">[</span><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code><span class="pre">,</span> <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><span class="pre">]</span></em><em class="property"> <span class="pre">[Required]</span></em><a class="headerlink" href="#perda.core_data_structures.single_run_data.SingleRunData.id_to_descript" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">id_to_descript</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict[int,</span> <span class="pre">str]</span></em><em class="property"> <span class="pre">[Required]</span></em><a class="headerlink" href="#perda.core_data_structures.single_run_data.SingleRunData.id_to_descript" title="Link to this definition">#</a></dt>
 <dd><p>Mapping from variable ID to variable description</p>
+<dl class="field-list simple">
+<dt class="field-odd">Validated by<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_build_keyword_index</span></code></p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute pydantic_field">
 <dt class="sig sig-object py" id="perda.core_data_structures.single_run_data.SingleRunData.creation_time">
-<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">creation_time</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code> <span class="pre">|</span> <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#perda.core_data_structures.single_run_data.SingleRunData.creation_time" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">creation_time</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">datetime</span> <span class="pre">|</span> <span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#perda.core_data_structures.single_run_data.SingleRunData.creation_time" title="Link to this definition">#</a></dt>
 <dd><p>Timestamp when this run log was recorded</p>
+<dl class="field-list simple">
+<dt class="field-odd">Validated by<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_build_keyword_index</span></code></p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute pydantic_field">
 <dt class="sig sig-object py" id="perda.core_data_structures.single_run_data.SingleRunData.total_data_points">
-<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">total_data_points</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></em><em class="property"> <span class="pre">[Required]</span></em><a class="headerlink" href="#perda.core_data_structures.single_run_data.SingleRunData.total_data_points" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">total_data_points</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"> <span class="pre">[Required]</span></em><a class="headerlink" href="#perda.core_data_structures.single_run_data.SingleRunData.total_data_points" title="Link to this definition">#</a></dt>
 <dd><p>Total number of data points across all variables</p>
+<dl class="field-list simple">
+<dt class="field-odd">Validated by<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_build_keyword_index</span></code></p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute pydantic_field">
 <dt class="sig sig-object py" id="perda.core_data_structures.single_run_data.SingleRunData.data_start_time">
-<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">data_start_time</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></em><em class="property"> <span class="pre">[Required]</span></em><a class="headerlink" href="#perda.core_data_structures.single_run_data.SingleRunData.data_start_time" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">data_start_time</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"> <span class="pre">[Required]</span></em><a class="headerlink" href="#perda.core_data_structures.single_run_data.SingleRunData.data_start_time" title="Link to this definition">#</a></dt>
 <dd><p>Start timestamp in log timestamp unit</p>
+<dl class="field-list simple">
+<dt class="field-odd">Validated by<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_build_keyword_index</span></code></p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute pydantic_field">
 <dt class="sig sig-object py" id="perda.core_data_structures.single_run_data.SingleRunData.data_end_time">
-<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">data_end_time</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></em><em class="property"> <span class="pre">[Required]</span></em><a class="headerlink" href="#perda.core_data_structures.single_run_data.SingleRunData.data_end_time" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">data_end_time</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"> <span class="pre">[Required]</span></em><a class="headerlink" href="#perda.core_data_structures.single_run_data.SingleRunData.data_end_time" title="Link to this definition">#</a></dt>
 <dd><p>End timestamp in log timestamp unit</p>
+<dl class="field-list simple">
+<dt class="field-odd">Validated by<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_build_keyword_index</span></code></p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute pydantic_field">
 <dt class="sig sig-object py" id="perda.core_data_structures.single_run_data.SingleRunData.timestamp_unit">
-<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">timestamp_unit</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="perda.units.html#perda.units.Timescale" title="perda.units.Timescale"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timescale</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Timescale.MS</span></em><a class="headerlink" href="#perda.core_data_structures.single_run_data.SingleRunData.timestamp_unit" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">timestamp_unit</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Timescale</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Timescale.MS</span></em><a class="headerlink" href="#perda.core_data_structures.single_run_data.SingleRunData.timestamp_unit" title="Link to this definition">#</a></dt>
 <dd><p>Timestamp logging unit for this run (ms/us)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Validated by<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_build_keyword_index</span></code></p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute pydantic_field">
 <dt class="sig sig-object py" id="perda.core_data_structures.single_run_data.SingleRunData.concat_boundaries">
-<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">concat_boundaries</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code><span class="pre">[</span><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code><span class="pre">]</span></em><em class="property"> <span class="pre">[Optional]</span></em><a class="headerlink" href="#perda.core_data_structures.single_run_data.SingleRunData.concat_boundaries" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">concat_boundaries</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list[int]</span></em><em class="property"> <span class="pre">[Optional]</span></em><a class="headerlink" href="#perda.core_data_structures.single_run_data.SingleRunData.concat_boundaries" title="Link to this definition">#</a></dt>
 <dd><p>Timestamps where concatenated runs begin (post-shift)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Validated by<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_build_keyword_index</span></code></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="perda.core_data_structures.single_run_data.SingleRunData.semantic_index">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">semantic_index</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">VariableSemanticIndex</span> <span class="pre">|</span> <span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#perda.core_data_structures.single_run_data.SingleRunData.semantic_index" title="Link to this definition">#</a></dt>
+<dd><p>Vector index over variable descriptions. None when semantic search is disabled or unavailable</p>
+<dl class="field-list simple">
+<dt class="field-odd">Validated by<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_build_keyword_index</span></code></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="perda.core_data_structures.single_run_data.SingleRunData.keyword_index">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">keyword_index</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">VariableKeywordIndex</span></em><em class="property"> <span class="pre">[Optional]</span></em><a class="headerlink" href="#perda.core_data_structures.single_run_data.SingleRunData.keyword_index" title="Link to this definition">#</a></dt>
+<dd><p>Normalized name and description text backing keyword search</p>
+<dl class="field-list simple">
+<dt class="field-odd">Validated by<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_build_keyword_index</span></code></p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -498,24 +602,6 @@
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt class="sig sig-object py" id="perda.core_data_structures.single_run_data.SingleRunData.model_post_init">
-<span class="sig-name descname"><span class="pre">model_post_init</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="positional-only-separator o"><abbr title="Positional-only parameter separator (PEP 570)"><span class="pre">/</span></abbr></span></em><span class="sig-paren">)</span><a class="headerlink" href="#perda.core_data_structures.single_run_data.SingleRunData.model_post_init" title="Link to this definition">#</a></dt>
-<dd><p>This function is meant to behave like a BaseModel method to initialize private attributes.</p>
-<p>It takes context as an argument since that’s what pydantic-core passes when calling it.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>self</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></span>) – The BaseModel instance.</p></li>
-<li><p><strong>context</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></span>) – The context.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
-</dd>
-</dl>
-</dd></dl>
-
 </dd></dl>
 
 </section>
@@ -531,12 +617,12 @@
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="perda.core_data_structures.resampling.html"
+       href="perda.core_data_structures.search_indexes.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">perda.core_data_structures.resampling</p>
+        <p class="prev-next-title">perda.core_data_structures.search_indexes</p>
       </div>
     </a>
     <a class="right-next"
@@ -578,9 +664,10 @@
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.core_data_structures.single_run_data.SingleRunData.data_end_time"><code class="docutils literal notranslate"><span class="pre">SingleRunData.data_end_time</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.core_data_structures.single_run_data.SingleRunData.timestamp_unit"><code class="docutils literal notranslate"><span class="pre">SingleRunData.timestamp_unit</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.core_data_structures.single_run_data.SingleRunData.concat_boundaries"><code class="docutils literal notranslate"><span class="pre">SingleRunData.concat_boundaries</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.core_data_structures.single_run_data.SingleRunData.semantic_index"><code class="docutils literal notranslate"><span class="pre">SingleRunData.semantic_index</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.core_data_structures.single_run_data.SingleRunData.keyword_index"><code class="docutils literal notranslate"><span class="pre">SingleRunData.keyword_index</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.core_data_structures.single_run_data.SingleRunData.add"><code class="docutils literal notranslate"><span class="pre">SingleRunData.add()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.core_data_structures.single_run_data.SingleRunData.replace"><code class="docutils literal notranslate"><span class="pre">SingleRunData.replace()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.core_data_structures.single_run_data.SingleRunData.model_post_init"><code class="docutils literal notranslate"><span class="pre">SingleRunData.model_post_init()</span></code></a></li>
 </ul>
 </li>
 </ul>

@@ -274,6 +274,7 @@
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.joins.html">perda.core_data_structures.joins</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.masking.html">perda.core_data_structures.masking</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.resampling.html">perda.core_data_structures.resampling</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.search_indexes.html">perda.core_data_structures.search_indexes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.single_run_data.html">perda.core_data_structures.single_run_data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.split_helpers.html">perda.core_data_structures.split_helpers</a></li>
 </ul>
@@ -378,27 +379,152 @@
                   
   <section id="module-perda.analyzer.csv">
 <span id="perda-analyzer-csv"></span><h1>perda.analyzer.csv<a class="headerlink" href="#module-perda.analyzer.csv" title="Link to this heading">#</a></h1>
+<dl class="py class pydantic_model">
+<dt class="sig sig-object py" id="perda.analyzer.csv.ParsedDataFrame">
+<em class="property"><span class="pre">pydantic</span> <span class="pre">model</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">perda.analyzer.csv.</span></span><span class="sig-name descname"><span class="pre">ParsedDataFrame</span></span><a class="reference internal" href="../_modules/perda/analyzer/csv.html#ParsedDataFrame"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.analyzer.csv.ParsedDataFrame" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">Config<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>arbitrary_types_allowed</strong>: <em>bool = True</em></p></li>
+</ul>
+</dd>
+<dt class="field-even">Fields<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><a class="reference internal" href="#perda.analyzer.csv.ParsedDataFrame.data_frame" title="perda.analyzer.csv.ParsedDataFrame.data_frame"><code class="xref py py-obj docutils literal notranslate"><span class="pre">data_frame</span> <span class="pre">(polars.dataframe.frame.DataFrame)</span></code></a></p></li>
+<li><p><a class="reference internal" href="#perda.analyzer.csv.ParsedDataFrame.parsing_errors" title="perda.analyzer.csv.ParsedDataFrame.parsing_errors"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parsing_errors</span> <span class="pre">(int)</span></code></a></p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="perda.analyzer.csv.ParsedDataFrame.data_frame">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">data_frame</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">pl.DataFrame</span></em><em class="property"> <span class="pre">[Required]</span></em><a class="headerlink" href="#perda.analyzer.csv.ParsedDataFrame.data_frame" title="Link to this definition">#</a></dt>
+<dd><p>Data sorted by variable ID then timestamp</p>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="perda.analyzer.csv.ParsedDataFrame.parsing_errors">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parsing_errors</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"> <span class="pre">[Required]</span></em><a class="headerlink" href="#perda.analyzer.csv.ParsedDataFrame.parsing_errors" title="Link to this definition">#</a></dt>
+<dd><p>Number of rows dropped as unparseable</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class pydantic_model">
+<dt class="sig sig-object py" id="perda.analyzer.csv.ParsedVariableLine">
+<em class="property"><span class="pre">pydantic</span> <span class="pre">model</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">perda.analyzer.csv.</span></span><span class="sig-name descname"><span class="pre">ParsedVariableLine</span></span><a class="reference internal" href="../_modules/perda/analyzer/csv.html#ParsedVariableLine"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.analyzer.csv.ParsedVariableLine" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">Fields<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><a class="reference internal" href="#perda.analyzer.csv.ParsedVariableLine.cpp_name" title="perda.analyzer.csv.ParsedVariableLine.cpp_name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cpp_name</span> <span class="pre">(str)</span></code></a></p></li>
+<li><p><a class="reference internal" href="#perda.analyzer.csv.ParsedVariableLine.description" title="perda.analyzer.csv.ParsedVariableLine.description"><code class="xref py py-obj docutils literal notranslate"><span class="pre">description</span> <span class="pre">(str)</span></code></a></p></li>
+<li><p><a class="reference internal" href="#perda.analyzer.csv.ParsedVariableLine.var_id" title="perda.analyzer.csv.ParsedVariableLine.var_id"><code class="xref py py-obj docutils literal notranslate"><span class="pre">var_id</span> <span class="pre">(int)</span></code></a></p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="perda.analyzer.csv.ParsedVariableLine.cpp_name">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cpp_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"> <span class="pre">[Required]</span></em><a class="headerlink" href="#perda.analyzer.csv.ParsedVariableLine.cpp_name" title="Link to this definition">#</a></dt>
+<dd><p>C++ name of the variable</p>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="perda.analyzer.csv.ParsedVariableLine.description">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">description</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"> <span class="pre">[Required]</span></em><a class="headerlink" href="#perda.analyzer.csv.ParsedVariableLine.description" title="Link to this definition">#</a></dt>
+<dd><p>Human readable description of the variable</p>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="perda.analyzer.csv.ParsedVariableLine.var_id">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">var_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"> <span class="pre">[Required]</span></em><a class="headerlink" href="#perda.analyzer.csv.ParsedVariableLine.var_id" title="Link to this definition">#</a></dt>
+<dd><p>Numeric ID the data rows refer to</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class pydantic_model">
+<dt class="sig sig-object py" id="perda.analyzer.csv.VariableMappings">
+<em class="property"><span class="pre">pydantic</span> <span class="pre">model</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">perda.analyzer.csv.</span></span><span class="sig-name descname"><span class="pre">VariableMappings</span></span><a class="reference internal" href="../_modules/perda/analyzer/csv.html#VariableMappings"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.analyzer.csv.VariableMappings" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">Fields<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><a class="reference internal" href="#perda.analyzer.csv.VariableMappings.id_to_cpp_name" title="perda.analyzer.csv.VariableMappings.id_to_cpp_name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">id_to_cpp_name</span> <span class="pre">(dict[int,</span> <span class="pre">str])</span></code></a></p></li>
+<li><p><a class="reference internal" href="#perda.analyzer.csv.VariableMappings.id_to_descript" title="perda.analyzer.csv.VariableMappings.id_to_descript"><code class="xref py py-obj docutils literal notranslate"><span class="pre">id_to_descript</span> <span class="pre">(dict[int,</span> <span class="pre">str])</span></code></a></p></li>
+<li><p><a class="reference internal" href="#perda.analyzer.csv.VariableMappings.skip_rows" title="perda.analyzer.csv.VariableMappings.skip_rows"><code class="xref py py-obj docutils literal notranslate"><span class="pre">skip_rows</span> <span class="pre">(int)</span></code></a></p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="perda.analyzer.csv.VariableMappings.id_to_cpp_name">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">id_to_cpp_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict[int,</span> <span class="pre">str]</span></em><em class="property"> <span class="pre">[Required]</span></em><a class="headerlink" href="#perda.analyzer.csv.VariableMappings.id_to_cpp_name" title="Link to this definition">#</a></dt>
+<dd><p>Mapping from variable ID to variable name</p>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="perda.analyzer.csv.VariableMappings.id_to_descript">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">id_to_descript</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict[int,</span> <span class="pre">str]</span></em><em class="property"> <span class="pre">[Required]</span></em><a class="headerlink" href="#perda.analyzer.csv.VariableMappings.id_to_descript" title="Link to this definition">#</a></dt>
+<dd><p>Mapping from variable ID to variable description</p>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="perda.analyzer.csv.VariableMappings.skip_rows">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">skip_rows</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"> <span class="pre">[Required]</span></em><a class="headerlink" href="#perda.analyzer.csv.VariableMappings.skip_rows" title="Link to this definition">#</a></dt>
+<dd><p>Number of leading rows before the numeric data section</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="perda.analyzer.csv.build_data_instances">
+<span class="sig-prename descclassname"><span class="pre">perda.analyzer.csv.</span></span><span class="sig-name descname"><span class="pre">build_data_instances</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mappings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_frame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/analyzer/csv.html#build_data_instances"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.analyzer.csv.build_data_instances" title="Link to this definition">#</a></dt>
+<dd><p>Slice the sorted data into one DataInstance per variable.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mappings</strong> (<a class="reference internal" href="#perda.analyzer.csv.VariableMappings" title="perda.analyzer.csv.VariableMappings"><em>VariableMappings</em></a>) – Variable ID lookup tables.</p></li>
+<li><p><strong>data_frame</strong> (<em>pl.DataFrame</em>) – Data sorted by variable ID then timestamp.</p></li>
+<li><p><strong>verbose</strong> (<em>int</em><em>, </em><em>optional</em>) – Verbosity level. 0 for no output, 2 for progress bars. Default is 1.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Mapping from variable ID to its DataInstance.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict[int, <a class="reference internal" href="perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance">DataInstance</a>]</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Slicing the shared arrays yields zero-copy numpy views rather than duplicating data.
+Variables declared in the mapping lines but absent from the data get empty arrays.</p>
+</dd></dl>
+
 <dl class="py function">
 <dt class="sig sig-object py" id="perda.analyzer.csv.parse_csv">
-<span class="sig-prename descclassname"><span class="pre">perda.analyzer.csv.</span></span><span class="sig-name descname"><span class="pre">parse_csv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts_offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parsing_errors_limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/analyzer/csv.html#parse_csv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.analyzer.csv.parse_csv" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">perda.analyzer.csv.</span></span><span class="sig-name descname"><span class="pre">parse_csv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts_offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parsing_errors_limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">build_search_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/analyzer/csv.html#parse_csv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.analyzer.csv.parse_csv" title="Link to this definition">#</a></dt>
 <dd><p>Parse CSV file and return SingleRunData model.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>file_path</strong> (<em>str</em>) – Path to the CSV file to parse</p></li>
-<li><p><strong>parsing_errors_limit</strong> (<em>int</em><em>, </em><em>optional</em>) – Maximum number of parsing errors before stopping. -1 for no limit. Default is 100</p></li>
-<li><p><strong>parse_unit</strong> (<a class="reference internal" href="perda.units.html#perda.units.Timescale" title="perda.units.Timescale"><em>Timescale</em></a><em> | </em><em>str</em><em> | </em><em>None</em><em>, </em><em>optional</em>) – Logging timestamp unit. If None, auto-detects using header suffix “v2.0” (us) or defaults to ms.</p></li>
+<li><p><strong>file_path</strong> (<em>str</em>) – Path to the CSV file to parse.</p></li>
+<li><p><strong>ts_offset</strong> (<em>int</em><em>, </em><em>optional</em>) – Timestamp offset applied to all data points. Default is 0.</p></li>
+<li><p><strong>parsing_errors_limit</strong> (<em>int</em><em>, </em><em>optional</em>) – Maximum number of parsing errors before stopping. -1 for no limit. Default is 100.</p></li>
 <li><p><strong>verbose</strong> (<em>int</em><em>, </em><em>optional</em>) – Verbosity level. 0 for no output, 1 for basic output, 2 for detailed output. Default is 1.</p></li>
-<li><p><strong>ts_offset</strong> (<em>int</em>)</p></li>
+<li><p><strong>build_search_index</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to vectorize variable descriptions for semantic search. Requires the
+<code class="docutils literal notranslate"><span class="pre">semantic</span></code> extra and adds noticeable time to parsing. Default is False.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Parsed data structure containing all variables</p>
+<dd class="field-even"><p>Parsed data structure containing all variables.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="perda.core_data_structures.single_run_data.html#perda.core_data_structures.single_run_data.SingleRunData" title="perda.core_data_structures.single_run_data.SingleRunData">SingleRunData</a></p>
 </dd>
 </dl>
+<p class="rubric">Notes</p>
+<p>The timestamp unit is auto-detected from the header suffix: “v2.0” means
+microseconds, anything else means milliseconds.</p>
 </dd></dl>
 
 <dl class="py function">
@@ -414,6 +540,66 @@
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>datetime | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="perda.analyzer.csv.parse_variable_id_mappings">
+<span class="sig-prename descclassname"><span class="pre">perda.analyzer.csv.</span></span><span class="sig-name descname"><span class="pre">parse_variable_id_mappings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_handle</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/analyzer/csv.html#parse_variable_id_mappings"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.analyzer.csv.parse_variable_id_mappings" title="Link to this definition">#</a></dt>
+<dd><p>Read the variable ID and name mapping lines that follow the file header.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file_handle</strong> (<em>TextIO</em>) – Open log file positioned just after the header line.</p></li>
+<li><p><strong>verbose</strong> (<em>int</em><em>, </em><em>optional</em>) – Verbosity level. 0 for no output, 1 for warnings, 2 for progress bars. Default is 1.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Parsed lookup tables and the row offset where numeric data begins.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#perda.analyzer.csv.VariableMappings" title="perda.analyzer.csv.VariableMappings">VariableMappings</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="perda.analyzer.csv.parse_variable_mapping_line">
+<span class="sig-prename descclassname"><span class="pre">perda.analyzer.csv.</span></span><span class="sig-name descname"><span class="pre">parse_variable_mapping_line</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">line</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/analyzer/csv.html#parse_variable_mapping_line"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.analyzer.csv.parse_variable_mapping_line" title="Link to this definition">#</a></dt>
+<dd><p>Parse one variable declaration line into its three fields.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>line</strong> (<em>str</em>) – Declaration line, e.g. <code class="docutils literal notranslate"><span class="pre">&quot;Value</span> <span class="pre">pack</span> <span class="pre">voltage</span> <span class="pre">(ams.pack.voltage):</span> <span class="pre">1&quot;</span></code>.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The variable’s C++ name, description, and ID.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#perda.analyzer.csv.ParsedVariableLine" title="perda.analyzer.csv.ParsedVariableLine">ParsedVariableLine</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="perda.analyzer.csv.read_and_sort_data">
+<span class="sig-prename descclassname"><span class="pre">perda.analyzer.csv.</span></span><span class="sig-name descname"><span class="pre">read_and_sort_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_rows</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts_offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parsing_errors_limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/analyzer/csv.html#read_and_sort_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.analyzer.csv.read_and_sort_data" title="Link to this definition">#</a></dt>
+<dd><p>Read the numeric data section and sort it by variable ID then timestamp.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file_path</strong> (<em>str</em>) – Path to the CSV file to read.</p></li>
+<li><p><strong>skip_rows</strong> (<em>int</em>) – Number of leading rows to skip before the numeric data.</p></li>
+<li><p><strong>ts_offset</strong> (<em>int</em><em>, </em><em>optional</em>) – Timestamp offset applied to all data points. Default is 0.</p></li>
+<li><p><strong>parsing_errors_limit</strong> (<em>int</em><em>, </em><em>optional</em>) – Maximum number of malformed rows tolerated. -1 for no limit. Default is 100.</p></li>
+<li><p><strong>verbose</strong> (<em>int</em><em>, </em><em>optional</em>) – Verbosity level. 0 for no output, 1 or higher for status. Default is 1.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Sorted data and the count of malformed rows dropped.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#perda.analyzer.csv.ParsedDataFrame" title="perda.analyzer.csv.ParsedDataFrame">ParsedDataFrame</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -467,8 +653,29 @@
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.analyzer.csv.ParsedDataFrame"><code class="docutils literal notranslate"><span class="pre">ParsedDataFrame</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.analyzer.csv.ParsedDataFrame.data_frame"><code class="docutils literal notranslate"><span class="pre">ParsedDataFrame.data_frame</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.analyzer.csv.ParsedDataFrame.parsing_errors"><code class="docutils literal notranslate"><span class="pre">ParsedDataFrame.parsing_errors</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.analyzer.csv.ParsedVariableLine"><code class="docutils literal notranslate"><span class="pre">ParsedVariableLine</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.analyzer.csv.ParsedVariableLine.cpp_name"><code class="docutils literal notranslate"><span class="pre">ParsedVariableLine.cpp_name</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.analyzer.csv.ParsedVariableLine.description"><code class="docutils literal notranslate"><span class="pre">ParsedVariableLine.description</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.analyzer.csv.ParsedVariableLine.var_id"><code class="docutils literal notranslate"><span class="pre">ParsedVariableLine.var_id</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.analyzer.csv.VariableMappings"><code class="docutils literal notranslate"><span class="pre">VariableMappings</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.analyzer.csv.VariableMappings.id_to_cpp_name"><code class="docutils literal notranslate"><span class="pre">VariableMappings.id_to_cpp_name</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.analyzer.csv.VariableMappings.id_to_descript"><code class="docutils literal notranslate"><span class="pre">VariableMappings.id_to_descript</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.analyzer.csv.VariableMappings.skip_rows"><code class="docutils literal notranslate"><span class="pre">VariableMappings.skip_rows</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.analyzer.csv.build_data_instances"><code class="docutils literal notranslate"><span class="pre">build_data_instances()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.analyzer.csv.parse_csv"><code class="docutils literal notranslate"><span class="pre">parse_csv()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.analyzer.csv.parse_header_creation_time"><code class="docutils literal notranslate"><span class="pre">parse_header_creation_time()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.analyzer.csv.parse_variable_id_mappings"><code class="docutils literal notranslate"><span class="pre">parse_variable_id_mappings()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.analyzer.csv.parse_variable_mapping_line"><code class="docutils literal notranslate"><span class="pre">parse_variable_mapping_line()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.analyzer.csv.read_and_sort_data"><code class="docutils literal notranslate"><span class="pre">read_and_sort_data()</span></code></a></li>
 </ul>
   </nav></div>
 

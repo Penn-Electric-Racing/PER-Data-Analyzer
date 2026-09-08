@@ -18,5 +18,6 @@ perda.core\_data\_structures
    joins
    masking
    resampling
+   search_indexes
    single_run_data
    split_helpers

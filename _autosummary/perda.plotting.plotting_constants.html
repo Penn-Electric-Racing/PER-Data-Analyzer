@@ -274,6 +274,7 @@
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.joins.html">perda.core_data_structures.joins</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.masking.html">perda.core_data_structures.masking</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.resampling.html">perda.core_data_structures.resampling</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.search_indexes.html">perda.core_data_structures.search_indexes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.single_run_data.html">perda.core_data_structures.single_run_data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.split_helpers.html">perda.core_data_structures.split_helpers</a></li>
 </ul>
@@ -510,8 +511,7 @@ Default is 500.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>mapbox_style</strong> (<em>str</em>) – Mapbox tile style. <code class="docutils literal notranslate"><span class="pre">&quot;carto-positron&quot;</span></code> is free and requires no token.</p></li>
-<li><p><strong>mapbox_token</strong> (<em>str</em>) – Mapbox access token. Only needed for Mapbox-hosted styles.</p></li>
+<li><p><strong>map_style</strong> (<em>str</em>) – MapLibre base map style. <code class="docutils literal notranslate"><span class="pre">&quot;open-street-map&quot;</span></code> requires no API key.</p></li>
 <li><p><strong>marker_size</strong> (<em>int</em>) – Marker size on GPS traces.</p></li>
 <li><p><strong>line_width</strong> (<em>int</em>) – Line width on the map trace.</p></li>
 <li><p><strong>line_color</strong> (<em>str</em>) – Color of the GPS trace line.</p></li>
@@ -528,8 +528,7 @@ Set to <code class="docutils literal notranslate"><span class="pre">float(&quot;
 <dd class="field-even"><ul class="simple">
 <li><p><a class="reference internal" href="#perda.plotting.plotting_constants.GpsMapConfig.line_color" title="perda.plotting.plotting_constants.GpsMapConfig.line_color"><code class="xref py py-obj docutils literal notranslate"><span class="pre">line_color</span> <span class="pre">(str)</span></code></a></p></li>
 <li><p><a class="reference internal" href="#perda.plotting.plotting_constants.GpsMapConfig.line_width" title="perda.plotting.plotting_constants.GpsMapConfig.line_width"><code class="xref py py-obj docutils literal notranslate"><span class="pre">line_width</span> <span class="pre">(int)</span></code></a></p></li>
-<li><p><a class="reference internal" href="#perda.plotting.plotting_constants.GpsMapConfig.mapbox_style" title="perda.plotting.plotting_constants.GpsMapConfig.mapbox_style"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mapbox_style</span> <span class="pre">(str)</span></code></a></p></li>
-<li><p><a class="reference internal" href="#perda.plotting.plotting_constants.GpsMapConfig.mapbox_token" title="perda.plotting.plotting_constants.GpsMapConfig.mapbox_token"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mapbox_token</span> <span class="pre">(str)</span></code></a></p></li>
+<li><p><a class="reference internal" href="#perda.plotting.plotting_constants.GpsMapConfig.map_style" title="perda.plotting.plotting_constants.GpsMapConfig.map_style"><code class="xref py py-obj docutils literal notranslate"><span class="pre">map_style</span> <span class="pre">(str)</span></code></a></p></li>
 <li><p><a class="reference internal" href="#perda.plotting.plotting_constants.GpsMapConfig.marker_size" title="perda.plotting.plotting_constants.GpsMapConfig.marker_size"><code class="xref py py-obj docutils literal notranslate"><span class="pre">marker_size</span> <span class="pre">(int)</span></code></a></p></li>
 <li><p><a class="reference internal" href="#perda.plotting.plotting_constants.GpsMapConfig.max_jump_m" title="perda.plotting.plotting_constants.GpsMapConfig.max_jump_m"><code class="xref py py-obj docutils literal notranslate"><span class="pre">max_jump_m</span> <span class="pre">(float)</span></code></a></p></li>
 <li><p><a class="reference internal" href="#perda.plotting.plotting_constants.GpsMapConfig.max_radius_m" title="perda.plotting.plotting_constants.GpsMapConfig.max_radius_m"><code class="xref py py-obj docutils literal notranslate"><span class="pre">max_radius_m</span> <span class="pre">(float)</span></code></a></p></li>
@@ -538,13 +537,8 @@ Set to <code class="docutils literal notranslate"><span class="pre">float(&quot;
 </dd>
 </dl>
 <dl class="py attribute pydantic_field">
-<dt class="sig sig-object py" id="perda.plotting.plotting_constants.GpsMapConfig.mapbox_style">
-<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">mapbox_style</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'carto-positron'</span></em><a class="headerlink" href="#perda.plotting.plotting_constants.GpsMapConfig.mapbox_style" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute pydantic_field">
-<dt class="sig sig-object py" id="perda.plotting.plotting_constants.GpsMapConfig.mapbox_token">
-<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">mapbox_token</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#perda.plotting.plotting_constants.GpsMapConfig.mapbox_token" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="perda.plotting.plotting_constants.GpsMapConfig.map_style">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">map_style</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'open-street-map'</span></em><a class="headerlink" href="#perda.plotting.plotting_constants.GpsMapConfig.map_style" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute pydantic_field">
@@ -809,8 +803,7 @@ Set to <code class="docutils literal notranslate"><span class="pre">float(&quot;
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.plotting.plotting_constants.GpsMapConfig"><code class="docutils literal notranslate"><span class="pre">GpsMapConfig</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.plotting.plotting_constants.GpsMapConfig.mapbox_style"><code class="docutils literal notranslate"><span class="pre">GpsMapConfig.mapbox_style</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.plotting.plotting_constants.GpsMapConfig.mapbox_token"><code class="docutils literal notranslate"><span class="pre">GpsMapConfig.mapbox_token</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.plotting.plotting_constants.GpsMapConfig.map_style"><code class="docutils literal notranslate"><span class="pre">GpsMapConfig.map_style</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.plotting.plotting_constants.GpsMapConfig.marker_size"><code class="docutils literal notranslate"><span class="pre">GpsMapConfig.marker_size</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.plotting.plotting_constants.GpsMapConfig.line_width"><code class="docutils literal notranslate"><span class="pre">GpsMapConfig.line_width</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.plotting.plotting_constants.GpsMapConfig.line_color"><code class="docutils literal notranslate"><span class="pre">GpsMapConfig.line_color</span></code></a></li>

@@ -302,15 +302,19 @@
                 <article class="bd-article">
                   
   <h1>Source code for perda.core_data_structures.single_run_data</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
-<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">numpy.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">NDArray</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">ConfigDict</span><span class="p">,</span> <span class="n">Field</span><span class="p">,</span> <span class="n">PrivateAttr</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">ConfigDict</span><span class="p">,</span> <span class="n">Field</span><span class="p">,</span> <span class="n">model_validator</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">..units</span><span class="w"> </span><span class="kn">import</span> <span class="n">Timescale</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.data_instance</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataInstance</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.search_indexes</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">VariableKeywordIndex</span><span class="p">,</span>
+    <span class="n">VariableSemanticIndex</span><span class="p">,</span>
+    <span class="n">variable_keyword_index_from_csv_mappings</span><span class="p">,</span>
+<span class="p">)</span>
 
 
 <div class="viewcode-block" id="SingleRunData">
@@ -320,26 +324,22 @@
 
     <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span><span class="n">arbitrary_types_allowed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-    <span class="c1"># Private caches (excluded from Pydantic serialization)</span>
-    <span class="n">_search_deck</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">]</span> <span class="o">=</span> <span class="n">PrivateAttr</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
-    <span class="n">_search_embeddings</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">]]</span> <span class="o">=</span> <span class="n">PrivateAttr</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
-
     <span class="c1"># Core data storage</span>
-    <span class="n">id_to_instance</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">DataInstance</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+    <span class="n">id_to_instance</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">DataInstance</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
         <span class="n">description</span><span class="o">=</span><span class="s2">"Mapping from variable ID to DataInstance"</span>
     <span class="p">)</span>
-    <span class="n">cpp_name_to_id</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+    <span class="n">cpp_name_to_id</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
         <span class="n">description</span><span class="o">=</span><span class="s2">"Mapping from variable name to variable ID"</span>
     <span class="p">)</span>
-    <span class="n">id_to_cpp_name</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+    <span class="n">id_to_cpp_name</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
         <span class="n">description</span><span class="o">=</span><span class="s2">"Mapping from variable ID to variable name"</span>
     <span class="p">)</span>
-    <span class="n">id_to_descript</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+    <span class="n">id_to_descript</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
         <span class="n">description</span><span class="o">=</span><span class="s2">"Mapping from variable ID to variable description"</span>
     <span class="p">)</span>
 
     <span class="c1"># Metadata</span>
-    <span class="n">creation_time</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+    <span class="n">creation_time</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
         <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">description</span><span class="o">=</span><span class="s2">"Timestamp when this run log was recorded"</span><span class="p">,</span>
     <span class="p">)</span>
@@ -352,20 +352,36 @@
         <span class="n">default</span><span class="o">=</span><span class="n">Timescale</span><span class="o">.</span><span class="n">MS</span><span class="p">,</span>
         <span class="n">description</span><span class="o">=</span><span class="s2">"Timestamp logging unit for this run (ms/us)"</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="n">concat_boundaries</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+    <span class="n">concat_boundaries</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
         <span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span>
         <span class="n">description</span><span class="o">=</span><span class="s2">"Timestamps where concatenated runs begin (post-shift)"</span><span class="p">,</span>
     <span class="p">)</span>
+    <span class="n">semantic_index</span><span class="p">:</span> <span class="n">VariableSemanticIndex</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">"Vector index over variable descriptions. None when semantic search is disabled or unavailable"</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">keyword_index</span><span class="p">:</span> <span class="n">VariableKeywordIndex</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">VariableKeywordIndex</span><span class="p">(</span>
+            <span class="n">row_to_var_id</span><span class="o">=</span><span class="p">[],</span> <span class="n">normalized_text</span><span class="o">=</span><span class="p">[]</span>
+        <span class="p">),</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">"Normalized name and description text backing keyword search"</span><span class="p">,</span>
+    <span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">input_var_id_name</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">DataInstance</span><span class="p">]</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataInstance</span><span class="p">:</span>
+    <span class="nd">@model_validator</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">"after"</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_build_keyword_index</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SingleRunData</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">keyword_index</span><span class="o">.</span><span class="n">row_to_var_id</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">keyword_index</span> <span class="o">=</span> <span class="n">variable_keyword_index_from_csv_mappings</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">id_to_cpp_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">id_to_descript</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_var_id_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">DataInstance</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataInstance</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Dictionary-like access to DataInstance by variable ID or variable name.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        input_var_id_name : Union[str, int, DataInstance]</span>
+<span class="sd">        input_var_id_name : str | int | DataInstance</span>
 <span class="sd">            Variable ID (int), variable name (str), or DataInstance to retrieve</span>
 
 <span class="sd">        Returns</span>
@@ -448,9 +464,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">id_to_instance</span><span class="p">[</span><span class="n">synthetic_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">stored</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cpp_name_to_id</span><span class="p">[</span><span class="n">cpp_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">synthetic_id</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">id_to_cpp_name</span><span class="p">[</span><span class="n">synthetic_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">cpp_name</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">id_to_descript</span><span class="p">[</span><span class="n">synthetic_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">di</span><span class="o">.</span><span class="n">label</span> <span class="ow">or</span> <span class="s2">""</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_search_deck</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_search_embeddings</span> <span class="o">=</span> <span class="kc">None</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">id_to_descript</span><span class="p">[</span><span class="n">synthetic_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">di</span><span class="o">.</span><span class="n">label</span> <span class="ow">or</span> <span class="s2">""</span></div>
 
 
 <div class="viewcode-block" id="SingleRunData.replace">
@@ -487,18 +501,16 @@
             <span class="n">label</span><span class="o">=</span><span class="n">di</span><span class="o">.</span><span class="n">label</span><span class="p">,</span>
             <span class="n">var_id</span><span class="o">=</span><span class="n">old</span><span class="o">.</span><span class="n">var_id</span><span class="p">,</span>
             <span class="n">cpp_name</span><span class="o">=</span><span class="n">old</span><span class="o">.</span><span class="n">cpp_name</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_search_deck</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_search_embeddings</span> <span class="o">=</span> <span class="kc">None</span></div>
+        <span class="p">)</span></div>
 
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_var_id_name</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_var_id_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Check if variable ID or variable name exists in the data.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        input_var_id_name : Union[str, int]</span>
+<span class="sd">        input_var_id_name : str | int</span>
 <span class="sd">            Variable ID or variable name to check</span>
 
 <span class="sd">        Returns</span>

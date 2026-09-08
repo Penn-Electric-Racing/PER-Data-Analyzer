@@ -393,10 +393,8 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    mapbox_style : str</span>
-<span class="sd">        Mapbox tile style. ``"carto-positron"`` is free and requires no token.</span>
-<span class="sd">    mapbox_token : str</span>
-<span class="sd">        Mapbox access token. Only needed for Mapbox-hosted styles.</span>
+<span class="sd">    map_style : str</span>
+<span class="sd">        MapLibre base map style. ``"open-street-map"`` requires no API key.</span>
 <span class="sd">    marker_size : int</span>
 <span class="sd">        Marker size on GPS traces.</span>
 <span class="sd">    line_width : int</span>
@@ -415,8 +413,7 @@
 <span class="sd">        Set to ``float("inf")`` to disable.</span>
 <span class="sd">    """</span>
 
-    <span class="n">mapbox_style</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"carto-positron"</span>
-    <span class="n">mapbox_token</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span>
+    <span class="n">map_style</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"open-street-map"</span>
     <span class="n">marker_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span>
     <span class="n">line_width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span>
     <span class="n">line_color</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"red"</span>

@@ -1,0 +1,8 @@
+perda.core\_data\_structures.search\_indexes
+============================================
+
+.. automodule:: perda.core_data_structures.search_indexes
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
