@@ -1,0 +1,42 @@
+# Copy this into every repo you want mirrored, at:
+#   .github/workflows/notion-sync.yml
+
+name: Sync to Notion
+
+on:
+  issues:
+    types:
+      [opened, edited, reopened, closed, deleted, assigned, unassigned, labeled, unlabeled, milestoned, demilestoned]
+  pull_request:
+    types:
+      [opened, edited, reopened, closed, ready_for_review, converted_to_draft,
+       assigned, unassigned, labeled, unlabeled, review_requested, review_request_removed]
+
+permissions:
+  contents: read
+
+concurrency:
+  # Serialize per item so two fast events can't both decide the page is new.
+  group: notion-sync-${{ github.event.issue.number || github.event.pull_request.number }}
+  cancel-in-progress: false
+
+jobs:
+  notion:
+    # Fork PRs run without secrets; skip them rather than fail.
+    if: >-
+      github.event_name != 'pull_request' ||
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - uses: Penn-Electric-Racing/operations_monorepo/notion-github-sync@main
+        with:
+          notion-token: ${{ secrets.NOTION_TOKEN }}
+          notion-software-project-board-database-id: ${{ vars.NOTION_SOFTWARE_PROJECT_BOARD_DATABASE_ID }}
+
+# --- Reusable-workflow variant -------------------------------------------
+# jobs:
+#   notion:
+#     uses: Penn-Electric-Racing/operations_monorepo/.github/workflows/notion-sync.yml@main
+#     with:
+#       notion-software-project-board-database-id: ${{ vars.NOTION_SOFTWARE_PROJECT_BOARD_DATABASE_ID }}
+#     secrets: inherit
