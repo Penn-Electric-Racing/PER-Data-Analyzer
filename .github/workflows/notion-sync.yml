@@ -31,12 +31,11 @@ jobs:
       - uses: Penn-Electric-Racing/operations_monorepo/notion-github-sync@main
         with:
           notion-token: ${{ secrets.NOTION_TOKEN }}
-          notion-software-project-board-database-id: ${{ vars.NOTION_SOFTWARE_PROJECT_BOARD_DATABASE_ID }}
+          # The board id is the action's default. Pass
+          # notion-software-project-board-database-id here to target another board.
 
 # --- Reusable-workflow variant -------------------------------------------
 # jobs:
 #   notion:
 #     uses: Penn-Electric-Racing/operations_monorepo/.github/workflows/notion-sync.yml@main
-#     with:
-#       notion-software-project-board-database-id: ${{ vars.NOTION_SOFTWARE_PROJECT_BOARD_DATABASE_ID }}
 #     secrets: inherit
