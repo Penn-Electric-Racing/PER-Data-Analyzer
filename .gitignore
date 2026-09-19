@@ -22,3 +22,6 @@ docs/source/_autosummary/
 .coverage
 .pytest_cache/
 htmlcov/
+
+# Timeline prototype scratch (local only)
+_scratch/

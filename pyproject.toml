@@ -14,6 +14,9 @@ dynamic = ["dependencies"]
 semantic = [
     "sentence-transformers",
 ]
+timeline = [
+    "psycopg2-binary",
+]
 notebook = [
     "anywidget",
     "ipykernel",
@@ -31,6 +34,7 @@ docs = [
 ]
 full = [
     "perda[semantic]",
+    "perda[timeline]",
     "perda[notebook]",
     "perda[docs]",
 ]
