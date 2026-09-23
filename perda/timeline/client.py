@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import getpass
 import os
 from datetime import date
 from typing import Sequence
+from urllib.parse import quote
 
 import numpy as np
 import polars as pl
@@ -10,33 +12,71 @@ import psycopg2
 
 from ..core_data_structures.data_instance import DataInstance
 
-DEFAULT_DSN = os.getenv(
-    "TIMELINE_DSN", "postgresql://postgres:perlivethedream@localhost:5435/per_timeline"
-)
+TIMELINE_HOST = "data-server.pennelectricracing.com"
+TIMELINE_PORT = 5432
+TIMELINE_DB = "car_data_server_db"
+# Reads every timeline table and owns nothing, so a stray DELETE in a notebook
+# is refused by the database rather than by good intentions.
+TIMELINE_USER = "timeline_ro"
 
 
-class TimelineClient:
-    """Query interface over the global log timeline.
+def default_dsn(password: str | None = None) -> str:
+    """Build the connection string, asking for the password if need be.
 
-    Wraps the three tiers -- session/variable dimensions, the per-session
-    summary tier, and the raw sample hypertable -- behind one object. Most
-    questions ("which sessions in May saw X above Y") are answered entirely
-    from the summary tier without touching raw samples.
+    ``$TIMELINE_DSN`` overrides everything, which is how the data server
+    itself points at its own local database.
 
     Parameters
     ----------
-    dsn : str
-        libpq connection string. Defaults to ``$TIMELINE_DSN``.
+    password : str | None
+        Password for ``timeline_ro``. Prompted for when omitted and
+        ``$TIMELINE_PASSWORD`` is unset.
+
+    Returns
+    -------
+    str
+        libpq connection string.
+    """
+    override = os.getenv("TIMELINE_DSN")
+    if override:
+        return override
+    if password is None:
+        password = os.getenv("TIMELINE_PASSWORD") or getpass.getpass(
+            f"password for {TIMELINE_USER}@{TIMELINE_HOST}: "
+        )
+    return (
+        f"postgresql://{TIMELINE_USER}:{quote(password)}"
+        f"@{TIMELINE_HOST}:{TIMELINE_PORT}/{TIMELINE_DB}"
+    )
+
+
+class TimelineClient:
+    """Read-only access to the global timeline on the data server.
+
+    Connects as ``timeline_ro``, which can select from every timeline table
+    and owns none of them, over a session that is itself read-only. Prompts
+    for the password unless one is given or ``$TIMELINE_PASSWORD`` is set.
+
+    Parameters
+    ----------
+    dsn : str | None
+        Full connection string, bypassing the defaults. Also read from
+        ``$TIMELINE_DSN``.
+    password : str | None
+        Password for ``timeline_ro``. Prompted for when omitted.
 
     Examples
     --------
     >>> tl = TimelineClient()
+    password for timeline_ro@data-server.pennelectricracing.com:
     >>> tl.find("bms.stack.mma.cellV.min", below=3.0, month="2026-05")
     """
 
-    def __init__(self, dsn: str = DEFAULT_DSN) -> None:
-        self._conn = psycopg2.connect(dsn)
-        self._conn.autocommit = True
+    def __init__(self, dsn: str | None = None, password: str | None = None) -> None:
+        self._conn = psycopg2.connect(dsn or default_dsn(password))
+        # Belt as well as braces: the role cannot write, and the session
+        # refuses writes even if it is pointed at a privileged one.
+        self._conn.set_session(readonly=True, autocommit=True)
         self._var_id_cache: dict[str, int | None] = {}
 
     @property
