@@ -1,23 +1,18 @@
 from __future__ import annotations
 
 import getpass
-import os
 from datetime import date
 from typing import Sequence
-from urllib.parse import quote
 
 import numpy as np
 import polars as pl
-import psycopg2
+import requests
 
 from ..core_data_structures.data_instance import DataInstance
+from ..server import SERVER_URL, TOKEN_ENDPOINT
 
-TIMELINE_HOST = "data-server.pennelectricracing.com"
-TIMELINE_PORT = 5432
-TIMELINE_DB = "car_data_server_db"
-# Reads every timeline table and owns nothing, so a stray DELETE in a notebook
-# is refused by the database rather than by good intentions.
-TIMELINE_USER = "timeline_ro"
+QUERY_ENDPOINT = "/api/v1/timeline/query"
+DEFAULT_MAX_ROWS = 1_000_000
 
 
 def default_dsn(password: str | None = None) -> str:
@@ -50,49 +45,58 @@ def default_dsn(password: str | None = None) -> str:
     )
 
 
-class TimelineClient:
-    """Read-only access to the global timeline on the data server.
-
-    Connects as ``timeline_ro``, which can select from every timeline table
-    and owns none of them, over a session that is itself read-only. Prompts
-    for the password unless one is given or ``$TIMELINE_PASSWORD`` is set.
+def _request_token(password: str) -> str:
+    """Exchange the team-internal programmatic password for a bearer token.
 
     Parameters
     ----------
-    dsn : str | None
-        Full connection string, bypassing the defaults. Also read from
-        ``$TIMELINE_DSN``.
+    password : str
+        Team-internal programmatic password.
+
+    Returns
+    -------
+    str
+        Bearer token for the timeline endpoint.
+    """
+    try:
+        response = requests.post(
+            f"{SERVER_URL}{TOKEN_ENDPOINT}", json={"password": password}
+        )
+    except requests.RequestException as error:
+        raise ConnectionError(f"Could not reach {SERVER_URL}: {error}") from error
+    if response.status_code == 401:
+        raise ConnectionError("Login failed: incorrect password")
+    if not response.ok:
+        raise ConnectionError(
+            f"Login failed (HTTP {response.status_code}): {response.text}"
+        )
+    return response.json()["token"]
+
+
+class TimelineClient:
+    """Query the global timeline through the data server.
+
+    Sends SQL to the server, which runs it read-only and sends the rows back,
+    the same way ``access_remote_log`` goes through the server for an S3 key.
+    Nothing here talks to the database, so nothing here can write to it.
+
+    Parameters
+    ----------
     password : str | None
-        Password for ``timeline_ro``. Prompted for when omitted.
+        Team-internal programmatic password. Prompted for when omitted.
 
     Examples
     --------
     >>> tl = TimelineClient()
-    password for timeline_ro@data-server.pennelectricracing.com:
+    team-internal programmatic password:
     >>> tl.find("bms.stack.mma.cellV.min", below=3.0, month="2026-05")
     """
 
-    def __init__(self, dsn: str | None = None, password: str | None = None) -> None:
-        self._conn = psycopg2.connect(dsn or default_dsn(password))
-        # Belt as well as braces: the role cannot write, and the session
-        # refuses writes even if it is pointed at a privileged one.
-        self._conn.set_session(readonly=True, autocommit=True)
+    def __init__(self, password: str | None = None) -> None:
+        if password is None:
+            password = getpass.getpass("team-internal programmatic password: ")
+        self._token = _request_token(password)
         self._var_id_cache: dict[str, int | None] = {}
-
-    @property
-    def connection(self) -> "psycopg2.extensions.connection":
-        """The underlying connection.
-
-        Returns
-        -------
-        psycopg2.extensions.connection
-            Live connection, autocommit enabled.
-        """
-        return self._conn
-
-    def close(self) -> None:
-        """Close the underlying connection."""
-        self._conn.close()
 
     def sizes(self) -> pl.DataFrame:
         """On-disk size of each timeline table.
@@ -109,7 +113,12 @@ class TimelineClient:
             " FROM unnest(ARRAY['timeline_session_var_stats','timeline_sessions','timeline_variables']) t"
         )
 
-    def sql(self, query: str, params: Sequence[object] | None = None) -> pl.DataFrame:
+    def sql(
+        self,
+        query: str,
+        params: Sequence[object] | None = None,
+        max_rows: int = DEFAULT_MAX_ROWS,
+    ) -> pl.DataFrame:
         """Run arbitrary SQL and return the result as a Polars frame.
 
         This is the escape hatch the LLM layer will eventually target: the
@@ -122,20 +131,31 @@ class TimelineClient:
             SQL text.
         params : Sequence[object] | None
             Bind parameters.
+        max_rows : int
+            Row cap. The server clamps this to its own ceiling.
 
         Returns
         -------
         pl.DataFrame
             Result set; empty frame when the query returns no rows.
         """
-        with self._conn.cursor() as cur:
-            cur.execute(query, params)
-            if cur.description is None:
-                return pl.DataFrame()
-            columns = [d[0] for d in cur.description]
-            rows = cur.fetchall()
+        response = requests.post(
+            f"{SERVER_URL}{QUERY_ENDPOINT}",
+            headers={"Authorization": f"Bearer {self._token}"},
+            json={
+                "sql": query,
+                "params": list(params) if params else None,
+                "max_rows": max_rows,
+            },
+        )
+        if not response.ok:
+            detail = response.json().get("error", response.text)
+            raise RuntimeError(f"Query failed (HTTP {response.status_code}): {detail}")
+        payload = response.json()
+        columns = payload["columns"]
+        rows = payload["rows"]
         if not rows:
-            return pl.DataFrame({c: [] for c in columns})
+            return pl.DataFrame({column: [] for column in columns})
         return pl.DataFrame(
             {c: [r[i] for r in rows] for i, c in enumerate(columns)}, strict=False
         )
