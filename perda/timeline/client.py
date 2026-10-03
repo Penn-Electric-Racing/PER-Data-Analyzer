@@ -18,18 +18,6 @@ __all__ = ["TimelineClient"]
 
 
 def _request_token(password: str) -> str:
-    """Exchange the team-internal programmatic password for a bearer token.
-
-    Parameters
-    ----------
-    password : str
-        Team-internal programmatic password.
-
-    Returns
-    -------
-    str
-        Bearer token for the timeline endpoint.
-    """
     try:
         response = requests.post(
             f"{SERVER_URL}{TOKEN_ENDPOINT}", json={"password": password}
@@ -46,23 +34,7 @@ def _request_token(password: str) -> str:
 
 
 class TimelineClient:
-    """Query the global timeline through the data server.
-
-    Sends SQL to the server, which runs it read-only and sends the rows back,
-    the same way ``access_remote_log`` goes through the server for an S3 key.
-    Nothing here talks to the database, so nothing here can write to it.
-
-    Parameters
-    ----------
-    password : str | None
-        Team-internal programmatic password. Prompted for when omitted.
-
-    Examples
-    --------
-    >>> tl = TimelineClient()
-    team-internal programmatic password:
-    >>> tl.find("bms.stack.mma.cellV.min", below=3.0, month="2026-05")
-    """
+    # Sends SQL to the timeline server (read only)
 
     def __init__(self, password: str | None = None) -> None:
         if password is None:
@@ -71,13 +43,6 @@ class TimelineClient:
         self._var_id_cache: dict[str, int | None] = {}
 
     def sizes(self) -> pl.DataFrame:
-        """On-disk size of each timeline table.
-
-        Returns
-        -------
-        pl.DataFrame
-            Columns ``object`` and ``size``.
-        """
         return self.sql(
             "SELECT 'samples (hypertable)' AS object,"
             "       pg_size_pretty(hypertable_size('timeline_samples')) AS size"
@@ -91,26 +56,6 @@ class TimelineClient:
         params: Sequence[object] | None = None,
         max_rows: int = DEFAULT_MAX_ROWS,
     ) -> pl.DataFrame:
-        """Run arbitrary SQL and return the result as a Polars frame.
-
-        This is the escape hatch the LLM layer will eventually target: the
-        views ``v_sessions``, ``v_stats`` and ``v_samples`` are stable names
-        that hide ids, epoch microseconds and partition layout.
-
-        Parameters
-        ----------
-        query : str
-            SQL text.
-        params : Sequence[object] | None
-            Bind parameters.
-        max_rows : int
-            Row cap. The server clamps this to its own ceiling.
-
-        Returns
-        -------
-        pl.DataFrame
-            Result set; empty frame when the query returns no rows.
-        """
         response = requests.post(
             f"{SERVER_URL}{QUERY_ENDPOINT}",
             headers={"Authorization": f"Bearer {self._token}"},
@@ -133,41 +78,11 @@ class TimelineClient:
         )
 
     def overview(self) -> pl.DataFrame:
-        """Summarise what the timeline currently holds, by test day.
-
-        Returns
-        -------
-        pl.DataFrame
-            One row per test day with session counts, duration and row counts.
-        """
         return self.sql(
             "SELECT test_day, count(*) AS sessions,"
             "       round(sum(duration_s)/60.0) AS minutes,"
             "       sum(n_rows) AS rows, max(n_variables) AS max_vars"
             " FROM timeline_sessions GROUP BY test_day ORDER BY test_day"
-        )
-
-    def search(self, text: str, limit: int = 25) -> pl.DataFrame:
-        """Find catalogued variables whose key or description matches text.
-
-        Parameters
-        ----------
-        text : str
-            Case-insensitive substring.
-        limit : int
-            Maximum rows to return.
-
-        Returns
-        -------
-        pl.DataFrame
-            Matching variables with dtype and session coverage.
-        """
-        return self.sql(
-            "SELECT var_key, dtype, description, n_sessions, first_seen, last_seen"
-            " FROM timeline_variables"
-            " WHERE var_key ILIKE %s OR description ILIKE %s"
-            " ORDER BY n_sessions DESC, var_key LIMIT %s",
-            (f"%{text}%", f"%{text}%", limit),
         )
 
     def stats(
@@ -181,7 +96,7 @@ class TimelineClient:
         Parameters
         ----------
         var_key : str
-            Exact dotted C++ path.
+            Exact C++ identifier for the variable.
         month : str | None
             Restrict to a month, formatted ``"YYYY-MM"``.
         test_day : date | None
@@ -201,7 +116,7 @@ class TimelineClient:
             clauses.append("test_day = %s")
             params.append(test_day)
         return self.sql(
-            "SELECT test_day, start_utc, session_id, source_key, n, n_invalid,"
+            "SELECT test_day, start_utc, session_id, source_key, n,"
             "       v_min, v_max, v_mean, v_p01, v_p50, v_p95, v_p99,"
             "       n_changes, n_rising, hz, max_gap_us"
             " FROM v_stats WHERE " + " AND ".join(clauses) + " ORDER BY start_utc",
@@ -217,13 +132,12 @@ class TimelineClient:
         min_samples: int = 1,
     ) -> pl.DataFrame:
         """Find sessions where a variable crossed a threshold.
-
         Answered entirely from the summary tier -- no raw samples are read.
 
         Parameters
         ----------
         var_key : str
-            Exact dotted C++ path.
+            Exact C++ identifier for the variable.
         above : float | None
             Keep sessions whose maximum exceeded this.
         below : float | None
@@ -231,14 +145,14 @@ class TimelineClient:
         month : str | None
             Restrict to a month, formatted ``"YYYY-MM"``.
         min_samples : int
-            Ignore sessions with fewer valid samples than this.
+            Ignore sessions with fewer samples than this.
 
         Returns
         -------
         pl.DataFrame
             Matching sessions, worst-first.
         """
-        clauses: list[str] = ["var_key = %s", "(n - n_invalid) >= %s"]
+        clauses: list[str] = ["var_key = %s", "n >= %s"]
         params: list[object] = [var_key, min_samples]
         if above is not None:
             clauses.append("v_max > %s")
@@ -252,39 +166,11 @@ class TimelineClient:
         order = "v_max DESC" if above is not None else "v_min ASC"
         return self.sql(
             "SELECT test_day, start_utc, session_id, source_key,"
-            "       v_min, v_max, v_mean, n, n_invalid"
+            "       v_min, v_max, v_mean, n"
             " FROM v_stats WHERE " + " AND ".join(clauses) + f" ORDER BY {order}",
             params,
         )
 
-    def invalid_report(self, min_fraction: float = 0.01) -> pl.DataFrame:
-        """Rank variables by how often they emit sentinel values.
-
-        Surfaces signals that are silently broken -- a sentinel decodes to a
-        near-zero float, so a naive aggregate reports it as a plausible
-        reading rather than as missing data.
-
-        Parameters
-        ----------
-        min_fraction : float
-            Only report variables whose invalid share exceeds this.
-
-        Returns
-        -------
-        pl.DataFrame
-            Variables ordered by invalid fraction, worst first.
-        """
-        return self.sql(
-            "SELECT var_key, dtype, max(sentinel_bits) AS sentinel_bits,"
-            "       sum(n_invalid) AS n_invalid, sum(n) AS n,"
-            "       sum(n_invalid)::float / NULLIF(sum(n), 0) AS invalid_fraction,"
-            "       count(*) FILTER (WHERE n_invalid > 0) AS sessions_affected,"
-            "       count(*) AS sessions_total"
-            " FROM v_stats GROUP BY var_key, dtype"
-            " HAVING sum(n_invalid)::float / NULLIF(sum(n), 0) > %s"
-            " ORDER BY invalid_fraction DESC",
-            (min_fraction,),
-        )
 
     def _time_bounds(
         self, session_id: int | None = None, test_day: date | None = None
@@ -336,7 +222,6 @@ class TimelineClient:
         var_key: str,
         session_id: int | None = None,
         test_day: date | None = None,
-        drop_invalid: bool = True,
     ) -> pl.DataFrame:
         """Fetch raw samples for one variable.
 
@@ -348,8 +233,6 @@ class TimelineClient:
             Restrict to a single session.
         test_day : date | None
             Restrict to one test day.
-        drop_invalid : bool
-            Exclude denormal sentinel samples.
 
         Returns
         -------
@@ -375,8 +258,6 @@ class TimelineClient:
         if session_id is not None:
             clauses.append("session_id = %s")
             params.append(session_id)
-        if drop_invalid:
-            clauses.append("(value = 0 OR abs(value) >= 1.17549435e-38)")
 
         frame = self.sql(
             "SELECT session_id, t_us, value FROM timeline_samples"
@@ -430,7 +311,6 @@ class TimelineClient:
         var_key: str,
         session_id: int | None = None,
         test_day: date | None = None,
-        drop_invalid: bool = True,
     ) -> DataInstance:
         """Load a variable as a PERDA ``DataInstance`` for plotting and maths.
 
@@ -446,8 +326,6 @@ class TimelineClient:
             Restrict to a single session.
         test_day : date | None
             Restrict to one test day.
-        drop_invalid : bool
-            Exclude denormal sentinel samples.
 
         Returns
         -------
@@ -455,7 +333,7 @@ class TimelineClient:
             Timestamps in microseconds relative to the session start.
         """
         frame = self.samples(
-            var_key, session_id=session_id, test_day=test_day, drop_invalid=drop_invalid
+            var_key, session_id=session_id, test_day=test_day
         )
         meta = self.sql(
             "SELECT var_id, description FROM timeline_variables WHERE var_key = %s", (var_key,)
