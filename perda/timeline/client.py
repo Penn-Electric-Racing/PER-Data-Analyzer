@@ -14,35 +14,7 @@ from ..server import SERVER_URL, TOKEN_ENDPOINT
 QUERY_ENDPOINT = "/api/v1/timeline/query"
 DEFAULT_MAX_ROWS = 1_000_000
 
-
-def default_dsn(password: str | None = None) -> str:
-    """Build the connection string, asking for the password if need be.
-
-    ``$TIMELINE_DSN`` overrides everything, which is how the data server
-    itself points at its own local database.
-
-    Parameters
-    ----------
-    password : str | None
-        Password for ``timeline_ro``. Prompted for when omitted and
-        ``$TIMELINE_PASSWORD`` is unset.
-
-    Returns
-    -------
-    str
-        libpq connection string.
-    """
-    override = os.getenv("TIMELINE_DSN")
-    if override:
-        return override
-    if password is None:
-        password = os.getenv("TIMELINE_PASSWORD") or getpass.getpass(
-            f"password for {TIMELINE_USER}@{TIMELINE_HOST}: "
-        )
-    return (
-        f"postgresql://{TIMELINE_USER}:{quote(password)}"
-        f"@{TIMELINE_HOST}:{TIMELINE_PORT}/{TIMELINE_DB}"
-    )
+__all__ = ["TimelineClient"]
 
 
 def _request_token(password: str) -> str:
