@@ -12,9 +12,16 @@ from ..core_data_structures.data_instance import DataInstance
 from ..server import SERVER_URL, TOKEN_ENDPOINT
 
 QUERY_ENDPOINT = "/api/v1/timeline/query"
+# JSON has no NaN/Infinity, so the server sends these as strings.
+NON_FINITE = {"NaN": float("nan"), "Infinity": float("inf"), "-Infinity": float("-inf")}
 DEFAULT_MAX_ROWS = 1_000_000
 
 __all__ = ["TimelineClient"]
+
+
+def _float(value: object) -> object:
+    """Turn the server's spelling of a non-finite float back into one."""
+    return NON_FINITE.get(value, value) if isinstance(value, str) else value
 
 
 def _request_token(password: str) -> str:
@@ -74,7 +81,8 @@ class TimelineClient:
         if not rows:
             return pl.DataFrame({column: [] for column in columns})
         return pl.DataFrame(
-            {c: [r[i] for r in rows] for i, c in enumerate(columns)}, strict=False
+            {c: [_float(r[i]) for r in rows] for i, c in enumerate(columns)},
+            strict=False
         )
 
     def overview(self) -> pl.DataFrame:
