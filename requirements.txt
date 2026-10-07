@@ -2,7 +2,7 @@
 faiss-cpu
 numba
 numpy
-polars
+polars<2  # read_csv(new_columns=..., schema=...) breaks on polars 2
 plotly
 pydantic
 rapidfuzz
