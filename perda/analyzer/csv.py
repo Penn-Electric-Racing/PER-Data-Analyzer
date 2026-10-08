@@ -14,11 +14,10 @@ from ..core_data_structures.single_run_data import SingleRunData
 from ..units import Timescale
 from ..utils.search import build_semantic_index
 
-DATA_COLUMN_NAMES = ["timestamp", "var_id", "value"]
 DATA_COLUMN_SCHEMA = {
-    "column_1": pl.Int64,
-    "column_2": pl.Int32,
-    "column_3": pl.Float64,
+    "timestamp": pl.Int64,
+    "var_id": pl.Int32,
+    "value": pl.Float64,
 }
 BATCH_BYTE_COUNT = 32 * 1024 * 1024
 VALUE_LINE_PREFIX = "Value "
@@ -282,7 +281,6 @@ def parse_data_lines(
         df = pl.read_csv(
             block,
             has_header=False,
-            new_columns=DATA_COLUMN_NAMES,
             schema=DATA_COLUMN_SCHEMA,
             ignore_errors=True,
         )
