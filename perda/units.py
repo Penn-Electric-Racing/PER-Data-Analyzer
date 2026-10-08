@@ -7,6 +7,9 @@ from numpy.typing import NDArray
 Numeric = TypeVar("Numeric", float, NDArray[float64])
 
 
+US_PER_SECOND = 1_000_000
+
+
 class Timescale(Enum):
     """Supported timestamp units for time-series data."""
 
