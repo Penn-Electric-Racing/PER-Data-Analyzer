@@ -302,11 +302,10 @@
                 <article class="bd-article">
                   
   <h1>Source code for perda.analyzer.csv</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
-
-<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Iterator</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TextIO</span><span class="p">,</span> <span class="n">cast</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TextIO</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">polars</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pl</span>
@@ -319,12 +318,12 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">..units</span><span class="w"> </span><span class="kn">import</span> <span class="n">Timescale</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..utils.search</span><span class="w"> </span><span class="kn">import</span> <span class="n">build_semantic_index</span>
 
-<span class="n">DATA_COLUMN_NAMES</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"timestamp"</span><span class="p">,</span> <span class="s2">"var_id"</span><span class="p">,</span> <span class="s2">"value"</span><span class="p">]</span>
 <span class="n">DATA_COLUMN_SCHEMA</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">"column_1"</span><span class="p">:</span> <span class="n">pl</span><span class="o">.</span><span class="n">Int64</span><span class="p">,</span>
-    <span class="s2">"column_2"</span><span class="p">:</span> <span class="n">pl</span><span class="o">.</span><span class="n">Int32</span><span class="p">,</span>
-    <span class="s2">"column_3"</span><span class="p">:</span> <span class="n">pl</span><span class="o">.</span><span class="n">Float64</span><span class="p">,</span>
+    <span class="s2">"timestamp"</span><span class="p">:</span> <span class="n">pl</span><span class="o">.</span><span class="n">Int64</span><span class="p">,</span>
+    <span class="s2">"var_id"</span><span class="p">:</span> <span class="n">pl</span><span class="o">.</span><span class="n">Int32</span><span class="p">,</span>
+    <span class="s2">"value"</span><span class="p">:</span> <span class="n">pl</span><span class="o">.</span><span class="n">Float64</span><span class="p">,</span>
 <span class="p">}</span>
+<span class="n">BATCH_BYTE_COUNT</span> <span class="o">=</span> <span class="mi">32</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span>
 <span class="n">VALUE_LINE_PREFIX</span> <span class="o">=</span> <span class="s2">"Value "</span>
 <span class="n">MICROSECOND_HEADER_SUFFIX</span> <span class="o">=</span> <span class="s2">"v2.0"</span>
 <span class="n">VARIABLE_LINE_PATTERN</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
@@ -364,14 +363,20 @@
 
 
 
-<div class="viewcode-block" id="ParsedDataFrame">
-<a class="viewcode-back" href="../../../_autosummary/perda.analyzer.csv.html#perda.analyzer.csv.ParsedDataFrame">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">ParsedDataFrame</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<div class="viewcode-block" id="ParsedData">
+<a class="viewcode-back" href="../../../_autosummary/perda.analyzer.csv.html#perda.analyzer.csv.ParsedData">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ParsedData</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
     <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span><span class="n">arbitrary_types_allowed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-    <span class="n">data_frame</span><span class="p">:</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
-        <span class="n">description</span><span class="o">=</span><span class="s2">"Data sorted by variable ID then timestamp"</span>
+    <span class="n">timestamp_chunks</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">]]]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">"Per-variable timestamp pieces, one per block the variable appears in"</span>
     <span class="p">)</span>
+    <span class="n">value_chunks</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">"Per-variable value pieces, aligned with timestamp_chunks"</span>
+    <span class="p">)</span>
+    <span class="n">total_data_points</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">"Number of valid data rows"</span><span class="p">)</span>
+    <span class="n">data_start_time</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">"Earliest timestamp in the data"</span><span class="p">)</span>
+    <span class="n">data_end_time</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">"Latest timestamp in the data"</span><span class="p">)</span>
     <span class="n">parsing_errors</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">"Number of rows dropped as unparseable"</span><span class="p">)</span></div>
 
 
@@ -533,17 +538,40 @@
     <span class="p">}</span>
 
 
-<div class="viewcode-block" id="read_and_sort_data">
-<a class="viewcode-back" href="../../../_autosummary/perda.analyzer.csv.html#perda.analyzer.csv.read_and_sort_data">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">read_and_sort_data</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_iter_data_blocks</span><span class="p">(</span><span class="n">file_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">skip_rows</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">bytes</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Yield the numeric data section in blocks of whole lines.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    file_path : str</span>
+<span class="sd">        Path to the CSV file to read.</span>
+<span class="sd">    skip_rows : int</span>
+<span class="sd">        Number of leading lines to skip before the numeric data.</span>
+
+<span class="sd">    Yields</span>
+<span class="sd">    ------</span>
+<span class="sd">    bytes</span>
+<span class="sd">        Roughly ``BATCH_BYTE_COUNT`` bytes, extended to the end of the last line.</span>
+<span class="sd">    """</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="s2">"rb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">file_handle</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">skip_rows</span><span class="p">):</span>
+            <span class="n">file_handle</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+        <span class="k">while</span> <span class="n">block</span> <span class="o">:=</span> <span class="n">file_handle</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">BATCH_BYTE_COUNT</span><span class="p">):</span>
+            <span class="k">yield</span> <span class="n">block</span> <span class="o">+</span> <span class="n">file_handle</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="parse_data_lines">
+<a class="viewcode-back" href="../../../_autosummary/perda.analyzer.csv.html#perda.analyzer.csv.parse_data_lines">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">parse_data_lines</span><span class="p">(</span>
     <span class="n">file_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">skip_rows</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">ts_offset</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
     <span class="n">parsing_errors_limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
     <span class="n">verbose</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ParsedDataFrame</span><span class="p">:</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ParsedData</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Read the numeric data section and sort it by variable ID then timestamp.</span>
+<span class="sd">    Read the numeric data section block by block, splitting it by variable ID.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -560,57 +588,79 @@
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    ParsedDataFrame</span>
-<span class="sd">        Sorted data and the count of malformed rows dropped.</span>
+<span class="sd">    ParsedData</span>
+<span class="sd">        Per-variable data pieces and the count of malformed rows dropped.</span>
 <span class="sd">    """</span>
     <span class="k">if</span> <span class="n">verbose</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">"Reading and sorting data..."</span><span class="p">)</span>
 
-    <span class="n">df</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span>
-        <span class="n">file_path</span><span class="p">,</span>
-        <span class="n">skip_rows</span><span class="o">=</span><span class="n">skip_rows</span><span class="p">,</span>
-        <span class="n">has_header</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">new_columns</span><span class="o">=</span><span class="n">DATA_COLUMN_NAMES</span><span class="p">,</span>
-        <span class="n">schema</span><span class="o">=</span><span class="n">DATA_COLUMN_SCHEMA</span><span class="p">,</span>
-        <span class="n">ignore_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">glob</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="p">)</span>
+    <span class="n">timestamp_chunks</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">]]]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">value_chunks</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">total_data_points</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">parsing_errors</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">block_start_times</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">block_end_times</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
 
-    <span class="n">parsing_errors</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span>
-        <span class="n">df</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
-            <span class="n">df</span><span class="p">[</span><span class="s2">"timestamp"</span><span class="p">]</span><span class="o">.</span><span class="n">is_null</span><span class="p">()</span> <span class="o">|</span> <span class="n">df</span><span class="p">[</span><span class="s2">"var_id"</span><span class="p">]</span><span class="o">.</span><span class="n">is_null</span><span class="p">()</span> <span class="o">|</span> <span class="n">df</span><span class="p">[</span><span class="s2">"value"</span><span class="p">]</span><span class="o">.</span><span class="n">is_null</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">block</span> <span class="ow">in</span> <span class="n">_iter_data_blocks</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">skip_rows</span><span class="p">):</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span>
+            <span class="n">block</span><span class="p">,</span>
+            <span class="n">has_header</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">schema</span><span class="o">=</span><span class="n">DATA_COLUMN_SCHEMA</span><span class="p">,</span>
+            <span class="n">ignore_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="p">)</span>
-    <span class="p">)</span>
-    <span class="k">if</span> <span class="n">parsing_errors_limit</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">parsing_errors</span> <span class="o">&gt;=</span> <span class="n">parsing_errors_limit</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">"Too many data parsing errors encountered."</span><span class="p">)</span>
 
-    <span class="n">df</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="n">df</span><span class="o">.</span><span class="n">drop_nulls</span><span class="p">()</span>
-        <span class="o">.</span><span class="n">with_columns</span><span class="p">((</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s2">"timestamp"</span><span class="p">)</span> <span class="o">+</span> <span class="n">ts_offset</span><span class="p">)</span><span class="o">.</span><span class="n">alias</span><span class="p">(</span><span class="s2">"timestamp"</span><span class="p">))</span>
-        <span class="o">.</span><span class="n">sort</span><span class="p">([</span><span class="s2">"var_id"</span><span class="p">,</span> <span class="s2">"timestamp"</span><span class="p">])</span>
-    <span class="p">)</span>
+        <span class="n">valid_df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">drop_nulls</span><span class="p">()</span>
+        <span class="n">parsing_errors</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">valid_df</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">parsing_errors_limit</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">parsing_errors</span> <span class="o">&gt;=</span> <span class="n">parsing_errors_limit</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">"Too many data parsing errors encountered."</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">valid_df</span><span class="o">.</span><span class="n">is_empty</span><span class="p">():</span>
+            <span class="k">continue</span>
 
-    <span class="k">if</span> <span class="n">df</span><span class="o">.</span><span class="n">is_empty</span><span class="p">():</span>
+        <span class="n">valid_df</span> <span class="o">=</span> <span class="n">valid_df</span><span class="o">.</span><span class="n">with_columns</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s2">"timestamp"</span><span class="p">)</span> <span class="o">+</span> <span class="n">ts_offset</span><span class="p">)</span><span class="o">.</span><span class="n">alias</span><span class="p">(</span><span class="s2">"timestamp"</span><span class="p">)</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">sort</span><span class="p">([</span><span class="s2">"var_id"</span><span class="p">,</span> <span class="s2">"timestamp"</span><span class="p">])</span>
+        <span class="n">timestamps</span> <span class="o">=</span> <span class="n">valid_df</span><span class="p">[</span><span class="s2">"timestamp"</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="n">valid_df</span><span class="p">[</span><span class="s2">"value"</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+
+        <span class="n">total_data_points</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">valid_df</span><span class="p">)</span>
+        <span class="n">block_start_times</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">timestamps</span><span class="o">.</span><span class="n">min</span><span class="p">()))</span>
+        <span class="n">block_end_times</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">timestamps</span><span class="o">.</span><span class="n">max</span><span class="p">()))</span>
+
+        <span class="n">slice_map</span> <span class="o">=</span> <span class="n">_find_start_end_indices_for_each_unique_value</span><span class="p">(</span>
+            <span class="n">valid_df</span><span class="p">[</span><span class="s2">"var_id"</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">var_id</span><span class="p">,</span> <span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span> <span class="ow">in</span> <span class="n">slice_map</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">timestamp_chunks</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">var_id</span><span class="p">,</span> <span class="p">[])</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">timestamps</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
+            <span class="n">value_chunks</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">var_id</span><span class="p">,</span> <span class="p">[])</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">values</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
+
+    <span class="k">if</span> <span class="n">total_data_points</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">"No valid data points found after parsing."</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">ParsedDataFrame</span><span class="p">(</span><span class="n">data_frame</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">parsing_errors</span><span class="o">=</span><span class="n">parsing_errors</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">ParsedData</span><span class="p">(</span>
+        <span class="n">timestamp_chunks</span><span class="o">=</span><span class="n">timestamp_chunks</span><span class="p">,</span>
+        <span class="n">value_chunks</span><span class="o">=</span><span class="n">value_chunks</span><span class="p">,</span>
+        <span class="n">total_data_points</span><span class="o">=</span><span class="n">total_data_points</span><span class="p">,</span>
+        <span class="n">data_start_time</span><span class="o">=</span><span class="nb">min</span><span class="p">(</span><span class="n">block_start_times</span><span class="p">),</span>
+        <span class="n">data_end_time</span><span class="o">=</span><span class="nb">max</span><span class="p">(</span><span class="n">block_end_times</span><span class="p">),</span>
+        <span class="n">parsing_errors</span><span class="o">=</span><span class="n">parsing_errors</span><span class="p">,</span>
+    <span class="p">)</span></div>
 
 
 
 <div class="viewcode-block" id="build_data_instances">
 <a class="viewcode-back" href="../../../_autosummary/perda.analyzer.csv.html#perda.analyzer.csv.build_data_instances">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">build_data_instances</span><span class="p">(</span>
-    <span class="n">mappings</span><span class="p">:</span> <span class="n">VariableMappings</span><span class="p">,</span> <span class="n">data_frame</span><span class="p">:</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">mappings</span><span class="p">:</span> <span class="n">VariableMappings</span><span class="p">,</span> <span class="n">parsed</span><span class="p">:</span> <span class="n">ParsedData</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">DataInstance</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Slice the sorted data into one DataInstance per variable.</span>
+<span class="sd">    Join each variable's pieces into one DataInstance per variable.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    mappings : VariableMappings</span>
 <span class="sd">        Variable ID lookup tables.</span>
-<span class="sd">    data_frame : pl.DataFrame</span>
-<span class="sd">        Data sorted by variable ID then timestamp.</span>
+<span class="sd">    parsed : ParsedData</span>
+<span class="sd">        Per-variable data pieces. Pieces are removed as they are joined.</span>
 <span class="sd">    verbose : int, optional</span>
 <span class="sd">        Verbosity level. 0 for no output, 2 for progress bars. Default is 1.</span>
 
@@ -619,17 +669,7 @@
 <span class="sd">    dict[int, DataInstance]</span>
 <span class="sd">        Mapping from variable ID to its DataInstance.</span>
 
-<span class="sd">    Notes</span>
-<span class="sd">    -----</span>
-<span class="sd">    Slicing the shared arrays yields zero-copy numpy views rather than duplicating data.</span>
-<span class="sd">    Variables declared in the mapping lines but absent from the data get empty arrays.</span>
 <span class="sd">    """</span>
-    <span class="n">var_ids</span> <span class="o">=</span> <span class="n">data_frame</span><span class="p">[</span><span class="s2">"var_id"</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
-    <span class="n">timestamps_all</span> <span class="o">=</span> <span class="n">data_frame</span><span class="p">[</span><span class="s2">"timestamp"</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
-    <span class="n">values_all</span> <span class="o">=</span> <span class="n">data_frame</span><span class="p">[</span><span class="s2">"value"</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
-
-    <span class="n">slice_map</span> <span class="o">=</span> <span class="n">_find_start_end_indices_for_each_unique_value</span><span class="p">(</span><span class="n">var_ids</span><span class="p">)</span>
-
     <span class="n">id_to_instance</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">DataInstance</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">progress_bar</span> <span class="o">=</span> <span class="p">(</span>
         <span class="n">tqdm</span><span class="p">(</span><span class="n">desc</span><span class="o">=</span><span class="s2">"Creating DataInstances"</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">mappings</span><span class="o">.</span><span class="n">id_to_cpp_name</span><span class="p">))</span>
@@ -638,10 +678,18 @@
     <span class="p">)</span>
 
     <span class="k">for</span> <span class="n">var_id</span><span class="p">,</span> <span class="n">cpp_name</span> <span class="ow">in</span> <span class="n">mappings</span><span class="o">.</span><span class="n">id_to_cpp_name</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-        <span class="k">if</span> <span class="n">var_id</span> <span class="ow">in</span> <span class="n">slice_map</span><span class="p">:</span>
-            <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="n">slice_map</span><span class="p">[</span><span class="n">var_id</span><span class="p">]</span>
-            <span class="n">timestamps_np</span> <span class="o">=</span> <span class="n">timestamps_all</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]</span>
-            <span class="n">values_np</span> <span class="o">=</span> <span class="n">values_all</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]</span>
+        <span class="n">timestamp_pieces</span> <span class="o">=</span> <span class="n">parsed</span><span class="o">.</span><span class="n">timestamp_chunks</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">var_id</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="n">value_pieces</span> <span class="o">=</span> <span class="n">parsed</span><span class="o">.</span><span class="n">value_chunks</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">var_id</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="k">if</span> <span class="n">timestamp_pieces</span><span class="p">:</span>
+            <span class="n">timestamps_np</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">timestamp_pieces</span><span class="p">)</span>
+            <span class="n">values_np</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">value_pieces</span><span class="p">)</span>
+
+            <span class="k">del</span> <span class="n">timestamp_pieces</span><span class="p">,</span> <span class="n">value_pieces</span>
+
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">timestamps_np</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">&lt;</span> <span class="n">timestamps_np</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]):</span>
+                <span class="n">order</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">timestamps_np</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s2">"stable"</span><span class="p">)</span>
+                <span class="n">timestamps_np</span> <span class="o">=</span> <span class="n">timestamps_np</span><span class="p">[</span><span class="n">order</span><span class="p">]</span>
+                <span class="n">values_np</span> <span class="o">=</span> <span class="n">values_np</span><span class="p">[</span><span class="n">order</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">timestamps_np</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
             <span class="n">values_np</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
@@ -686,8 +734,7 @@
 <span class="sd">    verbose : int, optional</span>
 <span class="sd">        Verbosity level. 0 for no output, 1 for basic output, 2 for detailed output. Default is 1.</span>
 <span class="sd">    build_search_index : bool, optional</span>
-<span class="sd">        Whether to vectorize variable descriptions for semantic search. Requires the</span>
-<span class="sd">        ``semantic`` extra and adds noticeable time to parsing. Default is False.</span>
+<span class="sd">        Whether to vectorize variable descriptions for semantic search. Requires the ``semantic`` extra and adds noticeable time to parsing. Default is False.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -696,8 +743,7 @@
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
-<span class="sd">    The timestamp unit is auto-detected from the header suffix: "v2.0" means</span>
-<span class="sd">    microseconds, anything else means milliseconds.</span>
+<span class="sd">    The timestamp unit is auto-detected from the header suffix: "v2.0" means microseconds, anything else means milliseconds.</span>
 <span class="sd">    """</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="s2">"r"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">header_line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
@@ -709,14 +755,13 @@
         <span class="n">creation_time</span> <span class="o">=</span> <span class="n">parse_header_creation_time</span><span class="p">(</span><span class="n">header_line</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">verbose</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Header: </span><span class="si">{</span><span class="n">header_line</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Timestamp unit: </span><span class="si">{</span><span class="n">parse_unit</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">creation_time</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Log recorded on: </span><span class="si">{</span><span class="n">creation_time</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"Header: </span><span class="si">{</span><span class="n">header_line</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span><span class="si">}</span><span class="se">\n</span><span class="s2">Timestamp unit: </span><span class="si">{</span><span class="n">parse_unit</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="se">\n</span><span class="s2">Creation time: </span><span class="si">{</span><span class="n">creation_time</span><span class="si">}</span><span class="s2">"</span>
+            <span class="p">)</span>
 
         <span class="n">mappings</span> <span class="o">=</span> <span class="n">parse_variable_id_mappings</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
 
-    <span class="n">parsed</span> <span class="o">=</span> <span class="n">read_and_sort_data</span><span class="p">(</span>
+    <span class="n">parsed</span> <span class="o">=</span> <span class="n">parse_data_lines</span><span class="p">(</span>
         <span class="n">file_path</span><span class="p">,</span>
         <span class="n">mappings</span><span class="o">.</span><span class="n">skip_rows</span><span class="p">,</span>
         <span class="n">ts_offset</span><span class="o">=</span><span class="n">ts_offset</span><span class="p">,</span>
@@ -730,7 +775,7 @@
         <span class="k">else</span> <span class="kc">None</span>
     <span class="p">)</span>
 
-    <span class="n">id_to_instance</span> <span class="o">=</span> <span class="n">build_data_instances</span><span class="p">(</span><span class="n">mappings</span><span class="p">,</span> <span class="n">parsed</span><span class="o">.</span><span class="n">data_frame</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+    <span class="n">id_to_instance</span> <span class="o">=</span> <span class="n">build_data_instances</span><span class="p">(</span><span class="n">mappings</span><span class="p">,</span> <span class="n">parsed</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">verbose</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"CSV parsing complete with </span><span class="si">{</span><span class="n">parsed</span><span class="o">.</span><span class="n">parsing_errors</span><span class="si">}</span><span class="s2"> parsing errors."</span><span class="p">)</span>
@@ -743,9 +788,9 @@
         <span class="n">id_to_cpp_name</span><span class="o">=</span><span class="n">mappings</span><span class="o">.</span><span class="n">id_to_cpp_name</span><span class="p">,</span>
         <span class="n">id_to_descript</span><span class="o">=</span><span class="n">mappings</span><span class="o">.</span><span class="n">id_to_descript</span><span class="p">,</span>
         <span class="n">creation_time</span><span class="o">=</span><span class="n">creation_time</span><span class="p">,</span>
-        <span class="n">total_data_points</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">parsed</span><span class="o">.</span><span class="n">data_frame</span><span class="p">),</span>
-        <span class="n">data_start_time</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">cast</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">parsed</span><span class="o">.</span><span class="n">data_frame</span><span class="p">[</span><span class="s2">"timestamp"</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">())),</span>
-        <span class="n">data_end_time</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">cast</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">parsed</span><span class="o">.</span><span class="n">data_frame</span><span class="p">[</span><span class="s2">"timestamp"</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">())),</span>
+        <span class="n">total_data_points</span><span class="o">=</span><span class="n">parsed</span><span class="o">.</span><span class="n">total_data_points</span><span class="p">,</span>
+        <span class="n">data_start_time</span><span class="o">=</span><span class="n">parsed</span><span class="o">.</span><span class="n">data_start_time</span><span class="p">,</span>
+        <span class="n">data_end_time</span><span class="o">=</span><span class="n">parsed</span><span class="o">.</span><span class="n">data_end_time</span><span class="p">,</span>
         <span class="n">timestamp_unit</span><span class="o">=</span><span class="n">parse_unit</span><span class="p">,</span>
         <span class="n">semantic_index</span><span class="o">=</span><span class="n">semantic_index</span><span class="p">,</span>
     <span class="p">)</span></div>
