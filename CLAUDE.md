@@ -17,7 +17,7 @@ PERDA (PER-Data-Analyzer) is Penn Electric Racing's in-house general purpose Pyt
 
 ### Code Cleanliness Rules
 
-- Always type annotate function return types and parameters. Use __future__ annotations instead of string annotations.
+- Always type annotate function return types and parameters. NEVER use string annotations. If you need forward references, instead import __future__ annotations.
 
 - Never use `TYPE_CHECKING`. If you struggle with circular imports, this is a problem with your code structure. Refactor your code to avoid circular imports.
 

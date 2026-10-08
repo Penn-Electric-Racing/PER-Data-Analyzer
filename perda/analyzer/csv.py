@@ -1,8 +1,7 @@
-from __future__ import annotations
-
 import re
+from collections.abc import Iterator
 from datetime import datetime
-from typing import TextIO, cast
+from typing import TextIO
 
 import numpy as np
 import polars as pl
@@ -21,6 +20,7 @@ DATA_COLUMN_SCHEMA = {
     "column_2": pl.Int32,
     "column_3": pl.Float64,
 }
+BATCH_BYTE_COUNT = 32 * 1024 * 1024
 VALUE_LINE_PREFIX = "Value "
 MICROSECOND_HEADER_SUFFIX = "v2.0"
 VARIABLE_LINE_PATTERN = re.compile(
@@ -54,12 +54,18 @@ class VariableMappings(BaseModel):
     )
 
 
-class ParsedDataFrame(BaseModel):
+class ParsedData(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
-    data_frame: pl.DataFrame = Field(
-        description="Data sorted by variable ID then timestamp"
+    timestamp_chunks: dict[int, list[NDArray[np.int64]]] = Field(
+        description="Per-variable timestamp pieces, one per block the variable appears in"
     )
+    value_chunks: dict[int, list[NDArray[np.float64]]] = Field(
+        description="Per-variable value pieces, aligned with timestamp_chunks"
+    )
+    total_data_points: int = Field(description="Number of valid data rows")
+    data_start_time: int = Field(description="Earliest timestamp in the data")
+    data_end_time: int = Field(description="Latest timestamp in the data")
     parsing_errors: int = Field(description="Number of rows dropped as unparseable")
 
 
@@ -211,15 +217,38 @@ def _find_start_end_indices_for_each_unique_value(
     }
 
 
-def read_and_sort_data(
+def _iter_data_blocks(file_path: str, skip_rows: int) -> Iterator[bytes]:
+    """
+    Yield the numeric data section in blocks of whole lines.
+
+    Parameters
+    ----------
+    file_path : str
+        Path to the CSV file to read.
+    skip_rows : int
+        Number of leading lines to skip before the numeric data.
+
+    Yields
+    ------
+    bytes
+        Roughly ``BATCH_BYTE_COUNT`` bytes, extended to the end of the last line.
+    """
+    with open(file_path, "rb") as file_handle:
+        for _ in range(skip_rows):
+            file_handle.readline()
+        while block := file_handle.read(BATCH_BYTE_COUNT):
+            yield block + file_handle.readline()
+
+
+def parse_data_lines(
     file_path: str,
     skip_rows: int,
     ts_offset: int = 0,
     parsing_errors_limit: int = 100,
     verbose: int = 1,
-) -> ParsedDataFrame:
+) -> ParsedData:
     """
-    Read the numeric data section and sort it by variable ID then timestamp.
+    Read the numeric data section block by block, splitting it by variable ID.
 
     Parameters
     ----------
@@ -236,54 +265,77 @@ def read_and_sort_data(
 
     Returns
     -------
-    ParsedDataFrame
-        Sorted data and the count of malformed rows dropped.
+    ParsedData
+        Per-variable data pieces and the count of malformed rows dropped.
     """
     if verbose >= 1:
         print("Reading and sorting data...")
 
-    df = pl.read_csv(
-        file_path,
-        skip_rows=skip_rows,
-        has_header=False,
-        new_columns=DATA_COLUMN_NAMES,
-        schema=DATA_COLUMN_SCHEMA,
-        ignore_errors=True,
-        glob=False,
-    )
+    timestamp_chunks: dict[int, list[NDArray[np.int64]]] = {}
+    value_chunks: dict[int, list[NDArray[np.float64]]] = {}
+    total_data_points = 0
+    parsing_errors = 0
+    block_start_times: list[int] = []
+    block_end_times: list[int] = []
 
-    parsing_errors = len(
-        df.filter(
-            df["timestamp"].is_null() | df["var_id"].is_null() | df["value"].is_null()
+    for block in _iter_data_blocks(file_path, skip_rows):
+        df = pl.read_csv(
+            block,
+            has_header=False,
+            new_columns=DATA_COLUMN_NAMES,
+            schema=DATA_COLUMN_SCHEMA,
+            ignore_errors=True,
         )
-    )
-    if parsing_errors_limit > 0 and parsing_errors >= parsing_errors_limit:
-        raise Exception("Too many data parsing errors encountered.")
 
-    df = (
-        df.drop_nulls()
-        .with_columns((pl.col("timestamp") + ts_offset).alias("timestamp"))
-        .sort(["var_id", "timestamp"])
-    )
+        valid_df = df.drop_nulls()
+        parsing_errors += len(df) - len(valid_df)
+        if parsing_errors_limit > 0 and parsing_errors >= parsing_errors_limit:
+            raise Exception("Too many data parsing errors encountered.")
+        if valid_df.is_empty():
+            continue
 
-    if df.is_empty():
+        valid_df = valid_df.with_columns(
+            (pl.col("timestamp") + ts_offset).alias("timestamp")
+        ).sort(["var_id", "timestamp"])
+        timestamps = valid_df["timestamp"].to_numpy()
+        values = valid_df["value"].to_numpy()
+
+        total_data_points += len(valid_df)
+        block_start_times.append(int(timestamps.min()))
+        block_end_times.append(int(timestamps.max()))
+
+        slice_map = _find_start_end_indices_for_each_unique_value(
+            valid_df["var_id"].to_numpy()
+        )
+        for var_id, (start, end) in slice_map.items():
+            timestamp_chunks.setdefault(var_id, []).append(timestamps[start:end].copy())
+            value_chunks.setdefault(var_id, []).append(values[start:end].copy())
+
+    if total_data_points == 0:
         raise Exception("No valid data points found after parsing.")
 
-    return ParsedDataFrame(data_frame=df, parsing_errors=parsing_errors)
+    return ParsedData(
+        timestamp_chunks=timestamp_chunks,
+        value_chunks=value_chunks,
+        total_data_points=total_data_points,
+        data_start_time=min(block_start_times),
+        data_end_time=max(block_end_times),
+        parsing_errors=parsing_errors,
+    )
 
 
 def build_data_instances(
-    mappings: VariableMappings, data_frame: pl.DataFrame, verbose: int = 1
+    mappings: VariableMappings, parsed: ParsedData, verbose: int = 1
 ) -> dict[int, DataInstance]:
     """
-    Slice the sorted data into one DataInstance per variable.
+    Join each variable's pieces into one DataInstance per variable.
 
     Parameters
     ----------
     mappings : VariableMappings
         Variable ID lookup tables.
-    data_frame : pl.DataFrame
-        Data sorted by variable ID then timestamp.
+    parsed : ParsedData
+        Per-variable data pieces. Pieces are removed as they are joined.
     verbose : int, optional
         Verbosity level. 0 for no output, 2 for progress bars. Default is 1.
 
@@ -292,17 +344,7 @@ def build_data_instances(
     dict[int, DataInstance]
         Mapping from variable ID to its DataInstance.
 
-    Notes
-    -----
-    Slicing the shared arrays yields zero-copy numpy views rather than duplicating data.
-    Variables declared in the mapping lines but absent from the data get empty arrays.
     """
-    var_ids = data_frame["var_id"].to_numpy()
-    timestamps_all = data_frame["timestamp"].to_numpy()
-    values_all = data_frame["value"].to_numpy()
-
-    slice_map = _find_start_end_indices_for_each_unique_value(var_ids)
-
     id_to_instance: dict[int, DataInstance] = {}
     progress_bar = (
         tqdm(desc="Creating DataInstances", total=len(mappings.id_to_cpp_name))
@@ -311,10 +353,18 @@ def build_data_instances(
     )
 
     for var_id, cpp_name in mappings.id_to_cpp_name.items():
-        if var_id in slice_map:
-            start, end = slice_map[var_id]
-            timestamps_np = timestamps_all[start:end]
-            values_np = values_all[start:end]
+        timestamp_pieces = parsed.timestamp_chunks.pop(var_id, [])
+        value_pieces = parsed.value_chunks.pop(var_id, [])
+        if timestamp_pieces:
+            timestamps_np = np.concatenate(timestamp_pieces)
+            values_np = np.concatenate(value_pieces)
+
+            del timestamp_pieces, value_pieces
+
+            if np.any(timestamps_np[1:] < timestamps_np[:-1]):
+                order = np.argsort(timestamps_np, kind="stable")
+                timestamps_np = timestamps_np[order]
+                values_np = values_np[order]
         else:
             timestamps_np = np.array([], dtype=np.int64)
             values_np = np.array([], dtype=np.float64)
@@ -356,8 +406,7 @@ def parse_csv(
     verbose : int, optional
         Verbosity level. 0 for no output, 1 for basic output, 2 for detailed output. Default is 1.
     build_search_index : bool, optional
-        Whether to vectorize variable descriptions for semantic search. Requires the
-        ``semantic`` extra and adds noticeable time to parsing. Default is False.
+        Whether to vectorize variable descriptions for semantic search. Requires the ``semantic`` extra and adds noticeable time to parsing. Default is False.
 
     Returns
     -------
@@ -366,8 +415,7 @@ def parse_csv(
 
     Notes
     -----
-    The timestamp unit is auto-detected from the header suffix: "v2.0" means
-    microseconds, anything else means milliseconds.
+    The timestamp unit is auto-detected from the header suffix: "v2.0" means microseconds, anything else means milliseconds.
     """
     with open(file_path, "r") as f:
         header_line = f.readline()
@@ -379,14 +427,13 @@ def parse_csv(
         creation_time = parse_header_creation_time(header_line)
 
         if verbose >= 1:
-            print(f"Header: {header_line.rstrip()}")
-            print(f"Timestamp unit: {parse_unit.value}")
-            if creation_time:
-                print(f"Log recorded on: {creation_time}")
+            print(
+                f"Header: {header_line.rstrip()}\nTimestamp unit: {parse_unit.value}\nCreation time: {creation_time}"
+            )
 
         mappings = parse_variable_id_mappings(f, verbose=verbose)
 
-    parsed = read_and_sort_data(
+    parsed = parse_data_lines(
         file_path,
         mappings.skip_rows,
         ts_offset=ts_offset,
@@ -400,7 +447,7 @@ def parse_csv(
         else None
     )
 
-    id_to_instance = build_data_instances(mappings, parsed.data_frame, verbose=verbose)
+    id_to_instance = build_data_instances(mappings, parsed, verbose=verbose)
 
     if verbose >= 1:
         print(f"CSV parsing complete with {parsed.parsing_errors} parsing errors.")
@@ -413,9 +460,9 @@ def parse_csv(
         id_to_cpp_name=mappings.id_to_cpp_name,
         id_to_descript=mappings.id_to_descript,
         creation_time=creation_time,
-        total_data_points=len(parsed.data_frame),
-        data_start_time=int(cast(int, parsed.data_frame["timestamp"].min())),
-        data_end_time=int(cast(int, parsed.data_frame["timestamp"].max())),
+        total_data_points=parsed.total_data_points,
+        data_start_time=parsed.data_start_time,
+        data_end_time=parsed.data_end_time,
         timestamp_unit=parse_unit,
         semantic_index=semantic_index,
     )
