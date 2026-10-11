@@ -71,7 +71,7 @@ def from_directory(
     directory : Path | str
         Directory to scan.
     pattern : str, optional
-        Filename glob pattern to match. Default is "*.csv".
+        Filename glob pattern to match. Default is ``"*.csv"``.
     recursive : bool, optional
         Search subdirectories as well. Default is False.
 

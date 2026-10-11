@@ -34,6 +34,16 @@ jobs:
           cd docs
           sphinx-build -b html source build
 
+      - name: Publish Docs Index
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release view docs-index || gh release create docs-index \
+            --title "Docs index" --latest=false \
+            --notes "JSON + FAISS index of the API docs, rebuilt from main on every push."
+          gh release upload docs-index \
+            docs/build_index/docs_index.json docs/build_index/docs_index.faiss --clobber
+
       # Deploy to gh-pages branch of this repo
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3

@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 
-from ..constants import DELIMITER, title_block
+from ..constants import SECTION_DIVIDER, title_block
 from ..core_data_structures.data_instance import DataInstance
 from ..core_data_structures.single_run_data import SingleRunData
 from ..units import Timescale, convert_time
@@ -58,7 +58,7 @@ class DataInstanceSummary(BaseModel):
                 ]
             )
         )
-        return f"{self.header}\n{DELIMITER}\n{body}"
+        return f"{self.header}\n{SECTION_DIVIDER}\n{body}"
 
 
 def data_instance_summary(
@@ -141,4 +141,4 @@ def single_run_summary(
     print(f"Time range:         {start_time} to {end_time} ({time_unit.value})")
     print(f"Total Variable:     {len(data.id_to_instance)}")
     print(f"Total Data Points:  {data.total_data_points}")
-    print(DELIMITER)
+    print(SECTION_DIVIDER)

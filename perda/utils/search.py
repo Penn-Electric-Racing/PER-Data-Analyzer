@@ -10,15 +10,17 @@ from numpy.typing import NDArray
 from pydantic import BaseModel, Field
 from rapidfuzz import fuzz
 
-from ..constants import DELIMITER, title_block
+from ..constants import (
+    SECTION_DIVIDER,
+    SENTENCE_EMBEDDING_DIMENSION,
+    SENTENCE_EMBEDDING_MODEL_ID,
+    title_block,
+)
 from ..core_data_structures.search_indexes import (
     VariableSemanticIndex,
     normalize_search_text,
 )
 from ..core_data_structures.single_run_data import SingleRunData
-
-HF_MODEL_ID = "sentence-transformers/all-MiniLM-L6-v2"
-EMBEDDING_DIMENSION = 384
 
 SCORE_COLUMN_WIDTH = 7
 ID_COLUMN_WIDTH = 4
@@ -91,12 +93,12 @@ def build_semantic_index(
         if verbose >= 1:
             print("Building semantic search index...")
 
-        encode = _load_encoder(HF_MODEL_ID)
+        encode = _load_encoder(SENTENCE_EMBEDDING_MODEL_ID)
         descriptions = list(id_to_descript.values())
         vectors = np.asarray(encode(descriptions), dtype=np.float32)
 
         faiss.normalize_L2(vectors)
-        faiss_index = faiss.IndexFlatIP(EMBEDDING_DIMENSION)
+        faiss_index = faiss.IndexFlatIP(SENTENCE_EMBEDDING_DIMENSION)
         faiss_index.add(vectors)
 
         return VariableSemanticIndex(
@@ -177,7 +179,7 @@ def _semantic_search(
     query: str,
     top_n: int,
 ) -> list[SearchResult]:
-    encode = _load_encoder(HF_MODEL_ID)
+    encode = _load_encoder(SENTENCE_EMBEDDING_MODEL_ID)
     query_vector = np.asarray(encode([query]), dtype=np.float32)
     faiss.normalize_L2(query_vector)
 
@@ -257,7 +259,7 @@ def _print_search_results(query: str, results: list[SearchResult]) -> None:
         f"{'ID':<{ID_COLUMN_WIDTH}}  "
         f"{'C++ Name':<{NAME_COLUMN_WIDTH}}  "
         f"{'Description'}\n"
-        f"{DELIMITER}"
+        f"{SECTION_DIVIDER}"
     )
     for result in results:
         print(result)

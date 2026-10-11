@@ -4,7 +4,7 @@ import numpy.typing as npt
 from plotly import graph_objects as go
 from tqdm import tqdm
 
-from ..constants import DELIMITER, title_block
+from ..constants import SECTION_DIVIDER, title_block
 from ..core_data_structures.data_instance import DataInstance
 from ..core_data_structures.single_run_data import SingleRunData
 from ..plotting.diff_plotter import plot_diff_bars
@@ -328,7 +328,7 @@ def diff(
     print(title_block("Diff Summary"))
     for label, value in rows:
         print(f"{label:<{col_width}}  {value}")
-    print(DELIMITER)
+    print(SECTION_DIVIDER)
 
     fig = plot_diff_bars(
         base_extra_ts=rpi_extra_all,
