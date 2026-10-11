@@ -314,15 +314,17 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">Field</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">rapidfuzz</span><span class="w"> </span><span class="kn">import</span> <span class="n">fuzz</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">..constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">DELIMITER</span><span class="p">,</span> <span class="n">title_block</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..constants</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">SECTION_DIVIDER</span><span class="p">,</span>
+    <span class="n">SENTENCE_EMBEDDING_DIMENSION</span><span class="p">,</span>
+    <span class="n">SENTENCE_EMBEDDING_MODEL_ID</span><span class="p">,</span>
+    <span class="n">title_block</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..core_data_structures.search_indexes</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">VariableSemanticIndex</span><span class="p">,</span>
     <span class="n">normalize_search_text</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..core_data_structures.single_run_data</span><span class="w"> </span><span class="kn">import</span> <span class="n">SingleRunData</span>
-
-<span class="n">HF_MODEL_ID</span> <span class="o">=</span> <span class="s2">"sentence-transformers/all-MiniLM-L6-v2"</span>
-<span class="n">EMBEDDING_DIMENSION</span> <span class="o">=</span> <span class="mi">384</span>
 
 <span class="n">SCORE_COLUMN_WIDTH</span> <span class="o">=</span> <span class="mi">7</span>
 <span class="n">ID_COLUMN_WIDTH</span> <span class="o">=</span> <span class="mi">4</span>
@@ -400,12 +402,12 @@
         <span class="k">if</span> <span class="n">verbose</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">"Building semantic search index..."</span><span class="p">)</span>
 
-        <span class="n">encode</span> <span class="o">=</span> <span class="n">_load_encoder</span><span class="p">(</span><span class="n">HF_MODEL_ID</span><span class="p">)</span>
+        <span class="n">encode</span> <span class="o">=</span> <span class="n">_load_encoder</span><span class="p">(</span><span class="n">SENTENCE_EMBEDDING_MODEL_ID</span><span class="p">)</span>
         <span class="n">descriptions</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">id_to_descript</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
         <span class="n">vectors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">encode</span><span class="p">(</span><span class="n">descriptions</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
 
         <span class="n">faiss</span><span class="o">.</span><span class="n">normalize_L2</span><span class="p">(</span><span class="n">vectors</span><span class="p">)</span>
-        <span class="n">faiss_index</span> <span class="o">=</span> <span class="n">faiss</span><span class="o">.</span><span class="n">IndexFlatIP</span><span class="p">(</span><span class="n">EMBEDDING_DIMENSION</span><span class="p">)</span>
+        <span class="n">faiss_index</span> <span class="o">=</span> <span class="n">faiss</span><span class="o">.</span><span class="n">IndexFlatIP</span><span class="p">(</span><span class="n">SENTENCE_EMBEDDING_DIMENSION</span><span class="p">)</span>
         <span class="n">faiss_index</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">vectors</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">VariableSemanticIndex</span><span class="p">(</span>
@@ -490,7 +492,7 @@
     <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">top_n</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">SearchResult</span><span class="p">]:</span>
-    <span class="n">encode</span> <span class="o">=</span> <span class="n">_load_encoder</span><span class="p">(</span><span class="n">HF_MODEL_ID</span><span class="p">)</span>
+    <span class="n">encode</span> <span class="o">=</span> <span class="n">_load_encoder</span><span class="p">(</span><span class="n">SENTENCE_EMBEDDING_MODEL_ID</span><span class="p">)</span>
     <span class="n">query_vector</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">encode</span><span class="p">([</span><span class="n">query</span><span class="p">]),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
     <span class="n">faiss</span><span class="o">.</span><span class="n">normalize_L2</span><span class="p">(</span><span class="n">query_vector</span><span class="p">)</span>
 
@@ -573,7 +575,7 @@
         <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="s1">'ID'</span><span class="si">:</span><span class="s2">&lt;</span><span class="si">{</span><span class="n">ID_COLUMN_WIDTH</span><span class="si">}}</span><span class="s2">  "</span>
         <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="s1">'C++ Name'</span><span class="si">:</span><span class="s2">&lt;</span><span class="si">{</span><span class="n">NAME_COLUMN_WIDTH</span><span class="si">}}</span><span class="s2">  "</span>
         <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="s1">'Description'</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span>
-        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">DELIMITER</span><span class="si">}</span><span class="s2">"</span>
+        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">SECTION_DIVIDER</span><span class="si">}</span><span class="s2">"</span>
     <span class="p">)</span>
     <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>

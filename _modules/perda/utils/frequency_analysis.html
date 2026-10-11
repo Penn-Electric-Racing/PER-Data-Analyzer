@@ -307,7 +307,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">numpy.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">NDArray</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">plotly</span><span class="w"> </span><span class="kn">import</span> <span class="n">graph_objects</span> <span class="k">as</span> <span class="n">go</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">..constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">DELIMITER</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">SECTION_DIVIDER</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..core_data_structures.data_instance</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataInstance</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..plotting.plotting_constants</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">DEFAULT_FONT_CONFIG</span><span class="p">,</span>
@@ -411,7 +411,7 @@
     <span class="n">W</span> <span class="o">=</span> <span class="mi">10</span>
     <span class="n">W_Label</span> <span class="o">=</span> <span class="mi">16</span>
     <span class="nb">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">data_instance</span><span class="p">))</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">DELIMITER</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">SECTION_DIVIDER</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="s1">'Duration:'</span><span class="si">:</span><span class="s2">&lt;</span><span class="si">{</span><span class="n">W_Label</span><span class="si">}}</span><span class="s2"> </span><span class="si">{</span><span class="n">total_duration_s</span><span class="si">:{</span><span class="n">W</span><span class="si">}</span><span class="s2">.3f</span><span class="si">}</span><span class="s2"> s"</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span>
         <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="s1">'Total samples:'</span><span class="si">:</span><span class="s2">&lt;</span><span class="si">{</span><span class="n">W_Label</span><span class="si">}}</span><span class="s2"> </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">data_instance</span><span class="p">)</span><span class="si">:{</span><span class="n">W</span><span class="si">}</span><span class="s2">d</span><span class="si">}</span><span class="s2">"</span>

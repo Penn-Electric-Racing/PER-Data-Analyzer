@@ -302,29 +302,20 @@
                 <article class="bd-article">
                   
   <h1>Source code for perda.constants</h1><div class="highlight"><pre>
-<span></span><span class="n">DELIMITER</span> <span class="o">=</span> <span class="s2">"="</span> <span class="o">*</span> <span class="mi">40</span>
-<span class="n">TITLE_DELIM</span> <span class="o">=</span> <span class="s2">"="</span> <span class="o">*</span> <span class="mi">5</span>
+<span></span><span class="n">SECTION_DIVIDER</span> <span class="o">=</span> <span class="s2">"="</span> <span class="o">*</span> <span class="mi">40</span>
+<span class="n">TITLE_DELIMITER</span> <span class="o">=</span> <span class="s2">"="</span> <span class="o">*</span> <span class="mi">5</span>
 
-<span class="n">R_EARTH_M</span> <span class="o">=</span> <span class="mf">6_371_000.0</span>
+<span class="n">EARTH_RADIUS_METERS</span> <span class="o">=</span> <span class="mf">6_371_000.0</span>
+
+<span class="n">SENTENCE_EMBEDDING_MODEL_ID</span> <span class="o">=</span> <span class="s2">"sentence-transformers/all-MiniLM-L6-v2"</span>
+<span class="n">SENTENCE_EMBEDDING_DIMENSION</span> <span class="o">=</span> <span class="mi">384</span>
 
 
 <div class="viewcode-block" id="title_block">
 <a class="viewcode-back" href="../../_autosummary/perda.constants.html#perda.constants.title_block">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">title_block</span><span class="p">(</span><span class="n">title</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Format a title surrounded by title delimiters.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    title : str</span>
-<span class="sd">        The title text</span>
-
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    str</span>
-<span class="sd">        Title formatted as ``===== Title =====``</span>
-<span class="sd">    """</span>
-    <span class="k">return</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">TITLE_DELIM</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">TITLE_DELIM</span><span class="si">}</span><span class="s2">"</span></div>
+<span class="w">    </span><span class="sd">"""Format a title as ``===== Title =====``"""</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">TITLE_DELIMITER</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">TITLE_DELIMITER</span><span class="si">}</span><span class="s2">"</span></div>
 
 </pre></div>
 

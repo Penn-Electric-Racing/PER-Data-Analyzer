@@ -80,7 +80,7 @@ in the commands below.
    If you change any files **outside** of the notebooks (.py files), you need to **restart** the runtime
    of the notebook.
 
-.. tip::
+.. hint::
 
    Two tutorial notebooks are included in the repository. You should be able to run both after following
    the installation instructions above.
