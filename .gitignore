@@ -15,7 +15,7 @@ perda/models/stsb-cross-encoder/
 
 # Ignore docs build artifacts
 docs/build/
-docs/build_md/
+docs/build_index/
 docs/source/_autosummary/
 
 # Ignore test artifacts

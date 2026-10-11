@@ -1,21 +1,12 @@
-DELIMITER = "=" * 40
-TITLE_DELIM = "=" * 5
+SECTION_DIVIDER = "=" * 40
+TITLE_DELIMITER = "=" * 5
 
-R_EARTH_M = 6_371_000.0
+EARTH_RADIUS_METERS = 6_371_000.0
+
+SENTENCE_EMBEDDING_MODEL_ID = "sentence-transformers/all-MiniLM-L6-v2"
+SENTENCE_EMBEDDING_DIMENSION = 384
 
 
 def title_block(title: str) -> str:
-    """
-    Format a title surrounded by title delimiters.
-
-    Parameters
-    ----------
-    title : str
-        The title text
-
-    Returns
-    -------
-    str
-        Title formatted as ``===== Title =====``
-    """
-    return f"{TITLE_DELIM} {title} {TITLE_DELIM}"
+    """Format a title as ``===== Title =====``"""
+    return f"{TITLE_DELIMITER} {title} {TITLE_DELIMITER}"

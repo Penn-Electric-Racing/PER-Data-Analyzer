@@ -5,7 +5,7 @@ import numpy as np
 import plotly.graph_objects as go
 from numpy.typing import NDArray
 
-from ..constants import R_EARTH_M
+from ..constants import EARTH_RADIUS_METERS
 from ..core_data_structures.data_instance import DataInstance, left_join_data_instances
 from ..plotting.parametric_plot import plot_parametric_trimmer
 from ..plotting.plotting_constants import (
@@ -115,8 +115,8 @@ def gps_to_enu(
     """
     lat_ref_rad = np.radians(lat_ref if lat_ref is not None else np.median(lat))
     lon_ref_rad = np.radians(lon_ref if lon_ref is not None else np.median(lon))
-    east_m = (np.radians(lon) - lon_ref_rad) * R_EARTH_M * np.cos(lat_ref_rad)
-    north_m = (np.radians(lat) - lat_ref_rad) * R_EARTH_M
+    east_m = (np.radians(lon) - lon_ref_rad) * EARTH_RADIUS_METERS * np.cos(lat_ref_rad)
+    north_m = (np.radians(lat) - lat_ref_rad) * EARTH_RADIUS_METERS
     return east_m.astype(np.float64), north_m.astype(np.float64)
 
 

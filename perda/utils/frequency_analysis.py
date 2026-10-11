@@ -3,7 +3,7 @@ from numpy import float64
 from numpy.typing import NDArray
 from plotly import graph_objects as go
 
-from ..constants import DELIMITER
+from ..constants import SECTION_DIVIDER
 from ..core_data_structures.data_instance import DataInstance
 from ..plotting.plotting_constants import (
     DEFAULT_FONT_CONFIG,
@@ -105,7 +105,7 @@ def analyze_frequency(
     W = 10
     W_Label = 16
     print(str(data_instance))
-    print(DELIMITER)
+    print(SECTION_DIVIDER)
     print(f"{'Duration:':<{W_Label}} {total_duration_s:{W}.3f} s")
     print(
         f"{'Total samples:':<{W_Label}} {len(data_instance):{W}d}"

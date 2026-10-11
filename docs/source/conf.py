@@ -24,6 +24,7 @@ import os
 import sys
 
 sys.path.insert(0, os.path.abspath("../.."))
+sys.path.insert(0, os.path.abspath("_ext"))
 
 
 # -- Autodoc Pydantic configuration ------------------------------------------
@@ -48,7 +49,7 @@ extensions = [
     "sphinx.ext.viewcode",  # Add links to source code
     "sphinx_copybutton",  # For copy buttons on code blocks
     "sphinx_design",  # For better CSS
-    "sphinx_markdown_builder",  # For MCP Markdown file
+    "docs_index",  # JSON + FAISS docs index for the MCP server (_ext/docs_index.py)
 ]
 
 # Configure autodoc-typehints to work with pydantic
