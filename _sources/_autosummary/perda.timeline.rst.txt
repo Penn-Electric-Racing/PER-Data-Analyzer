@@ -1,0 +1,16 @@
+perda.timeline
+==============
+
+.. automodule:: perda.timeline
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   client

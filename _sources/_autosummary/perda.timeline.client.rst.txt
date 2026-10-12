@@ -1,0 +1,8 @@
+perda.timeline.client
+=====================
+
+.. automodule:: perda.timeline.client
+   :members:
+   :undoc-members:
+   :show-inheritance:
+

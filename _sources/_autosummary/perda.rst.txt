@@ -19,5 +19,6 @@
    live
    plotting
    server
+   timeline
    units
    utils
