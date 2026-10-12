@@ -124,7 +124,7 @@ class TimelineClient:
             clauses.append("test_day = %s")
             params.append(test_day)
         return self.sql(
-            "SELECT test_day, start_utc, session_id, source_key, n,"
+            "SELECT test_day, start_utc, session_id, source_key, n, n_nonfinite,"
             "       v_min, v_max, v_mean, v_p01, v_p50, v_p95, v_p99,"
             "       n_changes, n_rising, hz, max_gap_us"
             " FROM v_stats WHERE " + " AND ".join(clauses) + " ORDER BY start_utc",
