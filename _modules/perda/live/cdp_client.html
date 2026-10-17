@@ -570,6 +570,8 @@
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_get_response</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="n">value_type</span><span class="p">)</span>
         <span class="k">except</span> <span class="n">socket</span><span class="o">.</span><span class="n">timeout</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">CDPException</span><span class="p">(</span><span class="s2">"Request timed out"</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">CDPException</span><span class="p">:</span>
+            <span class="k">raise</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">CDPException</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Communication error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span></div>
 
@@ -715,6 +717,8 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_parse_set_response</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
         <span class="k">except</span> <span class="n">socket</span><span class="o">.</span><span class="n">timeout</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">CDPException</span><span class="p">(</span><span class="s2">"Request timed out"</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">CDPException</span><span class="p">:</span>
+            <span class="k">raise</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">CDPException</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Communication error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span></div>
 
