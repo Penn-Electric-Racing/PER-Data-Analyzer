@@ -238,6 +238,8 @@ class CDPClient:
             return self._parse_get_response(response, value_type)
         except socket.timeout:
             raise CDPException("Request timed out")
+        except CDPException:
+            raise
         except Exception as e:
             raise CDPException(f"Communication error: {e}")
 
@@ -377,6 +379,8 @@ class CDPClient:
             self._parse_set_response(response)
         except socket.timeout:
             raise CDPException("Request timed out")
+        except CDPException:
+            raise
         except Exception as e:
             raise CDPException(f"Communication error: {e}")
 
