@@ -7,7 +7,7 @@ from mypy_boto3_s3.client import S3Client
 
 from .analyzer.analyzer import Analyzer
 
-SERVER_URL = "https://data-server.pennelectricracing.com"
+SERVER_URL = "https://dataserver.pennelectricracing.com"
 TOKEN_ENDPOINT = "/api/v1/auth/team-internal-programmatic/token"
 CREDENTIALS_ENDPOINT = "/api/v1/s3/credentials"
 
