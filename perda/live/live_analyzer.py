@@ -32,7 +32,7 @@ PlotInput = Union[
     List[Union[str, DataInstance]],
 ]
 
-_DATASERVER_IP = "198.74.62.28"
+_DATASERVER_HOST = "dataserver.pennelectricracing.com"
 _DEFAULT_PORT = 5001
 _DEFAULT_TIMEOUT = 5.0
 _DEFAULT_RANGE_TIMEOUT = 2.0
@@ -75,7 +75,7 @@ class LiveAnalyzer:
         timeout: float = _DEFAULT_TIMEOUT,
         range_timeout: float = _DEFAULT_RANGE_TIMEOUT,
     ) -> "LiveAnalyzer":
-        return cls(_DATASERVER_IP, port, timeout, range_timeout)
+        return cls(_DATASERVER_HOST, port, timeout, range_timeout)
 
     @classmethod
     def remote(
