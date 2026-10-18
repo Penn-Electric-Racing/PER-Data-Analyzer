@@ -45,8 +45,8 @@ def plot_parametric_curve(
 
     Examples
     --------
+    >>> from perda.plotting import plot_parametric_curve
     >>> fig = plot_parametric_curve(lon_arr, lat_arr, x_label="Longitude", y_label="Latitude")
-    >>> fig.show()
     """
     fig = go.Figure()
     fig.add_trace(
@@ -82,11 +82,11 @@ def plot_parametric_curve(
 def plot_parametric_trimmer(
     x: NDArray[float64],
     y: NDArray[float64],
+    timestamp_unit: Timescale,
     timestamps: NDArray[float64] | None = None,
     x_label: str = "X",
     y_label: str = "Y",
     title: str | None = None,
-    timestamp_unit: Timescale = Timescale.MS,
     layout_config: LayoutConfig = DEFAULT_LAYOUT_CONFIG,
     font_config: FontConfig = DEFAULT_FONT_CONFIG,
 ) -> widgets.VBox:
@@ -102,6 +102,8 @@ def plot_parametric_trimmer(
         X-axis values.
     y : NDArray[float64]
         Y-axis values. Must have the same length as `x`.
+    timestamp_unit : Timescale
+        Unit for timestamp labels in the slider. Ignored if `timestamps` is None. Pass ``aly.data.timestamp_unit``.
     timestamps : NDArray[float64] | None, optional
         Timestamps corresponding to each point, shown in the slider labels.
         If None, slider labels show index only.
@@ -111,8 +113,6 @@ def plot_parametric_trimmer(
         Y-axis label.
     title : str | None, optional
         Plot title.
-    timestamp_unit : Timescale, optional
-        Unit for timestamp labels in the slider. Ignored if `timestamps` is None.
     layout_config : LayoutConfig, optional
     font_config : FontConfig, optional
 
@@ -122,6 +122,7 @@ def plot_parametric_trimmer(
 
     Examples
     --------
+    >>> from perda.plotting import plot_parametric_trimmer
     >>> widget = plot_parametric_trimmer(lon_arr, lat_arr, timestamps=ts_arr, x_label="Longitude", y_label="Latitude")
     >>> display(widget)
     """

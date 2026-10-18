@@ -75,6 +75,26 @@ def plot_scatter_and_histogram(
     -------
     go.Figure
         Plotly figure with scatter and histogram subplots.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from perda.plotting import plot_scatter_and_histogram
+    >>> from perda.units import to_seconds
+    >>> di = aly.data["bms.pack.voltage"]
+    >>> fig = plot_scatter_and_histogram(
+    ...     x=to_seconds(di.timestamp_np, aly.data.timestamp_unit),
+    ...     y=di.value_np,
+    ...     title="Pack Voltage",
+    ...     scatter_title="Over time",
+    ...     histogram_title="Distribution",
+    ...     x_label="Time (s)",
+    ...     y_label="Voltage (V)",
+    ...     scatter_name="Voltage",
+    ...     histogram_name="Count",
+    ...     hline=float(np.mean(di.value_np)),
+    ...     hline_label="Mean",
+    ... )
     """
     fig = make_subplots(
         rows=2,

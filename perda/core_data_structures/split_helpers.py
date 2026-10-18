@@ -18,6 +18,15 @@ def trim_single_run_data(
     -------
     SingleRunData
         Fresh object; the original is not mutated.
+
+    Examples
+    --------
+    >>> from perda.core_data_structures import trim_single_run_data
+    >>> from perda.units import from_seconds
+    >>> start = aly.data.data_start_time
+    >>> first_minute = trim_single_run_data(
+    ...     aly.data, start, start + from_seconds(60.0, aly.data.timestamp_unit)
+    ... )
     """
     trimmed: dict[int, DataInstance] = {
         var_id: di.trim(ts_start, ts_end) for var_id, di in data.id_to_instance.items()
@@ -55,6 +64,16 @@ def split_single_run_data(
     Returns
     -------
     List[SingleRunData]
+        One SingleRunData per consecutive pair of boundaries.
+
+    Examples
+    --------
+    >>> from perda.core_data_structures import split_single_run_data
+    >>> data = aly.data
+    >>> middle = (data.data_start_time + data.data_end_time) / 2
+    >>> first_half, second_half = split_single_run_data(
+    ...     data, [data.data_start_time, middle, data.data_end_time]
+    ... )
     """
     if len(split_timestamps) < 2:
         raise ValueError(f"Need at least 2 boundary timestamps")

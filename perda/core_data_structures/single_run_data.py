@@ -14,7 +14,24 @@ from .search_indexes import (
 
 
 class SingleRunData(BaseModel):
-    """Pydantic model to store parsed CSV data with dictionary-like lookup."""
+    """
+    Pydantic model to store parsed CSV data with dictionary-like lookup.
+
+    Notes
+    -----
+    All timestamps (``data_start_time``, ``data_end_time`` and every DataInstance's
+    ``timestamp_np``) are raw integers in ``timestamp_unit``, which is microseconds for
+    current logs. Helpers that take a ``source_time_unit`` or ``timestamp_unit`` argument
+    require it; pass ``data.timestamp_unit``.
+
+    Examples
+    --------
+    >>> from perda.units import to_seconds
+    >>> data = aly.data
+    >>> di = data["pcm.wheelSpeeds.frontRight"]
+    >>> "pcm.wheelSpeeds.frontRight" in data
+    >>> duration_s = to_seconds(data.data_end_time - data.data_start_time, data.timestamp_unit)
+    """
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
@@ -135,6 +152,12 @@ class SingleRunData(BaseModel):
             C++ variable name key for the new variable.
         di : DataInstance
             DataInstance to insert.
+
+        Examples
+        --------
+        >>> power = aly.data["bms.pack.voltage"] * aly.data["bms.pack.current"]
+        >>> aly.data.add("derived.pack.power", power)
+        >>> fig = aly.plot("derived.pack.power")
         """
         if cpp_name in self:
             raise KeyError(f"'{cpp_name}' already exists; use replace() to overwrite.")
@@ -168,6 +191,11 @@ class SingleRunData(BaseModel):
           C++ variable name of the variable to replace.
         di : DataInstance
           DataInstance whose ``value_np`` that replaces the stored one.
+
+        Examples
+        --------
+        >>> voltage = aly.data["bms.pack.voltage"]
+        >>> aly.data.replace("bms.pack.voltage", voltage / 1000.0)
         """
         if cpp_name not in self:
             raise KeyError(

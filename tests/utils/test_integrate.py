@@ -39,7 +39,7 @@ def test_integrate_single_point_returns_zero():
         timestamp_np=np.array([500], dtype=np.int64),
         value_np=np.array([99.0], dtype=np.float64),
     )
-    result = integrate_over_time_range(di)
+    result = integrate_over_time_range(di, source_time_unit=Timescale.MS)
     assert result == 0.0
 
 
@@ -48,7 +48,9 @@ def test_integrate_zero_length_returns_zero():
         timestamp_np=np.array([0, 1, 2], dtype=np.int64),
         value_np=np.array([1.0, 1.0, 1.0], dtype=np.float64),
     )
-    result = integrate_over_time_range(di, start_time=1, end_time=1)
+    result = integrate_over_time_range(
+        di, start_time=1, end_time=1, source_time_unit=Timescale.MS
+    )
     assert result == 0.0
 
 
@@ -137,7 +139,7 @@ def test_average_single_point_returns_value():
         timestamp_np=np.array([42], dtype=np.int64),
         value_np=np.array([7.0], dtype=np.float64),
     )
-    avg = average_over_time_range(di)
+    avg = average_over_time_range(di, source_time_unit=Timescale.MS)
     assert avg == 7.0
 
 
@@ -146,7 +148,9 @@ def test_average_zero_time_range_returns_zero():
         timestamp_np=np.array([0, 1, 2], dtype=np.int64),
         value_np=np.array([1.0, 1.0, 1.0], dtype=np.float64),
     )
-    avg = average_over_time_range(di, start_time=5, end_time=5)
+    avg = average_over_time_range(
+        di, start_time=5, end_time=5, source_time_unit=Timescale.MS
+    )
     assert avg == 0.0
 
 

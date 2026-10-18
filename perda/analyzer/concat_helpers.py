@@ -199,8 +199,9 @@ def concat(
 
     Examples
     --------
+    >>> from perda.analyzer import concat
     >>> merged = concat(aly1, aly2)
-    >>> merged.plot("ams.pack.voltage")
+    >>> fig = merged.plot("bms.pack.voltage")
     """
     merged = object.__new__(Analyzer)
     merged.data = _concat_single_run_data(first.data, second.data, gap=gap)

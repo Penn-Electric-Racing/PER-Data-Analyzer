@@ -10,7 +10,7 @@ from ..units import Timescale, to_seconds
 def apply_time_offset(
     di: DataInstance | list[DataInstance],
     offset_s: float,
-    source_time_unit: Timescale = Timescale.MS,
+    source_time_unit: Timescale,
 ) -> DataInstance | list[DataInstance]:
     """Shift signals in time by a fixed offset, but keeping the same timestamp list.
 
@@ -23,8 +23,8 @@ def apply_time_offset(
         Input signal(s). Lists are processed independently.
     offset_s : float
         Time shift in seconds (positive shifts the signal later).
-    source_time_unit : Timescale, optional
-        Timestamp unit of ``di.timestamp_np``. Default is ``Timescale.MS``.
+    source_time_unit : Timescale
+        Timestamp unit of ``di.timestamp_np``. Pass ``aly.data.timestamp_unit``.
 
     Returns
     -------
@@ -33,8 +33,10 @@ def apply_time_offset(
 
     Examples
     --------
-    >>> di_aligned = apply_time_offset(gps_speed_di, offset_s=-0.08)
-    >>> a, b = apply_time_offset([di_a, di_b], offset_s=0.05)
+    >>> from perda.utils import apply_time_offset
+    >>> unit = aly.data.timestamp_unit
+    >>> di_aligned = apply_time_offset(gps_speed_di, offset_s=-0.08, source_time_unit=unit)
+    >>> a, b = apply_time_offset([di_a, di_b], offset_s=0.05, source_time_unit=unit)
     """
     di_list = [di] if isinstance(di, DataInstance) else di
 

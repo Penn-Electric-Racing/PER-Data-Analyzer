@@ -17,7 +17,8 @@ def deduplicate(data: DataInstance) -> DataInstance:
 
     Examples
     --------
-    >>> gps_deduped = deduplicate(analyzer.data["gps.lat"])
+    >>> from perda.core_data_structures import deduplicate
+    >>> gps_deduped = deduplicate(aly.data["gps.lat"])
     """
     src_v = data.value_np
     keep = np.concatenate(([True], src_v[1:] != src_v[:-1]))

@@ -28,7 +28,7 @@ def test_data_instance_summary_prints_nothing(capsys):
         timestamp_np=np.array([0, 500], dtype=np.int64),
         value_np=np.array([1.0, 2.0], dtype=np.float64),
     )
-    data_instance_summary(di)
+    data_instance_summary(di, source_time_unit=Timescale.MS)
     assert capsys.readouterr().out == ""
 
 
@@ -38,7 +38,7 @@ def test_data_instance_summary_empty():
         value_np=np.array([], dtype=np.float64),
         label="empty",
     )
-    summary = data_instance_summary(di)
+    summary = data_instance_summary(di, source_time_unit=Timescale.MS)
     assert summary.count == 0
     assert "Empty" in str(summary)
 
@@ -67,7 +67,7 @@ def test_data_instance_summary_min_max_reported(vals, expected_min, expected_max
         timestamp_np=np.arange(len(vals), dtype=np.int64),
         value_np=np.array(vals, dtype=np.float64),
     )
-    summary = data_instance_summary(di)
+    summary = data_instance_summary(di, source_time_unit=Timescale.MS)
     assert summary.min_value == expected_min
     assert summary.max_value == expected_max
     assert f"{expected_min:.4f}" in str(summary)

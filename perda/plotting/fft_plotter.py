@@ -57,9 +57,10 @@ def plot_fft_spectrum(
 
     Examples
     --------
-    >>> freqs, mags = compute_fft(di)
+    >>> from perda.plotting import plot_fft_spectrum
+    >>> from perda.utils import compute_fft
+    >>> freqs, mags = compute_fft(di, source_time_unit=aly.data.timestamp_unit)
     >>> fig = plot_fft_spectrum([freqs], [mags], [di.label])
-    >>> fig.show()
     """
     n = len(frequencies)
     if n == 0:

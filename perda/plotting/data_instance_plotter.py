@@ -44,12 +44,12 @@ def _add_vlines(
 
 def plot_single_axis(
     data_instances: List[DataInstance],
+    timestamp_unit: Timescale,
     title: str | None = None,
     y_axis_title: str | None = None,
     show_legend: bool = True,
     layout_config: LayoutConfig = DEFAULT_LAYOUT_CONFIG,
     font_config: FontConfig = DEFAULT_FONT_CONFIG,
-    timestamp_unit: Timescale = Timescale.MS,
     vlines: List[float] | None = None,
     vline_config: "VLineConfig" = DEFAULT_VLINE_CONFIG,
     max_points: int | None = None,
@@ -61,6 +61,8 @@ def plot_single_axis(
     ----------
     data_instances : List[DataInstance]
         List of DataInstance objects to plot
+    timestamp_unit : Timescale
+        Timestamp unit in the underlying data. Converted to seconds for x-axis display. Pass ``aly.data.timestamp_unit``.
     title : str | None, optional
         Title for the entire plot.
     y_axis_title : str | None, optional
@@ -69,8 +71,6 @@ def plot_single_axis(
         Whether to show plot legends. Default is True
     layout_config : LayoutConfig, optional
     font_config : FontConfig, optional
-    timestamp_unit : Timescale, optional
-        Timestamp unit in the underlying data. Converted to seconds for x-axis display.
     vlines : List[float] | None, optional
         X-axis positions (in seconds) where vertical lines are drawn. Default is None.
     vline_config : VLineConfig, optional
@@ -84,8 +84,13 @@ def plot_single_axis(
 
     Examples
     --------
-    >>> fig = plot_single_axis([speed_di, torque_di], title="Speed & Torque", y_axis_title="Value")
-    >>> fig.show()
+    >>> from perda.plotting import plot_single_axis
+    >>> fig = plot_single_axis(
+    ...     [speed_di, torque_di],
+    ...     title="Speed & Torque",
+    ...     y_axis_title="Value",
+    ...     timestamp_unit=aly.data.timestamp_unit,
+    ... )
     """
     if not data_instances:
         print("Warning: No data instances provided for plotting")
@@ -147,13 +152,13 @@ def plot_single_axis(
 def plot_dual_axis(
     left_data_instances: List[DataInstance],
     right_data_instances: List[DataInstance],
+    timestamp_unit: Timescale,
     title: str | None = None,
     left_y_axis_title: str | None = None,
     right_y_axis_title: str | None = None,
     show_legend: bool = True,
     font_config: FontConfig = DEFAULT_FONT_CONFIG,
     layout_config: LayoutConfig = DEFAULT_LAYOUT_CONFIG,
-    timestamp_unit: Timescale = Timescale.MS,
     vlines: List[float] | None = None,
     vline_config: VLineConfig = DEFAULT_VLINE_CONFIG,
     max_points: int | None = None,
@@ -167,6 +172,8 @@ def plot_dual_axis(
         List of DataInstance objects to plot on the left y-axis
     right_data_instances : List[DataInstance]
         List of DataInstance objects to plot on the right y-axis
+    timestamp_unit : Timescale
+        Timestamp unit in the underlying data. Converted to seconds for x-axis display. Pass ``aly.data.timestamp_unit``.
     title : str | None, optional
         Title for the entire plot.
     left_y_axis_title : str | None, optional
@@ -179,8 +186,6 @@ def plot_dual_axis(
         Font configuration for plot elements.
     layout_config : LayoutConfig, optional
         Layout configuration for plot dimensions.
-    timestamp_unit : Timescale, optional
-        Timestamp unit in the underlying data. Converted to seconds for x-axis display.
     vlines : List[float] | None, optional
         X-axis positions (in seconds) where vertical lines are drawn. Default is None.
     vline_config : VLineConfig, optional
@@ -194,8 +199,14 @@ def plot_dual_axis(
 
     Examples
     --------
-    >>> fig = plot_dual_axis([speed_di], [torque_di], left_y_axis_title="Speed (mph)", right_y_axis_title="Torque (Nm)")
-    >>> fig.show()
+    >>> from perda.plotting import plot_dual_axis
+    >>> fig = plot_dual_axis(
+    ...     [speed_di],
+    ...     [torque_di],
+    ...     left_y_axis_title="Speed (mph)",
+    ...     right_y_axis_title="Torque (Nm)",
+    ...     timestamp_unit=aly.data.timestamp_unit,
+    ... )
     """
     if not left_data_instances and not right_data_instances:
         print("Warning: No data instances provided for plotting")

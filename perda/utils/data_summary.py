@@ -63,7 +63,7 @@ class DataInstanceSummary(BaseModel):
 
 def data_instance_summary(
     data_instance: DataInstance,
-    source_time_unit: Timescale = Timescale.MS,
+    source_time_unit: Timescale,
     target_time_unit: Timescale = Timescale.S,
 ) -> DataInstanceSummary:
     """
@@ -73,8 +73,8 @@ def data_instance_summary(
     ----------
     data_instance : DataInstance
         The DataInstance to summarize
-    source_time_unit : Timescale, optional
-        Time unit of data instance. Default is milliseconds.
+    source_time_unit : Timescale
+        Time unit of data instance. Pass ``aly.data.timestamp_unit``.
     target_time_unit : Timescale, optional
         Time unit used by the summary. Default is Timescale.S.
 
@@ -85,8 +85,12 @@ def data_instance_summary(
 
     Examples
     --------
-    >>> print(data_instance_summary(aly.data["bms.pack.current"]))
-    >>> data_instance_summary(aly.data["bms.pack.current"]).max_value
+    >>> from perda.utils import data_instance_summary
+    >>> summary = data_instance_summary(
+    ...     aly.data["bms.pack.current"], source_time_unit=aly.data.timestamp_unit
+    ... )
+    >>> str(summary)
+    >>> summary.max_value
     """
     header = str(data_instance)
 
@@ -130,6 +134,20 @@ def single_run_summary(
         Data structure containing CSV file data
     time_unit : Timescale, optional
         Time unit used by the summary. Default is Timescale.S.
+
+    Notes
+    -----
+    This only prints. To keep the text, capture stdout with ``contextlib.redirect_stdout``.
+
+    Examples
+    --------
+    >>> import io
+    >>> from contextlib import redirect_stdout
+    >>> from perda.utils import single_run_summary
+    >>> buffer = io.StringIO()
+    >>> with redirect_stdout(buffer):
+    ...     single_run_summary(aly.data)
+    >>> summary_text = buffer.getvalue()
     """
     start_time = float(data.data_start_time)
     end_time = float(data.data_end_time)

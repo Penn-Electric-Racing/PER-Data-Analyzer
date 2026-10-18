@@ -32,6 +32,13 @@ def apply_sos_filter(
     NDArray[float64] | None
         Filtered signal with NaN preserved at original NaN positions, or
         ``None`` if there are too few valid samples to filter.
+
+    Examples
+    --------
+    >>> from scipy.signal import butter
+    >>> from perda.utils import apply_sos_filter
+    >>> sos = butter(4, 10.0, btype="low", fs=100.0, output="sos")
+    >>> filtered = apply_sos_filter(values, sos, order=4)
     """
     valid = ~np.isnan(signal)
     min_samples = 3 * (2 * order + 1)
@@ -49,7 +56,7 @@ def apply_sos_filter(
 def lowpass_filter(
     di: DataInstance | list[DataInstance],
     cutoff_hz: float,
-    source_time_unit: Timescale = Timescale.MS,
+    source_time_unit: Timescale,
     order: int = 4,
 ) -> DataInstance | list[DataInstance]:
     """Apply a Butterworth lowpass filter in the time domain.
@@ -71,8 +78,8 @@ def lowpass_filter(
         Input signal(s). Lists are processed independently.
     cutoff_hz : float
         Cutoff frequency in Hz.
-    source_time_unit : Timescale, optional
-        Timestamp unit of ``di.timestamp_np``. Default is ``Timescale.MS``.
+    source_time_unit : Timescale
+        Timestamp unit of ``di.timestamp_np``. Pass ``aly.data.timestamp_unit``.
     order : int, optional
         Butterworth filter order. The effective order is 2× due to
         forward-backward (``sosfiltfilt``) application. Default is 4.
@@ -84,8 +91,10 @@ def lowpass_filter(
 
     Examples
     --------
-    >>> di_filtered = lowpass_filter(di, cutoff_hz=10.0)
-    >>> di_filtered = lowpass_filter([di_a, di_b], cutoff_hz=5.0)
+    >>> from perda.utils import lowpass_filter
+    >>> unit = aly.data.timestamp_unit
+    >>> di_filtered = lowpass_filter(di, cutoff_hz=10.0, source_time_unit=unit)
+    >>> di_filtered = lowpass_filter([di_a, di_b], cutoff_hz=5.0, source_time_unit=unit)
     """
     di_list = [di] if isinstance(di, DataInstance) else di
 
@@ -164,6 +173,7 @@ def lowpass_filter_by_distance(
 
     Examples
     --------
+    >>> from perda.utils import lowpass_filter_by_distance
     >>> di_filtered = lowpass_filter_by_distance(di, distance_di, cutoff_freq_per_meter=0.05)
     """
     di_list = [di] if isinstance(di, DataInstance) else di
@@ -226,7 +236,7 @@ def zscore_filter(
     di: DataInstance | list[DataInstance],
     window_s: float,
     threshold: float,
-    source_time_unit: Timescale = Timescale.MS,
+    source_time_unit: Timescale,
 ) -> DataInstance | list[DataInstance]:
     """Remove outliers using a rolling-window z-score and interpolate gaps.
 
@@ -242,8 +252,8 @@ def zscore_filter(
         Rolling window size in seconds
     threshold : float
         Z-score threshold; samples exceeding this are masked.
-    source_time_unit : Timescale, optional
-        Timestamp unit. Default is ``Timescale.MS``.
+    source_time_unit : Timescale
+        Timestamp unit. Pass ``aly.data.timestamp_unit``.
 
     Returns
     -------
@@ -252,7 +262,10 @@ def zscore_filter(
 
     Examples
     --------
-    >>> di_clean = zscore_filter(di, window_s=1.0, threshold=3.0)
+    >>> from perda.utils import zscore_filter
+    >>> di_clean = zscore_filter(
+    ...     di, window_s=1.0, threshold=3.0, source_time_unit=aly.data.timestamp_unit
+    ... )
     """
     di_list = [di] if isinstance(di, DataInstance) else di
 
@@ -312,7 +325,7 @@ def zscore_filter(
 
 def compute_fft(
     di: DataInstance,
-    source_time_unit: Timescale = Timescale.MS,
+    source_time_unit: Timescale,
     distance_di: DataInstance | None = None,
 ) -> tuple[NDArray[float64], NDArray[float64]]:
     """Compute the real FFT magnitude spectrum of a DataInstance.
@@ -324,9 +337,8 @@ def compute_fft(
     ----------
     di : DataInstance
         Signal to transform.
-    source_time_unit : Timescale, optional
-        Timestamp unit. Used only in time-domain mode. Default is
-        ``Timescale.MS``.
+    source_time_unit : Timescale
+        Timestamp unit. Used only in time-domain mode. Pass ``aly.data.timestamp_unit``.
     distance_di : DataInstance | None, optional
         If provided, the FFT is computed in the spatial domain and the
         sample spacing is derived from cumulative distance in meters
@@ -342,7 +354,9 @@ def compute_fft(
 
     Examples
     --------
-    >>> freqs, mags = compute_fft(di)
+    >>> from perda.plotting import plot_fft_spectrum
+    >>> from perda.utils import compute_fft
+    >>> freqs, mags = compute_fft(di, source_time_unit=aly.data.timestamp_unit)
     >>> fig = plot_fft_spectrum([freqs], [mags], [di.label])
     """
     signal = di.value_np.astype(np.float64)

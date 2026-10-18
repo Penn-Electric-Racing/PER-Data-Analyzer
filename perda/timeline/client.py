@@ -82,7 +82,7 @@ class TimelineClient:
             return pl.DataFrame({column: [] for column in columns})
         return pl.DataFrame(
             {c: [_float(r[i]) for r in rows] for i, c in enumerate(columns)},
-            strict=False
+            strict=False,
         )
 
     def overview(self) -> pl.DataFrame:
@@ -178,7 +178,6 @@ class TimelineClient:
             " FROM v_stats WHERE " + " AND ".join(clauses) + f" ORDER BY {order}",
             params,
         )
-
 
     def _time_bounds(
         self, session_id: int | None = None, test_day: date | None = None
@@ -340,11 +339,10 @@ class TimelineClient:
         DataInstance
             Timestamps in microseconds relative to the session start.
         """
-        frame = self.samples(
-            var_key, session_id=session_id, test_day=test_day
-        )
+        frame = self.samples(var_key, session_id=session_id, test_day=test_day)
         meta = self.sql(
-            "SELECT var_id, description FROM timeline_variables WHERE var_key = %s", (var_key,)
+            "SELECT var_id, description FROM timeline_variables WHERE var_key = %s",
+            (var_key,),
         )
         var_id = int(meta["var_id"][0]) if meta.height else -1
         label = meta["description"][0] if meta.height else ""
