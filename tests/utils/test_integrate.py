@@ -39,7 +39,7 @@ def test_integrate_single_point_returns_zero():
         timestamp_np=np.array([500], dtype=np.int64),
         value_np=np.array([99.0], dtype=np.float64),
     )
-    result = integrate_over_time_range(di)
+    result = integrate_over_time_range(di, source_time_unit=Timescale.MS)
     assert result == 0.0
 
 
@@ -48,7 +48,9 @@ def test_integrate_zero_length_returns_zero():
         timestamp_np=np.array([0, 1, 2], dtype=np.int64),
         value_np=np.array([1.0, 1.0, 1.0], dtype=np.float64),
     )
-    result = integrate_over_time_range(di, start_time=1, end_time=1)
+    result = integrate_over_time_range(
+        di, start_time=1, end_time=1, source_time_unit=Timescale.MS
+    )
     assert result == 0.0
 
 
@@ -132,12 +134,36 @@ def test_average_linear_ramp_midpoint():
     assert pytest.approx(avg, abs=1e-9) == 1.0
 
 
+def test_average_window_matches_integral_over_duration():
+    # Ramp 0->10 over 0..10 s; average over [2 s, 6 s] is 4.0
+    di = DataInstance(
+        timestamp_np=np.arange(0, 10001, 100, dtype=np.int64),
+        value_np=np.linspace(0.0, 10.0, 101, dtype=np.float64),
+    )
+    avg = average_over_time_range(
+        di,
+        start_time=2,
+        end_time=6,
+        source_time_unit=Timescale.MS,
+        target_time_unit=Timescale.S,
+    )
+    integral = integrate_over_time_range(
+        di,
+        start_time=2,
+        end_time=6,
+        source_time_unit=Timescale.MS,
+        target_time_unit=Timescale.S,
+    )
+    assert pytest.approx(avg, abs=1e-9) == 4.0
+    assert pytest.approx(avg, abs=1e-9) == integral / 4
+
+
 def test_average_single_point_returns_value():
     di = DataInstance(
         timestamp_np=np.array([42], dtype=np.int64),
         value_np=np.array([7.0], dtype=np.float64),
     )
-    avg = average_over_time_range(di)
+    avg = average_over_time_range(di, source_time_unit=Timescale.MS)
     assert avg == 7.0
 
 
@@ -146,7 +172,9 @@ def test_average_zero_time_range_returns_zero():
         timestamp_np=np.array([0, 1, 2], dtype=np.int64),
         value_np=np.array([1.0, 1.0, 1.0], dtype=np.float64),
     )
-    avg = average_over_time_range(di, start_time=5, end_time=5)
+    avg = average_over_time_range(
+        di, start_time=5, end_time=5, source_time_unit=Timescale.MS
+    )
     assert avg == 0.0
 
 

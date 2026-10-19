@@ -11,7 +11,22 @@ US_PER_SECOND = 1_000_000
 
 
 class Timescale(Enum):
-    """Supported timestamp units for time-series data."""
+    """
+    Supported timestamp units for time-series data.
+
+    Notes
+    -----
+    Every log stores raw timestamps in one native unit, given by
+    ``SingleRunData.timestamp_unit``. Current logs use ``Timescale.US``. Helpers that
+    take a ``source_time_unit`` or ``timestamp_unit`` argument require it; pass
+    ``data.timestamp_unit``.
+
+    Examples
+    --------
+    >>> from perda.units import Timescale
+    >>> aly.data.timestamp_unit
+    <Timescale.US: 'us'>
+    """
 
     US = "us"
     MS = "ms"
@@ -26,12 +41,18 @@ def to_seconds(timestamp: Numeric, source_time_unit: Timescale) -> Numeric:
     timestamp : float | NDArray[Float64]
         Timestamp(s) to convert.
     source_time_unit : Timescale
-        Unit of the input timestamp.
+        Unit of the input timestamp. Pass ``aly.data.timestamp_unit``.
 
     Returns
     -------
     float | NDArray[Float64]
         Timestamp(s) in seconds.
+
+    Examples
+    --------
+    >>> from perda.units import to_seconds
+    >>> di = aly.data["pcm.wheelSpeeds.frontRight"]
+    >>> time_s = to_seconds(di.timestamp_np, aly.data.timestamp_unit)
     """
     if source_time_unit == Timescale.US:
         return timestamp / 1e6
@@ -54,6 +75,11 @@ def from_seconds(timestamp_s: Numeric, target_time_unit: Timescale) -> Numeric:
     -------
     float | NDArray[Float64]
         Timestamp(s) in the target unit.
+
+    Examples
+    --------
+    >>> from perda.units import from_seconds
+    >>> ts_start = aly.data.data_start_time + from_seconds(10.0, aly.data.timestamp_unit)
     """
     if target_time_unit == Timescale.US:
         return timestamp_s * 1e6
@@ -84,7 +110,7 @@ def convert_time(
     timestamp : float | NDArray[Float64]
         Timestamp(s) to convert.
     source_time_unit : Timescale
-        Unit of the input timestamp.
+        Unit of the input timestamp. Pass ``aly.data.timestamp_unit``.
     target_time_unit : Timescale
         Desired output unit.
 
@@ -95,6 +121,7 @@ def convert_time(
 
     Examples
     --------
+    >>> from perda.units import Timescale, convert_time
     >>> convert_time(5000.0, Timescale.MS, Timescale.S)
     5.0
     """
@@ -120,6 +147,7 @@ def mph_to_m_per_s(value: Numeric) -> Numeric:
 
     Examples
     --------
+    >>> from perda.units import mph_to_m_per_s
     >>> mph_to_m_per_s(1.0)
     0.44704
     """
@@ -145,6 +173,7 @@ def in_to_m(value: Numeric) -> Numeric:
 
     Examples
     --------
+    >>> from perda.units import in_to_m
     >>> in_to_m(1.0)
     0.0254
     """

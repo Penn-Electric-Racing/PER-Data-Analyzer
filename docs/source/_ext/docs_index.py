@@ -2,86 +2,175 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import faiss
-import numpy as np
+from docutils import nodes
+from docutils.frontend import get_default_settings
+from docutils.io import StringOutput
+from docutils.utils import new_document
 from pydantic import BaseModel, Field
-from sentence_transformers import SentenceTransformer
+from sphinx import addnodes
 from sphinx.application import Sphinx
+from sphinx.writers.text import TextWriter
 
-from perda.constants import SENTENCE_EMBEDDING_MODEL_ID
+# Object types kept inside their parent's entry, e.g. a pydantic model's fields
+MEMBER_KINDS = {"attribute", "pydantic_field"}
 
 
 class DocsIndexEntry(BaseModel):
-    name: str = Field(description="Fully qualified name of the documented object")
-    kind: str = Field(description="Autodoc object type, e.g. class or method")
-    docstring: str = Field(description="The object's complete docstring")
-
-
-class DocsIndex(BaseModel):
-    model: str = Field(description="Sentence-transformers model behind the vectors")
-    entries: list[DocsIndexEntry] = Field(description="Every documented object")
-    row_to_entry: list[int] = Field(
-        description="Maps each FAISS row to its position in entries"
+    name: str = Field(description="Fully qualified name, or the docname of a page")
+    kind: str = Field(description="Object type, e.g. class or method, or page")
+    summary: str = Field(
+        description="First paragraph of the docstring, or the page title"
+    )
+    text: str = Field(
+        description="The object's documentation, as the text builder renders it"
     )
 
 
-ENTRIES: dict[str, DocsIndexEntry] = {}
+class DocsIndex(BaseModel):
+    entries: list[DocsIndexEntry] = Field(
+        description="Every documented object and page"
+    )
 
 
-def record_docstring(
-    app: Sphinx, what: str, name: str, obj: object, options: object, lines: list[str]
-) -> None:
-    """Store the docstring of each object autodoc documents."""
-    docstring = "\n".join(lines).strip()
-    if docstring:
-        ENTRIES[name] = DocsIndexEntry(name=name, kind=what, docstring=docstring)
+# Filled page by page during the build, then written out by write_index
+ENTRIES: list[DocsIndexEntry] = []
+
+
+def render_text(app: Sphinx, nodes_to_render: list[nodes.Node]) -> str:
+    """
+    Render doctree nodes to plain text, as the text builder would render them on a page.
+
+    Parameters
+    ----------
+    app : Sphinx
+        The running Sphinx application. Its builder must be the text builder.
+    nodes_to_render : list of nodes.Node
+        Nodes to render, detached from their page (pass copies).
+
+    Returns
+    -------
+    str
+        The rendered text, stripped.
+
+    Notes
+    -----
+    Once a page's doctree is final (the ``doctree-resolved`` event), this extension renders each
+    ``desc`` node to text with the same writer the text builder uses for whole pages.
+    The writer renders whole documents, so the nodes go into a new, empty one. It needs the
+    text writer's default settings, plus the build environment that Sphinx's translator reads.
+    """
+    writer = TextWriter(app.builder)
+    settings = get_default_settings(writer)
+    settings.env = app.env
+    document = new_document("", settings)
+    document.extend(nodes_to_render)
+    writer.write(document, StringOutput(encoding="unicode"))
+    return writer.output.strip()
+
+
+def record_entries(app: Sphinx, doctree: nodes.document, docname: str) -> None:
+    """
+    Add an entry to ``ENTRIES`` for each object documented on a page.
+
+    Called by Sphinx for every page once its doctree is final.
+
+    Parameters
+    ----------
+    app : Sphinx
+        The running Sphinx application.
+    doctree : nodes.document
+        The page's doctree.
+    docname : str
+        The page's path in the source tree without its extension, e.g. ``getting_started/index``.
+
+    Notes
+    -----
+    Sphinx parses every page into a doctree, a tree of nodes. For each object it documents,
+    autodoc adds one ``desc`` node with two children: a ``desc_signature`` (the signature line,
+    whose ``ids`` hold the fully qualified name) and a ``desc_content`` (the rendered docstring).
+    A class's ``desc_content`` holds its members' ``desc`` nodes in turn.
+
+    - **Object entries:** a class's entry keeps its fields but drops its methods and nested
+      classes, which get entries of their own. That keeps each entry about one object.
+    - **Summary:** the first paragraph of the docstring. Autodoc's ``Bases: ...`` line is
+      skipped, and so are objects with no docstring, which get an empty summary.
+    - **Pages without objects:** a hand-written page such as Getting Started becomes one
+      ``page`` entry. Autosummary's generated package pages are skipped, since they only list
+      their modules.
+    """
+    # Under any other builder, TextWriter would get that builder's translator instead
+    if app.builder.name != "text":
+        return
+
+    # findall collects top-level objects (classes, functions) and objects nested inside a class's desc_content
+    # (methods, nested classes). Attributes and pydantic fields are left out: they stay inside their class's entry.
+    descs = [
+        desc
+        for desc in doctree.findall(addnodes.desc)
+        if desc["objtype"] not in MEMBER_KINDS
+    ]
+
+    # No documented objects means a hand-written page (or an autosummary package page)
+    if not descs:
+        if docname.startswith("_autosummary/"):
+            return
+        title = next(doctree.findall(nodes.title), None)
+        text = render_text(app, [child.deepcopy() for child in doctree.children])
+        if title is not None and text:
+            ENTRIES.append(
+                DocsIndexEntry(
+                    name=docname, kind="page", summary=title.astext(), text=text
+                )
+            )
+        return
+
+    for desc in descs:
+        node = desc.deepcopy()
+        for nested in list(node.findall(addnodes.desc))[1:]:
+            # Keep only nested attributed and pydantic fields, everything else documented already
+            if nested["objtype"] not in MEMBER_KINDS and nested.parent is not None:
+                nested.parent.remove(nested)
+        # The first desc_content in tree order is this object's own docstring
+        content = next(node.findall(addnodes.desc_content))
+        # Get the first paragraph of the docstring, skipping autodoc's "Bases: ..." line
+        summary = next(
+            (
+                child.astext()
+                for child in content.children
+                if isinstance(child, nodes.paragraph)
+                and not child.astext().startswith("Bases: ")
+            ),
+            "",
+        )
+        ENTRIES.append(
+            DocsIndexEntry(
+                name=next(desc.findall(addnodes.desc_signature))["ids"][0],
+                kind=desc["objtype"],
+                summary=" ".join(summary.split()),
+                text=render_text(app, [node]),
+            )
+        )
 
 
 def write_index(app: Sphinx, exception: Exception | None) -> None:
     """
-    Embed every docstring into a FAISS index and write it next to the JSON entries.
+    Write every recorded entry, sorted by name, to ``docs_index.json`` in the build directory.
 
-    Notes
-    -----
-    The model reads at most 256 tokens, so each docstring paragraph gets its own vector.
-    ``row_to_entry`` maps every vector back to its whole entry.
+    Called by Sphinx once the build ends. Sorting by name puts each class just above its methods.
+    Writes nothing if the build failed or wasn't a text build.
     """
-    if exception is not None:
+    if exception is not None or app.builder.name != "text":
         return
-
-    entries = sorted(ENTRIES.values(), key=lambda entry: entry.name)
-    texts: list[str] = []
-    row_to_entry: list[int] = []
-    for position, entry in enumerate(entries):
-        for paragraph in entry.docstring.split("\n\n"):
-            texts.append(f"{entry.name}: {paragraph}")
-            row_to_entry.append(position)
-
-    vectors = (
-        SentenceTransformer(SENTENCE_EMBEDDING_MODEL_ID)
-        .encode(texts)
-        .astype(np.float32)
-    )
-    faiss.normalize_L2(vectors)
-    index = faiss.IndexFlatIP(vectors.shape[1])
-    index.add(vectors)
-
-    docs_index = DocsIndex(
-        model=SENTENCE_EMBEDDING_MODEL_ID,
-        entries=entries,
-        row_to_entry=row_to_entry,
-    )
-
-    # Outside build/ so the index isn't deployed to GitHub Pages
-    outdir = Path(app.confdir).parent / "build_index"
-    outdir.mkdir(exist_ok=True)
-    faiss.write_index(index, str(outdir / "docs_index.faiss"))
-    (outdir / "docs_index.json").write_text(
+    docs_index = DocsIndex(entries=sorted(ENTRIES, key=lambda entry: entry.name))
+    (Path(app.outdir) / "docs_index.json").write_text(
         docs_index.model_dump_json(indent=2), encoding="utf-8"
     )
 
 
 def setup(app: Sphinx) -> None:
-    # Run before napoleon and typehints (priority 500) rewrite the docstring into rST
-    app.connect("autodoc-process-docstring", record_docstring, priority=400)
+    """
+    Register the extension's handlers with Sphinx.
+    The extension saves one entry per object, and writes them all to ``docs_index.json`` once the build finishes.
+    """
+    app.connect("doctree-resolved", record_entries)
     app.connect("build-finished", write_index)

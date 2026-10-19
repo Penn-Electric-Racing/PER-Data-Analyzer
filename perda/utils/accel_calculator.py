@@ -81,8 +81,8 @@ def detect_accel_event(
 def compute_accel_results(
     signal_obj: DataInstance,
     distance_obj: DataInstance,
+    source_time_unit: Timescale,
     target_dist: float = 75,
-    source_time_unit: Timescale = Timescale.MS,
     target_time_unit: Timescale = Timescale.S,
 ) -> list[AccelSegmentResult]:
     """Compute time-to-distance results for each acceleration event.
@@ -93,10 +93,10 @@ def compute_accel_results(
         Binary accel event signal (0.0/1.0), typically from `detect_accel_event`.
     distance_obj : DataInstance
         Cumulative distance signal in meters.
+    source_time_unit : Timescale
+        Time unit of input timestamps. Pass ``aly.data.timestamp_unit``.
     target_dist : float, optional
         Target distance in meters. Default is 75.
-    source_time_unit : Timescale, optional
-        Time unit of input timestamps. Default is Timescale.MS.
     target_time_unit : Timescale, optional
         Time unit for output times. Default is Timescale.S.
 
@@ -107,7 +107,7 @@ def compute_accel_results(
 
     Examples
     --------
-    >>> results = compute_accel_results(signal_di, distance_di)
+    >>> results = compute_accel_results(signal_di, distance_di, aly.data.timestamp_unit)
     >>> for r in results:
     ...     print(r)
     """

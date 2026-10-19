@@ -11,9 +11,9 @@ from ..units import MAD_TO_STD, Timescale, convert_time
 
 def integrate_over_time_range(
     data_instance: DataInstance,
+    source_time_unit: Timescale,
     start_time: int = 0,
     end_time: int = -1,
-    source_time_unit: Timescale = Timescale.MS,
     target_time_unit: Timescale = Timescale.S,
 ) -> float:
     """
@@ -23,14 +23,15 @@ def integrate_over_time_range(
     ----------
     data_instance : DataInstance
         DataInstance to integrate
+    source_time_unit : Timescale
+        Time unit of ``data_instance.timestamp_np``. Pass ``aly.data.timestamp_unit``.
     start_time : int, optional
-        Start time for integration. Default is 0
+        Start of the window, as an absolute timestamp in ``target_time_unit``. Default is 0
     end_time : int, optional
-        End time for integration. -1 means end of data. Default is -1
-    source_time_unit : Timescale, optional
-        Time unit of inputs. Default is Timescale.MS
+        End of the window, as an absolute timestamp in ``target_time_unit``. -1 means end
+        of data. Default is -1
     target_time_unit : Timescale, optional
-        Target time unit for averaging. Default is Timescale.S
+        Time unit to integrate over, e.g. seconds gives value * seconds. Default is Timescale.S
 
     Returns
     -------
@@ -40,6 +41,14 @@ def integrate_over_time_range(
     Notes
     -----
     Uses numpy.trapezoid (trapezoidal rule) for numerical integration of discrete data.
+
+    Examples
+    --------
+    >>> from perda.utils import integrate_over_time_range
+    >>> current = aly.data["bms.pack.current"]
+    >>> charge_amp_seconds = integrate_over_time_range(
+    ...     current, source_time_unit=aly.data.timestamp_unit
+    ... )
     """
     if len(data_instance.timestamp_np) < 2:
         return 0.0
@@ -73,9 +82,9 @@ def integrate_over_time_range(
 
 def average_over_time_range(
     data_instance: DataInstance,
+    source_time_unit: Timescale,
     start_time: int = 0,
     end_time: int = -1,
-    source_time_unit: Timescale = Timescale.MS,
     target_time_unit: Timescale = Timescale.S,
 ) -> float:
     """
@@ -85,14 +94,15 @@ def average_over_time_range(
     ----------
     data_instance : DataInstance
         DataInstance to average
+    source_time_unit : Timescale
+        Time unit of ``data_instance.timestamp_np``. Pass ``aly.data.timestamp_unit``.
     start_time : int, optional
-        Start time for averaging. Default is 0
+        Start of the window, as an absolute timestamp in ``target_time_unit``. Default is 0
     end_time : int, optional
-        End time for averaging. -1 means end of data. Default is -1
-    source_time_unit : Timescale, optional
-        Time unit of inputs. Default is Timescale.MS
+        End of the window, as an absolute timestamp in ``target_time_unit``. -1 means end
+        of data. Default is -1
     target_time_unit : Timescale, optional
-        Target time unit for averaging. Default is Timescale.S
+        Time unit of ``start_time`` and ``end_time``. Default is Timescale.S
 
     Returns
     -------
@@ -102,22 +112,33 @@ def average_over_time_range(
     Notes
     -----
     Uses numpy.trapezoid (trapezoidal rule) for numerical integration of discrete data.
+
+    Examples
+    --------
+    >>> from perda.utils import average_over_time_range
+    >>> voltage = aly.data["bms.pack.voltage"]
+    >>> mean_voltage = average_over_time_range(
+    ...     voltage, source_time_unit=aly.data.timestamp_unit
+    ... )
     """
     if len(data_instance.timestamp_np) == 1:
         return float(data_instance.value_np[0])
 
     integral = integrate_over_time_range(
-        data_instance, start_time, end_time, source_time_unit, target_time_unit
+        data_instance,
+        source_time_unit,
+        start_time=start_time,
+        end_time=end_time,
+        target_time_unit=target_time_unit,
     )
 
-    ts = data_instance.timestamp_np.astype(np.float64)
+    ts: NDArray[float64] = convert_time(
+        data_instance.timestamp_np.astype(np.float64),
+        source_time_unit,
+        target_time_unit,
+    )
     actual_start_time = max(start_time, ts[0])
     actual_end_time = ts[-1] if end_time == -1 else min(end_time, ts[-1])
-
-    actual_start_time = convert_time(
-        actual_start_time, source_time_unit, target_time_unit
-    )
-    actual_end_time = convert_time(actual_end_time, source_time_unit, target_time_unit)
 
     time_range = actual_end_time - actual_start_time
 
@@ -143,6 +164,16 @@ def get_data_slice_by_timestamp(
     -------
     DataInstance
         New DataInstance containing only data within the specified time range
+
+    Notes
+    -----
+    ``start_time`` and ``end_time`` are raw timestamps, in ``aly.data.timestamp_unit``.
+
+    Examples
+    --------
+    >>> from perda.utils import get_data_slice_by_timestamp
+    >>> di = aly.data["pcm.wheelSpeeds.frontRight"]
+    >>> first_half = get_data_slice_by_timestamp(di, end_time=int(di.timestamp_np[len(di) // 2]))
     """
     if end_time < 0:
         mask = original_instance.timestamp_np >= start_time
@@ -160,7 +191,7 @@ def get_data_slice_by_timestamp(
 
 def smoothed_filtered_integration(
     data: DataInstance,
-    source_time_unit: Timescale = Timescale.US,
+    source_time_unit: Timescale,
     target_time_unit: Timescale = Timescale.S,
     filter_window_size: int = 10,
     n_sigmas: float = 3,
@@ -177,7 +208,7 @@ def smoothed_filtered_integration(
     data : DataInstance
         Time-series signal to integrate.
     source_time_unit : Timescale
-        Time unit of inputs. Default is Timescale.US.
+        Time unit of ``data.timestamp_np``. Pass ``aly.data.timestamp_unit``.
     target_time_unit : Timescale
         Target time unit for integration result. Default is Timescale.S.
     filter_window_size : int
@@ -194,6 +225,14 @@ def smoothed_filtered_integration(
     tuple[NDArray[Float64], NDArray[Float64], NDArray[Float64]]
         A tuple of (timestamps, smoothed values, cumulative integral), all of the
         same length as the input signal.
+
+    Examples
+    --------
+    >>> from perda.utils import smoothed_filtered_integration
+    >>> power = aly.data["bms.pack.voltage"] * aly.data["bms.pack.current"]
+    >>> ts, smoothed_power, energy_joules = smoothed_filtered_integration(
+    ...     power, source_time_unit=aly.data.timestamp_unit
+    ... )
     """
     v_np = np.array(data.value_np, dtype=np.float64)
     t = np.array(data.timestamp_np, dtype=np.float64)

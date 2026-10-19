@@ -377,15 +377,6 @@ def test_resample_to_freq_zoh_method():
     np.testing.assert_allclose(result.value_np, [5.0, 5.0, 5.0, 5.0])
 
 
-def test_resample_to_freq_defaults_to_milliseconds():
-    di = DataInstance(
-        timestamp_np=np.array([0, 1000], dtype=np.int64),
-        value_np=np.array([0.0, 10.0]),
-    )
-    result = di.resample_to_freq(freq_hz=2.0)
-    np.testing.assert_array_equal(result.timestamp_np, [0, 500])
-
-
 def test_resample_to_freq_preserves_metadata():
     di = DataInstance(
         timestamp_np=np.array([0, 1_000_000], dtype=np.int64),

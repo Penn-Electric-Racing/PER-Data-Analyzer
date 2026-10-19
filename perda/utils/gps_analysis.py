@@ -22,10 +22,10 @@ from ..units import Timescale
 def plot_gps_trimmer(
     lat: DataInstance,
     lon: DataInstance,
+    timestamp_unit: Timescale,
     title: str | None = None,
     layout_config: LayoutConfig = DEFAULT_LAYOUT_CONFIG,
     font_config: FontConfig = DEFAULT_FONT_CONFIG,
-    timestamp_unit: Timescale = Timescale.MS,
 ) -> widgets.VBox:
     """
     Interactive GPS coordinate trimmer with a dual-handle range slider.
@@ -40,11 +40,11 @@ def plot_gps_trimmer(
         Latitude values. Must have the same length and identical timestamps as `lon`.
     lon : DataInstance
         Longitude values. Must have the same length and identical timestamps as `lat`.
+    timestamp_unit : Timescale
+        Timestamp unit used for the slider timestamp labels. Pass ``aly.data.timestamp_unit``.
     title : str | None, optional
     layout_config : LayoutConfig, optional
     font_config : FontConfig, optional
-    timestamp_unit : Timescale, optional
-        Timestamp unit used for the slider timestamp labels.
 
     Returns
     -------
@@ -52,7 +52,8 @@ def plot_gps_trimmer(
 
     Examples
     --------
-    >>> widget = plot_gps_trimmer(lat_di, lon_di, title="GPS Track")
+    >>> from perda.utils import plot_gps_trimmer
+    >>> widget = plot_gps_trimmer(lat_di, lon_di, aly.data.timestamp_unit, title="GPS Track")
     >>> display(widget)
     """
     if len(lat) != len(lon):
@@ -111,6 +112,7 @@ def gps_to_enu(
 
     Examples
     --------
+    >>> from perda.utils import gps_to_enu
     >>> east, north = gps_to_enu(lat_array, lon_array)
     """
     lat_ref_rad = np.radians(lat_ref if lat_ref is not None else np.median(lat))
@@ -150,6 +152,7 @@ def filter_gps_cartesian(
 
     Examples
     --------
+    >>> from perda.utils import filter_gps_cartesian
     >>> mask = filter_gps_cartesian(lat_array, lon_array)
     >>> lat_clean, lon_clean = lat_array[mask], lon_array[mask]
     """
@@ -194,11 +197,11 @@ def plot_gps_comparison(
 
     Examples
     --------
+    >>> from perda.utils import plot_gps_comparison
     >>> fig = plot_gps_comparison(
     ...     [(lat1, lon1, "Run 1"), (lat2, lon2, "Run 2")],
     ...     title="GPS Comparison",
     ... )
-    >>> fig.show()
     """
 
     all_lat = np.concatenate([lat for lat, _, _ in runs])
@@ -284,8 +287,8 @@ def create_representative_gps_image(
 
     Examples
     --------
+    >>> from perda.utils import create_representative_gps_image
     >>> fig = create_representative_gps_image(lat_di, lon_di, vel_raw=vel_di, title="Lap Track")
-    >>> fig.show()
     """
     lat_aligned, lon_aligned = left_join_data_instances(lat_raw, lon_raw)
 

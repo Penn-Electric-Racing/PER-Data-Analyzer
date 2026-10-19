@@ -109,6 +109,11 @@ class RunCollection:
         -------
         Analyzer
             Analyzer for that run. Repeated calls reuse the same instance.
+
+        Examples
+        --------
+        >>> first_run = col.get_run_by_chronological_index(0)
+        >>> latest_run = col.get_run_by_chronological_index(-1)
         """
         return self._load(self._runs_by_date[index])
 
@@ -258,7 +263,7 @@ class RunCollection:
 
         Examples
         --------
-        >>> col.plot_comparison("pcm.wheelSpeeds.frontLeft", max_points=20000).show()
+        >>> fig = col.plot_comparison("pcm.wheelSpeeds.frontLeft", max_points=20000)
         """
         overlaid = []
         for run, analyzer in self._iter_analyzers():

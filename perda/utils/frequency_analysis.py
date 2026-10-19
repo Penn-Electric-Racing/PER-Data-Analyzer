@@ -28,8 +28,8 @@ def _s_conversion_factor(time_unit: Timescale) -> float:
 
 def analyze_frequency(
     data_instance: DataInstance,
+    source_time_unit: Timescale,
     expected_frequency_hz: float | None = None,
-    source_time_unit: Timescale = Timescale.MS,
     gap_threshold_multiplier: float = 2.0,
     font_config: FontConfig = DEFAULT_FONT_CONFIG,
     layout_config: LayoutConfig = DEFAULT_LAYOUT_CONFIG,
@@ -46,12 +46,12 @@ def analyze_frequency(
     ----------
     data_instance : DataInstance
         The DataInstance whose logging cadence to analyse.
+    source_time_unit : Timescale
+        Timestamp unit used in ``data_instance.timestamp_np``. Pass ``aly.data.timestamp_unit``.
     expected_frequency_hz : float | None, optional
         Nominal expected sampling frequency in Hz. When provided, additional
         diagnostics (frequency error, missed-message estimate, reference lines)
         are included. Default is None.
-    source_time_unit : Timescale, optional
-        Timestamp unit used in ``data_instance.timestamp_np``. Default is ms.
     gap_threshold_multiplier : float, optional
         An interval is flagged as a gap when it exceeds this multiple of the
         expected interval (if ``expected_frequency_hz`` is given) or the median
@@ -70,8 +70,10 @@ def analyze_frequency(
 
     Examples
     --------
-    >>> fig = analyze_frequency(di, expected_frequency_hz=100)
-    >>> fig.show()
+    >>> from perda.utils import analyze_frequency
+    >>> fig = analyze_frequency(
+    ...     di, expected_frequency_hz=100, source_time_unit=aly.data.timestamp_unit
+    ... )
     """
     label = data_instance.label or f"var_id={data_instance.var_id}"
 

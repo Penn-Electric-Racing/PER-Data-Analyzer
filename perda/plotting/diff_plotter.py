@@ -87,6 +87,11 @@ def plot_diff_bars(
     Returns
     -------
     go.Figure
+
+    Examples
+    --------
+    >>> from perda.plotting import plot_diff_bars
+    >>> fig = plot_diff_bars(base_only_ts, incoming_only_ts, mismatch_ts, all_ts)
     """
     if total_present_ts.size == 0:
         print("No diff events to plot.")

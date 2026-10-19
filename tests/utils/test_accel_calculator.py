@@ -92,25 +92,33 @@ def test_detect_accel_event_label(accel_torque, accel_speed):
 
 def test_compute_accel_results_returns_list(accel_scenario):
     sig, dist = accel_scenario
-    results = compute_accel_results(sig, dist, target_dist=75)
+    results = compute_accel_results(
+        sig, dist, target_dist=75, source_time_unit=Timescale.MS
+    )
     assert isinstance(results, list)
 
 
 def test_compute_accel_results_one_event_detected(accel_scenario):
     sig, dist = accel_scenario
-    results = compute_accel_results(sig, dist, target_dist=75)
+    results = compute_accel_results(
+        sig, dist, target_dist=75, source_time_unit=Timescale.MS
+    )
     assert len(results) == 1
 
 
 def test_compute_accel_results_dist_reached_matches_target(accel_scenario):
     sig, dist = accel_scenario
-    results = compute_accel_results(sig, dist, target_dist=75)
+    results = compute_accel_results(
+        sig, dist, target_dist=75, source_time_unit=Timescale.MS
+    )
     assert results[0].dist_reached == 75
 
 
 def test_compute_accel_results_time_to_dist_positive(accel_scenario):
     sig, dist = accel_scenario
-    results = compute_accel_results(sig, dist, target_dist=75)
+    results = compute_accel_results(
+        sig, dist, target_dist=75, source_time_unit=Timescale.MS
+    )
     assert results[0].time_to_dist > 0
 
 
@@ -119,7 +127,7 @@ def test_compute_accel_results_no_event_when_signal_all_zero():
     ts = np.arange(n, dtype=np.int64)
     sig = DataInstance(timestamp_np=ts, value_np=np.zeros(n), label="sig")
     dist = DataInstance(timestamp_np=ts, value_np=np.linspace(0, 100, n), label="dist")
-    results = compute_accel_results(sig, dist)
+    results = compute_accel_results(sig, dist, source_time_unit=Timescale.MS)
     assert results == []
 
 
@@ -130,7 +138,9 @@ def test_compute_accel_results_skips_segment_shorter_than_target():
     signal_vals[2:8] = 1.0
     sig = DataInstance(timestamp_np=ts, value_np=signal_vals, label="sig")
     dist = DataInstance(timestamp_np=ts, value_np=np.linspace(0, 10, n), label="dist")
-    results = compute_accel_results(sig, dist, target_dist=75)
+    results = compute_accel_results(
+        sig, dist, target_dist=75, source_time_unit=Timescale.MS
+    )
     assert results == []
 
 

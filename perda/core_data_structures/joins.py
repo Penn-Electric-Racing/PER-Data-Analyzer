@@ -38,6 +38,11 @@ def left_join(
         Left values (unchanged)
     right_values : NDArray
         Right values interpolated onto left timestamps
+
+    Examples
+    --------
+    >>> from perda.core_data_structures import left_join
+    >>> ts, a_values, b_values = left_join(a_ts, a_values, b_ts, b_values)
     """
     if right_ts.size == 0 or left_ts.size == 0:
         raise ValueError("Both time series must be non-empty")
@@ -89,6 +94,11 @@ def outer_join(
         Left values interpolated to union timestamps
     right_values : NDArray
         Right values interpolated to union timestamps
+
+    Examples
+    --------
+    >>> from perda.core_data_structures import outer_join
+    >>> ts, a_values, b_values = outer_join(a_ts, a_values, b_ts, b_values)
     """
     if right_ts.size == 0 or left_ts.size == 0:
         raise ValueError("Both time series must be non-empty")
@@ -149,6 +159,11 @@ def inner_join(
         Left values at the kept timestamps
     right_values : NDArray
         Right values interpolated onto the kept timestamps
+
+    Examples
+    --------
+    >>> from perda.core_data_structures import inner_join
+    >>> ts, a_values, b_values = inner_join(a_ts, a_values, b_ts, b_values, tolerance=1_000)
     """
     if right_ts.size == 0 or left_ts.size == 0:
         raise ValueError("Both time series must be non-empty")

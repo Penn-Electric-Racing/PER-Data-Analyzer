@@ -61,7 +61,9 @@ class Analyzer:
     Summary stats for one variable
     ------------------------------
     >>> from perda.utils import data_instance_summary
-    >>> summary = data_instance_summary(aly.data["pcm.wheelSpeeds.frontRight"])
+    >>> summary = data_instance_summary(
+    ...     aly.data["pcm.wheelSpeeds.frontRight"], source_time_unit=aly.data.timestamp_unit
+    ... )
     >>> print(summary)          # formatted block
     >>> summary.max_value       # or read the fields directly
     """
@@ -211,6 +213,17 @@ class Analyzer:
         max_points : int | None, optional
             Maximum number of data points to plot per trace (enables zero-copy step downsampling). Default is None (full fidelity).
 
+        Returns
+        -------
+        go.Figure
+            Plotly figure. Customize it with ``update_layout`` or ``add_trace``.
+
+        Notes
+        -----
+        Unlike the lower-level plotters, this reads the log's timestamp unit itself.
+        ``ts_start`` and ``ts_end`` are seconds on the log's clock, i.e. raw timestamps
+        converted to seconds, not seconds since the start of the log.
+
         Examples
         --------
         >>> fig = aly.plot("pcm.wheelSpeeds.frontRight")
@@ -219,7 +232,6 @@ class Analyzer:
         >>> # Plot a derived DataInstance (e.g. average of two signals)
         >>> avg_speed = (aly.data["pcm.wheelSpeeds.frontRight"] + aly.data["pcm.wheelSpeeds.frontLeft"]) / 2.0
         >>> fig = aly.plot(avg_speed)
-        >>> fig.show()
         """
         var_1_norm = self._normalize_input(var_1)
         var_2_norm = self._normalize_input(var_2) if var_2 is not None else None
@@ -328,7 +340,6 @@ class Analyzer:
         ...     ts_start=5.0,
         ...     ts_end=30.0,
         ... )
-        >>> fig.show()
         """
         unit = self.data.timestamp_unit
 
@@ -380,10 +391,14 @@ class Analyzer:
         layout_config : LayoutConfig, optional
         font_config : FontConfig, optional
 
+        Returns
+        -------
+        go.Figure
+            Bar chart of per-variable differences between the two streams.
+
         Examples
         --------
         >>> fig = aly.diff(server_data)
-        >>> fig.show()
         """
         return diff(
             self.data,
@@ -434,7 +449,6 @@ class Analyzer:
         Examples
         --------
         >>> fig = aly.analyze_frequency("ams.stack.thermistors.temperature[38]", expected_frequency_hz=100)
-        >>> fig.show()
         """
         di = self.data[var]
         return _analyze_frequency(

@@ -12,7 +12,30 @@ from .resampling import ResampleMethod, _interpolate
 
 
 class DataInstance(BaseModel):
-    """A single time-series variable, pairing a 1D timestamp array with a 1D value array."""
+    """
+    A single time-series variable, pairing a 1D timestamp array with a 1D value array.
+
+    Notes
+    -----
+    Timestamps are raw integers in the log's native unit, ``SingleRunData.timestamp_unit``
+    (microseconds for current logs), not seconds.
+
+    Arithmetic (``+ - * / **``) accepts only another DataInstance or a scalar, never a raw
+    NumPy array. Between two DataInstances, the right one is interpolated onto the left
+    one's timestamps, so the result has the left one's length. To combine with an array,
+    do the math on ``.value_np`` and wrap the result in a new DataInstance.
+
+    The constructor takes keyword arguments only.
+
+    Examples
+    --------
+    >>> from perda.core_data_structures import DataInstance
+    >>> di = aly.data["pcm.wheelSpeeds.frontRight"]
+    >>> average = (di + aly.data["pcm.wheelSpeeds.frontLeft"]) / 2.0
+    >>> squared = DataInstance(
+    ...     timestamp_np=di.timestamp_np, value_np=di.value_np**2, label="Speed squared"
+    ... )
+    """
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
@@ -201,7 +224,7 @@ class DataInstance(BaseModel):
     def resample_to_freq(
         self,
         freq_hz: float,
-        source_time_unit: Timescale = Timescale.MS,
+        source_time_unit: Timescale,
         method: ResampleMethod = ResampleMethod.LINEAR,
     ) -> DataInstance:
         """
@@ -211,8 +234,8 @@ class DataInstance(BaseModel):
         ----------
         freq_hz : float
             Target sampling frequency in Hz
-        source_time_unit : Timescale, optional
-            Timestamp unit of ``timestamp_np``. Default is ``Timescale.MS``.
+        source_time_unit : Timescale
+            Timestamp unit of ``timestamp_np``. Pass ``aly.data.timestamp_unit``.
         method : ResampleMethod, optional
             Interpolation method. Default is LINEAR.
 
@@ -223,7 +246,7 @@ class DataInstance(BaseModel):
 
         Examples
         --------
-        >>> uniform = di.resample_to_freq(freq_hz=100.0, source_time_unit=Timescale.US)
+        >>> uniform = di.resample_to_freq(freq_hz=100.0, source_time_unit=aly.data.timestamp_unit)
         """
         dt = from_seconds(1.0 / freq_hz, source_time_unit)
         target_ts = np.arange(
@@ -273,8 +296,20 @@ def left_join_data_instances(
         First element is the left DataInstance (unchanged), followed by one
         aligned DataInstance per right input, in the same order.
 
+    Notes
+    -----
+    Signals are logged at different rates, so two DataInstances usually have different
+    lengths and timestamps. Join them first whenever you combine their arrays: a boolean
+    mask built from one signal's ``value_np`` cannot index another's until both share a
+    timestamp grid.
+
     Examples
     --------
+    >>> from perda.core_data_structures import ResampleMethod, left_join_data_instances
+    >>> speed = aly.data["pcm.wheelSpeeds.frontRight"]
+    >>> torque = aly.data["pcm.moc.motor.requestedTorque"]
+    >>> speed, torque = left_join_data_instances(speed, torque)
+    >>> torque_while_moving = torque.value_np[speed.value_np > 1.0]
     >>> left_a, right_b, right_c = left_join_data_instances(a, [b, c])
     >>> left_a, right_b = left_join_data_instances(a, b, method=ResampleMethod.ZOH)
     """
@@ -343,6 +378,11 @@ def outer_join_data_instances(
         Left DataInstance with values interpolated to union timestamps
     right_result : DataInstance
         Right DataInstance with values interpolated to union timestamps
+
+    Examples
+    --------
+    >>> from perda.core_data_structures import outer_join_data_instances
+    >>> a_union, b_union = outer_join_data_instances(a, b)
     """
     ts, left_val, right_val = outer_join(
         left.timestamp_np,
@@ -391,6 +431,15 @@ def inner_join_data_instances(
         Left DataInstance with only matched timestamps
     right_result : DataInstance
         Right DataInstance with only matched timestamps
+
+    Notes
+    -----
+    ``tolerance`` is in raw timestamp units, ``aly.data.timestamp_unit``.
+
+    Examples
+    --------
+    >>> from perda.core_data_structures import inner_join_data_instances
+    >>> a_matched, b_matched = inner_join_data_instances(a, b, tolerance=1_000)
     """
     ts, left_val, right_val = inner_join(
         left.timestamp_np,
@@ -432,6 +481,12 @@ def apply_ufunc_left_join(
     -------
     DataInstance
         New DataInstance with combined values
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from perda.core_data_structures import apply_ufunc_left_join
+    >>> larger = apply_ufunc_left_join(a, b, np.maximum)
     """
     left_aligned, right_aligned = left_join_data_instances(left, right)
     result_val = ufunc(left_aligned.value_np, right_aligned.value_np)
@@ -473,6 +528,12 @@ def apply_ufunc_outer_join(
     -------
     DataInstance
         New DataInstance with combined values
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from perda.core_data_structures import apply_ufunc_outer_join
+    >>> larger = apply_ufunc_outer_join(a, b, np.maximum)
     """
     left_aligned, right_aligned = outer_join_data_instances(
         left, right, drop_nan=drop_nan, fill=fill
@@ -506,12 +567,19 @@ def apply_ufunc_inner_join(
     ufunc : Callable
         NumPy universal function to apply (e.g., np.add, np.subtract)
     tolerance : float
-        Maximum allowed distance between left and right timestamps for a match.
+        Maximum allowed distance between left and right timestamps for a match,
+        in raw timestamp units.
 
     Returns
     -------
     DataInstance
         New DataInstance with combined values
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from perda.core_data_structures import apply_ufunc_inner_join
+    >>> larger = apply_ufunc_inner_join(a, b, np.maximum, tolerance=1_000)
     """
     left_aligned, right_aligned = inner_join_data_instances(
         left, right, tolerance=tolerance

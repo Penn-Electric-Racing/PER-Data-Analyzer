@@ -18,12 +18,12 @@ from .plotting_constants import (
 
 def data_instance_subplots(
     rows: List[List[DataInstance]],
+    timestamp_unit: Timescale,
     title: str | None = None,
     row_y_labels: List[str | None] | None = None,
     show_legend: bool = True,
     layout_config: LayoutConfig = DEFAULT_LAYOUT_CONFIG,
     font_config: FontConfig = DEFAULT_FONT_CONFIG,
-    timestamp_unit: Timescale = Timescale.MS,
 ) -> go.Figure:
     """Plot groups of DataInstances as stacked subplots on a shared time axis.
 
@@ -36,6 +36,8 @@ def data_instance_subplots(
     rows : List[List[DataInstance]]
         Outer list defines subplot rows (top to bottom); inner list defines
         the DataInstances overlaid within that row.
+    timestamp_unit : Timescale
+        Timestamp unit of the underlying DataInstances. Converted to seconds for x-axis display. Pass ``aly.data.timestamp_unit``.
     title : str | None, optional
         Figure-level title. Default is None (no title).
     row_y_labels : List[str | None] | None, optional
@@ -48,9 +50,6 @@ def data_instance_subplots(
         Dimensions, spacing, and style for the subplot grid.
     font_config : FontConfig, optional
         Font sizes for title, axis labels, tick labels, and legend.
-    timestamp_unit : Timescale, optional
-        Timestamp unit of the underlying DataInstances. Converted to seconds
-        for x-axis display. Default is Timescale.MS.
 
     Returns
     -------
@@ -59,12 +58,13 @@ def data_instance_subplots(
 
     Examples
     --------
+    >>> from perda.plotting import data_instance_subplots
     >>> fig = data_instance_subplots(
     ...     rows=[[speed_di], [torque_di, motor_di]],
     ...     title="Run Overview",
     ...     row_y_labels=["Speed (mph)", "Torque / Motor"],
+    ...     timestamp_unit=aly.data.timestamp_unit,
     ... )
-    >>> fig.show()
     """
     if not rows:
         print("Warning: No rows provided for subplot figure")
@@ -173,6 +173,11 @@ def stride_downsample(
     -------
     Tuple[np.ndarray, np.ndarray]
         Downsampled ``(timestamps_s, values)``.
+
+    Examples
+    --------
+    >>> from perda.plotting import stride_downsample
+    >>> ts_small, values_small = stride_downsample(time_s, di.value_np, 1000.0)
     """
     n = len(timestamps_s)
     if n <= 1:
@@ -194,11 +199,11 @@ def stride_downsample(
 def plot_multi_log_subplots(
     logs: List[SingleRunData],
     var_names: List[str],
+    timestamp_unit: Timescale,
     row_y_labels: List[str | None] | None = None,
     title: str | None = None,
     layout_config: LayoutConfig = DEFAULT_LAYOUT_CONFIG,
     font_config: FontConfig = DEFAULT_FONT_CONFIG,
-    timestamp_unit: Timescale = Timescale.MS,
 ) -> go.Figure:
     """Plot the same set of variables across multiple logs as stacked subplots, with each
     variable on one subplot.
@@ -209,6 +214,8 @@ def plot_multi_log_subplots(
     var_names : List[str]
         Ordered list of variable names to plot, one per subplot row.  Variables
         absent from log are silently skipped.
+    timestamp_unit : Timescale
+        Timestamp unit of the underlying DataInstances. Pass ``aly.data.timestamp_unit``.
     row_y_labels : List[str | None] | None, optional
         Y-axis label for each row. Must match the length of ``var_names``
     title : str | None, optional
@@ -216,8 +223,6 @@ def plot_multi_log_subplots(
         suffix is appended automatically.
     layout_config : LayoutConfig, optional
     font_config : FontConfig, optional
-    timestamp_unit : Timescale, optional
-        Timestamp unit of the underlying DataInstances. Default is Timescale.MS.
 
     Returns
     -------
@@ -226,12 +231,13 @@ def plot_multi_log_subplots(
 
     Examples
     --------
+    >>> from perda.plotting import plot_multi_log_subplots
     >>> fig = plot_multi_log_subplots(
     ...     logs=[aly1.data, aly2.data],
-    ...     var_names=["pcm."pcm.wheelSpeeds.frontLeft", "ludwig.steeringWheel.angle", "pcm.pedals.brakePressure.front"],
+    ...     var_names=["pcm.wheelSpeeds.frontLeft", "ludwig.steeringWheel.angle", "pcm.pedals.brakePressure.front"],
     ...     title="Speed Comparison",
+    ...     timestamp_unit=aly1.data.timestamp_unit,
     ... )
-    >>> fig.show()
     """
     if not logs or not var_names:
         print("No logs or variable names provided.")

@@ -35,6 +35,21 @@ def apply_ufunc_filter(
     -------
     DataInstance
         Filtered DataInstance
+
+    Notes
+    -----
+    The mask must come from this DataInstance's own arrays. To filter one signal by
+    another (e.g. torque only while moving), align them with ``left_join_data_instances``
+    first, since signals logged at different rates have different lengths.
+
+    Examples
+    --------
+    >>> from perda.core_data_structures import FilterOptions, apply_ufunc_filter
+    >>> voltage = aly.data["bms.pack.voltage"]
+    >>> valid = apply_ufunc_filter(voltage, lambda values: values > 0)
+    >>> late = apply_ufunc_filter(
+    ...     voltage, lambda ts: ts > ts[0] + 60_000_000, apply_to=FilterOptions.TIMESTAMPS
+    ... )
     """
     if apply_to == FilterOptions.VALUES:
         mask = filter_func(data.value_np)

@@ -47,7 +47,7 @@ def test_apply_sos_filter_returns_none_when_too_few_samples():
 def test_lowpass_attenuates_high_frequency(cutoff_hz: float, sine_di_factory):
     """A signal at 4x cutoff should be substantially attenuated in steady-state."""
     di = sine_di_factory(freq_hz=cutoff_hz * 4, n=2000)
-    result = lowpass_filter(di, cutoff_hz=cutoff_hz)
+    result = lowpass_filter(di, cutoff_hz=cutoff_hz, source_time_unit=Timescale.MS)
     assert isinstance(result, DataInstance)
     # Compare RMS over middle 50% to avoid filter transients at signal edges
     mid = slice(len(di.value_np) // 4, 3 * len(di.value_np) // 4)
@@ -60,7 +60,7 @@ def test_lowpass_attenuates_high_frequency(cutoff_hz: float, sine_di_factory):
 def test_lowpass_passes_low_frequency(cutoff_hz: float, sine_di_factory):
     """A signal well below the cutoff should pass through nearly unchanged."""
     di = sine_di_factory(freq_hz=cutoff_hz / 4)
-    result = lowpass_filter(di, cutoff_hz=cutoff_hz)
+    result = lowpass_filter(di, cutoff_hz=cutoff_hz, source_time_unit=Timescale.MS)
     assert isinstance(result, DataInstance)
     np.testing.assert_allclose(result.value_np, di.value_np, atol=0.05)
 
@@ -74,7 +74,7 @@ def test_lowpass_preserves_metadata(sine_di_factory):
         var_id=42,
         cpp_name="pcm.myvar",
     )
-    result = lowpass_filter(di, cutoff_hz=20.0)
+    result = lowpass_filter(di, cutoff_hz=20.0, source_time_unit=Timescale.MS)
     assert isinstance(result, DataInstance)
     assert result.label == "myvar"
     assert result.var_id == 42
@@ -85,7 +85,9 @@ def test_lowpass_preserves_metadata(sine_di_factory):
 def test_lowpass_list_input_returns_list(sine_di_factory):
     di_a = sine_di_factory(freq_hz=5.0, label="a", var_id=1)
     di_b = sine_di_factory(freq_hz=5.0, label="b", var_id=2)
-    results = lowpass_filter([di_a, di_b], cutoff_hz=20.0)
+    results = lowpass_filter(
+        [di_a, di_b], cutoff_hz=20.0, source_time_unit=Timescale.MS
+    )
     assert isinstance(results, list)
     assert len(results) == 2
 
@@ -94,7 +96,7 @@ def test_lowpass_skips_when_cutoff_above_nyquist(sine_di_factory, capsys):
     """When cutoff >= Nyquist the original DataInstance is returned unchanged."""
     di = sine_di_factory(freq_hz=5.0)
     # Default fs=200 Hz -> Nyquist=100 Hz; use 150 Hz cutoff
-    result = lowpass_filter(di, cutoff_hz=150.0)
+    result = lowpass_filter(di, cutoff_hz=150.0, source_time_unit=Timescale.MS)
     assert isinstance(result, DataInstance)
     np.testing.assert_array_equal(result.value_np, di.value_np)
     captured = capsys.readouterr()
@@ -332,7 +334,9 @@ def test_compute_fft_spatial_peak_at_correct_frequency(spatial_signal_factory):
     signal_di, distance_di = spatial_signal_factory(
         freq_per_m=target_freq, n=1000, dx=0.05
     )
-    freqs, mags = compute_fft(signal_di, distance_di=distance_di)
+    freqs, mags = compute_fft(
+        signal_di, distance_di=distance_di, source_time_unit=Timescale.MS
+    )
     peak_freq = freqs[np.argmax(mags)]
     assert abs(peak_freq - target_freq) < 0.2
 
@@ -347,7 +351,9 @@ def test_compute_fft_spatial_with_duplicate_distances():
     di = DataInstance(timestamp_np=ts, value_np=signal, label="sig", var_id=1)
     distance_di = DataInstance(timestamp_np=ts, value_np=dist, label="dist", var_id=2)
 
-    freqs, mags = compute_fft(di, distance_di=distance_di)
+    freqs, mags = compute_fft(
+        di, distance_di=distance_di, source_time_unit=Timescale.MS
+    )
     peak_freq = freqs[np.argmax(mags)]
     assert abs(peak_freq - target_freq) < 0.2
 
@@ -364,4 +370,4 @@ def test_compute_fft_spatial_all_stationary_raises():
     )
 
     with pytest.raises(ValueError, match="No positive distance steps"):
-        compute_fft(di, distance_di=distance_di)
+        compute_fft(di, distance_di=distance_di, source_time_unit=Timescale.MS)
