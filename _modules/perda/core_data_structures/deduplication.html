@@ -323,7 +323,8 @@
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
-<span class="sd">    &gt;&gt;&gt; gps_deduped = deduplicate(analyzer.data["gps.lat"])</span>
+<span class="sd">    &gt;&gt;&gt; from perda.core_data_structures import deduplicate</span>
+<span class="sd">    &gt;&gt;&gt; gps_deduped = deduplicate(aly.data["gps.lat"])</span>
 <span class="sd">    """</span>
     <span class="n">src_v</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">value_np</span>
     <span class="n">keep</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(([</span><span class="kc">True</span><span class="p">],</span> <span class="n">src_v</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">!=</span> <span class="n">src_v</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>

@@ -513,6 +513,11 @@ with <code class="docutils literal notranslate"><span class="pre">filter</span><
 <dd class="field-odd"><p><a class="reference internal" href="perda.analyzer.analyzer.html#perda.analyzer.analyzer.Analyzer" title="perda.analyzer.analyzer.Analyzer">Analyzer</a></p>
 </dd>
 </dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">first_run</span> <span class="o">=</span> <span class="n">col</span><span class="o">.</span><span class="n">get_run_by_chronological_index</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">latest_run</span> <span class="o">=</span> <span class="n">col</span><span class="o">.</span><span class="n">get_run_by_chronological_index</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py method">
@@ -535,7 +540,7 @@ with <code class="docutils literal notranslate"><span class="pre">filter</span><
 </dd>
 </dl>
 <p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">col</span><span class="o">.</span><span class="n">plot_comparison</span><span class="p">(</span><span class="s2">"pcm.wheelSpeeds.frontLeft"</span><span class="p">,</span> <span class="n">max_points</span><span class="o">=</span><span class="mi">20000</span><span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span> <span class="o">=</span> <span class="n">col</span><span class="o">.</span><span class="n">plot_comparison</span><span class="p">(</span><span class="s2">"pcm.wheelSpeeds.frontLeft"</span><span class="p">,</span> <span class="n">max_points</span><span class="o">=</span><span class="mi">20000</span><span class="p">)</span>
 </pre></div>
 </div>
 </dd></dl>

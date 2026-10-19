@@ -388,6 +388,19 @@
 <em class="property"><span class="pre">pydantic</span> <span class="pre">model</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">perda.core_data_structures.single_run_data.</span></span><span class="sig-name descname"><span class="pre">SingleRunData</span></span><a class="reference internal" href="../_modules/perda/core_data_structures/single_run_data.html#SingleRunData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.core_data_structures.single_run_data.SingleRunData" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
 <p>Pydantic model to store parsed CSV data with dictionary-like lookup.</p>
+<p class="rubric">Notes</p>
+<p>All timestamps (<code class="docutils literal notranslate"><span class="pre">data_start_time</span></code>, <code class="docutils literal notranslate"><span class="pre">data_end_time</span></code> and every DataInstance’s
+<code class="docutils literal notranslate"><span class="pre">timestamp_np</span></code>) are raw integers in <code class="docutils literal notranslate"><span class="pre">timestamp_unit</span></code>, which is microseconds for
+current logs. Helpers that take a <code class="docutils literal notranslate"><span class="pre">source_time_unit</span></code> or <code class="docutils literal notranslate"><span class="pre">timestamp_unit</span></code> argument
+require it; pass <code class="docutils literal notranslate"><span class="pre">data.timestamp_unit</span></code>.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">perda.units</span><span class="w"> </span><span class="kn">import</span> <span class="n">to_seconds</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">aly</span><span class="o">.</span><span class="n">data</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">di</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">"pcm.wheelSpeeds.frontRight"</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="s2">"pcm.wheelSpeeds.frontRight"</span> <span class="ow">in</span> <span class="n">data</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">duration_s</span> <span class="o">=</span> <span class="n">to_seconds</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">data_end_time</span> <span class="o">-</span> <span class="n">data</span><span class="o">.</span><span class="n">data_start_time</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">timestamp_unit</span><span class="p">)</span>
+</pre></div>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Config<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -587,6 +600,12 @@
 <dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
 </dd>
 </dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">power</span> <span class="o">=</span> <span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">"bms.pack.voltage"</span><span class="p">]</span> <span class="o">*</span> <span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">"bms.pack.current"</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">"derived.pack.power"</span><span class="p">,</span> <span class="n">power</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span> <span class="o">=</span> <span class="n">aly</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s2">"derived.pack.power"</span><span class="p">)</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py method">
@@ -604,6 +623,11 @@
 <dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
 </dd>
 </dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">voltage</span> <span class="o">=</span> <span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">"bms.pack.voltage"</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"bms.pack.voltage"</span><span class="p">,</span> <span class="n">voltage</span> <span class="o">/</span> <span class="mf">1000.0</span><span class="p">)</span>
+</pre></div>
+</div>
 </dd></dl>
 
 </dd></dl>

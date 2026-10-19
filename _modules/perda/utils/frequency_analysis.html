@@ -334,8 +334,8 @@
 <a class="viewcode-back" href="../../../_autosummary/perda.utils.frequency_analysis.html#perda.utils.frequency_analysis.analyze_frequency">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">analyze_frequency</span><span class="p">(</span>
     <span class="n">data_instance</span><span class="p">:</span> <span class="n">DataInstance</span><span class="p">,</span>
+    <span class="n">source_time_unit</span><span class="p">:</span> <span class="n">Timescale</span><span class="p">,</span>
     <span class="n">expected_frequency_hz</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">source_time_unit</span><span class="p">:</span> <span class="n">Timescale</span> <span class="o">=</span> <span class="n">Timescale</span><span class="o">.</span><span class="n">MS</span><span class="p">,</span>
     <span class="n">gap_threshold_multiplier</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">,</span>
     <span class="n">font_config</span><span class="p">:</span> <span class="n">FontConfig</span> <span class="o">=</span> <span class="n">DEFAULT_FONT_CONFIG</span><span class="p">,</span>
     <span class="n">layout_config</span><span class="p">:</span> <span class="n">LayoutConfig</span> <span class="o">=</span> <span class="n">DEFAULT_LAYOUT_CONFIG</span><span class="p">,</span>
@@ -352,12 +352,12 @@
 <span class="sd">    ----------</span>
 <span class="sd">    data_instance : DataInstance</span>
 <span class="sd">        The DataInstance whose logging cadence to analyse.</span>
+<span class="sd">    source_time_unit : Timescale</span>
+<span class="sd">        Timestamp unit used in ``data_instance.timestamp_np``. Pass ``aly.data.timestamp_unit``.</span>
 <span class="sd">    expected_frequency_hz : float | None, optional</span>
 <span class="sd">        Nominal expected sampling frequency in Hz. When provided, additional</span>
 <span class="sd">        diagnostics (frequency error, missed-message estimate, reference lines)</span>
 <span class="sd">        are included. Default is None.</span>
-<span class="sd">    source_time_unit : Timescale, optional</span>
-<span class="sd">        Timestamp unit used in ``data_instance.timestamp_np``. Default is ms.</span>
 <span class="sd">    gap_threshold_multiplier : float, optional</span>
 <span class="sd">        An interval is flagged as a gap when it exceeds this multiple of the</span>
 <span class="sd">        expected interval (if ``expected_frequency_hz`` is given) or the median</span>
@@ -376,8 +376,10 @@
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
-<span class="sd">    &gt;&gt;&gt; fig = analyze_frequency(di, expected_frequency_hz=100)</span>
-<span class="sd">    &gt;&gt;&gt; fig.show()</span>
+<span class="sd">    &gt;&gt;&gt; from perda.utils import analyze_frequency</span>
+<span class="sd">    &gt;&gt;&gt; fig = analyze_frequency(</span>
+<span class="sd">    ...     di, expected_frequency_hz=100, source_time_unit=aly.data.timestamp_unit</span>
+<span class="sd">    ... )</span>
 <span class="sd">    """</span>
     <span class="n">label</span> <span class="o">=</span> <span class="n">data_instance</span><span class="o">.</span><span class="n">label</span> <span class="ow">or</span> <span class="sa">f</span><span class="s2">"var_id=</span><span class="si">{</span><span class="n">data_instance</span><span class="o">.</span><span class="n">var_id</span><span class="si">}</span><span class="s2">"</span>
 

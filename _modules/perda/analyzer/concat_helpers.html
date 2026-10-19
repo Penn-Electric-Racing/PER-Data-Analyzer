@@ -505,8 +505,9 @@
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from perda.analyzer import concat</span>
 <span class="sd">    &gt;&gt;&gt; merged = concat(aly1, aly2)</span>
-<span class="sd">    &gt;&gt;&gt; merged.plot("ams.pack.voltage")</span>
+<span class="sd">    &gt;&gt;&gt; fig = merged.plot("bms.pack.voltage")</span>
 <span class="sd">    """</span>
     <span class="n">merged</span> <span class="o">=</span> <span class="nb">object</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="n">Analyzer</span><span class="p">)</span>
     <span class="n">merged</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">_concat_single_run_data</span><span class="p">(</span><span class="n">first</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">second</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">gap</span><span class="o">=</span><span class="n">gap</span><span class="p">)</span>

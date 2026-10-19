@@ -385,16 +385,17 @@
 <span id="perda-utils-integrate"></span><h1>perda.utils.integrate<a class="headerlink" href="#module-perda.utils.integrate" title="Link to this heading">#</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="perda.utils.integrate.average_over_time_range">
-<span class="sig-prename descclassname"><span class="pre">perda.utils.integrate.</span></span><span class="sig-name descname"><span class="pre">average_over_time_range</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_instance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_time_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Timescale.MS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_time_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Timescale.S</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/utils/integrate.html#average_over_time_range"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.utils.integrate.average_over_time_range" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">perda.utils.integrate.</span></span><span class="sig-name descname"><span class="pre">average_over_time_range</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_instance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_time_unit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_time_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Timescale.S</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/utils/integrate.html#average_over_time_range"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.utils.integrate.average_over_time_range" title="Link to this definition">#</a></dt>
 <dd><p>Get average value over time using integral divided by time range.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data_instance</strong> (<a class="reference internal" href="perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance"><em>DataInstance</em></a>) – DataInstance to average</p></li>
-<li><p><strong>start_time</strong> (<em>int</em><em>, </em><em>optional</em>) – Start time for averaging. Default is 0</p></li>
-<li><p><strong>end_time</strong> (<em>int</em><em>, </em><em>optional</em>) – End time for averaging. -1 means end of data. Default is -1</p></li>
-<li><p><strong>source_time_unit</strong> (<a class="reference internal" href="perda.units.html#perda.units.Timescale" title="perda.units.Timescale"><em>Timescale</em></a><em>, </em><em>optional</em>) – Time unit of inputs. Default is Timescale.MS</p></li>
-<li><p><strong>target_time_unit</strong> (<a class="reference internal" href="perda.units.html#perda.units.Timescale" title="perda.units.Timescale"><em>Timescale</em></a><em>, </em><em>optional</em>) – Target time unit for averaging. Default is Timescale.S</p></li>
+<li><p><strong>source_time_unit</strong> (<a class="reference internal" href="perda.units.html#perda.units.Timescale" title="perda.units.Timescale"><em>Timescale</em></a>) – Time unit of <code class="docutils literal notranslate"><span class="pre">data_instance.timestamp_np</span></code>. Pass <code class="docutils literal notranslate"><span class="pre">aly.data.timestamp_unit</span></code>.</p></li>
+<li><p><strong>start_time</strong> (<em>int</em><em>, </em><em>optional</em>) – Start of the window, as an absolute timestamp in <code class="docutils literal notranslate"><span class="pre">target_time_unit</span></code>. Default is 0</p></li>
+<li><p><strong>end_time</strong> (<em>int</em><em>, </em><em>optional</em>) – End of the window, as an absolute timestamp in <code class="docutils literal notranslate"><span class="pre">target_time_unit</span></code>. -1 means end
+of data. Default is -1</p></li>
+<li><p><strong>target_time_unit</strong> (<a class="reference internal" href="perda.units.html#perda.units.Timescale" title="perda.units.Timescale"><em>Timescale</em></a><em>, </em><em>optional</em>) – Time unit of <code class="docutils literal notranslate"><span class="pre">start_time</span></code> and <code class="docutils literal notranslate"><span class="pre">end_time</span></code>. Default is Timescale.S</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -406,6 +407,14 @@
 </dl>
 <p class="rubric">Notes</p>
 <p>Uses numpy.trapezoid (trapezoidal rule) for numerical integration of discrete data.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">perda.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">average_over_time_range</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">voltage</span> <span class="o">=</span> <span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">"bms.pack.voltage"</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mean_voltage</span> <span class="o">=</span> <span class="n">average_over_time_range</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">voltage</span><span class="p">,</span> <span class="n">source_time_unit</span><span class="o">=</span><span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">timestamp_unit</span>
+<span class="gp">... </span><span class="p">)</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py function">
@@ -427,20 +436,29 @@
 <dd class="field-odd"><p><a class="reference internal" href="perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance">DataInstance</a></p>
 </dd>
 </dl>
+<p class="rubric">Notes</p>
+<p><code class="docutils literal notranslate"><span class="pre">start_time</span></code> and <code class="docutils literal notranslate"><span class="pre">end_time</span></code> are raw timestamps, in <code class="docutils literal notranslate"><span class="pre">aly.data.timestamp_unit</span></code>.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">perda.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_data_slice_by_timestamp</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">di</span> <span class="o">=</span> <span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">"pcm.wheelSpeeds.frontRight"</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">first_half</span> <span class="o">=</span> <span class="n">get_data_slice_by_timestamp</span><span class="p">(</span><span class="n">di</span><span class="p">,</span> <span class="n">end_time</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">di</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">di</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span><span class="p">]))</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="perda.utils.integrate.integrate_over_time_range">
-<span class="sig-prename descclassname"><span class="pre">perda.utils.integrate.</span></span><span class="sig-name descname"><span class="pre">integrate_over_time_range</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_instance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_time_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Timescale.MS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_time_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Timescale.S</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/utils/integrate.html#integrate_over_time_range"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.utils.integrate.integrate_over_time_range" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">perda.utils.integrate.</span></span><span class="sig-name descname"><span class="pre">integrate_over_time_range</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_instance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_time_unit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_time_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Timescale.S</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/utils/integrate.html#integrate_over_time_range"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.utils.integrate.integrate_over_time_range" title="Link to this definition">#</a></dt>
 <dd><p>Get integral of the value over time using the trapezoidal rule.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data_instance</strong> (<a class="reference internal" href="perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance"><em>DataInstance</em></a>) – DataInstance to integrate</p></li>
-<li><p><strong>start_time</strong> (<em>int</em><em>, </em><em>optional</em>) – Start time for integration. Default is 0</p></li>
-<li><p><strong>end_time</strong> (<em>int</em><em>, </em><em>optional</em>) – End time for integration. -1 means end of data. Default is -1</p></li>
-<li><p><strong>source_time_unit</strong> (<a class="reference internal" href="perda.units.html#perda.units.Timescale" title="perda.units.Timescale"><em>Timescale</em></a><em>, </em><em>optional</em>) – Time unit of inputs. Default is Timescale.MS</p></li>
-<li><p><strong>target_time_unit</strong> (<a class="reference internal" href="perda.units.html#perda.units.Timescale" title="perda.units.Timescale"><em>Timescale</em></a><em>, </em><em>optional</em>) – Target time unit for averaging. Default is Timescale.S</p></li>
+<li><p><strong>source_time_unit</strong> (<a class="reference internal" href="perda.units.html#perda.units.Timescale" title="perda.units.Timescale"><em>Timescale</em></a>) – Time unit of <code class="docutils literal notranslate"><span class="pre">data_instance.timestamp_np</span></code>. Pass <code class="docutils literal notranslate"><span class="pre">aly.data.timestamp_unit</span></code>.</p></li>
+<li><p><strong>start_time</strong> (<em>int</em><em>, </em><em>optional</em>) – Start of the window, as an absolute timestamp in <code class="docutils literal notranslate"><span class="pre">target_time_unit</span></code>. Default is 0</p></li>
+<li><p><strong>end_time</strong> (<em>int</em><em>, </em><em>optional</em>) – End of the window, as an absolute timestamp in <code class="docutils literal notranslate"><span class="pre">target_time_unit</span></code>. -1 means end
+of data. Default is -1</p></li>
+<li><p><strong>target_time_unit</strong> (<a class="reference internal" href="perda.units.html#perda.units.Timescale" title="perda.units.Timescale"><em>Timescale</em></a><em>, </em><em>optional</em>) – Time unit to integrate over, e.g. seconds gives value * seconds. Default is Timescale.S</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -452,11 +470,19 @@
 </dl>
 <p class="rubric">Notes</p>
 <p>Uses numpy.trapezoid (trapezoidal rule) for numerical integration of discrete data.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">perda.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">integrate_over_time_range</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">current</span> <span class="o">=</span> <span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">"bms.pack.current"</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">charge_amp_seconds</span> <span class="o">=</span> <span class="n">integrate_over_time_range</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">current</span><span class="p">,</span> <span class="n">source_time_unit</span><span class="o">=</span><span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">timestamp_unit</span>
+<span class="gp">... </span><span class="p">)</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="perda.utils.integrate.smoothed_filtered_integration">
-<span class="sig-prename descclassname"><span class="pre">perda.utils.integrate.</span></span><span class="sig-name descname"><span class="pre">smoothed_filtered_integration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_time_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Timescale.US</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_time_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Timescale.S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_window_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_sigmas</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">smoothing_window_len</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">11</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">smoothing_poly_order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/utils/integrate.html#smoothed_filtered_integration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.utils.integrate.smoothed_filtered_integration" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">perda.utils.integrate.</span></span><span class="sig-name descname"><span class="pre">smoothed_filtered_integration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_time_unit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_time_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Timescale.S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_window_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_sigmas</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">smoothing_window_len</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">11</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">smoothing_poly_order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/utils/integrate.html#smoothed_filtered_integration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.utils.integrate.smoothed_filtered_integration" title="Link to this definition">#</a></dt>
 <dd><p>Integrate a time-series signal after outlier removal and smoothing.</p>
 <p>Cleans spikes via rolling MAD-based outlier detection, applies Savitzky-Golay
 smoothing, then computes the cumulative trapezoidal integral over time.</p>
@@ -464,7 +490,7 @@ smoothing, then computes the cumulative trapezoidal integral over time.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> (<a class="reference internal" href="perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance"><em>DataInstance</em></a>) – Time-series signal to integrate.</p></li>
-<li><p><strong>source_time_unit</strong> (<a class="reference internal" href="perda.units.html#perda.units.Timescale" title="perda.units.Timescale"><em>Timescale</em></a>) – Time unit of inputs. Default is Timescale.US.</p></li>
+<li><p><strong>source_time_unit</strong> (<a class="reference internal" href="perda.units.html#perda.units.Timescale" title="perda.units.Timescale"><em>Timescale</em></a>) – Time unit of <code class="docutils literal notranslate"><span class="pre">data.timestamp_np</span></code>. Pass <code class="docutils literal notranslate"><span class="pre">aly.data.timestamp_unit</span></code>.</p></li>
 <li><p><strong>target_time_unit</strong> (<a class="reference internal" href="perda.units.html#perda.units.Timescale" title="perda.units.Timescale"><em>Timescale</em></a>) – Target time unit for integration result. Default is Timescale.S.</p></li>
 <li><p><strong>filter_window_size</strong> (<em>int</em>) – Rolling window size used for median and MAD outlier detection.</p></li>
 <li><p><strong>n_sigmas</strong> (<em>float</em>) – Number of scaled MAD units beyond which a point is considered an outlier.</p></li>
@@ -480,6 +506,14 @@ same length as the input signal.</p>
 <dd class="field-odd"><p>tuple[NDArray[Float64], NDArray[Float64], NDArray[Float64]]</p>
 </dd>
 </dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">perda.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">smoothed_filtered_integration</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">power</span> <span class="o">=</span> <span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">"bms.pack.voltage"</span><span class="p">]</span> <span class="o">*</span> <span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">"bms.pack.current"</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span><span class="p">,</span> <span class="n">smoothed_power</span><span class="p">,</span> <span class="n">energy_joules</span> <span class="o">=</span> <span class="n">smoothed_filtered_integration</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">power</span><span class="p">,</span> <span class="n">source_time_unit</span><span class="o">=</span><span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">timestamp_unit</span>
+<span class="gp">... </span><span class="p">)</span>
+</pre></div>
+</div>
 </dd></dl>
 
 </section>

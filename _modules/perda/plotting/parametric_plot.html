@@ -351,8 +351,8 @@
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from perda.plotting import plot_parametric_curve</span>
 <span class="sd">    &gt;&gt;&gt; fig = plot_parametric_curve(lon_arr, lat_arr, x_label="Longitude", y_label="Latitude")</span>
-<span class="sd">    &gt;&gt;&gt; fig.show()</span>
 <span class="sd">    """</span>
     <span class="n">fig</span> <span class="o">=</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">()</span>
     <span class="n">fig</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span>
@@ -391,11 +391,11 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">plot_parametric_trimmer</span><span class="p">(</span>
     <span class="n">x</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">y</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span>
+    <span class="n">timestamp_unit</span><span class="p">:</span> <span class="n">Timescale</span><span class="p">,</span>
     <span class="n">timestamps</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">x_label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"X"</span><span class="p">,</span>
     <span class="n">y_label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"Y"</span><span class="p">,</span>
     <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">timestamp_unit</span><span class="p">:</span> <span class="n">Timescale</span> <span class="o">=</span> <span class="n">Timescale</span><span class="o">.</span><span class="n">MS</span><span class="p">,</span>
     <span class="n">layout_config</span><span class="p">:</span> <span class="n">LayoutConfig</span> <span class="o">=</span> <span class="n">DEFAULT_LAYOUT_CONFIG</span><span class="p">,</span>
     <span class="n">font_config</span><span class="p">:</span> <span class="n">FontConfig</span> <span class="o">=</span> <span class="n">DEFAULT_FONT_CONFIG</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">widgets</span><span class="o">.</span><span class="n">VBox</span><span class="p">:</span>
@@ -411,6 +411,8 @@
 <span class="sd">        X-axis values.</span>
 <span class="sd">    y : NDArray[float64]</span>
 <span class="sd">        Y-axis values. Must have the same length as `x`.</span>
+<span class="sd">    timestamp_unit : Timescale</span>
+<span class="sd">        Unit for timestamp labels in the slider. Ignored if `timestamps` is None. Pass ``aly.data.timestamp_unit``.</span>
 <span class="sd">    timestamps : NDArray[float64] | None, optional</span>
 <span class="sd">        Timestamps corresponding to each point, shown in the slider labels.</span>
 <span class="sd">        If None, slider labels show index only.</span>
@@ -420,8 +422,6 @@
 <span class="sd">        Y-axis label.</span>
 <span class="sd">    title : str | None, optional</span>
 <span class="sd">        Plot title.</span>
-<span class="sd">    timestamp_unit : Timescale, optional</span>
-<span class="sd">        Unit for timestamp labels in the slider. Ignored if `timestamps` is None.</span>
 <span class="sd">    layout_config : LayoutConfig, optional</span>
 <span class="sd">    font_config : FontConfig, optional</span>
 
@@ -431,7 +431,10 @@
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
-<span class="sd">    &gt;&gt;&gt; widget = plot_parametric_trimmer(lon_arr, lat_arr, timestamps=ts_arr, x_label="Longitude", y_label="Latitude")</span>
+<span class="sd">    &gt;&gt;&gt; from perda.plotting import plot_parametric_trimmer</span>
+<span class="sd">    &gt;&gt;&gt; widget = plot_parametric_trimmer(</span>
+<span class="sd">    ...     lon_arr, lat_arr, aly.data.timestamp_unit, timestamps=ts_arr, x_label="Longitude", y_label="Latitude"</span>
+<span class="sd">    ... )</span>
 <span class="sd">    &gt;&gt;&gt; display(widget)</span>
 <span class="sd">    """</span>
     <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>

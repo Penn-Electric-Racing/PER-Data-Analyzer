@@ -367,7 +367,9 @@
 <span class="sd">    Summary stats for one variable</span>
 <span class="sd">    ------------------------------</span>
 <span class="sd">    &gt;&gt;&gt; from perda.utils import data_instance_summary</span>
-<span class="sd">    &gt;&gt;&gt; summary = data_instance_summary(aly.data["pcm.wheelSpeeds.frontRight"])</span>
+<span class="sd">    &gt;&gt;&gt; summary = data_instance_summary(</span>
+<span class="sd">    ...     aly.data["pcm.wheelSpeeds.frontRight"], source_time_unit=aly.data.timestamp_unit</span>
+<span class="sd">    ... )</span>
 <span class="sd">    &gt;&gt;&gt; print(summary)          # formatted block</span>
 <span class="sd">    &gt;&gt;&gt; summary.max_value       # or read the fields directly</span>
 <span class="sd">    """</span>
@@ -522,6 +524,17 @@
 <span class="sd">        max_points : int | None, optional</span>
 <span class="sd">            Maximum number of data points to plot per trace (enables zero-copy step downsampling). Default is None (full fidelity).</span>
 
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        go.Figure</span>
+<span class="sd">            Plotly figure. Customize it with ``update_layout`` or ``add_trace``.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        Unlike the lower-level plotters, this reads the log's timestamp unit itself.</span>
+<span class="sd">        ``ts_start`` and ``ts_end`` are seconds on the log's clock, i.e. raw timestamps</span>
+<span class="sd">        converted to seconds, not seconds since the start of the log.</span>
+
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
 <span class="sd">        &gt;&gt;&gt; fig = aly.plot("pcm.wheelSpeeds.frontRight")</span>
@@ -530,7 +543,6 @@
 <span class="sd">        &gt;&gt;&gt; # Plot a derived DataInstance (e.g. average of two signals)</span>
 <span class="sd">        &gt;&gt;&gt; avg_speed = (aly.data["pcm.wheelSpeeds.frontRight"] + aly.data["pcm.wheelSpeeds.frontLeft"]) / 2.0</span>
 <span class="sd">        &gt;&gt;&gt; fig = aly.plot(avg_speed)</span>
-<span class="sd">        &gt;&gt;&gt; fig.show()</span>
 <span class="sd">        """</span>
         <span class="n">var_1_norm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_normalize_input</span><span class="p">(</span><span class="n">var_1</span><span class="p">)</span>
         <span class="n">var_2_norm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_normalize_input</span><span class="p">(</span><span class="n">var_2</span><span class="p">)</span> <span class="k">if</span> <span class="n">var_2</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
@@ -642,7 +654,6 @@
 <span class="sd">        ...     ts_start=5.0,</span>
 <span class="sd">        ...     ts_end=30.0,</span>
 <span class="sd">        ... )</span>
-<span class="sd">        &gt;&gt;&gt; fig.show()</span>
 <span class="sd">        """</span>
         <span class="n">unit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">timestamp_unit</span>
 
@@ -697,10 +708,14 @@
 <span class="sd">        layout_config : LayoutConfig, optional</span>
 <span class="sd">        font_config : FontConfig, optional</span>
 
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        go.Figure</span>
+<span class="sd">            Bar chart of per-variable differences between the two streams.</span>
+
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
 <span class="sd">        &gt;&gt;&gt; fig = aly.diff(server_data)</span>
-<span class="sd">        &gt;&gt;&gt; fig.show()</span>
 <span class="sd">        """</span>
         <span class="k">return</span> <span class="n">diff</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
@@ -754,7 +769,6 @@
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
 <span class="sd">        &gt;&gt;&gt; fig = aly.analyze_frequency("ams.stack.thermistors.temperature[38]", expected_frequency_hz=100)</span>
-<span class="sd">        &gt;&gt;&gt; fig.show()</span>
 <span class="sd">        """</span>
         <span class="n">di</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">var</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">_analyze_frequency</span><span class="p">(</span>

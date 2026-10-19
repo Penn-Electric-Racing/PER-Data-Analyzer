@@ -317,9 +317,9 @@
 <a class="viewcode-back" href="../../../_autosummary/perda.utils.integrate.html#perda.utils.integrate.integrate_over_time_range">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">integrate_over_time_range</span><span class="p">(</span>
     <span class="n">data_instance</span><span class="p">:</span> <span class="n">DataInstance</span><span class="p">,</span>
+    <span class="n">source_time_unit</span><span class="p">:</span> <span class="n">Timescale</span><span class="p">,</span>
     <span class="n">start_time</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
     <span class="n">end_time</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
-    <span class="n">source_time_unit</span><span class="p">:</span> <span class="n">Timescale</span> <span class="o">=</span> <span class="n">Timescale</span><span class="o">.</span><span class="n">MS</span><span class="p">,</span>
     <span class="n">target_time_unit</span><span class="p">:</span> <span class="n">Timescale</span> <span class="o">=</span> <span class="n">Timescale</span><span class="o">.</span><span class="n">S</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""</span>
@@ -329,14 +329,15 @@
 <span class="sd">    ----------</span>
 <span class="sd">    data_instance : DataInstance</span>
 <span class="sd">        DataInstance to integrate</span>
+<span class="sd">    source_time_unit : Timescale</span>
+<span class="sd">        Time unit of ``data_instance.timestamp_np``. Pass ``aly.data.timestamp_unit``.</span>
 <span class="sd">    start_time : int, optional</span>
-<span class="sd">        Start time for integration. Default is 0</span>
+<span class="sd">        Start of the window, as an absolute timestamp in ``target_time_unit``. Default is 0</span>
 <span class="sd">    end_time : int, optional</span>
-<span class="sd">        End time for integration. -1 means end of data. Default is -1</span>
-<span class="sd">    source_time_unit : Timescale, optional</span>
-<span class="sd">        Time unit of inputs. Default is Timescale.MS</span>
+<span class="sd">        End of the window, as an absolute timestamp in ``target_time_unit``. -1 means end</span>
+<span class="sd">        of data. Default is -1</span>
 <span class="sd">    target_time_unit : Timescale, optional</span>
-<span class="sd">        Target time unit for averaging. Default is Timescale.S</span>
+<span class="sd">        Time unit to integrate over, e.g. seconds gives value * seconds. Default is Timescale.S</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -346,6 +347,14 @@
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
 <span class="sd">    Uses numpy.trapezoid (trapezoidal rule) for numerical integration of discrete data.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from perda.utils import integrate_over_time_range</span>
+<span class="sd">    &gt;&gt;&gt; current = aly.data["bms.pack.current"]</span>
+<span class="sd">    &gt;&gt;&gt; charge_amp_seconds = integrate_over_time_range(</span>
+<span class="sd">    ...     current, source_time_unit=aly.data.timestamp_unit</span>
+<span class="sd">    ... )</span>
 <span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_instance</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
         <span class="k">return</span> <span class="mf">0.0</span>
@@ -382,9 +391,9 @@
 <a class="viewcode-back" href="../../../_autosummary/perda.utils.integrate.html#perda.utils.integrate.average_over_time_range">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">average_over_time_range</span><span class="p">(</span>
     <span class="n">data_instance</span><span class="p">:</span> <span class="n">DataInstance</span><span class="p">,</span>
+    <span class="n">source_time_unit</span><span class="p">:</span> <span class="n">Timescale</span><span class="p">,</span>
     <span class="n">start_time</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
     <span class="n">end_time</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
-    <span class="n">source_time_unit</span><span class="p">:</span> <span class="n">Timescale</span> <span class="o">=</span> <span class="n">Timescale</span><span class="o">.</span><span class="n">MS</span><span class="p">,</span>
     <span class="n">target_time_unit</span><span class="p">:</span> <span class="n">Timescale</span> <span class="o">=</span> <span class="n">Timescale</span><span class="o">.</span><span class="n">S</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""</span>
@@ -394,14 +403,15 @@
 <span class="sd">    ----------</span>
 <span class="sd">    data_instance : DataInstance</span>
 <span class="sd">        DataInstance to average</span>
+<span class="sd">    source_time_unit : Timescale</span>
+<span class="sd">        Time unit of ``data_instance.timestamp_np``. Pass ``aly.data.timestamp_unit``.</span>
 <span class="sd">    start_time : int, optional</span>
-<span class="sd">        Start time for averaging. Default is 0</span>
+<span class="sd">        Start of the window, as an absolute timestamp in ``target_time_unit``. Default is 0</span>
 <span class="sd">    end_time : int, optional</span>
-<span class="sd">        End time for averaging. -1 means end of data. Default is -1</span>
-<span class="sd">    source_time_unit : Timescale, optional</span>
-<span class="sd">        Time unit of inputs. Default is Timescale.MS</span>
+<span class="sd">        End of the window, as an absolute timestamp in ``target_time_unit``. -1 means end</span>
+<span class="sd">        of data. Default is -1</span>
 <span class="sd">    target_time_unit : Timescale, optional</span>
-<span class="sd">        Target time unit for averaging. Default is Timescale.S</span>
+<span class="sd">        Time unit of ``start_time`` and ``end_time``. Default is Timescale.S</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -411,22 +421,33 @@
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
 <span class="sd">    Uses numpy.trapezoid (trapezoidal rule) for numerical integration of discrete data.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from perda.utils import average_over_time_range</span>
+<span class="sd">    &gt;&gt;&gt; voltage = aly.data["bms.pack.voltage"]</span>
+<span class="sd">    &gt;&gt;&gt; mean_voltage = average_over_time_range(</span>
+<span class="sd">    ...     voltage, source_time_unit=aly.data.timestamp_unit</span>
+<span class="sd">    ... )</span>
 <span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_instance</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">data_instance</span><span class="o">.</span><span class="n">value_np</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 
     <span class="n">integral</span> <span class="o">=</span> <span class="n">integrate_over_time_range</span><span class="p">(</span>
-        <span class="n">data_instance</span><span class="p">,</span> <span class="n">start_time</span><span class="p">,</span> <span class="n">end_time</span><span class="p">,</span> <span class="n">source_time_unit</span><span class="p">,</span> <span class="n">target_time_unit</span>
+        <span class="n">data_instance</span><span class="p">,</span>
+        <span class="n">source_time_unit</span><span class="p">,</span>
+        <span class="n">start_time</span><span class="o">=</span><span class="n">start_time</span><span class="p">,</span>
+        <span class="n">end_time</span><span class="o">=</span><span class="n">end_time</span><span class="p">,</span>
+        <span class="n">target_time_unit</span><span class="o">=</span><span class="n">target_time_unit</span><span class="p">,</span>
     <span class="p">)</span>
 
-    <span class="n">ts</span> <span class="o">=</span> <span class="n">data_instance</span><span class="o">.</span><span class="n">timestamp_np</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="n">ts</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]</span> <span class="o">=</span> <span class="n">convert_time</span><span class="p">(</span>
+        <span class="n">data_instance</span><span class="o">.</span><span class="n">timestamp_np</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span>
+        <span class="n">source_time_unit</span><span class="p">,</span>
+        <span class="n">target_time_unit</span><span class="p">,</span>
+    <span class="p">)</span>
     <span class="n">actual_start_time</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">start_time</span><span class="p">,</span> <span class="n">ts</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
     <span class="n">actual_end_time</span> <span class="o">=</span> <span class="n">ts</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="n">end_time</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span> <span class="k">else</span> <span class="nb">min</span><span class="p">(</span><span class="n">end_time</span><span class="p">,</span> <span class="n">ts</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-
-    <span class="n">actual_start_time</span> <span class="o">=</span> <span class="n">convert_time</span><span class="p">(</span>
-        <span class="n">actual_start_time</span><span class="p">,</span> <span class="n">source_time_unit</span><span class="p">,</span> <span class="n">target_time_unit</span>
-    <span class="p">)</span>
-    <span class="n">actual_end_time</span> <span class="o">=</span> <span class="n">convert_time</span><span class="p">(</span><span class="n">actual_end_time</span><span class="p">,</span> <span class="n">source_time_unit</span><span class="p">,</span> <span class="n">target_time_unit</span><span class="p">)</span>
 
     <span class="n">time_range</span> <span class="o">=</span> <span class="n">actual_end_time</span> <span class="o">-</span> <span class="n">actual_start_time</span>
 
@@ -455,6 +476,16 @@
 <span class="sd">    -------</span>
 <span class="sd">    DataInstance</span>
 <span class="sd">        New DataInstance containing only data within the specified time range</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    ``start_time`` and ``end_time`` are raw timestamps, in ``aly.data.timestamp_unit``.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from perda.utils import get_data_slice_by_timestamp</span>
+<span class="sd">    &gt;&gt;&gt; di = aly.data["pcm.wheelSpeeds.frontRight"]</span>
+<span class="sd">    &gt;&gt;&gt; first_half = get_data_slice_by_timestamp(di, end_time=int(di.timestamp_np[len(di) // 2]))</span>
 <span class="sd">    """</span>
     <span class="k">if</span> <span class="n">end_time</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="n">mask</span> <span class="o">=</span> <span class="n">original_instance</span><span class="o">.</span><span class="n">timestamp_np</span> <span class="o">&gt;=</span> <span class="n">start_time</span>
@@ -475,7 +506,7 @@
 <a class="viewcode-back" href="../../../_autosummary/perda.utils.integrate.html#perda.utils.integrate.smoothed_filtered_integration">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">smoothed_filtered_integration</span><span class="p">(</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">DataInstance</span><span class="p">,</span>
-    <span class="n">source_time_unit</span><span class="p">:</span> <span class="n">Timescale</span> <span class="o">=</span> <span class="n">Timescale</span><span class="o">.</span><span class="n">US</span><span class="p">,</span>
+    <span class="n">source_time_unit</span><span class="p">:</span> <span class="n">Timescale</span><span class="p">,</span>
     <span class="n">target_time_unit</span><span class="p">:</span> <span class="n">Timescale</span> <span class="o">=</span> <span class="n">Timescale</span><span class="o">.</span><span class="n">S</span><span class="p">,</span>
     <span class="n">filter_window_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
     <span class="n">n_sigmas</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
@@ -492,7 +523,7 @@
 <span class="sd">    data : DataInstance</span>
 <span class="sd">        Time-series signal to integrate.</span>
 <span class="sd">    source_time_unit : Timescale</span>
-<span class="sd">        Time unit of inputs. Default is Timescale.US.</span>
+<span class="sd">        Time unit of ``data.timestamp_np``. Pass ``aly.data.timestamp_unit``.</span>
 <span class="sd">    target_time_unit : Timescale</span>
 <span class="sd">        Target time unit for integration result. Default is Timescale.S.</span>
 <span class="sd">    filter_window_size : int</span>
@@ -509,6 +540,14 @@
 <span class="sd">    tuple[NDArray[Float64], NDArray[Float64], NDArray[Float64]]</span>
 <span class="sd">        A tuple of (timestamps, smoothed values, cumulative integral), all of the</span>
 <span class="sd">        same length as the input signal.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from perda.utils import smoothed_filtered_integration</span>
+<span class="sd">    &gt;&gt;&gt; power = aly.data["bms.pack.voltage"] * aly.data["bms.pack.current"]</span>
+<span class="sd">    &gt;&gt;&gt; ts, smoothed_power, energy_joules = smoothed_filtered_integration(</span>
+<span class="sd">    ...     power, source_time_unit=aly.data.timestamp_unit</span>
+<span class="sd">    ... )</span>
 <span class="sd">    """</span>
     <span class="n">v_np</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">value_np</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
     <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>

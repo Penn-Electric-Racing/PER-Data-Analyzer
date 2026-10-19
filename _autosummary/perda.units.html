@@ -385,6 +385,17 @@
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">perda.units.</span></span><span class="sig-name descname"><span class="pre">Timescale</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/units.html#Timescale"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.units.Timescale" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
 <p>Supported timestamp units for time-series data.</p>
+<p class="rubric">Notes</p>
+<p>Every log stores raw timestamps in one native unit, given by
+<code class="docutils literal notranslate"><span class="pre">SingleRunData.timestamp_unit</span></code>. Current logs use <code class="docutils literal notranslate"><span class="pre">Timescale.US</span></code>. Helpers that
+take a <code class="docutils literal notranslate"><span class="pre">source_time_unit</span></code> or <code class="docutils literal notranslate"><span class="pre">timestamp_unit</span></code> argument require it; pass
+<code class="docutils literal notranslate"><span class="pre">data.timestamp_unit</span></code>.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">perda.units</span><span class="w"> </span><span class="kn">import</span> <span class="n">Timescale</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">timestamp_unit</span>
+<span class="go">&lt;Timescale.US: 'us'&gt;</span>
+</pre></div>
+</div>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="perda.units.Timescale.MS">
 <span class="sig-name descname"><span class="pre">MS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'ms'</span></em><a class="headerlink" href="#perda.units.Timescale.MS" title="Link to this definition">#</a></dt>
@@ -410,7 +421,7 @@
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>timestamp</strong> (<em>float</em><em> | </em><em>NDArray</em><em>[</em><em>Float64</em><em>]</em>) – Timestamp(s) to convert.</p></li>
-<li><p><strong>source_time_unit</strong> (<a class="reference internal" href="#perda.units.Timescale" title="perda.units.Timescale"><em>Timescale</em></a>) – Unit of the input timestamp.</p></li>
+<li><p><strong>source_time_unit</strong> (<a class="reference internal" href="#perda.units.Timescale" title="perda.units.Timescale"><em>Timescale</em></a>) – Unit of the input timestamp. Pass <code class="docutils literal notranslate"><span class="pre">aly.data.timestamp_unit</span></code>.</p></li>
 <li><p><strong>target_time_unit</strong> (<a class="reference internal" href="#perda.units.Timescale" title="perda.units.Timescale"><em>Timescale</em></a>) – Desired output unit.</p></li>
 </ul>
 </dd>
@@ -422,7 +433,8 @@
 </dd>
 </dl>
 <p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">convert_time</span><span class="p">(</span><span class="mf">5000.0</span><span class="p">,</span> <span class="n">Timescale</span><span class="o">.</span><span class="n">MS</span><span class="p">,</span> <span class="n">Timescale</span><span class="o">.</span><span class="n">S</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">perda.units</span><span class="w"> </span><span class="kn">import</span> <span class="n">Timescale</span><span class="p">,</span> <span class="n">convert_time</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">convert_time</span><span class="p">(</span><span class="mf">5000.0</span><span class="p">,</span> <span class="n">Timescale</span><span class="o">.</span><span class="n">MS</span><span class="p">,</span> <span class="n">Timescale</span><span class="o">.</span><span class="n">S</span><span class="p">)</span>
 <span class="go">5.0</span>
 </pre></div>
 </div>
@@ -446,6 +458,11 @@
 <dd class="field-odd"><p>float | NDArray[Float64]</p>
 </dd>
 </dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">perda.units</span><span class="w"> </span><span class="kn">import</span> <span class="n">from_seconds</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts_start</span> <span class="o">=</span> <span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">data_start_time</span> <span class="o">+</span> <span class="n">from_seconds</span><span class="p">(</span><span class="mf">10.0</span><span class="p">,</span> <span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">timestamp_unit</span><span class="p">)</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py function">
@@ -464,7 +481,8 @@
 </dd>
 </dl>
 <p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">in_to_m</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">perda.units</span><span class="w"> </span><span class="kn">import</span> <span class="n">in_to_m</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">in_to_m</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
 <span class="go">0.0254</span>
 </pre></div>
 </div>
@@ -486,7 +504,8 @@
 </dd>
 </dl>
 <p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mph_to_m_per_s</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">perda.units</span><span class="w"> </span><span class="kn">import</span> <span class="n">mph_to_m_per_s</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mph_to_m_per_s</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
 <span class="go">0.44704</span>
 </pre></div>
 </div>
@@ -500,7 +519,7 @@
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>timestamp</strong> (<em>float</em><em> | </em><em>NDArray</em><em>[</em><em>Float64</em><em>]</em>) – Timestamp(s) to convert.</p></li>
-<li><p><strong>source_time_unit</strong> (<a class="reference internal" href="#perda.units.Timescale" title="perda.units.Timescale"><em>Timescale</em></a>) – Unit of the input timestamp.</p></li>
+<li><p><strong>source_time_unit</strong> (<a class="reference internal" href="#perda.units.Timescale" title="perda.units.Timescale"><em>Timescale</em></a>) – Unit of the input timestamp. Pass <code class="docutils literal notranslate"><span class="pre">aly.data.timestamp_unit</span></code>.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -510,6 +529,12 @@
 <dd class="field-odd"><p>float | NDArray[Float64]</p>
 </dd>
 </dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">perda.units</span><span class="w"> </span><span class="kn">import</span> <span class="n">to_seconds</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">di</span> <span class="o">=</span> <span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">"pcm.wheelSpeeds.frontRight"</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">time_s</span> <span class="o">=</span> <span class="n">to_seconds</span><span class="p">(</span><span class="n">di</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">,</span> <span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">timestamp_unit</span><span class="p">)</span>
+</pre></div>
+</div>
 </dd></dl>
 
 </section>

@@ -320,7 +320,24 @@
 <div class="viewcode-block" id="SingleRunData">
 <a class="viewcode-back" href="../../../_autosummary/perda.core_data_structures.single_run_data.html#perda.core_data_structures.single_run_data.SingleRunData">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">SingleRunData</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""Pydantic model to store parsed CSV data with dictionary-like lookup."""</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Pydantic model to store parsed CSV data with dictionary-like lookup.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    All timestamps (``data_start_time``, ``data_end_time`` and every DataInstance's</span>
+<span class="sd">    ``timestamp_np``) are raw integers in ``timestamp_unit``, which is microseconds for</span>
+<span class="sd">    current logs. Helpers that take a ``source_time_unit`` or ``timestamp_unit`` argument</span>
+<span class="sd">    require it; pass ``data.timestamp_unit``.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from perda.units import to_seconds</span>
+<span class="sd">    &gt;&gt;&gt; data = aly.data</span>
+<span class="sd">    &gt;&gt;&gt; di = data["pcm.wheelSpeeds.frontRight"]</span>
+<span class="sd">    &gt;&gt;&gt; "pcm.wheelSpeeds.frontRight" in data</span>
+<span class="sd">    &gt;&gt;&gt; duration_s = to_seconds(data.data_end_time - data.data_start_time, data.timestamp_unit)</span>
+<span class="sd">    """</span>
 
     <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span><span class="n">arbitrary_types_allowed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
@@ -443,6 +460,12 @@
 <span class="sd">            C++ variable name key for the new variable.</span>
 <span class="sd">        di : DataInstance</span>
 <span class="sd">            DataInstance to insert.</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        &gt;&gt;&gt; power = aly.data["bms.pack.voltage"] * aly.data["bms.pack.current"]</span>
+<span class="sd">        &gt;&gt;&gt; aly.data.add("derived.pack.power", power)</span>
+<span class="sd">        &gt;&gt;&gt; fig = aly.plot("derived.pack.power")</span>
 <span class="sd">        """</span>
         <span class="k">if</span> <span class="n">cpp_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"'</span><span class="si">{</span><span class="n">cpp_name</span><span class="si">}</span><span class="s2">' already exists; use replace() to overwrite."</span><span class="p">)</span>
@@ -479,6 +502,11 @@
 <span class="sd">          C++ variable name of the variable to replace.</span>
 <span class="sd">        di : DataInstance</span>
 <span class="sd">          DataInstance whose ``value_np`` that replaces the stored one.</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        &gt;&gt;&gt; voltage = aly.data["bms.pack.voltage"]</span>
+<span class="sd">        &gt;&gt;&gt; aly.data.replace("bms.pack.voltage", voltage / 1000.0)</span>
 <span class="sd">        """</span>
         <span class="k">if</span> <span class="n">cpp_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span>

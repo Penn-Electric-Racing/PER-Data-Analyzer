@@ -420,6 +420,11 @@
 <span class="sd">        -------</span>
 <span class="sd">        Analyzer</span>
 <span class="sd">            Analyzer for that run. Repeated calls reuse the same instance.</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        &gt;&gt;&gt; first_run = col.get_run_by_chronological_index(0)</span>
+<span class="sd">        &gt;&gt;&gt; latest_run = col.get_run_by_chronological_index(-1)</span>
 <span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_runs_by_date</span><span class="p">[</span><span class="n">index</span><span class="p">])</span></div>
 
@@ -581,7 +586,7 @@
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
-<span class="sd">        &gt;&gt;&gt; col.plot_comparison("pcm.wheelSpeeds.frontLeft", max_points=20000).show()</span>
+<span class="sd">        &gt;&gt;&gt; fig = col.plot_comparison("pcm.wheelSpeeds.frontLeft", max_points=20000)</span>
 <span class="sd">        """</span>
         <span class="n">overlaid</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">run</span><span class="p">,</span> <span class="n">analyzer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iter_analyzers</span><span class="p">():</span>

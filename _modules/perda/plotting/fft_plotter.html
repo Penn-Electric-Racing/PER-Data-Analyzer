@@ -363,9 +363,10 @@
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
-<span class="sd">    &gt;&gt;&gt; freqs, mags = compute_fft(di)</span>
+<span class="sd">    &gt;&gt;&gt; from perda.plotting import plot_fft_spectrum</span>
+<span class="sd">    &gt;&gt;&gt; from perda.utils import compute_fft</span>
+<span class="sd">    &gt;&gt;&gt; freqs, mags = compute_fft(di, source_time_unit=aly.data.timestamp_unit)</span>
 <span class="sd">    &gt;&gt;&gt; fig = plot_fft_spectrum([freqs], [mags], [di.label])</span>
-<span class="sd">    &gt;&gt;&gt; fig.show()</span>
 <span class="sd">    """</span>
     <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">frequencies</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>

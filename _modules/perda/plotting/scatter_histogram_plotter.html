@@ -381,6 +381,26 @@
 <span class="sd">    -------</span>
 <span class="sd">    go.Figure</span>
 <span class="sd">        Plotly figure with scatter and histogram subplots.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">    &gt;&gt;&gt; from perda.plotting import plot_scatter_and_histogram</span>
+<span class="sd">    &gt;&gt;&gt; from perda.units import to_seconds</span>
+<span class="sd">    &gt;&gt;&gt; di = aly.data["bms.pack.voltage"]</span>
+<span class="sd">    &gt;&gt;&gt; fig = plot_scatter_and_histogram(</span>
+<span class="sd">    ...     x=to_seconds(di.timestamp_np, aly.data.timestamp_unit),</span>
+<span class="sd">    ...     y=di.value_np,</span>
+<span class="sd">    ...     title="Pack Voltage",</span>
+<span class="sd">    ...     scatter_title="Over time",</span>
+<span class="sd">    ...     histogram_title="Distribution",</span>
+<span class="sd">    ...     x_label="Time (s)",</span>
+<span class="sd">    ...     y_label="Voltage (V)",</span>
+<span class="sd">    ...     scatter_name="Voltage",</span>
+<span class="sd">    ...     histogram_name="Count",</span>
+<span class="sd">    ...     hline=float(np.mean(di.value_np)),</span>
+<span class="sd">    ...     hline_label="Mean",</span>
+<span class="sd">    ... )</span>
 <span class="sd">    """</span>
     <span class="n">fig</span> <span class="o">=</span> <span class="n">make_subplots</span><span class="p">(</span>
         <span class="n">rows</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>

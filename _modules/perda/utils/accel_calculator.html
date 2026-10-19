@@ -393,8 +393,8 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">compute_accel_results</span><span class="p">(</span>
     <span class="n">signal_obj</span><span class="p">:</span> <span class="n">DataInstance</span><span class="p">,</span>
     <span class="n">distance_obj</span><span class="p">:</span> <span class="n">DataInstance</span><span class="p">,</span>
+    <span class="n">source_time_unit</span><span class="p">:</span> <span class="n">Timescale</span><span class="p">,</span>
     <span class="n">target_dist</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">75</span><span class="p">,</span>
-    <span class="n">source_time_unit</span><span class="p">:</span> <span class="n">Timescale</span> <span class="o">=</span> <span class="n">Timescale</span><span class="o">.</span><span class="n">MS</span><span class="p">,</span>
     <span class="n">target_time_unit</span><span class="p">:</span> <span class="n">Timescale</span> <span class="o">=</span> <span class="n">Timescale</span><span class="o">.</span><span class="n">S</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">AccelSegmentResult</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">"""Compute time-to-distance results for each acceleration event.</span>
@@ -405,10 +405,10 @@
 <span class="sd">        Binary accel event signal (0.0/1.0), typically from `detect_accel_event`.</span>
 <span class="sd">    distance_obj : DataInstance</span>
 <span class="sd">        Cumulative distance signal in meters.</span>
+<span class="sd">    source_time_unit : Timescale</span>
+<span class="sd">        Time unit of input timestamps. Pass ``aly.data.timestamp_unit``.</span>
 <span class="sd">    target_dist : float, optional</span>
 <span class="sd">        Target distance in meters. Default is 75.</span>
-<span class="sd">    source_time_unit : Timescale, optional</span>
-<span class="sd">        Time unit of input timestamps. Default is Timescale.MS.</span>
 <span class="sd">    target_time_unit : Timescale, optional</span>
 <span class="sd">        Time unit for output times. Default is Timescale.S.</span>
 
@@ -419,7 +419,7 @@
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
-<span class="sd">    &gt;&gt;&gt; results = compute_accel_results(signal_di, distance_di)</span>
+<span class="sd">    &gt;&gt;&gt; results = compute_accel_results(signal_di, distance_di, aly.data.timestamp_unit)</span>
 <span class="sd">    &gt;&gt;&gt; for r in results:</span>
 <span class="sd">    ...     print(r)</span>
 <span class="sd">    """</span>

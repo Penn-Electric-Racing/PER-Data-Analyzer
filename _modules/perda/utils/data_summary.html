@@ -372,7 +372,7 @@
 <a class="viewcode-back" href="../../../_autosummary/perda.utils.data_summary.html#perda.utils.data_summary.data_instance_summary">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">data_instance_summary</span><span class="p">(</span>
     <span class="n">data_instance</span><span class="p">:</span> <span class="n">DataInstance</span><span class="p">,</span>
-    <span class="n">source_time_unit</span><span class="p">:</span> <span class="n">Timescale</span> <span class="o">=</span> <span class="n">Timescale</span><span class="o">.</span><span class="n">MS</span><span class="p">,</span>
+    <span class="n">source_time_unit</span><span class="p">:</span> <span class="n">Timescale</span><span class="p">,</span>
     <span class="n">target_time_unit</span><span class="p">:</span> <span class="n">Timescale</span> <span class="o">=</span> <span class="n">Timescale</span><span class="o">.</span><span class="n">S</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataInstanceSummary</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""</span>
@@ -382,8 +382,8 @@
 <span class="sd">    ----------</span>
 <span class="sd">    data_instance : DataInstance</span>
 <span class="sd">        The DataInstance to summarize</span>
-<span class="sd">    source_time_unit : Timescale, optional</span>
-<span class="sd">        Time unit of data instance. Default is milliseconds.</span>
+<span class="sd">    source_time_unit : Timescale</span>
+<span class="sd">        Time unit of data instance. Pass ``aly.data.timestamp_unit``.</span>
 <span class="sd">    target_time_unit : Timescale, optional</span>
 <span class="sd">        Time unit used by the summary. Default is Timescale.S.</span>
 
@@ -394,8 +394,12 @@
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
-<span class="sd">    &gt;&gt;&gt; print(data_instance_summary(aly.data["bms.pack.current"]))</span>
-<span class="sd">    &gt;&gt;&gt; data_instance_summary(aly.data["bms.pack.current"]).max_value</span>
+<span class="sd">    &gt;&gt;&gt; from perda.utils import data_instance_summary</span>
+<span class="sd">    &gt;&gt;&gt; summary = data_instance_summary(</span>
+<span class="sd">    ...     aly.data["bms.pack.current"], source_time_unit=aly.data.timestamp_unit</span>
+<span class="sd">    ... )</span>
+<span class="sd">    &gt;&gt;&gt; str(summary)</span>
+<span class="sd">    &gt;&gt;&gt; summary.max_value</span>
 <span class="sd">    """</span>
     <span class="n">header</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">data_instance</span><span class="p">)</span>
 
@@ -442,6 +446,20 @@
 <span class="sd">        Data structure containing CSV file data</span>
 <span class="sd">    time_unit : Timescale, optional</span>
 <span class="sd">        Time unit used by the summary. Default is Timescale.S.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    This only prints. To keep the text, capture stdout with ``contextlib.redirect_stdout``.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; import io</span>
+<span class="sd">    &gt;&gt;&gt; from contextlib import redirect_stdout</span>
+<span class="sd">    &gt;&gt;&gt; from perda.utils import single_run_summary</span>
+<span class="sd">    &gt;&gt;&gt; buffer = io.StringIO()</span>
+<span class="sd">    &gt;&gt;&gt; with redirect_stdout(buffer):</span>
+<span class="sd">    ...     single_run_summary(aly.data)</span>
+<span class="sd">    &gt;&gt;&gt; summary_text = buffer.getvalue()</span>
 <span class="sd">    """</span>
     <span class="n">start_time</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">data_start_time</span><span class="p">)</span>
     <span class="n">end_time</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">data_end_time</span><span class="p">)</span>

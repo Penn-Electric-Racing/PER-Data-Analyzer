@@ -410,9 +410,10 @@ If <code class="docutils literal notranslate"><span class="pre">False</span></co
 </dd>
 </dl>
 <p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">freqs</span><span class="p">,</span> <span class="n">mags</span> <span class="o">=</span> <span class="n">compute_fft</span><span class="p">(</span><span class="n">di</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">perda.plotting</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_fft_spectrum</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">perda.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">compute_fft</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">freqs</span><span class="p">,</span> <span class="n">mags</span> <span class="o">=</span> <span class="n">compute_fft</span><span class="p">(</span><span class="n">di</span><span class="p">,</span> <span class="n">source_time_unit</span><span class="o">=</span><span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">timestamp_unit</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span> <span class="o">=</span> <span class="n">plot_fft_spectrum</span><span class="p">([</span><span class="n">freqs</span><span class="p">],</span> <span class="p">[</span><span class="n">mags</span><span class="p">],</span> <span class="p">[</span><span class="n">di</span><span class="o">.</span><span class="n">label</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
 </dd></dl>

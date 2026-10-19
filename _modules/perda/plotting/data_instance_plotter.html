@@ -350,12 +350,12 @@
 <a class="viewcode-back" href="../../../_autosummary/perda.plotting.data_instance_plotter.html#perda.plotting.data_instance_plotter.plot_single_axis">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">plot_single_axis</span><span class="p">(</span>
     <span class="n">data_instances</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">DataInstance</span><span class="p">],</span>
+    <span class="n">timestamp_unit</span><span class="p">:</span> <span class="n">Timescale</span><span class="p">,</span>
     <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">y_axis_title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">show_legend</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">layout_config</span><span class="p">:</span> <span class="n">LayoutConfig</span> <span class="o">=</span> <span class="n">DEFAULT_LAYOUT_CONFIG</span><span class="p">,</span>
     <span class="n">font_config</span><span class="p">:</span> <span class="n">FontConfig</span> <span class="o">=</span> <span class="n">DEFAULT_FONT_CONFIG</span><span class="p">,</span>
-    <span class="n">timestamp_unit</span><span class="p">:</span> <span class="n">Timescale</span> <span class="o">=</span> <span class="n">Timescale</span><span class="o">.</span><span class="n">MS</span><span class="p">,</span>
     <span class="n">vlines</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">vline_config</span><span class="p">:</span> <span class="s2">"VLineConfig"</span> <span class="o">=</span> <span class="n">DEFAULT_VLINE_CONFIG</span><span class="p">,</span>
     <span class="n">max_points</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -367,6 +367,8 @@
 <span class="sd">    ----------</span>
 <span class="sd">    data_instances : List[DataInstance]</span>
 <span class="sd">        List of DataInstance objects to plot</span>
+<span class="sd">    timestamp_unit : Timescale</span>
+<span class="sd">        Timestamp unit in the underlying data. Converted to seconds for x-axis display. Pass ``aly.data.timestamp_unit``.</span>
 <span class="sd">    title : str | None, optional</span>
 <span class="sd">        Title for the entire plot.</span>
 <span class="sd">    y_axis_title : str | None, optional</span>
@@ -375,8 +377,6 @@
 <span class="sd">        Whether to show plot legends. Default is True</span>
 <span class="sd">    layout_config : LayoutConfig, optional</span>
 <span class="sd">    font_config : FontConfig, optional</span>
-<span class="sd">    timestamp_unit : Timescale, optional</span>
-<span class="sd">        Timestamp unit in the underlying data. Converted to seconds for x-axis display.</span>
 <span class="sd">    vlines : List[float] | None, optional</span>
 <span class="sd">        X-axis positions (in seconds) where vertical lines are drawn. Default is None.</span>
 <span class="sd">    vline_config : VLineConfig, optional</span>
@@ -390,8 +390,13 @@
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
-<span class="sd">    &gt;&gt;&gt; fig = plot_single_axis([speed_di, torque_di], title="Speed &amp; Torque", y_axis_title="Value")</span>
-<span class="sd">    &gt;&gt;&gt; fig.show()</span>
+<span class="sd">    &gt;&gt;&gt; from perda.plotting import plot_single_axis</span>
+<span class="sd">    &gt;&gt;&gt; fig = plot_single_axis(</span>
+<span class="sd">    ...     [speed_di, torque_di],</span>
+<span class="sd">    ...     title="Speed &amp; Torque",</span>
+<span class="sd">    ...     y_axis_title="Value",</span>
+<span class="sd">    ...     timestamp_unit=aly.data.timestamp_unit,</span>
+<span class="sd">    ... )</span>
 <span class="sd">    """</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">data_instances</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">"Warning: No data instances provided for plotting"</span><span class="p">)</span>
@@ -456,13 +461,13 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">plot_dual_axis</span><span class="p">(</span>
     <span class="n">left_data_instances</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">DataInstance</span><span class="p">],</span>
     <span class="n">right_data_instances</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">DataInstance</span><span class="p">],</span>
+    <span class="n">timestamp_unit</span><span class="p">:</span> <span class="n">Timescale</span><span class="p">,</span>
     <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">left_y_axis_title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">right_y_axis_title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">show_legend</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">font_config</span><span class="p">:</span> <span class="n">FontConfig</span> <span class="o">=</span> <span class="n">DEFAULT_FONT_CONFIG</span><span class="p">,</span>
     <span class="n">layout_config</span><span class="p">:</span> <span class="n">LayoutConfig</span> <span class="o">=</span> <span class="n">DEFAULT_LAYOUT_CONFIG</span><span class="p">,</span>
-    <span class="n">timestamp_unit</span><span class="p">:</span> <span class="n">Timescale</span> <span class="o">=</span> <span class="n">Timescale</span><span class="o">.</span><span class="n">MS</span><span class="p">,</span>
     <span class="n">vlines</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">vline_config</span><span class="p">:</span> <span class="n">VLineConfig</span> <span class="o">=</span> <span class="n">DEFAULT_VLINE_CONFIG</span><span class="p">,</span>
     <span class="n">max_points</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -476,6 +481,8 @@
 <span class="sd">        List of DataInstance objects to plot on the left y-axis</span>
 <span class="sd">    right_data_instances : List[DataInstance]</span>
 <span class="sd">        List of DataInstance objects to plot on the right y-axis</span>
+<span class="sd">    timestamp_unit : Timescale</span>
+<span class="sd">        Timestamp unit in the underlying data. Converted to seconds for x-axis display. Pass ``aly.data.timestamp_unit``.</span>
 <span class="sd">    title : str | None, optional</span>
 <span class="sd">        Title for the entire plot.</span>
 <span class="sd">    left_y_axis_title : str | None, optional</span>
@@ -488,8 +495,6 @@
 <span class="sd">        Font configuration for plot elements.</span>
 <span class="sd">    layout_config : LayoutConfig, optional</span>
 <span class="sd">        Layout configuration for plot dimensions.</span>
-<span class="sd">    timestamp_unit : Timescale, optional</span>
-<span class="sd">        Timestamp unit in the underlying data. Converted to seconds for x-axis display.</span>
 <span class="sd">    vlines : List[float] | None, optional</span>
 <span class="sd">        X-axis positions (in seconds) where vertical lines are drawn. Default is None.</span>
 <span class="sd">    vline_config : VLineConfig, optional</span>
@@ -503,8 +508,14 @@
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
-<span class="sd">    &gt;&gt;&gt; fig = plot_dual_axis([speed_di], [torque_di], left_y_axis_title="Speed (mph)", right_y_axis_title="Torque (Nm)")</span>
-<span class="sd">    &gt;&gt;&gt; fig.show()</span>
+<span class="sd">    &gt;&gt;&gt; from perda.plotting import plot_dual_axis</span>
+<span class="sd">    &gt;&gt;&gt; fig = plot_dual_axis(</span>
+<span class="sd">    ...     [speed_di],</span>
+<span class="sd">    ...     [torque_di],</span>
+<span class="sd">    ...     left_y_axis_title="Speed (mph)",</span>
+<span class="sd">    ...     right_y_axis_title="Torque (Nm)",</span>
+<span class="sd">    ...     timestamp_unit=aly.data.timestamp_unit,</span>
+<span class="sd">    ... )</span>
 <span class="sd">    """</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">left_data_instances</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">right_data_instances</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">"Warning: No data instances provided for plotting"</span><span class="p">)</span>

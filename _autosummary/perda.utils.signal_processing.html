@@ -403,11 +403,18 @@
 <dd class="field-odd"><p>NDArray[float64] | None</p>
 </dd>
 </dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">scipy.signal</span><span class="w"> </span><span class="kn">import</span> <span class="n">butter</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">perda.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">apply_sos_filter</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sos</span> <span class="o">=</span> <span class="n">butter</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">,</span> <span class="n">btype</span><span class="o">=</span><span class="s2">"low"</span><span class="p">,</span> <span class="n">fs</span><span class="o">=</span><span class="mf">100.0</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="s2">"sos"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">filtered</span> <span class="o">=</span> <span class="n">apply_sos_filter</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">sos</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="perda.utils.signal_processing.compute_fft">
-<span class="sig-prename descclassname"><span class="pre">perda.utils.signal_processing.</span></span><span class="sig-name descname"><span class="pre">compute_fft</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">di</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_time_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Timescale.MS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distance_di</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/utils/signal_processing.html#compute_fft"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.utils.signal_processing.compute_fft" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">perda.utils.signal_processing.</span></span><span class="sig-name descname"><span class="pre">compute_fft</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">di</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_time_unit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distance_di</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/utils/signal_processing.html#compute_fft"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.utils.signal_processing.compute_fft" title="Link to this definition">#</a></dt>
 <dd><p>Compute the real FFT magnitude spectrum of a DataInstance.</p>
 <p>NaN values are dropped before the transform.  The signal is
 mean-subtracted to suppress the DC component.</p>
@@ -415,8 +422,7 @@ mean-subtracted to suppress the DC component.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>di</strong> (<a class="reference internal" href="perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance"><em>DataInstance</em></a>) – Signal to transform.</p></li>
-<li><p><strong>source_time_unit</strong> (<a class="reference internal" href="perda.units.html#perda.units.Timescale" title="perda.units.Timescale"><em>Timescale</em></a><em>, </em><em>optional</em>) – Timestamp unit. Used only in time-domain mode. Default is
-<code class="docutils literal notranslate"><span class="pre">Timescale.MS</span></code>.</p></li>
+<li><p><strong>source_time_unit</strong> (<a class="reference internal" href="perda.units.html#perda.units.Timescale" title="perda.units.Timescale"><em>Timescale</em></a>) – Timestamp unit. Used only in time-domain mode. Pass <code class="docutils literal notranslate"><span class="pre">aly.data.timestamp_unit</span></code>.</p></li>
 <li><p><strong>distance_di</strong> (<a class="reference internal" href="perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance"><em>DataInstance</em></a><em> | </em><em>None</em><em>, </em><em>optional</em>) – If provided, the FFT is computed in the spatial domain and the
 sample spacing is derived from cumulative distance in meters
 (interpolated onto <code class="docutils literal notranslate"><span class="pre">di</span></code>’s timestamp grid). Default is None
@@ -435,7 +441,9 @@ sample spacing is derived from cumulative distance in meters
 </dd>
 </dl>
 <p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">freqs</span><span class="p">,</span> <span class="n">mags</span> <span class="o">=</span> <span class="n">compute_fft</span><span class="p">(</span><span class="n">di</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">perda.plotting</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_fft_spectrum</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">perda.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">compute_fft</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">freqs</span><span class="p">,</span> <span class="n">mags</span> <span class="o">=</span> <span class="n">compute_fft</span><span class="p">(</span><span class="n">di</span><span class="p">,</span> <span class="n">source_time_unit</span><span class="o">=</span><span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">timestamp_unit</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span> <span class="o">=</span> <span class="n">plot_fft_spectrum</span><span class="p">([</span><span class="n">freqs</span><span class="p">],</span> <span class="p">[</span><span class="n">mags</span><span class="p">],</span> <span class="p">[</span><span class="n">di</span><span class="o">.</span><span class="n">label</span><span class="p">])</span>
 </pre></div>
 </div>
@@ -443,7 +451,7 @@ sample spacing is derived from cumulative distance in meters
 
 <dl class="py function">
 <dt class="sig sig-object py" id="perda.utils.signal_processing.lowpass_filter">
-<span class="sig-prename descclassname"><span class="pre">perda.utils.signal_processing.</span></span><span class="sig-name descname"><span class="pre">lowpass_filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">di</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cutoff_hz</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_time_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Timescale.MS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/utils/signal_processing.html#lowpass_filter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.utils.signal_processing.lowpass_filter" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">perda.utils.signal_processing.</span></span><span class="sig-name descname"><span class="pre">lowpass_filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">di</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cutoff_hz</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_time_unit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/utils/signal_processing.html#lowpass_filter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.utils.signal_processing.lowpass_filter" title="Link to this definition">#</a></dt>
 <dd><p>Apply a Butterworth lowpass filter in the time domain.</p>
 <p>Returns a new DataInstance (or list thereof) with filtered values.
 Original timestamps and metadata are preserved. NaN positions in the
@@ -451,8 +459,9 @@ input remain NaN in the output.</p>
 <p>To re-filter at a different cutoff without stacking, pass the original
 (pre-filter) DataInstance again:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">di_original</span> <span class="o">=</span> <span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">"pcm.wheelSpeeds.frontRight"</span><span class="p">]</span>
-<span class="n">di_10hz</span> <span class="o">=</span> <span class="n">lowpass_filter</span><span class="p">(</span><span class="n">di_original</span><span class="p">,</span> <span class="n">cutoff_hz</span><span class="o">=</span><span class="mf">10.0</span><span class="p">)</span>
-<span class="n">di_5hz</span>  <span class="o">=</span> <span class="n">lowpass_filter</span><span class="p">(</span><span class="n">di_original</span><span class="p">,</span> <span class="n">cutoff_hz</span><span class="o">=</span><span class="mf">5.0</span><span class="p">)</span>   <span class="c1"># not stacked</span>
+<span class="n">unit</span> <span class="o">=</span> <span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">timestamp_unit</span>
+<span class="n">di_10hz</span> <span class="o">=</span> <span class="n">lowpass_filter</span><span class="p">(</span><span class="n">di_original</span><span class="p">,</span> <span class="n">cutoff_hz</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span> <span class="n">source_time_unit</span><span class="o">=</span><span class="n">unit</span><span class="p">)</span>
+<span class="n">di_5hz</span>  <span class="o">=</span> <span class="n">lowpass_filter</span><span class="p">(</span><span class="n">di_original</span><span class="p">,</span> <span class="n">cutoff_hz</span><span class="o">=</span><span class="mf">5.0</span><span class="p">,</span> <span class="n">source_time_unit</span><span class="o">=</span><span class="n">unit</span><span class="p">)</span>   <span class="c1"># not stacked</span>
 </pre></div>
 </div>
 <dl class="field-list simple">
@@ -460,7 +469,7 @@ input remain NaN in the output.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>di</strong> (<a class="reference internal" href="perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance"><em>DataInstance</em></a><em> | </em><em>list</em><em>[</em><a class="reference internal" href="perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance"><em>DataInstance</em></a><em>]</em>) – Input signal(s). Lists are processed independently.</p></li>
 <li><p><strong>cutoff_hz</strong> (<em>float</em>) – Cutoff frequency in Hz.</p></li>
-<li><p><strong>source_time_unit</strong> (<a class="reference internal" href="perda.units.html#perda.units.Timescale" title="perda.units.Timescale"><em>Timescale</em></a><em>, </em><em>optional</em>) – Timestamp unit of <code class="docutils literal notranslate"><span class="pre">di.timestamp_np</span></code>. Default is <code class="docutils literal notranslate"><span class="pre">Timescale.MS</span></code>.</p></li>
+<li><p><strong>source_time_unit</strong> (<a class="reference internal" href="perda.units.html#perda.units.Timescale" title="perda.units.Timescale"><em>Timescale</em></a>) – Timestamp unit of <code class="docutils literal notranslate"><span class="pre">di.timestamp_np</span></code>. Pass <code class="docutils literal notranslate"><span class="pre">aly.data.timestamp_unit</span></code>.</p></li>
 <li><p><strong>order</strong> (<em>int</em><em>, </em><em>optional</em>) – Butterworth filter order. The effective order is 2× due to
 forward-backward (<code class="docutils literal notranslate"><span class="pre">sosfiltfilt</span></code>) application. Default is 4.</p></li>
 </ul>
@@ -473,8 +482,10 @@ forward-backward (<code class="docutils literal notranslate"><span class="pre">s
 </dd>
 </dl>
 <p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">di_filtered</span> <span class="o">=</span> <span class="n">lowpass_filter</span><span class="p">(</span><span class="n">di</span><span class="p">,</span> <span class="n">cutoff_hz</span><span class="o">=</span><span class="mf">10.0</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">di_filtered</span> <span class="o">=</span> <span class="n">lowpass_filter</span><span class="p">([</span><span class="n">di_a</span><span class="p">,</span> <span class="n">di_b</span><span class="p">],</span> <span class="n">cutoff_hz</span><span class="o">=</span><span class="mf">5.0</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">perda.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">lowpass_filter</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">unit</span> <span class="o">=</span> <span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">timestamp_unit</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">di_filtered</span> <span class="o">=</span> <span class="n">lowpass_filter</span><span class="p">(</span><span class="n">di</span><span class="p">,</span> <span class="n">cutoff_hz</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span> <span class="n">source_time_unit</span><span class="o">=</span><span class="n">unit</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">di_filtered</span> <span class="o">=</span> <span class="n">lowpass_filter</span><span class="p">([</span><span class="n">di_a</span><span class="p">,</span> <span class="n">di_b</span><span class="p">],</span> <span class="n">cutoff_hz</span><span class="o">=</span><span class="mf">5.0</span><span class="p">,</span> <span class="n">source_time_unit</span><span class="o">=</span><span class="n">unit</span><span class="p">)</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -505,14 +516,15 @@ original signal timestamp grid.</p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">di_filtered</span> <span class="o">=</span> <span class="n">lowpass_filter_by_distance</span><span class="p">(</span><span class="n">di</span><span class="p">,</span> <span class="n">distance_di</span><span class="p">,</span> <span class="n">cutoff_freq_per_meter</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">perda.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">lowpass_filter_by_distance</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">di_filtered</span> <span class="o">=</span> <span class="n">lowpass_filter_by_distance</span><span class="p">(</span><span class="n">di</span><span class="p">,</span> <span class="n">distance_di</span><span class="p">,</span> <span class="n">cutoff_freq_per_meter</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span>
 </pre></div>
 </div>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="perda.utils.signal_processing.zscore_filter">
-<span class="sig-prename descclassname"><span class="pre">perda.utils.signal_processing.</span></span><span class="sig-name descname"><span class="pre">zscore_filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">di</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window_s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_time_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Timescale.MS</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/utils/signal_processing.html#zscore_filter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.utils.signal_processing.zscore_filter" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">perda.utils.signal_processing.</span></span><span class="sig-name descname"><span class="pre">zscore_filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">di</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window_s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_time_unit</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/utils/signal_processing.html#zscore_filter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.utils.signal_processing.zscore_filter" title="Link to this definition">#</a></dt>
 <dd><p>Remove outliers using a rolling-window z-score and interpolate gaps.</p>
 <p>For each sample, a z-score is computed relative to the local rolling
 mean and standard deviation.  Samples with <code class="docutils literal notranslate"><span class="pre">|z|</span> <span class="pre">&gt;</span> <span class="pre">threshold</span></code> are
@@ -523,7 +535,7 @@ replaced with <code class="docutils literal notranslate"><span class="pre">NaN</
 <li><p><strong>di</strong> (<a class="reference internal" href="perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance"><em>DataInstance</em></a><em> | </em><em>list</em><em>[</em><a class="reference internal" href="perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance"><em>DataInstance</em></a><em>]</em>) – Input signal(s).</p></li>
 <li><p><strong>window_s</strong> (<em>float</em>) – Rolling window size in seconds</p></li>
 <li><p><strong>threshold</strong> (<em>float</em>) – Z-score threshold; samples exceeding this are masked.</p></li>
-<li><p><strong>source_time_unit</strong> (<a class="reference internal" href="perda.units.html#perda.units.Timescale" title="perda.units.Timescale"><em>Timescale</em></a><em>, </em><em>optional</em>) – Timestamp unit. Default is <code class="docutils literal notranslate"><span class="pre">Timescale.MS</span></code>.</p></li>
+<li><p><strong>source_time_unit</strong> (<a class="reference internal" href="perda.units.html#perda.units.Timescale" title="perda.units.Timescale"><em>Timescale</em></a>) – Timestamp unit. Pass <code class="docutils literal notranslate"><span class="pre">aly.data.timestamp_unit</span></code>.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -534,7 +546,10 @@ replaced with <code class="docutils literal notranslate"><span class="pre">NaN</
 </dd>
 </dl>
 <p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">di_clean</span> <span class="o">=</span> <span class="n">zscore_filter</span><span class="p">(</span><span class="n">di</span><span class="p">,</span> <span class="n">window_s</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">3.0</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">perda.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">zscore_filter</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">di_clean</span> <span class="o">=</span> <span class="n">zscore_filter</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">di</span><span class="p">,</span> <span class="n">window_s</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">3.0</span><span class="p">,</span> <span class="n">source_time_unit</span><span class="o">=</span><span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">timestamp_unit</span>
+<span class="gp">... </span><span class="p">)</span>
 </pre></div>
 </div>
 </dd></dl>

@@ -338,6 +338,13 @@
 <span class="sd">    NDArray[float64] | None</span>
 <span class="sd">        Filtered signal with NaN preserved at original NaN positions, or</span>
 <span class="sd">        ``None`` if there are too few valid samples to filter.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from scipy.signal import butter</span>
+<span class="sd">    &gt;&gt;&gt; from perda.utils import apply_sos_filter</span>
+<span class="sd">    &gt;&gt;&gt; sos = butter(4, 10.0, btype="low", fs=100.0, output="sos")</span>
+<span class="sd">    &gt;&gt;&gt; filtered = apply_sos_filter(values, sos, order=4)</span>
 <span class="sd">    """</span>
     <span class="n">valid</span> <span class="o">=</span> <span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">signal</span><span class="p">)</span>
     <span class="n">min_samples</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">order</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
@@ -358,7 +365,7 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">lowpass_filter</span><span class="p">(</span>
     <span class="n">di</span><span class="p">:</span> <span class="n">DataInstance</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="n">DataInstance</span><span class="p">],</span>
     <span class="n">cutoff_hz</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-    <span class="n">source_time_unit</span><span class="p">:</span> <span class="n">Timescale</span> <span class="o">=</span> <span class="n">Timescale</span><span class="o">.</span><span class="n">MS</span><span class="p">,</span>
+    <span class="n">source_time_unit</span><span class="p">:</span> <span class="n">Timescale</span><span class="p">,</span>
     <span class="n">order</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataInstance</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="n">DataInstance</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">"""Apply a Butterworth lowpass filter in the time domain.</span>
@@ -371,8 +378,9 @@
 <span class="sd">    (pre-filter) DataInstance again::</span>
 
 <span class="sd">        di_original = aly.data["pcm.wheelSpeeds.frontRight"]</span>
-<span class="sd">        di_10hz = lowpass_filter(di_original, cutoff_hz=10.0)</span>
-<span class="sd">        di_5hz  = lowpass_filter(di_original, cutoff_hz=5.0)   # not stacked</span>
+<span class="sd">        unit = aly.data.timestamp_unit</span>
+<span class="sd">        di_10hz = lowpass_filter(di_original, cutoff_hz=10.0, source_time_unit=unit)</span>
+<span class="sd">        di_5hz  = lowpass_filter(di_original, cutoff_hz=5.0, source_time_unit=unit)   # not stacked</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -380,8 +388,8 @@
 <span class="sd">        Input signal(s). Lists are processed independently.</span>
 <span class="sd">    cutoff_hz : float</span>
 <span class="sd">        Cutoff frequency in Hz.</span>
-<span class="sd">    source_time_unit : Timescale, optional</span>
-<span class="sd">        Timestamp unit of ``di.timestamp_np``. Default is ``Timescale.MS``.</span>
+<span class="sd">    source_time_unit : Timescale</span>
+<span class="sd">        Timestamp unit of ``di.timestamp_np``. Pass ``aly.data.timestamp_unit``.</span>
 <span class="sd">    order : int, optional</span>
 <span class="sd">        Butterworth filter order. The effective order is 2× due to</span>
 <span class="sd">        forward-backward (``sosfiltfilt``) application. Default is 4.</span>
@@ -393,8 +401,10 @@
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
-<span class="sd">    &gt;&gt;&gt; di_filtered = lowpass_filter(di, cutoff_hz=10.0)</span>
-<span class="sd">    &gt;&gt;&gt; di_filtered = lowpass_filter([di_a, di_b], cutoff_hz=5.0)</span>
+<span class="sd">    &gt;&gt;&gt; from perda.utils import lowpass_filter</span>
+<span class="sd">    &gt;&gt;&gt; unit = aly.data.timestamp_unit</span>
+<span class="sd">    &gt;&gt;&gt; di_filtered = lowpass_filter(di, cutoff_hz=10.0, source_time_unit=unit)</span>
+<span class="sd">    &gt;&gt;&gt; di_filtered = lowpass_filter([di_a, di_b], cutoff_hz=5.0, source_time_unit=unit)</span>
 <span class="sd">    """</span>
     <span class="n">di_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">di</span><span class="p">]</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">di</span><span class="p">,</span> <span class="n">DataInstance</span><span class="p">)</span> <span class="k">else</span> <span class="n">di</span>
 
@@ -476,6 +486,7 @@
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from perda.utils import lowpass_filter_by_distance</span>
 <span class="sd">    &gt;&gt;&gt; di_filtered = lowpass_filter_by_distance(di, distance_di, cutoff_freq_per_meter=0.05)</span>
 <span class="sd">    """</span>
     <span class="n">di_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">di</span><span class="p">]</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">di</span><span class="p">,</span> <span class="n">DataInstance</span><span class="p">)</span> <span class="k">else</span> <span class="n">di</span>
@@ -541,7 +552,7 @@
     <span class="n">di</span><span class="p">:</span> <span class="n">DataInstance</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="n">DataInstance</span><span class="p">],</span>
     <span class="n">window_s</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">threshold</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-    <span class="n">source_time_unit</span><span class="p">:</span> <span class="n">Timescale</span> <span class="o">=</span> <span class="n">Timescale</span><span class="o">.</span><span class="n">MS</span><span class="p">,</span>
+    <span class="n">source_time_unit</span><span class="p">:</span> <span class="n">Timescale</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataInstance</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="n">DataInstance</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">"""Remove outliers using a rolling-window z-score and interpolate gaps.</span>
 
@@ -557,8 +568,8 @@
 <span class="sd">        Rolling window size in seconds</span>
 <span class="sd">    threshold : float</span>
 <span class="sd">        Z-score threshold; samples exceeding this are masked.</span>
-<span class="sd">    source_time_unit : Timescale, optional</span>
-<span class="sd">        Timestamp unit. Default is ``Timescale.MS``.</span>
+<span class="sd">    source_time_unit : Timescale</span>
+<span class="sd">        Timestamp unit. Pass ``aly.data.timestamp_unit``.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -567,7 +578,10 @@
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
-<span class="sd">    &gt;&gt;&gt; di_clean = zscore_filter(di, window_s=1.0, threshold=3.0)</span>
+<span class="sd">    &gt;&gt;&gt; from perda.utils import zscore_filter</span>
+<span class="sd">    &gt;&gt;&gt; di_clean = zscore_filter(</span>
+<span class="sd">    ...     di, window_s=1.0, threshold=3.0, source_time_unit=aly.data.timestamp_unit</span>
+<span class="sd">    ... )</span>
 <span class="sd">    """</span>
     <span class="n">di_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">di</span><span class="p">]</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">di</span><span class="p">,</span> <span class="n">DataInstance</span><span class="p">)</span> <span class="k">else</span> <span class="n">di</span>
 
@@ -630,7 +644,7 @@
 <a class="viewcode-back" href="../../../_autosummary/perda.utils.signal_processing.html#perda.utils.signal_processing.compute_fft">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">compute_fft</span><span class="p">(</span>
     <span class="n">di</span><span class="p">:</span> <span class="n">DataInstance</span><span class="p">,</span>
-    <span class="n">source_time_unit</span><span class="p">:</span> <span class="n">Timescale</span> <span class="o">=</span> <span class="n">Timescale</span><span class="o">.</span><span class="n">MS</span><span class="p">,</span>
+    <span class="n">source_time_unit</span><span class="p">:</span> <span class="n">Timescale</span><span class="p">,</span>
     <span class="n">distance_di</span><span class="p">:</span> <span class="n">DataInstance</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]]:</span>
 <span class="w">    </span><span class="sd">"""Compute the real FFT magnitude spectrum of a DataInstance.</span>
@@ -642,9 +656,8 @@
 <span class="sd">    ----------</span>
 <span class="sd">    di : DataInstance</span>
 <span class="sd">        Signal to transform.</span>
-<span class="sd">    source_time_unit : Timescale, optional</span>
-<span class="sd">        Timestamp unit. Used only in time-domain mode. Default is</span>
-<span class="sd">        ``Timescale.MS``.</span>
+<span class="sd">    source_time_unit : Timescale</span>
+<span class="sd">        Timestamp unit. Used only in time-domain mode. Pass ``aly.data.timestamp_unit``.</span>
 <span class="sd">    distance_di : DataInstance | None, optional</span>
 <span class="sd">        If provided, the FFT is computed in the spatial domain and the</span>
 <span class="sd">        sample spacing is derived from cumulative distance in meters</span>
@@ -660,7 +673,9 @@
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
-<span class="sd">    &gt;&gt;&gt; freqs, mags = compute_fft(di)</span>
+<span class="sd">    &gt;&gt;&gt; from perda.plotting import plot_fft_spectrum</span>
+<span class="sd">    &gt;&gt;&gt; from perda.utils import compute_fft</span>
+<span class="sd">    &gt;&gt;&gt; freqs, mags = compute_fft(di, source_time_unit=aly.data.timestamp_unit)</span>
 <span class="sd">    &gt;&gt;&gt; fig = plot_fft_spectrum([freqs], [mags], [di.label])</span>
 <span class="sd">    """</span>
     <span class="n">signal</span> <span class="o">=</span> <span class="n">di</span><span class="o">.</span><span class="n">value_np</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>

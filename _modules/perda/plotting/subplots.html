@@ -324,12 +324,12 @@
 <a class="viewcode-back" href="../../../_autosummary/perda.plotting.subplots.html#perda.plotting.subplots.data_instance_subplots">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">data_instance_subplots</span><span class="p">(</span>
     <span class="n">rows</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">DataInstance</span><span class="p">]],</span>
+    <span class="n">timestamp_unit</span><span class="p">:</span> <span class="n">Timescale</span><span class="p">,</span>
     <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">row_y_labels</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">show_legend</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">layout_config</span><span class="p">:</span> <span class="n">LayoutConfig</span> <span class="o">=</span> <span class="n">DEFAULT_LAYOUT_CONFIG</span><span class="p">,</span>
     <span class="n">font_config</span><span class="p">:</span> <span class="n">FontConfig</span> <span class="o">=</span> <span class="n">DEFAULT_FONT_CONFIG</span><span class="p">,</span>
-    <span class="n">timestamp_unit</span><span class="p">:</span> <span class="n">Timescale</span> <span class="o">=</span> <span class="n">Timescale</span><span class="o">.</span><span class="n">MS</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""Plot groups of DataInstances as stacked subplots on a shared time axis.</span>
 
@@ -342,6 +342,8 @@
 <span class="sd">    rows : List[List[DataInstance]]</span>
 <span class="sd">        Outer list defines subplot rows (top to bottom); inner list defines</span>
 <span class="sd">        the DataInstances overlaid within that row.</span>
+<span class="sd">    timestamp_unit : Timescale</span>
+<span class="sd">        Timestamp unit of the underlying DataInstances. Converted to seconds for x-axis display. Pass ``aly.data.timestamp_unit``.</span>
 <span class="sd">    title : str | None, optional</span>
 <span class="sd">        Figure-level title. Default is None (no title).</span>
 <span class="sd">    row_y_labels : List[str | None] | None, optional</span>
@@ -354,9 +356,6 @@
 <span class="sd">        Dimensions, spacing, and style for the subplot grid.</span>
 <span class="sd">    font_config : FontConfig, optional</span>
 <span class="sd">        Font sizes for title, axis labels, tick labels, and legend.</span>
-<span class="sd">    timestamp_unit : Timescale, optional</span>
-<span class="sd">        Timestamp unit of the underlying DataInstances. Converted to seconds</span>
-<span class="sd">        for x-axis display. Default is Timescale.MS.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -365,12 +364,13 @@
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from perda.plotting import data_instance_subplots</span>
 <span class="sd">    &gt;&gt;&gt; fig = data_instance_subplots(</span>
 <span class="sd">    ...     rows=[[speed_di], [torque_di, motor_di]],</span>
 <span class="sd">    ...     title="Run Overview",</span>
 <span class="sd">    ...     row_y_labels=["Speed (mph)", "Torque / Motor"],</span>
+<span class="sd">    ...     timestamp_unit=aly.data.timestamp_unit,</span>
 <span class="sd">    ... )</span>
-<span class="sd">    &gt;&gt;&gt; fig.show()</span>
 <span class="sd">    """</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">rows</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">"Warning: No rows provided for subplot figure"</span><span class="p">)</span>
@@ -482,6 +482,11 @@
 <span class="sd">    -------</span>
 <span class="sd">    Tuple[np.ndarray, np.ndarray]</span>
 <span class="sd">        Downsampled ``(timestamps_s, values)``.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from perda.plotting import stride_downsample</span>
+<span class="sd">    &gt;&gt;&gt; ts_small, values_small = stride_downsample(time_s, di.value_np, 1000.0)</span>
 <span class="sd">    """</span>
     <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">timestamps_s</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
@@ -506,11 +511,11 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">plot_multi_log_subplots</span><span class="p">(</span>
     <span class="n">logs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">SingleRunData</span><span class="p">],</span>
     <span class="n">var_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="n">timestamp_unit</span><span class="p">:</span> <span class="n">Timescale</span><span class="p">,</span>
     <span class="n">row_y_labels</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">layout_config</span><span class="p">:</span> <span class="n">LayoutConfig</span> <span class="o">=</span> <span class="n">DEFAULT_LAYOUT_CONFIG</span><span class="p">,</span>
     <span class="n">font_config</span><span class="p">:</span> <span class="n">FontConfig</span> <span class="o">=</span> <span class="n">DEFAULT_FONT_CONFIG</span><span class="p">,</span>
-    <span class="n">timestamp_unit</span><span class="p">:</span> <span class="n">Timescale</span> <span class="o">=</span> <span class="n">Timescale</span><span class="o">.</span><span class="n">MS</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""Plot the same set of variables across multiple logs as stacked subplots, with each</span>
 <span class="sd">    variable on one subplot.</span>
@@ -521,6 +526,8 @@
 <span class="sd">    var_names : List[str]</span>
 <span class="sd">        Ordered list of variable names to plot, one per subplot row.  Variables</span>
 <span class="sd">        absent from log are silently skipped.</span>
+<span class="sd">    timestamp_unit : Timescale</span>
+<span class="sd">        Timestamp unit of the underlying DataInstances. Pass ``aly.data.timestamp_unit``.</span>
 <span class="sd">    row_y_labels : List[str | None] | None, optional</span>
 <span class="sd">        Y-axis label for each row. Must match the length of ``var_names``</span>
 <span class="sd">    title : str | None, optional</span>
@@ -528,8 +535,6 @@
 <span class="sd">        suffix is appended automatically.</span>
 <span class="sd">    layout_config : LayoutConfig, optional</span>
 <span class="sd">    font_config : FontConfig, optional</span>
-<span class="sd">    timestamp_unit : Timescale, optional</span>
-<span class="sd">        Timestamp unit of the underlying DataInstances. Default is Timescale.MS.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -538,12 +543,13 @@
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from perda.plotting import plot_multi_log_subplots</span>
 <span class="sd">    &gt;&gt;&gt; fig = plot_multi_log_subplots(</span>
 <span class="sd">    ...     logs=[aly1.data, aly2.data],</span>
-<span class="sd">    ...     var_names=["pcm."pcm.wheelSpeeds.frontLeft", "ludwig.steeringWheel.angle", "pcm.pedals.brakePressure.front"],</span>
+<span class="sd">    ...     var_names=["pcm.wheelSpeeds.frontLeft", "ludwig.steeringWheel.angle", "pcm.pedals.brakePressure.front"],</span>
 <span class="sd">    ...     title="Speed Comparison",</span>
+<span class="sd">    ...     timestamp_unit=aly1.data.timestamp_unit,</span>
 <span class="sd">    ... )</span>
-<span class="sd">    &gt;&gt;&gt; fig.show()</span>
 <span class="sd">    """</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">logs</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">var_names</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">"No logs or variable names provided."</span><span class="p">)</span>

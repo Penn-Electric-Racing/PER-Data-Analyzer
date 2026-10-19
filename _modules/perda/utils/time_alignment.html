@@ -316,7 +316,7 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">apply_time_offset</span><span class="p">(</span>
     <span class="n">di</span><span class="p">:</span> <span class="n">DataInstance</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="n">DataInstance</span><span class="p">],</span>
     <span class="n">offset_s</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-    <span class="n">source_time_unit</span><span class="p">:</span> <span class="n">Timescale</span> <span class="o">=</span> <span class="n">Timescale</span><span class="o">.</span><span class="n">MS</span><span class="p">,</span>
+    <span class="n">source_time_unit</span><span class="p">:</span> <span class="n">Timescale</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataInstance</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="n">DataInstance</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">"""Shift signals in time by a fixed offset, but keeping the same timestamp list.</span>
 
@@ -329,8 +329,8 @@
 <span class="sd">        Input signal(s). Lists are processed independently.</span>
 <span class="sd">    offset_s : float</span>
 <span class="sd">        Time shift in seconds (positive shifts the signal later).</span>
-<span class="sd">    source_time_unit : Timescale, optional</span>
-<span class="sd">        Timestamp unit of ``di.timestamp_np``. Default is ``Timescale.MS``.</span>
+<span class="sd">    source_time_unit : Timescale</span>
+<span class="sd">        Timestamp unit of ``di.timestamp_np``. Pass ``aly.data.timestamp_unit``.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -339,8 +339,10 @@
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
-<span class="sd">    &gt;&gt;&gt; di_aligned = apply_time_offset(gps_speed_di, offset_s=-0.08)</span>
-<span class="sd">    &gt;&gt;&gt; a, b = apply_time_offset([di_a, di_b], offset_s=0.05)</span>
+<span class="sd">    &gt;&gt;&gt; from perda.utils import apply_time_offset</span>
+<span class="sd">    &gt;&gt;&gt; unit = aly.data.timestamp_unit</span>
+<span class="sd">    &gt;&gt;&gt; di_aligned = apply_time_offset(gps_speed_di, offset_s=-0.08, source_time_unit=unit)</span>
+<span class="sd">    &gt;&gt;&gt; a, b = apply_time_offset([di_a, di_b], offset_s=0.05, source_time_unit=unit)</span>
 <span class="sd">    """</span>
     <span class="n">di_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">di</span><span class="p">]</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">di</span><span class="p">,</span> <span class="n">DataInstance</span><span class="p">)</span> <span class="k">else</span> <span class="n">di</span>
 

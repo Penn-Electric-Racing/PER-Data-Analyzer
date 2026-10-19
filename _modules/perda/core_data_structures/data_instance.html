@@ -318,7 +318,30 @@
 <div class="viewcode-block" id="DataInstance">
 <a class="viewcode-back" href="../../../_autosummary/perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.DataInstance">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">DataInstance</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""A single time-series variable, pairing a 1D timestamp array with a 1D value array."""</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    A single time-series variable, pairing a 1D timestamp array with a 1D value array.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Timestamps are raw integers in the log's native unit, ``SingleRunData.timestamp_unit``</span>
+<span class="sd">    (microseconds for current logs), not seconds.</span>
+
+<span class="sd">    Arithmetic (``+ - * / **``) accepts only another DataInstance or a scalar, never a raw</span>
+<span class="sd">    NumPy array. Between two DataInstances, the right one is interpolated onto the left</span>
+<span class="sd">    one's timestamps, so the result has the left one's length. To combine with an array,</span>
+<span class="sd">    do the math on ``.value_np`` and wrap the result in a new DataInstance.</span>
+
+<span class="sd">    The constructor takes keyword arguments only.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from perda.core_data_structures import DataInstance</span>
+<span class="sd">    &gt;&gt;&gt; di = aly.data["pcm.wheelSpeeds.frontRight"]</span>
+<span class="sd">    &gt;&gt;&gt; average = (di + aly.data["pcm.wheelSpeeds.frontLeft"]) / 2.0</span>
+<span class="sd">    &gt;&gt;&gt; squared = DataInstance(</span>
+<span class="sd">    ...     timestamp_np=di.timestamp_np, value_np=di.value_np**2, label="Speed squared"</span>
+<span class="sd">    ... )</span>
+<span class="sd">    """</span>
 
     <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span><span class="n">arbitrary_types_allowed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
@@ -521,7 +544,7 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">resample_to_freq</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">freq_hz</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-        <span class="n">source_time_unit</span><span class="p">:</span> <span class="n">Timescale</span> <span class="o">=</span> <span class="n">Timescale</span><span class="o">.</span><span class="n">MS</span><span class="p">,</span>
+        <span class="n">source_time_unit</span><span class="p">:</span> <span class="n">Timescale</span><span class="p">,</span>
         <span class="n">method</span><span class="p">:</span> <span class="n">ResampleMethod</span> <span class="o">=</span> <span class="n">ResampleMethod</span><span class="o">.</span><span class="n">LINEAR</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataInstance</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
@@ -531,8 +554,8 @@
 <span class="sd">        ----------</span>
 <span class="sd">        freq_hz : float</span>
 <span class="sd">            Target sampling frequency in Hz</span>
-<span class="sd">        source_time_unit : Timescale, optional</span>
-<span class="sd">            Timestamp unit of ``timestamp_np``. Default is ``Timescale.MS``.</span>
+<span class="sd">        source_time_unit : Timescale</span>
+<span class="sd">            Timestamp unit of ``timestamp_np``. Pass ``aly.data.timestamp_unit``.</span>
 <span class="sd">        method : ResampleMethod, optional</span>
 <span class="sd">            Interpolation method. Default is LINEAR.</span>
 
@@ -543,7 +566,7 @@
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
-<span class="sd">        &gt;&gt;&gt; uniform = di.resample_to_freq(freq_hz=100.0, source_time_unit=Timescale.US)</span>
+<span class="sd">        &gt;&gt;&gt; uniform = di.resample_to_freq(freq_hz=100.0, source_time_unit=aly.data.timestamp_unit)</span>
 <span class="sd">        """</span>
         <span class="n">dt</span> <span class="o">=</span> <span class="n">from_seconds</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="n">freq_hz</span><span class="p">,</span> <span class="n">source_time_unit</span><span class="p">)</span>
         <span class="n">target_ts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span>
@@ -597,8 +620,20 @@
 <span class="sd">        First element is the left DataInstance (unchanged), followed by one</span>
 <span class="sd">        aligned DataInstance per right input, in the same order.</span>
 
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Signals are logged at different rates, so two DataInstances usually have different</span>
+<span class="sd">    lengths and timestamps. Join them first whenever you combine their arrays: a boolean</span>
+<span class="sd">    mask built from one signal's ``value_np`` cannot index another's until both share a</span>
+<span class="sd">    timestamp grid.</span>
+
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from perda.core_data_structures import ResampleMethod, left_join_data_instances</span>
+<span class="sd">    &gt;&gt;&gt; speed = aly.data["pcm.wheelSpeeds.frontRight"]</span>
+<span class="sd">    &gt;&gt;&gt; torque = aly.data["pcm.moc.motor.requestedTorque"]</span>
+<span class="sd">    &gt;&gt;&gt; speed, torque = left_join_data_instances(speed, torque)</span>
+<span class="sd">    &gt;&gt;&gt; torque_while_moving = torque.value_np[speed.value_np &gt; 1.0]</span>
 <span class="sd">    &gt;&gt;&gt; left_a, right_b, right_c = left_join_data_instances(a, [b, c])</span>
 <span class="sd">    &gt;&gt;&gt; left_a, right_b = left_join_data_instances(a, b, method=ResampleMethod.ZOH)</span>
 <span class="sd">    """</span>
@@ -670,6 +705,11 @@
 <span class="sd">        Left DataInstance with values interpolated to union timestamps</span>
 <span class="sd">    right_result : DataInstance</span>
 <span class="sd">        Right DataInstance with values interpolated to union timestamps</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from perda.core_data_structures import outer_join_data_instances</span>
+<span class="sd">    &gt;&gt;&gt; a_union, b_union = outer_join_data_instances(a, b)</span>
 <span class="sd">    """</span>
     <span class="n">ts</span><span class="p">,</span> <span class="n">left_val</span><span class="p">,</span> <span class="n">right_val</span> <span class="o">=</span> <span class="n">outer_join</span><span class="p">(</span>
         <span class="n">left</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">,</span>
@@ -721,6 +761,15 @@
 <span class="sd">        Left DataInstance with only matched timestamps</span>
 <span class="sd">    right_result : DataInstance</span>
 <span class="sd">        Right DataInstance with only matched timestamps</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    ``tolerance`` is in raw timestamp units, ``aly.data.timestamp_unit``.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from perda.core_data_structures import inner_join_data_instances</span>
+<span class="sd">    &gt;&gt;&gt; a_matched, b_matched = inner_join_data_instances(a, b, tolerance=1_000)</span>
 <span class="sd">    """</span>
     <span class="n">ts</span><span class="p">,</span> <span class="n">left_val</span><span class="p">,</span> <span class="n">right_val</span> <span class="o">=</span> <span class="n">inner_join</span><span class="p">(</span>
         <span class="n">left</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">,</span>
@@ -765,6 +814,12 @@
 <span class="sd">    -------</span>
 <span class="sd">    DataInstance</span>
 <span class="sd">        New DataInstance with combined values</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">    &gt;&gt;&gt; from perda.core_data_structures import apply_ufunc_left_join</span>
+<span class="sd">    &gt;&gt;&gt; larger = apply_ufunc_left_join(a, b, np.maximum)</span>
 <span class="sd">    """</span>
     <span class="n">left_aligned</span><span class="p">,</span> <span class="n">right_aligned</span> <span class="o">=</span> <span class="n">left_join_data_instances</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">)</span>
     <span class="n">result_val</span> <span class="o">=</span> <span class="n">ufunc</span><span class="p">(</span><span class="n">left_aligned</span><span class="o">.</span><span class="n">value_np</span><span class="p">,</span> <span class="n">right_aligned</span><span class="o">.</span><span class="n">value_np</span><span class="p">)</span>
@@ -809,6 +864,12 @@
 <span class="sd">    -------</span>
 <span class="sd">    DataInstance</span>
 <span class="sd">        New DataInstance with combined values</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">    &gt;&gt;&gt; from perda.core_data_structures import apply_ufunc_outer_join</span>
+<span class="sd">    &gt;&gt;&gt; larger = apply_ufunc_outer_join(a, b, np.maximum)</span>
 <span class="sd">    """</span>
     <span class="n">left_aligned</span><span class="p">,</span> <span class="n">right_aligned</span> <span class="o">=</span> <span class="n">outer_join_data_instances</span><span class="p">(</span>
         <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="n">drop_nan</span><span class="o">=</span><span class="n">drop_nan</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="n">fill</span>
@@ -845,12 +906,19 @@
 <span class="sd">    ufunc : Callable</span>
 <span class="sd">        NumPy universal function to apply (e.g., np.add, np.subtract)</span>
 <span class="sd">    tolerance : float</span>
-<span class="sd">        Maximum allowed distance between left and right timestamps for a match.</span>
+<span class="sd">        Maximum allowed distance between left and right timestamps for a match,</span>
+<span class="sd">        in raw timestamp units.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    DataInstance</span>
 <span class="sd">        New DataInstance with combined values</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">    &gt;&gt;&gt; from perda.core_data_structures import apply_ufunc_inner_join</span>
+<span class="sd">    &gt;&gt;&gt; larger = apply_ufunc_inner_join(a, b, np.maximum, tolerance=1_000)</span>
 <span class="sd">    """</span>
     <span class="n">left_aligned</span><span class="p">,</span> <span class="n">right_aligned</span> <span class="o">=</span> <span class="n">inner_join_data_instances</span><span class="p">(</span>
         <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="n">tolerance</span>

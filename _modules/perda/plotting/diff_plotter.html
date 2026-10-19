@@ -393,6 +393,11 @@
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    go.Figure</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from perda.plotting import plot_diff_bars</span>
+<span class="sd">    &gt;&gt;&gt; fig = plot_diff_bars(base_only_ts, incoming_only_ts, mismatch_ts, all_ts)</span>
 <span class="sd">    """</span>
     <span class="k">if</span> <span class="n">total_present_ts</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">"No diff events to plot."</span><span class="p">)</span>

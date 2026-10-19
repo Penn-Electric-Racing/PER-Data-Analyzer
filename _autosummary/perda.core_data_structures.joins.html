@@ -412,6 +412,11 @@ timestamp to be kept.</p></li>
 </p>
 </dd>
 </dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">perda.core_data_structures</span><span class="w"> </span><span class="kn">import</span> <span class="n">inner_join</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span><span class="p">,</span> <span class="n">a_values</span><span class="p">,</span> <span class="n">b_values</span> <span class="o">=</span> <span class="n">inner_join</span><span class="p">(</span><span class="n">a_ts</span><span class="p">,</span> <span class="n">a_values</span><span class="p">,</span> <span class="n">b_ts</span><span class="p">,</span> <span class="n">b_values</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="mi">1_000</span><span class="p">)</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py function">
@@ -440,6 +445,11 @@ timestamp to be kept.</p></li>
 </p>
 </dd>
 </dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">perda.core_data_structures</span><span class="w"> </span><span class="kn">import</span> <span class="n">left_join</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span><span class="p">,</span> <span class="n">a_values</span><span class="p">,</span> <span class="n">b_values</span> <span class="o">=</span> <span class="n">left_join</span><span class="p">(</span><span class="n">a_ts</span><span class="p">,</span> <span class="n">a_values</span><span class="p">,</span> <span class="n">b_ts</span><span class="p">,</span> <span class="n">b_values</span><span class="p">)</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py function">
@@ -471,6 +481,11 @@ Default is True.</p></li>
 </p>
 </dd>
 </dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">perda.core_data_structures</span><span class="w"> </span><span class="kn">import</span> <span class="n">outer_join</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span><span class="p">,</span> <span class="n">a_values</span><span class="p">,</span> <span class="n">b_values</span> <span class="o">=</span> <span class="n">outer_join</span><span class="p">(</span><span class="n">a_ts</span><span class="p">,</span> <span class="n">a_values</span><span class="p">,</span> <span class="n">b_ts</span><span class="p">,</span> <span class="n">b_values</span><span class="p">)</span>
+</pre></div>
+</div>
 </dd></dl>
 
 </section>

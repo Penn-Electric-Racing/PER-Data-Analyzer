@@ -324,6 +324,15 @@
 <span class="sd">    -------</span>
 <span class="sd">    SingleRunData</span>
 <span class="sd">        Fresh object; the original is not mutated.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from perda.core_data_structures import trim_single_run_data</span>
+<span class="sd">    &gt;&gt;&gt; from perda.units import from_seconds</span>
+<span class="sd">    &gt;&gt;&gt; start = aly.data.data_start_time</span>
+<span class="sd">    &gt;&gt;&gt; first_minute = trim_single_run_data(</span>
+<span class="sd">    ...     aly.data, start, start + from_seconds(60.0, aly.data.timestamp_unit)</span>
+<span class="sd">    ... )</span>
 <span class="sd">    """</span>
     <span class="n">trimmed</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">DataInstance</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
         <span class="n">var_id</span><span class="p">:</span> <span class="n">di</span><span class="o">.</span><span class="n">trim</span><span class="p">(</span><span class="n">ts_start</span><span class="p">,</span> <span class="n">ts_end</span><span class="p">)</span> <span class="k">for</span> <span class="n">var_id</span><span class="p">,</span> <span class="n">di</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">id_to_instance</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
@@ -364,6 +373,16 @@
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    List[SingleRunData]</span>
+<span class="sd">        One SingleRunData per consecutive pair of boundaries.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from perda.core_data_structures import split_single_run_data</span>
+<span class="sd">    &gt;&gt;&gt; data = aly.data</span>
+<span class="sd">    &gt;&gt;&gt; middle = (data.data_start_time + data.data_end_time) / 2</span>
+<span class="sd">    &gt;&gt;&gt; first_half, second_half = split_single_run_data(</span>
+<span class="sd">    ...     data, [data.data_start_time, middle, data.data_end_time]</span>
+<span class="sd">    ... )</span>
 <span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">split_timestamps</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Need at least 2 boundary timestamps"</span><span class="p">)</span>

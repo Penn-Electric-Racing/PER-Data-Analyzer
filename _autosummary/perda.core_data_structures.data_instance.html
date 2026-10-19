@@ -388,6 +388,23 @@
 <em class="property"><span class="pre">pydantic</span> <span class="pre">model</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">perda.core_data_structures.data_instance.</span></span><span class="sig-name descname"><span class="pre">DataInstance</span></span><a class="reference internal" href="../_modules/perda/core_data_structures/data_instance.html#DataInstance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.core_data_structures.data_instance.DataInstance" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
 <p>A single time-series variable, pairing a 1D timestamp array with a 1D value array.</p>
+<p class="rubric">Notes</p>
+<p>Timestamps are raw integers in the log’s native unit, <code class="docutils literal notranslate"><span class="pre">SingleRunData.timestamp_unit</span></code>
+(microseconds for current logs), not seconds.</p>
+<p>Arithmetic (<code class="docutils literal notranslate"><span class="pre">+</span> <span class="pre">-</span> <span class="pre">*</span> <span class="pre">/</span> <span class="pre">**</span></code>) accepts only another DataInstance or a scalar, never a raw
+NumPy array. Between two DataInstances, the right one is interpolated onto the left
+one’s timestamps, so the result has the left one’s length. To combine with an array,
+do the math on <code class="docutils literal notranslate"><span class="pre">.value_np</span></code> and wrap the result in a new DataInstance.</p>
+<p>The constructor takes keyword arguments only.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">perda.core_data_structures</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataInstance</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">di</span> <span class="o">=</span> <span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">"pcm.wheelSpeeds.frontRight"</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">average</span> <span class="o">=</span> <span class="p">(</span><span class="n">di</span> <span class="o">+</span> <span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">"pcm.wheelSpeeds.frontLeft"</span><span class="p">])</span> <span class="o">/</span> <span class="mf">2.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">squared</span> <span class="o">=</span> <span class="n">DataInstance</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">timestamp_np</span><span class="o">=</span><span class="n">di</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">,</span> <span class="n">value_np</span><span class="o">=</span><span class="n">di</span><span class="o">.</span><span class="n">value_np</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Speed squared"</span>
+<span class="gp">... </span><span class="p">)</span>
+</pre></div>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Config<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -522,13 +539,13 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="perda.core_data_structures.data_instance.DataInstance.resample_to_freq">
-<span class="sig-name descname"><span class="pre">resample_to_freq</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">freq_hz</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_time_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Timescale.MS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">ResampleMethod.LINEAR</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/core_data_structures/data_instance.html#DataInstance.resample_to_freq"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.core_data_structures.data_instance.DataInstance.resample_to_freq" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">resample_to_freq</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">freq_hz</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_time_unit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">ResampleMethod.LINEAR</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/core_data_structures/data_instance.html#DataInstance.resample_to_freq"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.core_data_structures.data_instance.DataInstance.resample_to_freq" title="Link to this definition">#</a></dt>
 <dd><p>Return a new DataInstance resampled onto a uniform frequency grid.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>freq_hz</strong> (<em>float</em>) – Target sampling frequency in Hz</p></li>
-<li><p><strong>source_time_unit</strong> (<a class="reference internal" href="perda.units.html#perda.units.Timescale" title="perda.units.Timescale"><em>Timescale</em></a><em>, </em><em>optional</em>) – Timestamp unit of <code class="docutils literal notranslate"><span class="pre">timestamp_np</span></code>. Default is <code class="docutils literal notranslate"><span class="pre">Timescale.MS</span></code>.</p></li>
+<li><p><strong>source_time_unit</strong> (<a class="reference internal" href="perda.units.html#perda.units.Timescale" title="perda.units.Timescale"><em>Timescale</em></a>) – Timestamp unit of <code class="docutils literal notranslate"><span class="pre">timestamp_np</span></code>. Pass <code class="docutils literal notranslate"><span class="pre">aly.data.timestamp_unit</span></code>.</p></li>
 <li><p><strong>method</strong> (<a class="reference internal" href="perda.core_data_structures.resampling.html#perda.core_data_structures.resampling.ResampleMethod" title="perda.core_data_structures.resampling.ResampleMethod"><em>ResampleMethod</em></a><em>, </em><em>optional</em>) – Interpolation method. Default is LINEAR.</p></li>
 </ul>
 </dd>
@@ -540,7 +557,7 @@
 </dd>
 </dl>
 <p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">uniform</span> <span class="o">=</span> <span class="n">di</span><span class="o">.</span><span class="n">resample_to_freq</span><span class="p">(</span><span class="n">freq_hz</span><span class="o">=</span><span class="mf">100.0</span><span class="p">,</span> <span class="n">source_time_unit</span><span class="o">=</span><span class="n">Timescale</span><span class="o">.</span><span class="n">US</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">uniform</span> <span class="o">=</span> <span class="n">di</span><span class="o">.</span><span class="n">resample_to_freq</span><span class="p">(</span><span class="n">freq_hz</span><span class="o">=</span><span class="mf">100.0</span><span class="p">,</span> <span class="n">source_time_unit</span><span class="o">=</span><span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">timestamp_unit</span><span class="p">)</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -557,7 +574,8 @@
 <li><p><strong>left</strong> (<a class="reference internal" href="#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance"><em>DataInstance</em></a>) – Left DataInstance</p></li>
 <li><p><strong>right</strong> (<a class="reference internal" href="#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance"><em>DataInstance</em></a>) – Right DataInstance</p></li>
 <li><p><strong>ufunc</strong> (<em>Callable</em>) – NumPy universal function to apply (e.g., np.add, np.subtract)</p></li>
-<li><p><strong>tolerance</strong> (<em>float</em>) – Maximum allowed distance between left and right timestamps for a match.</p></li>
+<li><p><strong>tolerance</strong> (<em>float</em>) – Maximum allowed distance between left and right timestamps for a match,
+in raw timestamp units.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -567,6 +585,12 @@
 <dd class="field-odd"><p><a class="reference internal" href="#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance">DataInstance</a></p>
 </dd>
 </dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">perda.core_data_structures</span><span class="w"> </span><span class="kn">import</span> <span class="n">apply_ufunc_inner_join</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">larger</span> <span class="o">=</span> <span class="n">apply_ufunc_inner_join</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="mi">1_000</span><span class="p">)</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py function">
@@ -588,6 +612,12 @@
 <dd class="field-odd"><p><a class="reference internal" href="#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance">DataInstance</a></p>
 </dd>
 </dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">perda.core_data_structures</span><span class="w"> </span><span class="kn">import</span> <span class="n">apply_ufunc_left_join</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">larger</span> <span class="o">=</span> <span class="n">apply_ufunc_left_join</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">)</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py function">
@@ -612,6 +642,12 @@ Default is True.</p></li>
 <dd class="field-odd"><p><a class="reference internal" href="#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance">DataInstance</a></p>
 </dd>
 </dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">perda.core_data_structures</span><span class="w"> </span><span class="kn">import</span> <span class="n">apply_ufunc_outer_join</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">larger</span> <span class="o">=</span> <span class="n">apply_ufunc_outer_join</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">)</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py function">
@@ -639,6 +675,13 @@ Timestamps with distance &gt; tolerance are dropped.</p></li>
 </p>
 </dd>
 </dl>
+<p class="rubric">Notes</p>
+<p><code class="docutils literal notranslate"><span class="pre">tolerance</span></code> is in raw timestamp units, <code class="docutils literal notranslate"><span class="pre">aly.data.timestamp_unit</span></code>.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">perda.core_data_structures</span><span class="w"> </span><span class="kn">import</span> <span class="n">inner_join_data_instances</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a_matched</span><span class="p">,</span> <span class="n">b_matched</span> <span class="o">=</span> <span class="n">inner_join_data_instances</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="mi">1_000</span><span class="p">)</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py function">
@@ -664,8 +707,18 @@ aligned DataInstance per right input, in the same order.</p>
 <dd class="field-odd"><p>tuple of <a class="reference internal" href="#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance">DataInstance</a></p>
 </dd>
 </dl>
+<p class="rubric">Notes</p>
+<p>Signals are logged at different rates, so two DataInstances usually have different
+lengths and timestamps. Join them first whenever you combine their arrays: a boolean
+mask built from one signal’s <code class="docutils literal notranslate"><span class="pre">value_np</span></code> cannot index another’s until both share a
+timestamp grid.</p>
 <p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">left_a</span><span class="p">,</span> <span class="n">right_b</span><span class="p">,</span> <span class="n">right_c</span> <span class="o">=</span> <span class="n">left_join_data_instances</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="p">[</span><span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">])</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">perda.core_data_structures</span><span class="w"> </span><span class="kn">import</span> <span class="n">ResampleMethod</span><span class="p">,</span> <span class="n">left_join_data_instances</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">speed</span> <span class="o">=</span> <span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">"pcm.wheelSpeeds.frontRight"</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">torque</span> <span class="o">=</span> <span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">"pcm.moc.motor.requestedTorque"</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">speed</span><span class="p">,</span> <span class="n">torque</span> <span class="o">=</span> <span class="n">left_join_data_instances</span><span class="p">(</span><span class="n">speed</span><span class="p">,</span> <span class="n">torque</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">torque_while_moving</span> <span class="o">=</span> <span class="n">torque</span><span class="o">.</span><span class="n">value_np</span><span class="p">[</span><span class="n">speed</span><span class="o">.</span><span class="n">value_np</span> <span class="o">&gt;</span> <span class="mf">1.0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">left_a</span><span class="p">,</span> <span class="n">right_b</span><span class="p">,</span> <span class="n">right_c</span> <span class="o">=</span> <span class="n">left_join_data_instances</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="p">[</span><span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">left_a</span><span class="p">,</span> <span class="n">right_b</span> <span class="o">=</span> <span class="n">left_join_data_instances</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">ResampleMethod</span><span class="o">.</span><span class="n">ZOH</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -696,6 +749,11 @@ Default is True.</p></li>
 </p>
 </dd>
 </dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">perda.core_data_structures</span><span class="w"> </span><span class="kn">import</span> <span class="n">outer_join_data_instances</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a_union</span><span class="p">,</span> <span class="n">b_union</span> <span class="o">=</span> <span class="n">outer_join_data_instances</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+</pre></div>
+</div>
 </dd></dl>
 
 </section>

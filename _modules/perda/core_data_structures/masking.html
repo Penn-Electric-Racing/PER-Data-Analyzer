@@ -344,6 +344,21 @@
 <span class="sd">    -------</span>
 <span class="sd">    DataInstance</span>
 <span class="sd">        Filtered DataInstance</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    The mask must come from this DataInstance's own arrays. To filter one signal by</span>
+<span class="sd">    another (e.g. torque only while moving), align them with ``left_join_data_instances``</span>
+<span class="sd">    first, since signals logged at different rates have different lengths.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from perda.core_data_structures import FilterOptions, apply_ufunc_filter</span>
+<span class="sd">    &gt;&gt;&gt; voltage = aly.data["bms.pack.voltage"]</span>
+<span class="sd">    &gt;&gt;&gt; valid = apply_ufunc_filter(voltage, lambda values: values &gt; 0)</span>
+<span class="sd">    &gt;&gt;&gt; late = apply_ufunc_filter(</span>
+<span class="sd">    ...     voltage, lambda ts: ts &gt; ts[0] + 60_000_000, apply_to=FilterOptions.TIMESTAMPS</span>
+<span class="sd">    ... )</span>
 <span class="sd">    """</span>
     <span class="k">if</span> <span class="n">apply_to</span> <span class="o">==</span> <span class="n">FilterOptions</span><span class="o">.</span><span class="n">VALUES</span><span class="p">:</span>
         <span class="n">mask</span> <span class="o">=</span> <span class="n">filter_func</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">value_np</span><span class="p">)</span>

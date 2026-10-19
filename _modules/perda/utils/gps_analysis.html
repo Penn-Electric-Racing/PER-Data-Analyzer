@@ -328,10 +328,10 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">plot_gps_trimmer</span><span class="p">(</span>
     <span class="n">lat</span><span class="p">:</span> <span class="n">DataInstance</span><span class="p">,</span>
     <span class="n">lon</span><span class="p">:</span> <span class="n">DataInstance</span><span class="p">,</span>
+    <span class="n">timestamp_unit</span><span class="p">:</span> <span class="n">Timescale</span><span class="p">,</span>
     <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">layout_config</span><span class="p">:</span> <span class="n">LayoutConfig</span> <span class="o">=</span> <span class="n">DEFAULT_LAYOUT_CONFIG</span><span class="p">,</span>
     <span class="n">font_config</span><span class="p">:</span> <span class="n">FontConfig</span> <span class="o">=</span> <span class="n">DEFAULT_FONT_CONFIG</span><span class="p">,</span>
-    <span class="n">timestamp_unit</span><span class="p">:</span> <span class="n">Timescale</span> <span class="o">=</span> <span class="n">Timescale</span><span class="o">.</span><span class="n">MS</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">widgets</span><span class="o">.</span><span class="n">VBox</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Interactive GPS coordinate trimmer with a dual-handle range slider.</span>
@@ -346,11 +346,11 @@
 <span class="sd">        Latitude values. Must have the same length and identical timestamps as `lon`.</span>
 <span class="sd">    lon : DataInstance</span>
 <span class="sd">        Longitude values. Must have the same length and identical timestamps as `lat`.</span>
+<span class="sd">    timestamp_unit : Timescale</span>
+<span class="sd">        Timestamp unit used for the slider timestamp labels. Pass ``aly.data.timestamp_unit``.</span>
 <span class="sd">    title : str | None, optional</span>
 <span class="sd">    layout_config : LayoutConfig, optional</span>
 <span class="sd">    font_config : FontConfig, optional</span>
-<span class="sd">    timestamp_unit : Timescale, optional</span>
-<span class="sd">        Timestamp unit used for the slider timestamp labels.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -358,7 +358,8 @@
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
-<span class="sd">    &gt;&gt;&gt; widget = plot_gps_trimmer(lat_di, lon_di, title="GPS Track")</span>
+<span class="sd">    &gt;&gt;&gt; from perda.utils import plot_gps_trimmer</span>
+<span class="sd">    &gt;&gt;&gt; widget = plot_gps_trimmer(lat_di, lon_di, aly.data.timestamp_unit, title="GPS Track")</span>
 <span class="sd">    &gt;&gt;&gt; display(widget)</span>
 <span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">lat</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">lon</span><span class="p">):</span>
@@ -420,6 +421,7 @@
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from perda.utils import gps_to_enu</span>
 <span class="sd">    &gt;&gt;&gt; east, north = gps_to_enu(lat_array, lon_array)</span>
 <span class="sd">    """</span>
     <span class="n">lat_ref_rad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">lat_ref</span> <span class="k">if</span> <span class="n">lat_ref</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">lat</span><span class="p">))</span>
@@ -462,6 +464,7 @@
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from perda.utils import filter_gps_cartesian</span>
 <span class="sd">    &gt;&gt;&gt; mask = filter_gps_cartesian(lat_array, lon_array)</span>
 <span class="sd">    &gt;&gt;&gt; lat_clean, lon_clean = lat_array[mask], lon_array[mask]</span>
 <span class="sd">    """</span>
@@ -509,11 +512,11 @@
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from perda.utils import plot_gps_comparison</span>
 <span class="sd">    &gt;&gt;&gt; fig = plot_gps_comparison(</span>
 <span class="sd">    ...     [(lat1, lon1, "Run 1"), (lat2, lon2, "Run 2")],</span>
 <span class="sd">    ...     title="GPS Comparison",</span>
 <span class="sd">    ... )</span>
-<span class="sd">    &gt;&gt;&gt; fig.show()</span>
 <span class="sd">    """</span>
 
     <span class="n">all_lat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">lat</span> <span class="k">for</span> <span class="n">lat</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">runs</span><span class="p">])</span>
@@ -602,8 +605,8 @@
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from perda.utils import create_representative_gps_image</span>
 <span class="sd">    &gt;&gt;&gt; fig = create_representative_gps_image(lat_di, lon_di, vel_raw=vel_di, title="Lap Track")</span>
-<span class="sd">    &gt;&gt;&gt; fig.show()</span>
 <span class="sd">    """</span>
     <span class="n">lat_aligned</span><span class="p">,</span> <span class="n">lon_aligned</span> <span class="o">=</span> <span class="n">left_join_data_instances</span><span class="p">(</span><span class="n">lat_raw</span><span class="p">,</span> <span class="n">lon_raw</span><span class="p">)</span>
 

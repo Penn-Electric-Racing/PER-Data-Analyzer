@@ -424,6 +424,19 @@
 <dd class="field-odd"><p><a class="reference internal" href="perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance">DataInstance</a></p>
 </dd>
 </dl>
+<p class="rubric">Notes</p>
+<p>The mask must come from this DataInstance’s own arrays. To filter one signal by
+another (e.g. torque only while moving), align them with <code class="docutils literal notranslate"><span class="pre">left_join_data_instances</span></code>
+first, since signals logged at different rates have different lengths.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">perda.core_data_structures</span><span class="w"> </span><span class="kn">import</span> <span class="n">FilterOptions</span><span class="p">,</span> <span class="n">apply_ufunc_filter</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">voltage</span> <span class="o">=</span> <span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">"bms.pack.voltage"</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">valid</span> <span class="o">=</span> <span class="n">apply_ufunc_filter</span><span class="p">(</span><span class="n">voltage</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">values</span><span class="p">:</span> <span class="n">values</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">late</span> <span class="o">=</span> <span class="n">apply_ufunc_filter</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">voltage</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">ts</span><span class="p">:</span> <span class="n">ts</span> <span class="o">&gt;</span> <span class="n">ts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">60_000_000</span><span class="p">,</span> <span class="n">apply_to</span><span class="o">=</span><span class="n">FilterOptions</span><span class="o">.</span><span class="n">TIMESTAMPS</span>
+<span class="gp">... </span><span class="p">)</span>
+</pre></div>
+</div>
 </dd></dl>
 
 </section>

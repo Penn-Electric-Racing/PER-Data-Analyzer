@@ -393,7 +393,7 @@
             <span class="k">return</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="n">column</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">columns</span><span class="p">})</span>
         <span class="k">return</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
             <span class="p">{</span><span class="n">c</span><span class="p">:</span> <span class="p">[</span><span class="n">_float</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">columns</span><span class="p">)},</span>
-            <span class="n">strict</span><span class="o">=</span><span class="kc">False</span>
+            <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="p">)</span></div>
 
 
@@ -498,7 +498,6 @@
             <span class="s2">" FROM v_stats WHERE "</span> <span class="o">+</span> <span class="s2">" AND "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">clauses</span><span class="p">)</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">" ORDER BY </span><span class="si">{</span><span class="n">order</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
             <span class="n">params</span><span class="p">,</span>
         <span class="p">)</span></div>
-
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_time_bounds</span><span class="p">(</span>
@@ -669,11 +668,10 @@
 <span class="sd">        DataInstance</span>
 <span class="sd">            Timestamps in microseconds relative to the session start.</span>
 <span class="sd">        """</span>
-        <span class="n">frame</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">samples</span><span class="p">(</span>
-            <span class="n">var_key</span><span class="p">,</span> <span class="n">session_id</span><span class="o">=</span><span class="n">session_id</span><span class="p">,</span> <span class="n">test_day</span><span class="o">=</span><span class="n">test_day</span>
-        <span class="p">)</span>
+        <span class="n">frame</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">samples</span><span class="p">(</span><span class="n">var_key</span><span class="p">,</span> <span class="n">session_id</span><span class="o">=</span><span class="n">session_id</span><span class="p">,</span> <span class="n">test_day</span><span class="o">=</span><span class="n">test_day</span><span class="p">)</span>
         <span class="n">meta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="p">(</span>
-            <span class="s2">"SELECT var_id, description FROM timeline_variables WHERE var_key = </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="p">(</span><span class="n">var_key</span><span class="p">,)</span>
+            <span class="s2">"SELECT var_id, description FROM timeline_variables WHERE var_key = </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span>
+            <span class="p">(</span><span class="n">var_key</span><span class="p">,),</span>
         <span class="p">)</span>
         <span class="n">var_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">meta</span><span class="p">[</span><span class="s2">"var_id"</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span> <span class="k">if</span> <span class="n">meta</span><span class="o">.</span><span class="n">height</span> <span class="k">else</span> <span class="o">-</span><span class="mi">1</span>
         <span class="n">label</span> <span class="o">=</span> <span class="n">meta</span><span class="p">[</span><span class="s2">"description"</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">meta</span><span class="o">.</span><span class="n">height</span> <span class="k">else</span> <span class="s2">""</span>

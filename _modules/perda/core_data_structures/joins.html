@@ -344,6 +344,11 @@
 <span class="sd">        Left values (unchanged)</span>
 <span class="sd">    right_values : NDArray</span>
 <span class="sd">        Right values interpolated onto left timestamps</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from perda.core_data_structures import left_join</span>
+<span class="sd">    &gt;&gt;&gt; ts, a_values, b_values = left_join(a_ts, a_values, b_ts, b_values)</span>
 <span class="sd">    """</span>
     <span class="k">if</span> <span class="n">right_ts</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">left_ts</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Both time series must be non-empty"</span><span class="p">)</span>
@@ -398,6 +403,11 @@
 <span class="sd">        Left values interpolated to union timestamps</span>
 <span class="sd">    right_values : NDArray</span>
 <span class="sd">        Right values interpolated to union timestamps</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from perda.core_data_structures import outer_join</span>
+<span class="sd">    &gt;&gt;&gt; ts, a_values, b_values = outer_join(a_ts, a_values, b_ts, b_values)</span>
 <span class="sd">    """</span>
     <span class="k">if</span> <span class="n">right_ts</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">left_ts</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Both time series must be non-empty"</span><span class="p">)</span>
@@ -461,6 +471,11 @@
 <span class="sd">        Left values at the kept timestamps</span>
 <span class="sd">    right_values : NDArray</span>
 <span class="sd">        Right values interpolated onto the kept timestamps</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from perda.core_data_structures import inner_join</span>
+<span class="sd">    &gt;&gt;&gt; ts, a_values, b_values = inner_join(a_ts, a_values, b_ts, b_values, tolerance=1_000)</span>
 <span class="sd">    """</span>
     <span class="k">if</span> <span class="n">right_ts</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">left_ts</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Both time series must be non-empty"</span><span class="p">)</span>
