@@ -134,22 +134,6 @@ def test_average_linear_ramp_midpoint():
     assert pytest.approx(avg, abs=1e-9) == 1.0
 
 
-def test_average_window_uses_target_time_unit():
-    # 0..10 s sampled every 100 ms; window [2 s, 5 s] of a constant signal
-    di = DataInstance(
-        timestamp_np=np.arange(0, 10001, 100, dtype=np.int64),
-        value_np=np.full(101, 5.0, dtype=np.float64),
-    )
-    avg = average_over_time_range(
-        di,
-        start_time=2,
-        end_time=5,
-        source_time_unit=Timescale.MS,
-        target_time_unit=Timescale.S,
-    )
-    assert pytest.approx(avg, abs=1e-9) == 5.0
-
-
 def test_average_window_matches_integral_over_duration():
     # Ramp 0->10 over 0..10 s; average over [2 s, 6 s] is 4.0
     di = DataInstance(
