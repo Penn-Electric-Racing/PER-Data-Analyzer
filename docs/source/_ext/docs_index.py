@@ -102,11 +102,15 @@ def record_entries(app: Sphinx, doctree: nodes.document, docname: str) -> None:
     if app.builder.name != "text":
         return
 
+    # findall collects top-level objects (classes, functions) and objects nested inside a class's desc_content
+    # (methods, nested classes). Attributes and pydantic fields are left out: they stay inside their class's entry.
     descs = [
         desc
         for desc in doctree.findall(addnodes.desc)
         if desc["objtype"] not in MEMBER_KINDS
     ]
+
+    # No documented objects means a hand-written page (or an autosummary package page)
     if not descs:
         if docname.startswith("_autosummary/"):
             return
@@ -121,12 +125,14 @@ def record_entries(app: Sphinx, doctree: nodes.document, docname: str) -> None:
         return
 
     for desc in descs:
-        # Remove nested methods and classes from a copy, leaving the page itself intact
         node = desc.deepcopy()
         for nested in list(node.findall(addnodes.desc))[1:]:
+            # Keep only nested attributed and pydantic fields, everything else documented already
             if nested["objtype"] not in MEMBER_KINDS and nested.parent is not None:
                 nested.parent.remove(nested)
+        # The first desc_content in tree order is this object's own docstring
         content = next(node.findall(addnodes.desc_content))
+        # Get the first paragraph of the docstring, skipping autodoc's "Bases: ..." line
         summary = next(
             (
                 child.astext()
