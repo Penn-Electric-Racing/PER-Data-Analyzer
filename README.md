@@ -14,7 +14,14 @@ cd docs
 sphinx-build -b html source build
 ```
 
-The same build writes `docs/build_index/` (`docs_index.json` + `docs_index.faiss`), a semantic search index over every docstring used by the car-data-server MCP server. CI publishes it to the [`docs-index` release](https://github.com/Penn-Electric-Racing/PER-Data-Analyzer/releases/tag/docs-index) on every push to `main`. The extension lives in `docs/source/_ext/docs_index.py`.
+The car-data-server MCP server reads the same docs as plain text, one entry per documented object, from `docs_index.json`. To build it:
+
+```bash
+cd docs
+sphinx-build -b text source build_index
+```
+
+CI publishes it to the [`docs-index` release](https://github.com/Penn-Electric-Racing/PER-Data-Analyzer/releases/tag/docs-index) on every push to `main`. The extension lives in `docs/source/_ext/docs_index.py`.
 
 ## Testing
 

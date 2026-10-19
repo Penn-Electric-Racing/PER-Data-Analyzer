@@ -53,7 +53,7 @@ def plot_gps_trimmer(
     Examples
     --------
     >>> from perda.utils import plot_gps_trimmer
-    >>> widget = plot_gps_trimmer(lat_di, lon_di, title="GPS Track")
+    >>> widget = plot_gps_trimmer(lat_di, lon_di, aly.data.timestamp_unit, title="GPS Track")
     >>> display(widget)
     """
     if len(lat) != len(lon):

@@ -97,11 +97,12 @@ def average_over_time_range(
     source_time_unit : Timescale
         Time unit of ``data_instance.timestamp_np``. Pass ``aly.data.timestamp_unit``.
     start_time : int, optional
-        Start time for averaging. Default is 0
+        Start of the window, as an absolute timestamp in ``target_time_unit``. Default is 0
     end_time : int, optional
-        End time for averaging. -1 means end of data. Default is -1
+        End of the window, as an absolute timestamp in ``target_time_unit``. -1 means end
+        of data. Default is -1
     target_time_unit : Timescale, optional
-        Target time unit for averaging. Default is Timescale.S
+        Time unit of ``start_time`` and ``end_time``. Default is Timescale.S
 
     Returns
     -------
@@ -110,9 +111,6 @@ def average_over_time_range(
 
     Notes
     -----
-    To average over part of a log, trim it first with ``DataInstance.trim`` and leave
-    ``start_time`` and ``end_time`` at their defaults.
-
     Uses numpy.trapezoid (trapezoidal rule) for numerical integration of discrete data.
 
     Examples
@@ -134,14 +132,13 @@ def average_over_time_range(
         target_time_unit=target_time_unit,
     )
 
-    ts = data_instance.timestamp_np.astype(np.float64)
+    ts: NDArray[float64] = convert_time(
+        data_instance.timestamp_np.astype(np.float64),
+        source_time_unit,
+        target_time_unit,
+    )
     actual_start_time = max(start_time, ts[0])
     actual_end_time = ts[-1] if end_time == -1 else min(end_time, ts[-1])
-
-    actual_start_time = convert_time(
-        actual_start_time, source_time_unit, target_time_unit
-    )
-    actual_end_time = convert_time(actual_end_time, source_time_unit, target_time_unit)
 
     time_range = actual_end_time - actual_start_time
 

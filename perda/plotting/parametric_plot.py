@@ -123,7 +123,9 @@ def plot_parametric_trimmer(
     Examples
     --------
     >>> from perda.plotting import plot_parametric_trimmer
-    >>> widget = plot_parametric_trimmer(lon_arr, lat_arr, timestamps=ts_arr, x_label="Longitude", y_label="Latitude")
+    >>> widget = plot_parametric_trimmer(
+    ...     lon_arr, lat_arr, aly.data.timestamp_unit, timestamps=ts_arr, x_label="Longitude", y_label="Latitude"
+    ... )
     >>> display(widget)
     """
     n = len(x)

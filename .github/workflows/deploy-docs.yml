@@ -34,15 +34,20 @@ jobs:
           cd docs
           sphinx-build -b html source build
 
+      # The docs_index extension writes docs_index.json during the text build
+      - name: Build Docs Index
+        run: |
+          cd docs
+          sphinx-build -b text source build_index
+
       - name: Publish Docs Index
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh release view docs-index || gh release create docs-index \
             --title "Docs index" --latest=false \
-            --notes "JSON + FAISS index of the API docs, rebuilt from main on every push."
-          gh release upload docs-index \
-            docs/build_index/docs_index.json docs/build_index/docs_index.faiss --clobber
+            --notes "The API docs as plain text, one entry per object, rebuilt from main on every push."
+          gh release upload docs-index docs/build_index/docs_index.json --clobber
 
       # Deploy to gh-pages branch of this repo
       - name: Deploy to GitHub Pages

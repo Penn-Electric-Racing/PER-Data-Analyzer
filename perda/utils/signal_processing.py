@@ -69,8 +69,9 @@ def lowpass_filter(
     (pre-filter) DataInstance again::
 
         di_original = aly.data["pcm.wheelSpeeds.frontRight"]
-        di_10hz = lowpass_filter(di_original, cutoff_hz=10.0)
-        di_5hz  = lowpass_filter(di_original, cutoff_hz=5.0)   # not stacked
+        unit = aly.data.timestamp_unit
+        di_10hz = lowpass_filter(di_original, cutoff_hz=10.0, source_time_unit=unit)
+        di_5hz  = lowpass_filter(di_original, cutoff_hz=5.0, source_time_unit=unit)   # not stacked
 
     Parameters
     ----------

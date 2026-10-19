@@ -46,6 +46,7 @@ repos:
           - numpy
           - pydantic
           - types-PyYAML
+          - types-docutils
           - types-requests
           - types-tqdm
           - boto3-stubs[s3]

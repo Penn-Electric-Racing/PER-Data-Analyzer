@@ -49,7 +49,7 @@ extensions = [
     "sphinx.ext.viewcode",  # Add links to source code
     "sphinx_copybutton",  # For copy buttons on code blocks
     "sphinx_design",  # For better CSS
-    "docs_index",  # JSON + FAISS docs index for the MCP server (_ext/docs_index.py)
+    "docs_index",  # Text-build docs index for the MCP server (_ext/docs_index.py)
 ]
 
 # Configure autodoc-typehints to work with pydantic

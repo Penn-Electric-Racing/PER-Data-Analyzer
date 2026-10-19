@@ -107,7 +107,7 @@ def compute_accel_results(
 
     Examples
     --------
-    >>> results = compute_accel_results(signal_di, distance_di)
+    >>> results = compute_accel_results(signal_di, distance_di, aly.data.timestamp_unit)
     >>> for r in results:
     ...     print(r)
     """
