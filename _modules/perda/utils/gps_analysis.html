@@ -304,14 +304,12 @@
   <h1>Source code for perda.utils.gps_analysis</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span>
 
-<span class="kn">import</span><span class="w"> </span><span class="nn">ipywidgets</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">widgets</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">plotly.graph_objects</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">go</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">numpy.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">NDArray</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">..constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">EARTH_RADIUS_METERS</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..core_data_structures.data_instance</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataInstance</span><span class="p">,</span> <span class="n">left_join_data_instances</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">..plotting.parametric_plot</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_parametric_trimmer</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..plotting.plotting_constants</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">DEFAULT_FONT_CONFIG</span><span class="p">,</span>
     <span class="n">DEFAULT_GPS_MAP_CONFIG</span><span class="p">,</span>
@@ -320,72 +318,6 @@
     <span class="n">GpsMapConfig</span><span class="p">,</span>
     <span class="n">LayoutConfig</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">..units</span><span class="w"> </span><span class="kn">import</span> <span class="n">Timescale</span>
-
-
-<div class="viewcode-block" id="plot_gps_trimmer">
-<a class="viewcode-back" href="../../../_autosummary/perda.utils.gps_analysis.html#perda.utils.gps_analysis.plot_gps_trimmer">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">plot_gps_trimmer</span><span class="p">(</span>
-    <span class="n">lat</span><span class="p">:</span> <span class="n">DataInstance</span><span class="p">,</span>
-    <span class="n">lon</span><span class="p">:</span> <span class="n">DataInstance</span><span class="p">,</span>
-    <span class="n">timestamp_unit</span><span class="p">:</span> <span class="n">Timescale</span><span class="p">,</span>
-    <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">layout_config</span><span class="p">:</span> <span class="n">LayoutConfig</span> <span class="o">=</span> <span class="n">DEFAULT_LAYOUT_CONFIG</span><span class="p">,</span>
-    <span class="n">font_config</span><span class="p">:</span> <span class="n">FontConfig</span> <span class="o">=</span> <span class="n">DEFAULT_FONT_CONFIG</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">widgets</span><span class="o">.</span><span class="n">VBox</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Interactive GPS coordinate trimmer with a dual-handle range slider.</span>
-
-<span class="sd">    Displays a 2D scatter plot of GPS coordinates (longitude vs latitude) alongside</span>
-<span class="sd">    an ipywidgets IntRangeSlider that trims which points are shown. Designed for use</span>
-<span class="sd">    in Jupyter notebooks.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    lat : DataInstance</span>
-<span class="sd">        Latitude values. Must have the same length and identical timestamps as `lon`.</span>
-<span class="sd">    lon : DataInstance</span>
-<span class="sd">        Longitude values. Must have the same length and identical timestamps as `lat`.</span>
-<span class="sd">    timestamp_unit : Timescale</span>
-<span class="sd">        Timestamp unit used for the slider timestamp labels. Pass ``aly.data.timestamp_unit``.</span>
-<span class="sd">    title : str | None, optional</span>
-<span class="sd">    layout_config : LayoutConfig, optional</span>
-<span class="sd">    font_config : FontConfig, optional</span>
-
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    ipywidgets.VBox</span>
-
-<span class="sd">    Examples</span>
-<span class="sd">    --------</span>
-<span class="sd">    &gt;&gt;&gt; from perda.utils import plot_gps_trimmer</span>
-<span class="sd">    &gt;&gt;&gt; widget = plot_gps_trimmer(lat_di, lon_di, aly.data.timestamp_unit, title="GPS Track")</span>
-<span class="sd">    &gt;&gt;&gt; display(widget)</span>
-<span class="sd">    """</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">lat</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">lon</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">"lat and lon DataInstances have different lengths (</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">lat</span><span class="p">)</span><span class="si">}</span><span class="s2"> vs </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">lon</span><span class="p">)</span><span class="si">}</span><span class="s2">). "</span>
-            <span class="s2">"Align them first using a join (e.g., inner_join_data_instances, left_join_data_instances)."</span>
-        <span class="p">)</span>
-
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">array_equal</span><span class="p">(</span><span class="n">lat</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">,</span> <span class="n">lon</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">"lat and lon DataInstances have mismatched timestamps. "</span>
-            <span class="s2">"Align them first using a join (e.g., inner_join_data_instances, left_join_data_instances)."</span>
-        <span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">plot_parametric_trimmer</span><span class="p">(</span>
-        <span class="n">x</span><span class="o">=</span><span class="n">lon</span><span class="o">.</span><span class="n">value_np</span><span class="p">,</span>
-        <span class="n">y</span><span class="o">=</span><span class="n">lat</span><span class="o">.</span><span class="n">value_np</span><span class="p">,</span>
-        <span class="n">timestamps</span><span class="o">=</span><span class="n">lat</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">,</span>
-        <span class="n">x_label</span><span class="o">=</span><span class="s2">"Longitude"</span><span class="p">,</span>
-        <span class="n">y_label</span><span class="o">=</span><span class="s2">"Latitude"</span><span class="p">,</span>
-        <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
-        <span class="n">timestamp_unit</span><span class="o">=</span><span class="n">timestamp_unit</span><span class="p">,</span>
-        <span class="n">layout_config</span><span class="o">=</span><span class="n">layout_config</span><span class="p">,</span>
-        <span class="n">font_config</span><span class="o">=</span><span class="n">font_config</span><span class="p">,</span>
-    <span class="p">)</span></div>
-
 
 
 <div class="viewcode-block" id="gps_to_enu">

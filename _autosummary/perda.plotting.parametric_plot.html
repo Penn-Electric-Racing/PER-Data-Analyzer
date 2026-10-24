@@ -50,7 +50,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/perda.plotting.parametric_plot';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="perda.plotting.plotting_constants" href="perda.plotting.plotting_constants.html" />
+    <link rel="next" title="perda.plotting.parametric_trimmer" href="perda.plotting.parametric_trimmer.html" />
     <link rel="prev" title="perda.plotting.fft_plotter" href="perda.plotting.fft_plotter.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -289,6 +289,7 @@
 <li class="toctree-l3"><a class="reference internal" href="perda.plotting.diff_plotter.html">perda.plotting.diff_plotter</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.plotting.fft_plotter.html">perda.plotting.fft_plotter</a></li>
 <li class="toctree-l3 current active"><a class="current reference internal" href="#">perda.plotting.parametric_plot</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.plotting.parametric_trimmer.html">perda.plotting.parametric_trimmer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.plotting.plotting_constants.html">perda.plotting.plotting_constants</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.plotting.scatter_histogram_plotter.html">perda.plotting.scatter_histogram_plotter</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.plotting.subplots.html">perda.plotting.subplots</a></li>
@@ -306,6 +307,7 @@
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.diff.html">perda.utils.diff</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.frequency_analysis.html">perda.utils.frequency_analysis</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.gps_analysis.html">perda.utils.gps_analysis</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.utils.gps_trimmer.html">perda.utils.gps_trimmer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.integrate.html">perda.utils.integrate</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.preprocessing.html">perda.utils.preprocessing</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.search.html">perda.utils.search</a></li>
@@ -410,41 +412,6 @@
 </div>
 </dd></dl>
 
-<dl class="py function">
-<dt class="sig sig-object py" id="perda.plotting.parametric_plot.plot_parametric_trimmer">
-<span class="sig-prename descclassname"><span class="pre">perda.plotting.parametric_plot.</span></span><span class="sig-name descname"><span class="pre">plot_parametric_trimmer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp_unit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'X'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Y'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layout_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">LayoutConfig(width=1200,</span> <span class="pre">height=700,</span> <span class="pre">margin={'l':</span> <span class="pre">70,</span> <span class="pre">'r':</span> <span class="pre">50,</span> <span class="pre">'t':</span> <span class="pre">90,</span> <span class="pre">'b':</span> <span class="pre">70},</span> <span class="pre">plot_bgcolor='white',</span> <span class="pre">title_x=0.5,</span> <span class="pre">title_xanchor='center',</span> <span class="pre">title_yanchor='top',</span> <span class="pre">grid_width_per_col=400,</span> <span class="pre">grid_height_per_row=350,</span> <span class="pre">grid_horizontal_spacing=0.08,</span> <span class="pre">grid_vertical_spacing=0.12,</span> <span class="pre">max_display_resolution=50)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">font_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">FontConfig(large=20,</span> <span class="pre">medium=14,</span> <span class="pre">small=10)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/plotting/parametric_plot.html#plot_parametric_trimmer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.plotting.parametric_plot.plot_parametric_trimmer" title="Link to this definition">#</a></dt>
-<dd><p>Interactive parametric curve trimmer with a dual-handle range slider.</p>
-<p>Displays a 2D parametric scatter plot alongside an ipywidgets IntRangeSlider
-that trims which points are shown. Designed for use in Jupyter notebooks.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>x</strong> (<em>NDArray</em><em>[</em><em>float64</em><em>]</em>) – X-axis values.</p></li>
-<li><p><strong>y</strong> (<em>NDArray</em><em>[</em><em>float64</em><em>]</em>) – Y-axis values. Must have the same length as <cite>x</cite>.</p></li>
-<li><p><strong>timestamp_unit</strong> (<a class="reference internal" href="perda.units.html#perda.units.Timescale" title="perda.units.Timescale"><em>Timescale</em></a>) – Unit for timestamp labels in the slider. Ignored if <cite>timestamps</cite> is None. Pass <code class="docutils literal notranslate"><span class="pre">aly.data.timestamp_unit</span></code>.</p></li>
-<li><p><strong>timestamps</strong> (<em>NDArray</em><em>[</em><em>float64</em><em>] </em><em>| </em><em>None</em><em>, </em><em>optional</em>) – Timestamps corresponding to each point, shown in the slider labels.
-If None, slider labels show index only.</p></li>
-<li><p><strong>x_label</strong> (<em>str</em><em>, </em><em>optional</em>) – X-axis label.</p></li>
-<li><p><strong>y_label</strong> (<em>str</em><em>, </em><em>optional</em>) – Y-axis label.</p></li>
-<li><p><strong>title</strong> (<em>str</em><em> | </em><em>None</em><em>, </em><em>optional</em>) – Plot title.</p></li>
-<li><p><strong>layout_config</strong> (<a class="reference internal" href="perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.LayoutConfig" title="perda.plotting.plotting_constants.LayoutConfig"><em>LayoutConfig</em></a><em>, </em><em>optional</em>)</p></li>
-<li><p><strong>font_config</strong> (<a class="reference internal" href="perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.FontConfig" title="perda.plotting.plotting_constants.FontConfig"><em>FontConfig</em></a><em>, </em><em>optional</em>)</p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>ipywidgets.VBox</p>
-</dd>
-</dl>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">perda.plotting</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_parametric_trimmer</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">widget</span> <span class="o">=</span> <span class="n">plot_parametric_trimmer</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="n">lon_arr</span><span class="p">,</span> <span class="n">lat_arr</span><span class="p">,</span> <span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">timestamp_unit</span><span class="p">,</span> <span class="n">timestamps</span><span class="o">=</span><span class="n">ts_arr</span><span class="p">,</span> <span class="n">x_label</span><span class="o">=</span><span class="s2">"Longitude"</span><span class="p">,</span> <span class="n">y_label</span><span class="o">=</span><span class="s2">"Latitude"</span>
-<span class="gp">... </span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">display</span><span class="p">(</span><span class="n">widget</span><span class="p">)</span>
-</pre></div>
-</div>
-</dd></dl>
-
 </section>
 
 
@@ -467,11 +434,11 @@ If None, slider labels show index only.</p></li>
       </div>
     </a>
     <a class="right-next"
-       href="perda.plotting.plotting_constants.html"
+       href="perda.plotting.parametric_trimmer.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">perda.plotting.plotting_constants</p>
+        <p class="prev-next-title">perda.plotting.parametric_trimmer</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -495,7 +462,6 @@ If None, slider labels show index only.</p></li>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.plotting.parametric_plot.plot_parametric_curve"><code class="docutils literal notranslate"><span class="pre">plot_parametric_curve()</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.plotting.parametric_plot.plot_parametric_trimmer"><code class="docutils literal notranslate"><span class="pre">plot_parametric_trimmer()</span></code></a></li>
 </ul>
   </nav></div>
 

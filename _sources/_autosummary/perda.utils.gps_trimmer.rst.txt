@@ -1,0 +1,8 @@
+perda.utils.gps\_trimmer
+========================
+
+.. automodule:: perda.utils.gps_trimmer
+   :members:
+   :undoc-members:
+   :show-inheritance:
+

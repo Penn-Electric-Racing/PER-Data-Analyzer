@@ -18,6 +18,7 @@ perda.utils
    diff
    frequency_analysis
    gps_analysis
+   gps_trimmer
    integrate
    preprocessing
    search

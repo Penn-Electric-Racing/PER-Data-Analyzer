@@ -17,6 +17,7 @@ perda.plotting
    diff_plotter
    fft_plotter
    parametric_plot
+   parametric_trimmer
    plotting_constants
    scatter_histogram_plotter
    subplots

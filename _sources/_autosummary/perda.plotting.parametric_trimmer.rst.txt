@@ -1,0 +1,8 @@
+perda.plotting.parametric\_trimmer
+==================================
+
+.. automodule:: perda.plotting.parametric_trimmer
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
