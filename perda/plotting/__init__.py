@@ -5,3 +5,9 @@ from .parametric_plot import *
 from .plotting_constants import *
 from .scatter_histogram_plotter import *
 from .subplots import *
+
+# Requires the notebook extra.
+try:
+    from .parametric_trimmer import *
+except ModuleNotFoundError:
+    pass
