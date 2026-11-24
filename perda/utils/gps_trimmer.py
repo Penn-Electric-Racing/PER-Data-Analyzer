@@ -1,14 +1,8 @@
 import ipywidgets as widgets
-import numpy as np
 
-from ..core_data_structures.data_instance import DataInstance
+from ..core_data_structures.data_instance import DataInstance, left_join_data_instances
+from ..plotting.defaults import PLOT_HEIGHT, PLOT_WIDTH
 from ..plotting.parametric_trimmer import plot_parametric_trimmer
-from ..plotting.plotting_constants import (
-    DEFAULT_FONT_CONFIG,
-    DEFAULT_LAYOUT_CONFIG,
-    FontConfig,
-    LayoutConfig,
-)
 from ..units import Timescale
 
 
@@ -17,58 +11,58 @@ def plot_gps_trimmer(
     lon: DataInstance,
     timestamp_unit: Timescale,
     title: str | None = None,
-    layout_config: LayoutConfig = DEFAULT_LAYOUT_CONFIG,
-    font_config: FontConfig = DEFAULT_FONT_CONFIG,
+    width: int = PLOT_WIDTH,
+    height: int = PLOT_HEIGHT,
 ) -> widgets.VBox:
     """
-    Interactive GPS coordinate trimmer with a dual-handle range slider.
+    Interactive GPS track plot (longitude vs latitude) with a range slider for picking a time window of the log.
 
-    Displays a 2D scatter plot of GPS coordinates (longitude vs latitude) alongside
-    an ipywidgets IntRangeSlider that trims which points are shown. Designed for use
-    in Jupyter notebooks.
+    Drag the two slider handles to hide points outside the selected range. The labels under the slider show the sample index and the raw timestamp (in the log's own unit, e.g. ms or us, not seconds) of the first and last visible point. Pass those timestamps straight to ``trim_single_run_data(data, ts_start=..., ts_end=...)`` or ``DataInstance.trim`` to cut the log to that window. Designed for Jupyter notebooks.
 
     Parameters
     ----------
     lat : DataInstance
-        Latitude values. Must have the same length and identical timestamps as `lon`.
+        Latitude in degrees. Its timestamps define the points shown and the timestamps in the slider labels.
     lon : DataInstance
-        Longitude values. Must have the same length and identical timestamps as `lat`.
+        Longitude in degrees. Does not need to share timestamps with ``lat``: it is automatically aligned onto ``lat``'s timestamps with ``left_join_data_instances`` (linear interpolation).
     timestamp_unit : Timescale
-        Timestamp unit used for the slider timestamp labels. Pass ``aly.data.timestamp_unit``.
+        Unit of the raw timestamps, shown next to the timestamps in the slider labels. Pass ``aly.data.timestamp_unit``.
     title : str | None, optional
-    layout_config : LayoutConfig, optional
-    font_config : FontConfig, optional
+        Title shown above the plot. Default is None (no title).
+    width : int, optional
+        Figure width in pixels. Default is PLOT_WIDTH (1200).
+    height : int, optional
+        Figure height in pixels. Default is PLOT_HEIGHT (700).
 
     Returns
     -------
     ipywidgets.VBox
+        Widget containing the figure, the slider and the labels. Display it as the last expression in a notebook cell or with ``display(widget)``.
 
     Examples
     --------
+    >>> from perda.core_data_structures import trim_single_run_data
     >>> from perda.utils import plot_gps_trimmer
-    >>> widget = plot_gps_trimmer(lat_di, lon_di, aly.data.timestamp_unit, title="GPS Track")
+    >>> widget = plot_gps_trimmer(
+    ...     aly.data["pcm.vnav.posLla.latitude"],
+    ...     aly.data["pcm.vnav.posLla.longitude"],
+    ...     aly.data.timestamp_unit,
+    ...     title="GPS Track",
+    ... )
     >>> display(widget)
+    >>> # After reading the start/end timestamps off the slider:
+    >>> trimmed = trim_single_run_data(aly.data, ts_start=436_000, ts_end=1_552_000)
     """
-    if len(lat) != len(lon):
-        raise ValueError(
-            f"lat and lon DataInstances have different lengths ({len(lat)} vs {len(lon)}). "
-            "Align them first using a join (e.g., inner_join_data_instances, left_join_data_instances)."
-        )
-
-    if not np.array_equal(lat.timestamp_np, lon.timestamp_np):
-        raise ValueError(
-            "lat and lon DataInstances have mismatched timestamps. "
-            "Align them first using a join (e.g., inner_join_data_instances, left_join_data_instances)."
-        )
+    lat_aligned, lon_aligned = left_join_data_instances(lat, lon)
 
     return plot_parametric_trimmer(
-        x=lon.value_np,
-        y=lat.value_np,
-        timestamps=lat.timestamp_np,
+        x=lon_aligned.value_np,
+        y=lat_aligned.value_np,
+        timestamps=lat_aligned.timestamp_np,
         x_label="Longitude",
         y_label="Latitude",
         title=title,
         timestamp_unit=timestamp_unit,
-        layout_config=layout_config,
-        font_config=font_config,
+        width=width,
+        height=height,
     )

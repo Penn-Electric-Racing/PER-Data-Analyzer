@@ -1,5 +1,3 @@
-from typing import List, Tuple
-
 import numpy as np
 import numpy.typing as npt
 import plotly.graph_objects as go
@@ -8,53 +6,65 @@ from plotly.subplots import make_subplots
 from ..core_data_structures.data_instance import DataInstance
 from ..core_data_structures.single_run_data import SingleRunData
 from ..units import Timescale, to_seconds
-from .plotting_constants import (
-    DEFAULT_FONT_CONFIG,
-    DEFAULT_LAYOUT_CONFIG,
-    FontConfig,
-    LayoutConfig,
+from .defaults import (
+    FONT_SIZE_LARGE,
+    FONT_SIZE_MEDIUM,
+    FONT_SIZE_SMALL,
+    MARGIN,
+    MAX_DISPLAY_RESOLUTION_HZ,
+    PLOT_BGCOLOR,
+    PLOT_WIDTH,
+    SUBPLOT_HEIGHT,
+    SUBPLOT_VERTICAL_SPACING,
+    TITLE_X,
+    TITLE_XANCHOR,
+    TITLE_YANCHOR,
 )
 
 
 def data_instance_subplots(
-    rows: List[List[DataInstance]],
+    rows: list[list[DataInstance]],
     timestamp_unit: Timescale,
     title: str | None = None,
-    row_y_labels: List[str | None] | None = None,
+    row_y_labels: list[str | None] | None = None,
     show_legend: bool = True,
-    layout_config: LayoutConfig = DEFAULT_LAYOUT_CONFIG,
-    font_config: FontConfig = DEFAULT_FONT_CONFIG,
+    log_x: bool = False,
+    log_y: bool = False,
+    width: int = PLOT_WIDTH,
+    height: int | None = None,
+    vertical_spacing: float = SUBPLOT_VERTICAL_SPACING,
 ) -> go.Figure:
-    """Plot groups of DataInstances as stacked subplots on a shared time axis.
+    """Plot groups of DataInstances as vertically stacked subplots sharing one time axis.
 
-    Each element of ``rows`` becomes one subplot row. Multiple DataInstances
-    in the same row are overlaid on that row's y-axis — useful for comparing
-    signals that share the same units or scale.
+    Each element of ``rows`` becomes one subplot row. Multiple DataInstances in the same row are overlaid on that row's y-axis, which is useful for comparing signals that share the same units or scale. Zooming the time axis zooms every row together.
 
     Parameters
     ----------
-    rows : List[List[DataInstance]]
-        Outer list defines subplot rows (top to bottom); inner list defines
-        the DataInstances overlaid within that row.
+    rows : list[list[DataInstance]]
+        Outer list is the subplot rows, top to bottom. Inner list is the signals overlaid within that row.
     timestamp_unit : Timescale
-        Timestamp unit of the underlying DataInstances. Converted to seconds for x-axis display. Pass ``aly.data.timestamp_unit``.
+        Unit of the raw timestamps in the DataInstances. They are converted to seconds for the x-axis. Pass ``aly.data.timestamp_unit``.
     title : str | None, optional
-        Figure-level title. Default is None (no title).
-    row_y_labels : List[str | None] | None, optional
-        Y-axis label for each row. Must match the length of ``rows`` when
-        provided. ``None`` entries fall back to auto-labelling from the
-        DataInstance labels in that row. Default is None (all rows auto-label).
+        Title shown above the whole figure. Default is None (no title).
+    row_y_labels : list[str | None] | None, optional
+        Y-axis label for each row, in the same order as ``rows``. A ``None`` entry falls back to the signal labels in that row. Default is None (every row uses its signal labels).
     show_legend : bool, optional
-        Whether to show the figure legend. Default is True.
-    layout_config : LayoutConfig, optional
-        Dimensions, spacing, and style for the subplot grid.
-    font_config : FontConfig, optional
-        Font sizes for title, axis labels, tick labels, and legend.
+        Whether to show the legend listing each signal. Default is True.
+    log_x : bool, optional
+        Use a logarithmic time (x) axis. Default is False (linear).
+    log_y : bool, optional
+        Use logarithmic y-axes on every row. Default is False (linear).
+    width : int, optional
+        Figure width in pixels. Default is PLOT_WIDTH (1200).
+    height : int | None, optional
+        Figure height in pixels. Default is None, which gives SUBPLOT_HEIGHT (350) pixels per row.
+    vertical_spacing : float, optional
+        Gap between rows as a fraction of the figure height (0 to 1). Default is SUBPLOT_VERTICAL_SPACING (0.12).
 
     Returns
     -------
     go.Figure
-        Plotly figure containing the stacked subplot grid.
+        Plotly figure. Change anything not exposed here (fonts, colors, margins, axis ranges, ...) with ``fig.update_layout``, ``fig.update_xaxes``, ``fig.update_yaxes`` or ``fig.update_traces`` before calling ``fig.show()``. Target one row with ``row=i, col=1``.
 
     Examples
     --------
@@ -84,7 +94,7 @@ def data_instance_subplots(
         rows=n,
         cols=1,
         shared_xaxes=True,
-        vertical_spacing=layout_config.grid_vertical_spacing,
+        vertical_spacing=vertical_spacing,
         subplot_titles=subplot_titles,
     )
 
@@ -110,7 +120,6 @@ def data_instance_subplots(
                 col=1,
             )
 
-        # Resolve y-axis label for this row
         if row_y_labels and row_idx - 1 < len(row_y_labels):
             y_label = row_y_labels[row_idx - 1]
         else:
@@ -119,35 +128,37 @@ def data_instance_subplots(
 
         fig.update_yaxes(
             title_text=y_label,
-            title_font=dict(size=font_config.medium),
-            tickfont=dict(size=font_config.small),
+            title_font=dict(size=FONT_SIZE_MEDIUM),
+            tickfont=dict(size=FONT_SIZE_SMALL),
             row=row_idx,
             col=1,
         )
 
     fig.update_xaxes(
         title_text="Time (s)",
-        title_font=dict(size=font_config.medium),
-        tickfont=dict(size=font_config.small),
+        title_font=dict(size=FONT_SIZE_MEDIUM),
+        tickfont=dict(size=FONT_SIZE_SMALL),
         row=n,
         col=1,
     )
+    fig.update_xaxes(type="log" if log_x else "linear")
+    fig.update_yaxes(type="log" if log_y else "linear")
 
     fig.update_layout(
         title=dict(
             text=title,
-            x=0.5,
-            xanchor="center",
-            yanchor="top",
-            font=dict(size=font_config.large),
+            x=TITLE_X,
+            xanchor=TITLE_XANCHOR,
+            yanchor=TITLE_YANCHOR,
+            font=dict(size=FONT_SIZE_LARGE),
         ),
-        height=layout_config.grid_height_per_row * n,
-        width=layout_config.width,
-        margin=layout_config.margin,
-        plot_bgcolor=layout_config.plot_bgcolor,
+        height=height if height is not None else SUBPLOT_HEIGHT * n,
+        width=width,
+        margin=MARGIN,
+        plot_bgcolor=PLOT_BGCOLOR,
         showlegend=show_legend,
         hovermode="x unified",
-        legend=dict(font=dict(size=font_config.small)),
+        legend=dict(font=dict(size=FONT_SIZE_SMALL)),
     )
 
     return fig
@@ -157,21 +168,21 @@ def stride_downsample(
     timestamps_s: npt.NDArray[np.float64],
     values: npt.NDArray[np.float64],
     max_display_resolution: float,
-) -> Tuple[npt.NDArray[np.float64], npt.NDArray[np.float64]]:
-    """Return stride-downsampled arrays capped at *max_display_resolution*.
+) -> tuple[npt.NDArray[np.float64], npt.NDArray[np.float64]]:
+    """Keep every Nth sample so the effective sample rate is at most ``max_display_resolution``.
 
     Parameters
     ----------
-    timestamps_s : np.ndarray
-        Time values in seconds.
-    values : np.ndarray
-        Corresponding sample values.
+    timestamps_s : npt.NDArray[np.float64]
+        Sample times in seconds.
+    values : npt.NDArray[np.float64]
+        Sample values, same length as ``timestamps_s``.
     max_display_resolution : float
-        Target display sample rate.
+        Maximum sample rate to keep, in Hz. Data already at or below this rate is returned unchanged.
 
     Returns
     -------
-    Tuple[np.ndarray, np.ndarray]
+    tuple[npt.NDArray[np.float64], npt.NDArray[np.float64]]
         Downsampled ``(timestamps_s, values)``.
 
     Examples
@@ -197,37 +208,51 @@ def stride_downsample(
 
 
 def plot_multi_log_subplots(
-    logs: List[SingleRunData],
-    var_names: List[str],
+    logs: list[SingleRunData],
+    var_names: list[str],
     timestamp_unit: Timescale,
-    row_y_labels: List[str | None] | None = None,
+    row_y_labels: list[str | None] | None = None,
     title: str | None = None,
-    layout_config: LayoutConfig = DEFAULT_LAYOUT_CONFIG,
-    font_config: FontConfig = DEFAULT_FONT_CONFIG,
+    max_display_resolution_hz: float = MAX_DISPLAY_RESOLUTION_HZ,
+    log_x: bool = False,
+    log_y: bool = False,
+    width: int = PLOT_WIDTH,
+    height: int | None = None,
+    vertical_spacing: float = SUBPLOT_VERTICAL_SPACING,
 ) -> go.Figure:
-    """Plot the same set of variables across multiple logs as stacked subplots, with each
-    variable on one subplot.
+    """Compare the same variables across multiple logs, one stacked subplot per variable.
+
+    Each subplot overlays one variable from every log. Variables missing from a log are skipped for that log.
 
     Parameters
     ----------
-    logs : List[SingleRunData]
-    var_names : List[str]
-        Ordered list of variable names to plot, one per subplot row.  Variables
-        absent from log are silently skipped.
+    logs : list[SingleRunData]
+        Logs to compare, e.g. ``[aly1.data, aly2.data]``.
+    var_names : list[str]
+        Variable names to plot, one subplot row per name, top to bottom.
     timestamp_unit : Timescale
-        Timestamp unit of the underlying DataInstances. Pass ``aly.data.timestamp_unit``.
-    row_y_labels : List[str | None] | None, optional
-        Y-axis label for each row. Must match the length of ``var_names``
+        Unit of the raw timestamps in the logs. They are converted to seconds for the x-axis. Pass ``aly.data.timestamp_unit``.
+    row_y_labels : list[str | None] | None, optional
+        Y-axis label for each row, in the same order as ``var_names``. Ignored unless its length matches ``var_names``. Default is None (no y-axis labels; subplot titles show the variable names).
     title : str | None, optional
-        Base figure title.  When multiple figures are produced a ``(1/N)``
-        suffix is appended automatically.
-    layout_config : LayoutConfig, optional
-    font_config : FontConfig, optional
+        Title shown above the whole figure. Default is None (no title).
+    max_display_resolution_hz : float, optional
+        Signals sampled faster than this rate (Hz) are downsampled before plotting to keep the figure responsive. Default is MAX_DISPLAY_RESOLUTION_HZ (50).
+    log_x : bool, optional
+        Use a logarithmic time (x) axis. Default is False (linear).
+    log_y : bool, optional
+        Use logarithmic y-axes on every row. Default is False (linear).
+    width : int, optional
+        Figure width in pixels. Default is PLOT_WIDTH (1200).
+    height : int | None, optional
+        Figure height in pixels. Default is None, which gives SUBPLOT_HEIGHT (350) pixels per row.
+    vertical_spacing : float, optional
+        Gap between rows as a fraction of the figure height (0 to 1). Default is SUBPLOT_VERTICAL_SPACING (0.12).
 
     Returns
     -------
     go.Figure
-        The combined figure with all subplots.
+        Plotly figure. Change anything not exposed here (fonts, colors, margins, axis ranges, ...) with ``fig.update_layout``, ``fig.update_xaxes``, ``fig.update_yaxes`` or ``fig.update_traces`` before calling ``fig.show()``.
 
     Examples
     --------
@@ -249,7 +274,7 @@ def plot_multi_log_subplots(
         rows=n_vars,
         cols=1,
         shared_xaxes=True,
-        vertical_spacing=layout_config.grid_vertical_spacing,
+        vertical_spacing=vertical_spacing,
         subplot_titles=var_names,
     )
 
@@ -266,9 +291,9 @@ def plot_multi_log_subplots(
                 di.timestamp_np.astype(np.float64), timestamp_unit
             )
             values = di.value_np
-            if layout_config.max_display_resolution:
+            if max_display_resolution_hz:
                 timestamps_s, values = stride_downsample(
-                    timestamps_s, values, layout_config.max_display_resolution
+                    timestamps_s, values, max_display_resolution_hz
                 )
 
             fig.add_trace(
@@ -289,34 +314,36 @@ def plot_multi_log_subplots(
         for var_idx, y_label in enumerate(row_y_labels, start=1):
             fig.update_yaxes(
                 title_text=y_label,
-                title_font=dict(size=font_config.medium),
-                tickfont=dict(size=font_config.small),
+                title_font=dict(size=FONT_SIZE_MEDIUM),
+                tickfont=dict(size=FONT_SIZE_SMALL),
                 row=var_idx,
                 col=1,
             )
 
     fig.update_xaxes(
         title_text="Time (s)",
-        title_font=dict(size=font_config.medium),
-        tickfont=dict(size=font_config.small),
+        title_font=dict(size=FONT_SIZE_MEDIUM),
+        tickfont=dict(size=FONT_SIZE_SMALL),
         row=n_vars,
         col=1,
     )
+    fig.update_xaxes(type="log" if log_x else "linear")
+    fig.update_yaxes(type="log" if log_y else "linear")
 
     fig.update_layout(
         title=dict(
             text=title,
-            x=0.5,
-            xanchor="center",
-            yanchor="top",
-            font=dict(size=font_config.large),
+            x=TITLE_X,
+            xanchor=TITLE_XANCHOR,
+            yanchor=TITLE_YANCHOR,
+            font=dict(size=FONT_SIZE_LARGE),
         ),
-        height=layout_config.grid_height_per_row * n_vars,
-        width=layout_config.width,
-        margin=layout_config.margin,
-        plot_bgcolor=layout_config.plot_bgcolor,
+        height=height if height is not None else SUBPLOT_HEIGHT * n_vars,
+        width=width,
+        margin=MARGIN,
+        plot_bgcolor=PLOT_BGCOLOR,
         hovermode="x unified",
-        legend=dict(font=dict(size=font_config.small)),
+        legend=dict(font=dict(size=FONT_SIZE_SMALL)),
     )
 
     return fig

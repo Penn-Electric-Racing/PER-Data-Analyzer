@@ -3,13 +3,21 @@ from numpy.typing import NDArray
 from plotly import graph_objects as go
 from plotly.subplots import make_subplots
 
-from .plotting_constants import (
-    DEFAULT_FONT_CONFIG,
-    DEFAULT_LAYOUT_CONFIG,
-    DEFAULT_SCATTER_HISTOGRAM_PLOT_CONFIG,
-    FontConfig,
-    LayoutConfig,
-    ScatterHistogramPlotConfig,
+from .defaults import (
+    FONT_SIZE_LARGE,
+    FONT_SIZE_MEDIUM,
+    FONT_SIZE_SMALL,
+    HISTOGRAM_BINS,
+    HISTOGRAM_COLOR,
+    MARGIN,
+    PLOT_BGCOLOR,
+    PLOT_HEIGHT,
+    PLOT_WIDTH,
+    REFERENCE_LINE_COLOR,
+    SCATTER_COLOR,
+    TITLE_X,
+    TITLE_XANCHOR,
+    TITLE_YANCHOR,
 )
 
 
@@ -27,54 +35,52 @@ def plot_scatter_and_histogram(
     hline_label: str | None = None,
     vline: float | None = None,
     vline_label: str | None = None,
-    font_config: FontConfig = DEFAULT_FONT_CONFIG,
-    layout_config: LayoutConfig = DEFAULT_LAYOUT_CONFIG,
-    plot_config: ScatterHistogramPlotConfig = DEFAULT_SCATTER_HISTOGRAM_PLOT_CONFIG,
+    histogram_bins: int = HISTOGRAM_BINS,
+    width: int = PLOT_WIDTH,
+    height: int = PLOT_HEIGHT,
 ) -> go.Figure:
     """
-    Build a figure with a scatter plot over time and a histogram of the same values.
+    Build a two-panel figure: a line plot of ``y`` against ``x`` on top, and a histogram of the same ``y`` values below.
 
     Parameters
     ----------
     x : NDArray[float64]
-        X-axis values for the scatter plot (e.g. time).
+        X-axis values for the top line plot, e.g. time in seconds.
     y : NDArray[float64]
-        Y-axis values shared between the scatter plot and histogram.
+        Values shown in both panels: as the y-axis of the top plot and as the binned quantity of the histogram.
     title : str
-        Overall figure title.
+        Title shown above the whole figure.
     scatter_title : str
-        Subplot title for the scatter plot.
+        Title of the top (line plot) panel.
     histogram_title : str
-        Subplot title for the histogram.
+        Title of the bottom (histogram) panel.
     x_label : str
-        X-axis label for the scatter plot.
+        X-axis label of the top panel.
     y_label : str
-        Y-axis label for the scatter plot and X-axis label for the histogram.
+        Y-axis label of the top panel, also used as the x-axis label of the histogram.
     scatter_name : str
-        Legend name for the scatter trace.
+        Legend name for the top panel's line.
     histogram_name : str
-        Legend name for the histogram trace.
+        Legend name for the histogram bars.
     hline : float | None, optional
-        Y value at which to draw a horizontal reference line on the scatter plot.
-        Default is None.
+        Y value at which to draw a dashed horizontal reference line on the top panel. Default is None (no line).
     hline_label : str | None, optional
-        Annotation text for the horizontal reference line. Default is None.
+        Text shown next to the horizontal reference line. Default is None (no text).
     vline : float | None, optional
-        X value at which to draw a vertical reference line on the histogram.
-        Default is None.
+        X value at which to draw a dashed vertical reference line on the histogram. Default is None (no line).
     vline_label : str | None, optional
-        Annotation text for the vertical reference line. Default is None.
-    font_config : FontConfig, optional
-        Font sizes for plot elements.
-    layout_config : LayoutConfig, optional
-        Plot dimensions and margins.
-    plot_config : ScatterHistogramPlotConfig, optional
-        Colors and histogram bin count.
+        Text shown next to the vertical reference line. Default is None (no text).
+    histogram_bins : int, optional
+        Maximum number of histogram bins. Default is HISTOGRAM_BINS (80).
+    width : int, optional
+        Figure width in pixels. Default is PLOT_WIDTH (1200).
+    height : int, optional
+        Figure height in pixels. Default is PLOT_HEIGHT (700).
 
     Returns
     -------
     go.Figure
-        Plotly figure with scatter and histogram subplots.
+        Plotly figure. Change anything not exposed here (fonts, colors, margins, log axes, ...) with ``fig.update_layout``, ``fig.update_xaxes``, ``fig.update_yaxes`` or ``fig.update_traces`` before calling ``fig.show()``. Target one panel with ``row=1`` (line plot) or ``row=2`` (histogram) and ``col=1``.
 
     Examples
     --------
@@ -109,7 +115,7 @@ def plot_scatter_and_histogram(
             y=y,
             mode="lines",
             name=scatter_name,
-            line=dict(color=plot_config.color_scatter, width=1),
+            line=dict(color=SCATTER_COLOR, width=1),
         ),
         row=1,
         col=1,
@@ -118,9 +124,9 @@ def plot_scatter_and_histogram(
     if hline is not None:
         fig.add_hline(
             y=hline,
-            line=dict(color=plot_config.color_line, width=1.5, dash="dash"),
+            line=dict(color=REFERENCE_LINE_COLOR, width=1.5, dash="dash"),
             annotation_text=hline_label,
-            annotation_font_size=font_config.small,
+            annotation_font_size=FONT_SIZE_SMALL,
             row=1,
             col=1,
         )
@@ -128,9 +134,9 @@ def plot_scatter_and_histogram(
     fig.add_trace(
         go.Histogram(
             x=y,
-            nbinsx=plot_config.histogram_bins,
+            nbinsx=histogram_bins,
             name=histogram_name,
-            marker_color=plot_config.color_histogram,
+            marker_color=HISTOGRAM_COLOR,
             opacity=0.8,
         ),
         row=2,
@@ -140,38 +146,30 @@ def plot_scatter_and_histogram(
     if vline is not None:
         fig.add_vline(
             x=vline,
-            line=dict(color=plot_config.color_line, width=1.5, dash="dash"),
+            line=dict(color=REFERENCE_LINE_COLOR, width=1.5, dash="dash"),
             annotation_text=vline_label,
-            annotation_font_size=font_config.small,
+            annotation_font_size=FONT_SIZE_SMALL,
             row=2,
             col=1,
         )
 
-    fig.update_xaxes(
-        title_text=x_label, row=1, col=1, title_font_size=font_config.medium
-    )
-    fig.update_yaxes(
-        title_text=y_label, row=1, col=1, title_font_size=font_config.medium
-    )
-    fig.update_xaxes(
-        title_text=y_label, row=2, col=1, title_font_size=font_config.medium
-    )
-    fig.update_yaxes(
-        title_text="Count", row=2, col=1, title_font_size=font_config.medium
-    )
+    fig.update_xaxes(title_text=x_label, row=1, col=1, title_font_size=FONT_SIZE_MEDIUM)
+    fig.update_yaxes(title_text=y_label, row=1, col=1, title_font_size=FONT_SIZE_MEDIUM)
+    fig.update_xaxes(title_text=y_label, row=2, col=1, title_font_size=FONT_SIZE_MEDIUM)
+    fig.update_yaxes(title_text="Count", row=2, col=1, title_font_size=FONT_SIZE_MEDIUM)
 
     fig.update_layout(
         title=dict(
             text=title,
-            x=layout_config.title_x,
-            xanchor=layout_config.title_xanchor,
-            yanchor=layout_config.title_yanchor,
-            font=dict(size=font_config.large),
+            x=TITLE_X,
+            xanchor=TITLE_XANCHOR,
+            yanchor=TITLE_YANCHOR,
+            font=dict(size=FONT_SIZE_LARGE),
         ),
-        width=layout_config.width,
-        height=layout_config.height,
-        margin=layout_config.margin,
-        plot_bgcolor=layout_config.plot_bgcolor,
+        width=width,
+        height=height,
+        margin=MARGIN,
+        plot_bgcolor=PLOT_BGCOLOR,
         showlegend=True,
     )
 

@@ -1,30 +1,13 @@
-"""
-perda.live.live_analyzer
-------------------------
-Live data analysis using the CDP IPC server, mirroring the Analyzer interface.
-"""
-
 from typing import List, Union
 
 from plotly import graph_objects as go
 
 from ..core_data_structures.data_instance import DataInstance
 from ..plotting.data_instance_plotter import plot_dual_axis, plot_single_axis
-from ..plotting.plotting_constants import (
-    DEFAULT_FONT_CONFIG,
-    DEFAULT_LAYOUT_CONFIG,
-    DEFAULT_SCATTER_HISTOGRAM_PLOT_CONFIG,
-    FontConfig,
-    LayoutConfig,
-    ScatterHistogramPlotConfig,
-)
+from ..plotting.defaults import HISTOGRAM_BINS, PLOT_HEIGHT, PLOT_WIDTH
 from ..units import Timescale
 from ..utils.frequency_analysis import analyze_frequency as _analyze_frequency
 from .cdp_client import CDPClient, CDPException, ValueType
-
-# ---------------------------------------------------------------------------
-# Types
-# ---------------------------------------------------------------------------
 
 PlotInput = Union[
     str,
@@ -55,10 +38,6 @@ class LiveAnalyzer:
         self._connected = False
         self._check_connection()
 
-    # ------------------------------------------------------------------
-    # Named constructors
-    # ------------------------------------------------------------------
-
     @classmethod
     def local(
         cls,
@@ -87,10 +66,6 @@ class LiveAnalyzer:
     ) -> "LiveAnalyzer":
         return cls(host, port, timeout, range_timeout)
 
-    # ------------------------------------------------------------------
-    # Connection management
-    # ------------------------------------------------------------------
-
     def _check_connection(self) -> None:
         try:
             with self._client():
@@ -113,10 +88,6 @@ class LiveAnalyzer:
     def ensure_connected(self) -> None:
         if not self.is_connected(refresh=True):
             raise CDPException("Lost connection to CDP server")
-
-    # ------------------------------------------------------------------
-    # Public API
-    # ------------------------------------------------------------------
 
     def fetch(
         self,
@@ -155,8 +126,10 @@ class LiveAnalyzer:
         y_label_1: str | None = None,
         y_label_2: str | None = None,
         show_legend: bool = True,
-        font_config: FontConfig = DEFAULT_FONT_CONFIG,
-        layout_config: LayoutConfig = DEFAULT_LAYOUT_CONFIG,
+        log_x: bool = False,
+        log_y: bool = False,
+        width: int = PLOT_WIDTH,
+        height: int = PLOT_HEIGHT,
     ) -> go.Figure:
         self.ensure_connected()
 
@@ -172,9 +145,11 @@ class LiveAnalyzer:
                 left_y_axis_title=y_label_1,
                 right_y_axis_title=y_label_2,
                 show_legend=show_legend,
-                font_config=font_config,
-                layout_config=layout_config,
                 timestamp_unit=_TIMESTAMP_UNIT,
+                log_x=log_x,
+                log_y=log_y,
+                width=width,
+                height=height,
             )
         else:
             return plot_single_axis(
@@ -182,9 +157,11 @@ class LiveAnalyzer:
                 title=title,
                 y_axis_title=y_label_1,
                 show_legend=show_legend,
-                font_config=font_config,
-                layout_config=layout_config,
                 timestamp_unit=_TIMESTAMP_UNIT,
+                log_x=log_x,
+                log_y=log_y,
+                width=width,
+                height=height,
             )
 
     def analyze_frequency(
@@ -193,9 +170,9 @@ class LiveAnalyzer:
         time_secs: int = _DEFAULT_TIME_SECS,
         expected_frequency_hz: float | None = None,
         gap_threshold_multiplier: float = 2.0,
-        font_config: FontConfig = DEFAULT_FONT_CONFIG,
-        layout_config: LayoutConfig = DEFAULT_LAYOUT_CONFIG,
-        plot_config: ScatterHistogramPlotConfig = DEFAULT_SCATTER_HISTOGRAM_PLOT_CONFIG,
+        histogram_bins: int = HISTOGRAM_BINS,
+        width: int = PLOT_WIDTH,
+        height: int = PLOT_HEIGHT,
     ) -> go.Figure:
         di = self.fetch(var, time_secs)
         return _analyze_frequency(
@@ -203,17 +180,13 @@ class LiveAnalyzer:
             expected_frequency_hz=expected_frequency_hz,
             source_time_unit=_TIMESTAMP_UNIT,
             gap_threshold_multiplier=gap_threshold_multiplier,
-            font_config=font_config,
-            layout_config=layout_config,
-            plot_config=plot_config,
+            histogram_bins=histogram_bins,
+            width=width,
+            height=height,
         )
 
     def __repr__(self) -> str:
         return f"LiveAnalyzer(host={self._host!r}, port={self._port})"
-
-    # ------------------------------------------------------------------
-    # Internal helpers
-    # ------------------------------------------------------------------
 
     def _client(self) -> CDPClient:
         client = CDPClient(timeout=self._timeout, range_timeout=self._range_timeout)

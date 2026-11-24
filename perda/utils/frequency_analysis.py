@@ -5,14 +5,7 @@ from plotly import graph_objects as go
 
 from ..constants import SECTION_DIVIDER
 from ..core_data_structures.data_instance import DataInstance
-from ..plotting.plotting_constants import (
-    DEFAULT_FONT_CONFIG,
-    DEFAULT_LAYOUT_CONFIG,
-    DEFAULT_SCATTER_HISTOGRAM_PLOT_CONFIG,
-    FontConfig,
-    LayoutConfig,
-    ScatterHistogramPlotConfig,
-)
+from ..plotting.defaults import HISTOGRAM_BINS, PLOT_HEIGHT, PLOT_WIDTH
 from ..plotting.scatter_histogram_plotter import plot_scatter_and_histogram
 from ..units import Timescale
 
@@ -31,9 +24,9 @@ def analyze_frequency(
     source_time_unit: Timescale,
     expected_frequency_hz: float | None = None,
     gap_threshold_multiplier: float = 2.0,
-    font_config: FontConfig = DEFAULT_FONT_CONFIG,
-    layout_config: LayoutConfig = DEFAULT_LAYOUT_CONFIG,
-    plot_config: ScatterHistogramPlotConfig = DEFAULT_SCATTER_HISTOGRAM_PLOT_CONFIG,
+    histogram_bins: int = HISTOGRAM_BINS,
+    width: int = PLOT_WIDTH,
+    height: int = PLOT_HEIGHT,
 ) -> go.Figure:
     """
     Analyse the sampling frequency of a DataInstance and return a diagnostic figure.
@@ -56,17 +49,17 @@ def analyze_frequency(
         An interval is flagged as a gap when it exceeds this multiple of the
         expected interval (if ``expected_frequency_hz`` is given) or the median
         interval. Default is 2.0.
-    font_config : FontConfig, optional
-        Font sizes for plot elements.
-    layout_config : LayoutConfig, optional
-        Plot dimensions and margins.
-    plot_config : ScatterHistogramPlotConfig | None, optional
-        Colors and histogram bin count.
+    histogram_bins : int, optional
+        Maximum number of bins in the frequency histogram. Default is HISTOGRAM_BINS (80).
+    width : int, optional
+        Figure width in pixels. Default is PLOT_WIDTH (1200).
+    height : int, optional
+        Figure height in pixels. Default is PLOT_HEIGHT (700).
 
     Returns
     -------
     go.Figure
-        Plotly figure with frequency time-series and frequency histogram subplots.
+        Plotly figure with frequency time-series and frequency histogram subplots. Change anything not exposed here (fonts, colors, log axes, ...) with ``fig.update_layout``, ``fig.update_xaxes``, ``fig.update_yaxes`` or ``fig.update_traces`` before calling ``fig.show()``.
 
     Examples
     --------
@@ -158,7 +151,7 @@ def analyze_frequency(
         hline_label=line_label,
         vline=expected_frequency_hz,
         vline_label=line_label,
-        font_config=font_config,
-        layout_config=layout_config,
-        plot_config=plot_config,
+        histogram_bins=histogram_bins,
+        width=width,
+        height=height,
     )

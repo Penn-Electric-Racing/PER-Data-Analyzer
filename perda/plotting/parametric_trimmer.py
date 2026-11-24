@@ -4,11 +4,17 @@ from numpy import float64
 from numpy.typing import NDArray
 
 from ..units import Timescale
-from .plotting_constants import (
-    DEFAULT_FONT_CONFIG,
-    DEFAULT_LAYOUT_CONFIG,
-    FontConfig,
-    LayoutConfig,
+from .defaults import (
+    FONT_SIZE_LARGE,
+    FONT_SIZE_MEDIUM,
+    FONT_SIZE_SMALL,
+    MARGIN,
+    PLOT_BGCOLOR,
+    PLOT_HEIGHT,
+    PLOT_WIDTH,
+    TITLE_X,
+    TITLE_XANCHOR,
+    TITLE_YANCHOR,
 )
 
 
@@ -20,38 +26,44 @@ def plot_parametric_trimmer(
     x_label: str = "X",
     y_label: str = "Y",
     title: str | None = None,
-    layout_config: LayoutConfig = DEFAULT_LAYOUT_CONFIG,
-    font_config: FontConfig = DEFAULT_FONT_CONFIG,
+    width: int = PLOT_WIDTH,
+    height: int = PLOT_HEIGHT,
 ) -> widgets.VBox:
     """
-    Interactive parametric curve trimmer with a dual-handle range slider.
+    Interactive parametric curve (y against x) with a range slider for picking a sub-window of samples.
 
-    Displays a 2D parametric scatter plot alongside an ipywidgets IntRangeSlider
-    that trims which points are shown. Designed for use in Jupyter notebooks.
+    Drag the two slider handles to hide points outside the selected range. The labels under the slider show the index and raw timestamp of the first and last visible point, which can be passed directly to trimming functions such as ``trim_single_run_data(ts_start=..., ts_end=...)``. Designed for Jupyter notebooks.
 
     Parameters
     ----------
     x : NDArray[float64]
-        X-axis values.
+        X-axis values, e.g. longitude or East position.
     y : NDArray[float64]
-        Y-axis values. Must have the same length as `x`.
+        Y-axis values, e.g. latitude or North position. Must have the same length as ``x``.
     timestamp_unit : Timescale
-        Unit for timestamp labels in the slider. Ignored if `timestamps` is None. Pass ``aly.data.timestamp_unit``.
+        Unit of ``timestamps``, shown next to the timestamp in the slider labels. Ignored if ``timestamps`` is None. Pass ``aly.data.timestamp_unit``.
     timestamps : NDArray[float64] | None, optional
-        Timestamps corresponding to each point, shown in the slider labels.
-        If None, slider labels show index only.
+        Raw timestamp of each point (in ``timestamp_unit``, not converted to seconds), shown in the slider labels. Default is None (labels show sample index only).
     x_label : str, optional
-        X-axis label.
+        X-axis label. Default is ``"X"``.
     y_label : str, optional
-        Y-axis label.
+        Y-axis label. Default is ``"Y"``.
     title : str | None, optional
-        Plot title.
-    layout_config : LayoutConfig, optional
-    font_config : FontConfig, optional
+        Title shown above the plot. Default is None (no title).
+    width : int, optional
+        Figure width in pixels. Default is PLOT_WIDTH (1200).
+    height : int, optional
+        Figure height in pixels. Default is PLOT_HEIGHT (700).
 
     Returns
     -------
     ipywidgets.VBox
+        Widget containing the figure, the slider and the labels. Display it as the last expression in a notebook cell or with ``display(widget)``. The figure is ``widget.children[0]`` and can be customized with ``update_layout`` like any Plotly figure.
+
+    Raises
+    ------
+    ValueError
+        If ``x`` is empty, or ``y`` (or ``timestamps``, when given) does not have the same length as ``x``.
 
     Examples
     --------
@@ -62,6 +74,14 @@ def plot_parametric_trimmer(
     >>> display(widget)
     """
     n = len(x)
+    if n == 0:
+        raise ValueError("x and y are empty; there is nothing to trim.")
+    if len(y) != n:
+        raise ValueError(f"x and y have different lengths ({n} vs {len(y)}).")
+    if timestamps is not None and len(timestamps) != n:
+        raise ValueError(
+            f"timestamps has {len(timestamps)} values but x and y have {n}; there must be one timestamp per point."
+        )
 
     fig = go.FigureWidget()
     fig.add_trace(
@@ -76,20 +96,20 @@ def plot_parametric_trimmer(
     fig.update_layout(
         title=dict(
             text=title,
-            x=layout_config.title_x,
-            xanchor=layout_config.title_xanchor,
-            yanchor=layout_config.title_yanchor,
-            font=dict(size=font_config.large),
+            x=TITLE_X,
+            xanchor=TITLE_XANCHOR,
+            yanchor=TITLE_YANCHOR,
+            font=dict(size=FONT_SIZE_LARGE),
         ),
-        xaxis_title=dict(text=x_label, font=dict(size=font_config.medium)),
-        yaxis_title=dict(text=y_label, font=dict(size=font_config.medium)),
+        xaxis_title=dict(text=x_label, font=dict(size=FONT_SIZE_MEDIUM)),
+        yaxis_title=dict(text=y_label, font=dict(size=FONT_SIZE_MEDIUM)),
         showlegend=False,
-        width=int(layout_config.width),
-        height=int(layout_config.height),
-        margin=layout_config.margin,
-        plot_bgcolor=layout_config.plot_bgcolor,
-        xaxis=dict(tickfont=dict(size=font_config.small)),
-        yaxis=dict(tickfont=dict(size=font_config.small)),
+        width=width,
+        height=height,
+        margin=MARGIN,
+        plot_bgcolor=PLOT_BGCOLOR,
+        xaxis=dict(tickfont=dict(size=FONT_SIZE_SMALL)),
+        yaxis=dict(tickfont=dict(size=FONT_SIZE_SMALL)),
     )
 
     range_slider = widgets.IntRangeSlider(
