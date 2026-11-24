@@ -37,6 +37,8 @@ HISTOGRAM_BINS = 80
 
 # Parametric curves
 PARAMETRIC_MARKER_SIZE = 3
+TRIMMER_MARKER_SIZE = 4
+TIME_COLORSCALE = "Viridis"  # Colors trimmer points by elapsed time
 
 # Map traces
 MAP_STYLE = "open-street-map"  # MapLibre style, needs no API key
