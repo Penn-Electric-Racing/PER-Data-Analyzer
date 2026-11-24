@@ -426,7 +426,7 @@ mean-subtracted to suppress the DC component.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>di</strong> (<a class="reference internal" href="perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance"><em>DataInstance</em></a>) – Signal to transform.</p></li>
+<li><p><strong>di</strong> (<a class="reference internal" href="perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance"><em>DataInstance</em></a><em> | </em><em>Sequence</em><em>[</em><a class="reference internal" href="perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance"><em>DataInstance</em></a><em>]</em>) – Signal to transform, or several signals transformed independently.</p></li>
 <li><p><strong>source_time_unit</strong> (<a class="reference internal" href="perda.units.html#perda.units.Timescale" title="perda.units.Timescale"><em>Timescale</em></a>) – Timestamp unit. Used only in time-domain mode. Pass <code class="docutils literal notranslate"><span class="pre">aly.data.timestamp_unit</span></code>.</p></li>
 <li><p><strong>distance_di</strong> (<a class="reference internal" href="perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance"><em>DataInstance</em></a><em> | </em><em>None</em><em>, </em><em>optional</em>) – If provided, the FFT is computed in the spatial domain and the
 sample spacing is derived from cumulative distance in meters
@@ -435,12 +435,13 @@ sample spacing is derived from cumulative distance in meters
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">GenericAlias</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float64</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">GenericAlias</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float64</span></code>]]</span></p>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">GenericAlias</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float64</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">GenericAlias</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float64</span></code>]] | <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">GenericAlias</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float64</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">GenericAlias</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float64</span></code>]], <code class="xref py py-data docutils literal notranslate"><span class="pre">...</span></code>]</span></p>
 </dd>
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><ul class="simple">
 <li><p><strong>frequencies</strong> (<em>NDArray[float64]</em>) – Frequency axis values.</p></li>
 <li><p><strong>magnitudes</strong> (<em>NDArray[float64]</em>) – FFT magnitude (<code class="docutils literal notranslate"><span class="pre">abs(rfft(signal</span> <span class="pre">-</span> <span class="pre">mean))</span></code>).</p></li>
+<li><p>Given several signals, returns one <code class="docutils literal notranslate"><span class="pre">(frequencies,</span> <span class="pre">magnitudes)</span></code> pair per signal.</p></li>
 </ul>
 </p>
 </dd>
@@ -450,6 +451,7 @@ sample spacing is derived from cumulative distance in meters
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">perda.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">compute_fft</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">freqs</span><span class="p">,</span> <span class="n">mags</span> <span class="o">=</span> <span class="n">compute_fft</span><span class="p">(</span><span class="n">di</span><span class="p">,</span> <span class="n">source_time_unit</span><span class="o">=</span><span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">timestamp_unit</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span> <span class="o">=</span> <span class="n">plot_fft_spectrum</span><span class="p">([</span><span class="n">freqs</span><span class="p">],</span> <span class="p">[</span><span class="n">mags</span><span class="p">],</span> <span class="p">[</span><span class="n">di</span><span class="o">.</span><span class="n">label</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">freqs</span><span class="p">,</span> <span class="n">mags</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">compute_fft</span><span class="p">(</span><span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">"pcm.vnav.*"</span><span class="p">],</span> <span class="n">source_time_unit</span><span class="o">=</span><span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">timestamp_unit</span><span class="p">))</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -458,7 +460,7 @@ sample spacing is derived from cumulative distance in meters
 <dt class="sig sig-object py" id="perda.utils.signal_processing.lowpass_filter">
 <span class="sig-prename descclassname"><span class="pre">perda.utils.signal_processing.</span></span><span class="sig-name descname"><span class="pre">lowpass_filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">di</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cutoff_hz</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_time_unit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/utils/signal_processing.html#lowpass_filter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.utils.signal_processing.lowpass_filter" title="Link to this definition">#</a></dt>
 <dd><p>Apply a Butterworth lowpass filter in the time domain.</p>
-<p>Returns a new DataInstance (or list thereof) with filtered values.
+<p>Returns a new DataInstance (or tuple of them) with filtered values.
 Original timestamps and metadata are preserved. NaN positions in the
 input remain NaN in the output.</p>
 <p>To re-filter at a different cutoff without stacking, pass the original
@@ -472,7 +474,7 @@ input remain NaN in the output.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>di</strong> (<a class="reference internal" href="perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance"><em>DataInstance</em></a><em> | </em><em>list</em><em>[</em><a class="reference internal" href="perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance"><em>DataInstance</em></a><em>]</em>) – Input signal(s). Lists are processed independently.</p></li>
+<li><p><strong>di</strong> (<a class="reference internal" href="perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance"><em>DataInstance</em></a><em> | </em><em>Sequence</em><em>[</em><a class="reference internal" href="perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance"><em>DataInstance</em></a><em>]</em>) – Input signal, or several signals (e.g. from a wildcard lookup) filtered independently.</p></li>
 <li><p><strong>cutoff_hz</strong> (<em>float</em>) – Cutoff frequency in Hz.</p></li>
 <li><p><strong>source_time_unit</strong> (<a class="reference internal" href="perda.units.html#perda.units.Timescale" title="perda.units.Timescale"><em>Timescale</em></a>) – Timestamp unit of <code class="docutils literal notranslate"><span class="pre">di.timestamp_np</span></code>. Pass <code class="docutils literal notranslate"><span class="pre">aly.data.timestamp_unit</span></code>.</p></li>
 <li><p><strong>order</strong> (<em>int</em><em>, </em><em>optional</em>) – Butterworth filter order. The effective order is 2× due to
@@ -480,17 +482,17 @@ forward-backward (<code class="docutils literal notranslate"><span class="pre">s
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>New DataInstance(s) with filtered <code class="docutils literal notranslate"><span class="pre">value_np</span></code>.</p>
+<dd class="field-even"><p>New DataInstance(s) with filtered <code class="docutils literal notranslate"><span class="pre">value_np</span></code>, one per input.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance">DataInstance</a> | list[<a class="reference internal" href="perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance">DataInstance</a>]</p>
+<dd class="field-odd"><p><a class="reference internal" href="perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance">DataInstance</a> | tuple[<a class="reference internal" href="perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance">DataInstance</a>, …]</p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">perda.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">lowpass_filter</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">unit</span> <span class="o">=</span> <span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">timestamp_unit</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">di_filtered</span> <span class="o">=</span> <span class="n">lowpass_filter</span><span class="p">(</span><span class="n">di</span><span class="p">,</span> <span class="n">cutoff_hz</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span> <span class="n">source_time_unit</span><span class="o">=</span><span class="n">unit</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">di_filtered</span> <span class="o">=</span> <span class="n">lowpass_filter</span><span class="p">([</span><span class="n">di_a</span><span class="p">,</span> <span class="n">di_b</span><span class="p">],</span> <span class="n">cutoff_hz</span><span class="o">=</span><span class="mf">5.0</span><span class="p">,</span> <span class="n">source_time_unit</span><span class="o">=</span><span class="n">unit</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">"pcm.vnav.*"</span><span class="p">]</span> <span class="o">=</span> <span class="n">lowpass_filter</span><span class="p">(</span><span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">"pcm.vnav.*"</span><span class="p">],</span> <span class="n">cutoff_hz</span><span class="o">=</span><span class="mf">5.0</span><span class="p">,</span> <span class="n">source_time_unit</span><span class="o">=</span><span class="n">unit</span><span class="p">)</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -506,7 +508,7 @@ same grid.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>di</strong> (<a class="reference internal" href="perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance"><em>DataInstance</em></a><em> | </em><em>list</em><em>[</em><a class="reference internal" href="perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance"><em>DataInstance</em></a><em>]</em>) – Input signal(s) to filter.</p></li>
+<li><p><strong>di</strong> (<a class="reference internal" href="perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance"><em>DataInstance</em></a><em> | </em><em>Sequence</em><em>[</em><a class="reference internal" href="perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance"><em>DataInstance</em></a><em>]</em>) – Input signal, or several signals filtered independently.</p></li>
 <li><p><strong>distance_di</strong> (<a class="reference internal" href="perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance"><em>DataInstance</em></a>) – Cumulative distance in meters on any timestamp grid.</p></li>
 <li><p><strong>cutoff_freq_per_meter</strong> (<em>float</em>) – Cutoff frequency in cycles per meter (1/m).</p></li>
 <li><p><strong>order</strong> (<em>int</em><em>, </em><em>optional</em>) – Butterworth filter order. Default is 4.</p></li>
@@ -514,10 +516,10 @@ same grid.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>New DataInstance(s) with spatially filtered <code class="docutils literal notranslate"><span class="pre">value_np</span></code>, on the
-original signal timestamp grid.</p>
+original signal timestamp grid, one per input.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance">DataInstance</a> | list[<a class="reference internal" href="perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance">DataInstance</a>]</p>
+<dd class="field-odd"><p><a class="reference internal" href="perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance">DataInstance</a> | tuple[<a class="reference internal" href="perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance">DataInstance</a>, …]</p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
@@ -537,17 +539,17 @@ replaced with <code class="docutils literal notranslate"><span class="pre">NaN</
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>di</strong> (<a class="reference internal" href="perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance"><em>DataInstance</em></a><em> | </em><em>list</em><em>[</em><a class="reference internal" href="perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance"><em>DataInstance</em></a><em>]</em>) – Input signal(s).</p></li>
+<li><p><strong>di</strong> (<a class="reference internal" href="perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance"><em>DataInstance</em></a><em> | </em><em>Sequence</em><em>[</em><a class="reference internal" href="perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance"><em>DataInstance</em></a><em>]</em>) – Input signal, or several signals filtered independently.</p></li>
 <li><p><strong>window_s</strong> (<em>float</em>) – Rolling window size in seconds</p></li>
 <li><p><strong>threshold</strong> (<em>float</em>) – Z-score threshold; samples exceeding this are masked.</p></li>
 <li><p><strong>source_time_unit</strong> (<a class="reference internal" href="perda.units.html#perda.units.Timescale" title="perda.units.Timescale"><em>Timescale</em></a>) – Timestamp unit. Pass <code class="docutils literal notranslate"><span class="pre">aly.data.timestamp_unit</span></code>.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>New DataInstance(s) with outliers replaced by linear interpolation.</p>
+<dd class="field-even"><p>New DataInstance(s) with outliers replaced by linear interpolation, one per input.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance">DataInstance</a> | list[<a class="reference internal" href="perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance">DataInstance</a>]</p>
+<dd class="field-odd"><p><a class="reference internal" href="perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance">DataInstance</a> | tuple[<a class="reference internal" href="perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance">DataInstance</a>, …]</p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>

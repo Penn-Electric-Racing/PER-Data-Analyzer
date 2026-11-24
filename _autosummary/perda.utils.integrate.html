@@ -395,7 +395,7 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>data_instance</strong> (<a class="reference internal" href="perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance"><em>DataInstance</em></a>) – DataInstance to average</p></li>
+<li><p><strong>data_instance</strong> (<a class="reference internal" href="perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance"><em>DataInstance</em></a><em> | </em><em>Sequence</em><em>[</em><a class="reference internal" href="perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance"><em>DataInstance</em></a><em>]</em>) – DataInstance to average, or several DataInstances handled independently</p></li>
 <li><p><strong>source_time_unit</strong> (<a class="reference internal" href="perda.units.html#perda.units.Timescale" title="perda.units.Timescale"><em>Timescale</em></a>) – Time unit of <code class="docutils literal notranslate"><span class="pre">data_instance.timestamp_np</span></code>. Pass <code class="docutils literal notranslate"><span class="pre">aly.data.timestamp_unit</span></code>.</p></li>
 <li><p><strong>start_time</strong> (<em>int</em><em>, </em><em>optional</em>) – Start of the window, as an absolute timestamp in <code class="docutils literal notranslate"><span class="pre">target_time_unit</span></code>. Default is 0</p></li>
 <li><p><strong>end_time</strong> (<em>int</em><em>, </em><em>optional</em>) – End of the window, as an absolute timestamp in <code class="docutils literal notranslate"><span class="pre">target_time_unit</span></code>. -1 means end
@@ -407,7 +407,7 @@ of data. Default is -1</p></li>
 <dd class="field-even"><p>Time-weighted average value over the time range</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>float</p>
+<dd class="field-odd"><p>float | tuple[float, …]</p>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
@@ -458,7 +458,7 @@ of data. Default is -1</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>data_instance</strong> (<a class="reference internal" href="perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance"><em>DataInstance</em></a>) – DataInstance to integrate</p></li>
+<li><p><strong>data_instance</strong> (<a class="reference internal" href="perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance"><em>DataInstance</em></a><em> | </em><em>Sequence</em><em>[</em><a class="reference internal" href="perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance"><em>DataInstance</em></a><em>]</em>) – DataInstance to integrate, or several DataInstances handled independently</p></li>
 <li><p><strong>source_time_unit</strong> (<a class="reference internal" href="perda.units.html#perda.units.Timescale" title="perda.units.Timescale"><em>Timescale</em></a>) – Time unit of <code class="docutils literal notranslate"><span class="pre">data_instance.timestamp_np</span></code>. Pass <code class="docutils literal notranslate"><span class="pre">aly.data.timestamp_unit</span></code>.</p></li>
 <li><p><strong>start_time</strong> (<em>int</em><em>, </em><em>optional</em>) – Start of the window, as an absolute timestamp in <code class="docutils literal notranslate"><span class="pre">target_time_unit</span></code>. Default is 0</p></li>
 <li><p><strong>end_time</strong> (<em>int</em><em>, </em><em>optional</em>) – End of the window, as an absolute timestamp in <code class="docutils literal notranslate"><span class="pre">target_time_unit</span></code>. -1 means end
@@ -470,7 +470,7 @@ of data. Default is -1</p></li>
 <dd class="field-even"><p>Integral of the value over the time range</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>float</p>
+<dd class="field-odd"><p>float | tuple[float, …]</p>
 </dd>
 </dl>
 <p class="rubric">Notes</p>

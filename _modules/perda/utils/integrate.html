@@ -302,7 +302,10 @@
                 <article class="bd-article">
                   
   <h1>Source code for perda.utils.integrate</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Sequence</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">overload</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">polars</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pl</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="kn">import</span> <span class="n">float64</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">numpy.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">NDArray</span>
@@ -313,22 +316,42 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">..units</span><span class="w"> </span><span class="kn">import</span> <span class="n">MAD_TO_STD</span><span class="p">,</span> <span class="n">Timescale</span><span class="p">,</span> <span class="n">convert_time</span>
 
 
-<div class="viewcode-block" id="integrate_over_time_range">
-<a class="viewcode-back" href="../../../_autosummary/perda.utils.integrate.html#perda.utils.integrate.integrate_over_time_range">[docs]</a>
+<span class="nd">@overload</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">integrate_over_time_range</span><span class="p">(</span>
     <span class="n">data_instance</span><span class="p">:</span> <span class="n">DataInstance</span><span class="p">,</span>
     <span class="n">source_time_unit</span><span class="p">:</span> <span class="n">Timescale</span><span class="p">,</span>
     <span class="n">start_time</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
     <span class="n">end_time</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
     <span class="n">target_time_unit</span><span class="p">:</span> <span class="n">Timescale</span> <span class="o">=</span> <span class="n">Timescale</span><span class="o">.</span><span class="n">S</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span> <span class="o">...</span>
+
+
+<span class="nd">@overload</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">integrate_over_time_range</span><span class="p">(</span>
+    <span class="n">data_instance</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">DataInstance</span><span class="p">],</span>
+    <span class="n">source_time_unit</span><span class="p">:</span> <span class="n">Timescale</span><span class="p">,</span>
+    <span class="n">start_time</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="n">end_time</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">target_time_unit</span><span class="p">:</span> <span class="n">Timescale</span> <span class="o">=</span> <span class="n">Timescale</span><span class="o">.</span><span class="n">S</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span> <span class="o">...</span>
+
+
+<div class="viewcode-block" id="integrate_over_time_range">
+<a class="viewcode-back" href="../../../_autosummary/perda.utils.integrate.html#perda.utils.integrate.integrate_over_time_range">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">integrate_over_time_range</span><span class="p">(</span>
+    <span class="n">data_instance</span><span class="p">:</span> <span class="n">DataInstance</span> <span class="o">|</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">DataInstance</span><span class="p">],</span>
+    <span class="n">source_time_unit</span><span class="p">:</span> <span class="n">Timescale</span><span class="p">,</span>
+    <span class="n">start_time</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="n">end_time</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">target_time_unit</span><span class="p">:</span> <span class="n">Timescale</span> <span class="o">=</span> <span class="n">Timescale</span><span class="o">.</span><span class="n">S</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Get integral of the value over time using the trapezoidal rule.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    data_instance : DataInstance</span>
-<span class="sd">        DataInstance to integrate</span>
+<span class="sd">    data_instance : DataInstance | Sequence[DataInstance]</span>
+<span class="sd">        DataInstance to integrate, or several DataInstances handled independently</span>
 <span class="sd">    source_time_unit : Timescale</span>
 <span class="sd">        Time unit of ``data_instance.timestamp_np``. Pass ``aly.data.timestamp_unit``.</span>
 <span class="sd">    start_time : int, optional</span>
@@ -341,7 +364,7 @@
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    float</span>
+<span class="sd">    float | tuple[float, ...]</span>
 <span class="sd">        Integral of the value over the time range</span>
 
 <span class="sd">    Notes</span>
@@ -356,6 +379,14 @@
 <span class="sd">    ...     current, source_time_unit=aly.data.timestamp_unit</span>
 <span class="sd">    ... )</span>
 <span class="sd">    """</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data_instance</span><span class="p">,</span> <span class="n">DataInstance</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span>
+            <span class="n">integrate_over_time_range</span><span class="p">(</span>
+                <span class="n">instance</span><span class="p">,</span> <span class="n">source_time_unit</span><span class="p">,</span> <span class="n">start_time</span><span class="p">,</span> <span class="n">end_time</span><span class="p">,</span> <span class="n">target_time_unit</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">instance</span> <span class="ow">in</span> <span class="n">data_instance</span>
+        <span class="p">)</span>
+
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_instance</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
         <span class="k">return</span> <span class="mf">0.0</span>
 
@@ -387,22 +418,42 @@
 
 
 
-<div class="viewcode-block" id="average_over_time_range">
-<a class="viewcode-back" href="../../../_autosummary/perda.utils.integrate.html#perda.utils.integrate.average_over_time_range">[docs]</a>
+<span class="nd">@overload</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">average_over_time_range</span><span class="p">(</span>
     <span class="n">data_instance</span><span class="p">:</span> <span class="n">DataInstance</span><span class="p">,</span>
     <span class="n">source_time_unit</span><span class="p">:</span> <span class="n">Timescale</span><span class="p">,</span>
     <span class="n">start_time</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
     <span class="n">end_time</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
     <span class="n">target_time_unit</span><span class="p">:</span> <span class="n">Timescale</span> <span class="o">=</span> <span class="n">Timescale</span><span class="o">.</span><span class="n">S</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span> <span class="o">...</span>
+
+
+<span class="nd">@overload</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">average_over_time_range</span><span class="p">(</span>
+    <span class="n">data_instance</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">DataInstance</span><span class="p">],</span>
+    <span class="n">source_time_unit</span><span class="p">:</span> <span class="n">Timescale</span><span class="p">,</span>
+    <span class="n">start_time</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="n">end_time</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">target_time_unit</span><span class="p">:</span> <span class="n">Timescale</span> <span class="o">=</span> <span class="n">Timescale</span><span class="o">.</span><span class="n">S</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span> <span class="o">...</span>
+
+
+<div class="viewcode-block" id="average_over_time_range">
+<a class="viewcode-back" href="../../../_autosummary/perda.utils.integrate.html#perda.utils.integrate.average_over_time_range">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">average_over_time_range</span><span class="p">(</span>
+    <span class="n">data_instance</span><span class="p">:</span> <span class="n">DataInstance</span> <span class="o">|</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">DataInstance</span><span class="p">],</span>
+    <span class="n">source_time_unit</span><span class="p">:</span> <span class="n">Timescale</span><span class="p">,</span>
+    <span class="n">start_time</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="n">end_time</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">target_time_unit</span><span class="p">:</span> <span class="n">Timescale</span> <span class="o">=</span> <span class="n">Timescale</span><span class="o">.</span><span class="n">S</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Get average value over time using integral divided by time range.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    data_instance : DataInstance</span>
-<span class="sd">        DataInstance to average</span>
+<span class="sd">    data_instance : DataInstance | Sequence[DataInstance]</span>
+<span class="sd">        DataInstance to average, or several DataInstances handled independently</span>
 <span class="sd">    source_time_unit : Timescale</span>
 <span class="sd">        Time unit of ``data_instance.timestamp_np``. Pass ``aly.data.timestamp_unit``.</span>
 <span class="sd">    start_time : int, optional</span>
@@ -415,7 +466,7 @@
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    float</span>
+<span class="sd">    float | tuple[float, ...]</span>
 <span class="sd">        Time-weighted average value over the time range</span>
 
 <span class="sd">    Notes</span>
@@ -430,6 +481,14 @@
 <span class="sd">    ...     voltage, source_time_unit=aly.data.timestamp_unit</span>
 <span class="sd">    ... )</span>
 <span class="sd">    """</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data_instance</span><span class="p">,</span> <span class="n">DataInstance</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span>
+            <span class="n">average_over_time_range</span><span class="p">(</span>
+                <span class="n">instance</span><span class="p">,</span> <span class="n">source_time_unit</span><span class="p">,</span> <span class="n">start_time</span><span class="p">,</span> <span class="n">end_time</span><span class="p">,</span> <span class="n">target_time_unit</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">instance</span> <span class="ow">in</span> <span class="n">data_instance</span>
+        <span class="p">)</span>
+
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_instance</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">data_instance</span><span class="o">.</span><span class="n">value_np</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 

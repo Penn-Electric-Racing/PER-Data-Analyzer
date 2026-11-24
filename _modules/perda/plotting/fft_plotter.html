@@ -302,7 +302,9 @@
                 <article class="bd-article">
                   
   <h1>Source code for perda.plotting.fft_plotter</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">plotly.graph_objects</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">go</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Sequence</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">plotly.graph_objects</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">go</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="kn">import</span> <span class="n">float64</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">numpy.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">NDArray</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">plotly.subplots</span><span class="w"> </span><span class="kn">import</span> <span class="n">make_subplots</span>
@@ -327,9 +329,9 @@
 <div class="viewcode-block" id="plot_fft_spectrum">
 <a class="viewcode-back" href="../../../_autosummary/perda.plotting.fft_plotter.html#perda.plotting.fft_plotter.plot_fft_spectrum">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">plot_fft_spectrum</span><span class="p">(</span>
-    <span class="n">frequencies</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]],</span>
-    <span class="n">magnitudes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]],</span>
-    <span class="n">series_names</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="n">frequencies</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]],</span>
+    <span class="n">magnitudes</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]],</span>
+    <span class="n">series_names</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
     <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">x_label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"Frequency (Hz)"</span><span class="p">,</span>
     <span class="n">y_label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"Magnitude"</span><span class="p">,</span>
@@ -344,11 +346,11 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    frequencies : list[NDArray[float64]]</span>
+<span class="sd">    frequencies : Sequence[NDArray[float64]]</span>
 <span class="sd">        Frequency axis (Hz) for each series, e.g. the first output of ``compute_fft``.</span>
-<span class="sd">    magnitudes : list[NDArray[float64]]</span>
+<span class="sd">    magnitudes : Sequence[NDArray[float64]]</span>
 <span class="sd">        Magnitude array for each series, same length as the matching ``frequencies`` entry.</span>
-<span class="sd">    series_names : list[str]</span>
+<span class="sd">    series_names : Sequence[str]</span>
 <span class="sd">        Display name for each series. Used as subplot titles when ``stacked=True`` and as legend entries when ``stacked=False``.</span>
 <span class="sd">    title : str | None, optional</span>
 <span class="sd">        Title shown above the whole figure. Default is None (no title).</span>
