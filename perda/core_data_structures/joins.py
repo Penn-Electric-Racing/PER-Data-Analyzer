@@ -3,7 +3,7 @@ from __future__ import annotations
 import numpy as np
 from numpy.typing import NDArray
 
-from .resampling import ResampleMethod, _interpolate
+from .resampling import ResampleMethod, interpolate_onto_timestamps
 
 
 def left_join(
@@ -48,7 +48,7 @@ def left_join(
         raise ValueError("Both time series must be non-empty")
 
     target_f = left_ts.astype(np.float64)
-    right_values = _interpolate(
+    right_values = interpolate_onto_timestamps(
         target_f, right_ts.astype(np.float64), right_val, method
     )
 
@@ -105,8 +105,10 @@ def outer_join(
 
     timestamps = np.union1d(left_ts, right_ts)
     target_f = timestamps.astype(np.float64)
-    left_values = _interpolate(target_f, left_ts.astype(np.float64), left_val, method)
-    right_values = _interpolate(
+    left_values = interpolate_onto_timestamps(
+        target_f, left_ts.astype(np.float64), left_val, method
+    )
+    right_values = interpolate_onto_timestamps(
         target_f, right_ts.astype(np.float64), right_val, method
     )
 
@@ -179,7 +181,7 @@ def inner_join(
     keep = min_dist <= tolerance
     timestamps = left_ts[keep]
     left_values = left_val[keep]
-    right_values = _interpolate(
+    right_values = interpolate_onto_timestamps(
         timestamps.astype(np.float64), right_ts.astype(np.float64), right_val, method
     )
 
