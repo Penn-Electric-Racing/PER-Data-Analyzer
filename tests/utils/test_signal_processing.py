@@ -82,13 +82,13 @@ def test_lowpass_preserves_metadata(sine_di_factory):
     np.testing.assert_array_equal(result.timestamp_np, di.timestamp_np)
 
 
-def test_lowpass_list_input_returns_list(sine_di_factory):
+def test_lowpass_tuple_input_returns_tuple(sine_di_factory):
     di_a = sine_di_factory(freq_hz=5.0, label="a", var_id=1)
     di_b = sine_di_factory(freq_hz=5.0, label="b", var_id=2)
     results = lowpass_filter(
-        [di_a, di_b], cutoff_hz=20.0, source_time_unit=Timescale.MS
+        (di_a, di_b), cutoff_hz=20.0, source_time_unit=Timescale.MS
     )
-    assert isinstance(results, list)
+    assert isinstance(results, tuple)
     assert len(results) == 2
 
 
@@ -167,7 +167,7 @@ def test_zscore_preserves_timestamps(uniform_di):
     np.testing.assert_array_equal(result.timestamp_np, uniform_di.timestamp_np)
 
 
-def test_zscore_list_input_returns_list(uniform_di):
+def test_zscore_tuple_input_returns_tuple(uniform_di):
     di_a = DataInstance(
         timestamp_np=uniform_di.timestamp_np,
         value_np=uniform_di.value_np.copy(),
@@ -181,9 +181,9 @@ def test_zscore_list_input_returns_list(uniform_di):
         var_id=2,
     )
     results = zscore_filter(
-        [di_a, di_b], window_s=2.0, threshold=4.8, source_time_unit=Timescale.MS
+        (di_a, di_b), window_s=2.0, threshold=4.8, source_time_unit=Timescale.MS
     )
-    assert isinstance(results, list)
+    assert isinstance(results, tuple)
     assert len(results) == 2
 
 
@@ -217,6 +217,27 @@ def test_compute_fft_drops_nan(sine_di_factory):
     freqs, mags = compute_fft(di_nan, source_time_unit=Timescale.MS)
     assert not np.any(np.isnan(mags))
     assert len(freqs) > 0
+
+
+def test_compute_fft_tuple_input_returns_pair_per_signal(sine_di_factory):
+    di = sine_di_factory(freq_hz=10.0)
+    single_freqs, single_mags = compute_fft(di, source_time_unit=Timescale.MS)
+    spectra = compute_fft((di, di), source_time_unit=Timescale.MS)
+    assert len(spectra) == 2
+    for freqs, mags in spectra:
+        np.testing.assert_array_equal(freqs, single_freqs)
+        np.testing.assert_array_equal(mags, single_mags)
+
+
+def test_filter_wildcard_round_trip(srd_basic):
+    srd_basic["cpp.*"] = zscore_filter(
+        srd_basic["cpp.*"],
+        window_s=1.0,
+        threshold=3.0,
+        source_time_unit=srd_basic.timestamp_unit,
+    )
+    assert srd_basic["cpp.var_a"].cpp_name == "cpp.var_a"
+    assert srd_basic["cpp.var_b"].cpp_name == "cpp.var_b"
 
 
 def test_compute_fft_dc_suppressed(uniform_di):
@@ -313,7 +334,7 @@ def test_lowpass_by_distance_skips_when_cutoff_above_nyquist(
     assert "Nyquist" in capsys.readouterr().out
 
 
-def test_lowpass_by_distance_list_input_returns_list(spatial_signal_factory):
+def test_lowpass_by_distance_tuple_input_returns_tuple(spatial_signal_factory):
     signal_di, distance_di = spatial_signal_factory(freq_per_m=0.5)
     di_b = DataInstance(
         timestamp_np=signal_di.timestamp_np,
@@ -322,9 +343,9 @@ def test_lowpass_by_distance_list_input_returns_list(spatial_signal_factory):
         var_id=2,
     )
     results = lowpass_filter_by_distance(
-        [signal_di, di_b], distance_di, cutoff_freq_per_meter=0.5
+        (signal_di, di_b), distance_di, cutoff_freq_per_meter=0.5
     )
-    assert isinstance(results, list)
+    assert isinstance(results, tuple)
     assert len(results) == 2
 
 
