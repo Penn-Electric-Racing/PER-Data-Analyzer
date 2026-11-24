@@ -1,6 +1,5 @@
 [project]
 name = "perda"
-version = "1.0.0"
 description = "Penn Electric Racing Data Analyzer"
 authors = [
     {name = "laytcai", email = "1715782167@qq.com"},
@@ -8,7 +7,7 @@ authors = [
 ]
 readme = "README.md"
 requires-python = ">=3.9"
-dynamic = ["dependencies"]
+dynamic = ["dependencies", "version"]
 
 [project.optional-dependencies]
 semantic = [
@@ -42,11 +41,13 @@ include = ["perda*"]
 [tool.setuptools.package-data]
 perda = ["py.typed"]
 
+[tool.setuptools_scm]
+
 [tool.setuptools.dynamic]
 dependencies = {file = ["requirements.txt"]}
 
 [build-system]
-requires = ["setuptools >= 61.0", "wheel"]
+requires = ["setuptools >= 64", "setuptools-scm >= 8", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [tool.pytest.ini_options]
