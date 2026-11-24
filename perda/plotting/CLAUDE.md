@@ -2,6 +2,8 @@
 
 - NO SPECIFIC FUNTIONALITY OR LOGIC in this module. Callers are responsible for wrapping the generics in an application-specific layer.
 
+- If some new analysis feature requires a plot, create the plot with existing functions and make custom modifications to the returned figure. Only modify the existing functions if the new feature requirements seems important and reusable. Only write new plotting functions if there is really no suitable existing function to use.
+
 - The inputs to the plotting functions should be generic objects, such as numpy arrays, dictionaries, and lists. The one exception is for DataInstance, which we consider to be an atomic data type representing one time-series variable for plotting purposes.
 
 - Graphs should always be generated using Plotly
