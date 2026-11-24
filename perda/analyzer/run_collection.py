@@ -2,13 +2,14 @@ from __future__ import annotations
 
 from datetime import datetime
 from pathlib import Path
-from typing import Callable, Iterator
+from typing import Callable, Iterator, Sequence
 
 import plotly.graph_objects as go
 from pydantic import BaseModel, Field
 
 from ..core_data_structures.data_instance import DataInstance
-from ..plotting.data_instance_plotter import plot_single_axis
+from ..plotting.data_instance_plotter import plot_time_series
+from ..plotting.defaults import PLOT_WIDTH, SUBPLOT_VERTICAL_SPACING
 from ..units import Timescale, convert_time
 from ..utils.data_summary import DataInstanceSummary, data_instance_summary
 from .analyzer import Analyzer
@@ -243,67 +244,65 @@ class RunCollection:
 
     def plot_comparison(
         self,
-        cpp_name: str,
+        vars: str | Sequence[str],
         max_points: int | None = None,
         log_x: bool = False,
         log_y: bool = False,
+        width: int = PLOT_WIDTH,
+        height: int | None = None,
+        vertical_spacing: float = SUBPLOT_VERTICAL_SPACING,
     ) -> go.Figure:
         """
-        Overlay a variable from every run in the collection on a single plot.
+        Overlay variables from every run in the collection, one stacked subplot per variable.
 
-        Each run's timestamps are shifted so that all runs start at t = 0.
+        Each run's timestamps are shifted so that all runs start at t = 0. Runs missing a
+        variable are skipped in that variable's subplot.
 
         Parameters
         ----------
-        cpp_name : str
-            C++ name of the variable to compare.
+        vars : str | Sequence[str]
+            C++ name of the variable to compare, or a list of names for one subplot each, top to bottom.
         max_points : int | None, optional
             Maximum number of points drawn per run. Longer signals are evenly downsampled (every Nth point), which speeds up rendering. Default is None (draw every point).
         log_x : bool, optional
             Use a logarithmic time (x) axis. Default is False (linear).
         log_y : bool, optional
-            Use a logarithmic y-axis. Default is False (linear).
+            Use logarithmic y-axes. Default is False (linear).
+        width : int, optional
+            Figure width in pixels. Default is PLOT_WIDTH (1200).
+        height : int | None, optional
+            Figure height in pixels. Default is None, which gives PLOT_HEIGHT for one subplot and SUBPLOT_HEIGHT per subplot otherwise.
+        vertical_spacing : float, optional
+            Gap between subplots as a fraction of the figure height (0 to 1). Default is SUBPLOT_VERTICAL_SPACING (0.12).
 
         Returns
         -------
         go.Figure
-            Plotly figure with one trace per run that contains the variable. Change anything not exposed here (size, fonts, colors, ...) with ``fig.update_layout`` or ``fig.update_traces`` before calling ``fig.show()``.
+            Plotly figure with one trace per run and variable. Change anything not exposed here (fonts, colors, ...) with ``fig.update_layout`` or ``fig.update_traces`` before calling ``fig.show()``.
 
         Examples
         --------
         >>> fig = col.plot_comparison("pcm.wheelSpeeds.frontLeft", max_points=20000)
+        >>> fig = col.plot_comparison(["pcm.wheelSpeeds.frontLeft", "ludwig.steeringWheel.angle"])
         """
-        overlaid = []
+        cpp_names = [vars] if isinstance(vars, str) else list(vars)
+        rows: list[list[DataInstance]] = [[] for _ in cpp_names]
         for run, analyzer in self._iter_analyzers():
-            if cpp_name not in analyzer.data:
-                continue
-            di = analyzer.data[cpp_name]
-            if len(di) == 0:
-                continue
+            for row, cpp_name in zip(rows, cpp_names):
+                if cpp_name in analyzer.data and len(analyzer.data[cpp_name]) > 0:
+                    row.append(_shift_to_run_start(run, analyzer, cpp_name))
 
-            relative_timestamps = di.timestamp_np - analyzer.data.data_start_time
-            overlaid.append(
-                DataInstance(
-                    timestamp_np=convert_time(
-                        relative_timestamps,
-                        analyzer.data.timestamp_unit,
-                        COMPARISON_TIMESTAMP_UNIT,
-                    ),
-                    value_np=di.value_np,
-                    label=f"{run.file_path.name} ({di.label})",
-                    var_id=di.var_id,
-                    cpp_name=di.cpp_name,
-                )
-            )
-
-        return plot_single_axis(
-            overlaid,
-            title=f"Multi-Log Comparison: {cpp_name}",
-            y_axis_title=cpp_name,
+        return plot_time_series(
+            rows=rows,
+            title="Multi-Log Comparison",
+            y_axis_titles=list(cpp_names),
             timestamp_unit=COMPARISON_TIMESTAMP_UNIT,
             max_points=max_points,
             log_x=log_x,
             log_y=log_y,
+            width=width,
+            height=height,
+            vertical_spacing=vertical_spacing,
         )
 
     def compare_summary(self, cpp_name: str) -> dict[str, DataInstanceSummary]:
@@ -332,3 +331,21 @@ class RunCollection:
             for run, analyzer in self._iter_analyzers()
             if cpp_name in analyzer.data
         }
+
+
+def _shift_to_run_start(
+    run: RunMetadata, analyzer: Analyzer, cpp_name: str
+) -> DataInstance:
+    di = analyzer.data[cpp_name]
+    relative_timestamps = di.timestamp_np - analyzer.data.data_start_time
+    return DataInstance(
+        timestamp_np=convert_time(
+            relative_timestamps,
+            analyzer.data.timestamp_unit,
+            COMPARISON_TIMESTAMP_UNIT,
+        ),
+        value_np=di.value_np,
+        label=f"{run.file_path.name} ({di.label})",
+        var_id=di.var_id,
+        cpp_name=di.cpp_name,
+    )

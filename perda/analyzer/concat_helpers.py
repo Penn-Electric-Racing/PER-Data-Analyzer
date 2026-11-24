@@ -133,7 +133,8 @@ def _concat_single_run_data(
             label = di_first.label
             descript = first_descript[name]
         else:
-            assert di_second is not None
+            if di_second is None:
+                raise KeyError(f"Variable '{name}' is missing from both runs")
             merged_ts = di_second.timestamp_np + shift
             merged_vals = di_second.value_np
             label = di_second.label

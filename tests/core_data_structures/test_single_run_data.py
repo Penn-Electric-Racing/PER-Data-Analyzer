@@ -41,12 +41,44 @@ def test_getitem_invalid_raises(srd_basic, bad_key, exc_type):
         srd_basic[bad_key]
 
 
-@pytest.mark.parametrize("key", [1, 2, "cpp.var_a", "cpp.var_b"])
+@pytest.mark.parametrize(
+    "key, expected_names",
+    [
+        pytest.param("cpp.*", ["cpp.var_a", "cpp.var_b"], id="trailing_wildcard"),
+        pytest.param("*_b", ["cpp.var_b"], id="leading_wildcard_single_match"),
+        pytest.param("cpp.var_*", ["cpp.var_a", "cpp.var_b"], id="partial_segment"),
+        pytest.param(
+            ("cpp.var_b", 1), ["cpp.var_b", "cpp.var_a"], id="tuple_keeps_order"
+        ),
+        pytest.param(
+            ("*_b", "cpp.var_a"), ["cpp.var_b", "cpp.var_a"], id="tuple_with_pattern"
+        ),
+    ],
+)
+def test_getitem_multiple_returns_tuple(srd_basic, key, expected_names):
+    result = srd_basic[key]
+    assert isinstance(result, tuple)
+    assert [di.cpp_name for di in result] == expected_names
+
+
+@pytest.mark.parametrize("key", ["ghost.*", ("cpp.var_a", "ghost")])
+def test_getitem_multiple_missing_raises(srd_basic, key):
+    with pytest.raises(KeyError):
+        srd_basic[key]
+
+
+def test_pattern_does_not_treat_dot_as_regex(srd_basic):
+    with pytest.raises(KeyError):
+        srd_basic["cpp?var_*"]
+    assert "cppXvar_*" not in srd_basic
+
+
+@pytest.mark.parametrize("key", [1, 2, "cpp.var_a", "cpp.var_b", "cpp.*"])
 def test_contains_present(srd_basic, key):
     assert key in srd_basic
 
 
-@pytest.mark.parametrize("key", [999, "ghost", "", 42])
+@pytest.mark.parametrize("key", [999, "ghost", "", 42, "ghost.*"])
 def test_contains_absent(srd_basic, key):
     assert key not in srd_basic
 

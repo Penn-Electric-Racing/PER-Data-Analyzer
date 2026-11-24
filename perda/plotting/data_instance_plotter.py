@@ -13,6 +13,9 @@ from .defaults import (
     PLOT_BGCOLOR,
     PLOT_HEIGHT,
     PLOT_WIDTH,
+    RIGHT_AXIS_LINE_DASH,
+    SUBPLOT_HEIGHT,
+    SUBPLOT_VERTICAL_SPACING,
     TITLE_X,
     TITLE_XANCHOR,
     TITLE_YANCHOR,
@@ -44,75 +47,17 @@ def _time_series_xy(
     return to_seconds(di.timestamp_np, timestamp_unit), di.value_np
 
 
-def plot_single_axis(
+def _add_row_traces(
+    fig: go.Figure,
     data_instances: list[DataInstance],
+    row: int,
+    on_right: bool,
     timestamp_unit: Timescale,
-    title: str | None = None,
-    y_axis_title: str | None = None,
-    show_legend: bool = True,
-    vlines: list[float] | None = None,
-    max_points: int | None = None,
-    log_x: bool = False,
-    log_y: bool = False,
-    width: int = PLOT_WIDTH,
-    height: int = PLOT_HEIGHT,
-) -> go.Figure:
-    """
-    Plot one or more DataInstances against time on a single shared y-axis.
-
-    Parameters
-    ----------
-    data_instances : list[DataInstance]
-        Signals to plot. Each becomes one line, named by its ``label`` in the legend.
-    timestamp_unit : Timescale
-        Unit of the raw timestamps in the DataInstances. They are converted to seconds for the x-axis. Pass ``aly.data.timestamp_unit``.
-    title : str | None, optional
-        Title shown above the plot. Default is None (no title).
-    y_axis_title : str | None, optional
-        Y-axis label, e.g. ``"Speed (mph)"``. Default is None (no label).
-    show_legend : bool, optional
-        Whether to show the legend listing each signal. Default is True.
-    vlines : list[float] | None, optional
-        Times in seconds at which to draw dashed vertical marker lines. Default is None (no lines).
-    max_points : int | None, optional
-        Maximum number of points drawn per signal. Longer signals are evenly downsampled (every Nth point), which speeds up rendering of large logs. Default is None (draw every point).
-    log_x : bool, optional
-        Use a logarithmic time (x) axis. Default is False (linear).
-    log_y : bool, optional
-        Use a logarithmic y-axis. Default is False (linear).
-    width : int, optional
-        Figure width in pixels. Default is PLOT_WIDTH (1200).
-    height : int, optional
-        Figure height in pixels. Default is PLOT_HEIGHT (700).
-
-    Returns
-    -------
-    go.Figure
-        Plotly figure. Change anything not exposed here (fonts, colors, margins, axis ranges, ...) with ``fig.update_layout``, ``fig.update_xaxes``, ``fig.update_yaxes`` or ``fig.update_traces`` before calling ``fig.show()``.
-
-    Examples
-    --------
-    >>> from perda.plotting import plot_single_axis
-    >>> fig = plot_single_axis(
-    ...     [speed_di, torque_di],
-    ...     title="Speed & Torque",
-    ...     y_axis_title="Value",
-    ...     timestamp_unit=aly.data.timestamp_unit,
-    ...     log_y=True,
-    ... )
-    >>> fig.update_layout(font_size=16)  # further customization
-    """
-    if not data_instances:
-        print("Warning: No data instances provided for plotting")
-        return
-
-    fig = go.Figure()
-
+    max_points: int | None,
+) -> None:
     for di in data_instances:
         if len(di) == 0:
-            print(f"Warning: No data points in DataInstance for {di.label}")
-            continue
-
+            raise ValueError(f"No data points in DataInstance for {di.label}")
         timestamps_s, values_np = _time_series_xy(di, timestamp_unit, max_points)
         fig.add_trace(
             go.Scattergl(
@@ -120,153 +65,139 @@ def plot_single_axis(
                 y=values_np,
                 mode="lines",
                 name=di.label,
-            )
+                legendgroup=str(row),
+                line=dict(dash=RIGHT_AXIS_LINE_DASH) if on_right else None,
+            ),
+            row=row,
+            col=1,
+            secondary_y=on_right,
         )
 
-    fig.update_layout(
-        title=dict(
-            text=title,
-            x=TITLE_X,
-            xanchor=TITLE_XANCHOR,
-            yanchor=TITLE_YANCHOR,
-            font=dict(size=FONT_SIZE_LARGE),
-        ),
-        xaxis_title=dict(text="Time (s)", font=dict(size=FONT_SIZE_MEDIUM)),
-        yaxis_title=dict(text=y_axis_title, font=dict(size=FONT_SIZE_MEDIUM)),
-        showlegend=show_legend,
-        hovermode="x unified",
-        width=width,
-        height=height,
-        margin=MARGIN,
-        plot_bgcolor=PLOT_BGCOLOR,
-        xaxis=dict(
-            tickfont=dict(size=FONT_SIZE_SMALL), type="log" if log_x else "linear"
-        ),
-        yaxis=dict(
-            tickfont=dict(size=FONT_SIZE_SMALL), type="log" if log_y else "linear"
-        ),
-        legend=dict(font=dict(size=FONT_SIZE_SMALL)),
-    )
 
-    if vlines:
-        _add_vlines(fig, vlines)
-
-    return fig
+def _axis_titles_per_subplot(
+    titles: list[str | None] | None, n_rows: int
+) -> list[str | None]:
+    if titles is None:
+        return [None] * n_rows
+    if len(titles) != n_rows:
+        raise ValueError(
+            f"Expected {n_rows} axis titles (one per subplot), got {len(titles)}"
+        )
+    return titles
 
 
-def plot_dual_axis(
-    left_data_instances: list[DataInstance],
-    right_data_instances: list[DataInstance],
+def plot_time_series(
+    rows: list[list[DataInstance]],
     timestamp_unit: Timescale,
+    right_rows: list[list[DataInstance]] | None = None,
     title: str | None = None,
-    left_y_axis_title: str | None = None,
-    right_y_axis_title: str | None = None,
+    y_axis_titles: list[str | None] | None = None,
+    right_y_axis_titles: list[str | None] | None = None,
     show_legend: bool = True,
     vlines: list[float] | None = None,
     max_points: int | None = None,
     log_x: bool = False,
     log_y: bool = False,
     width: int = PLOT_WIDTH,
-    height: int = PLOT_HEIGHT,
+    height: int | None = None,
+    vertical_spacing: float = SUBPLOT_VERTICAL_SPACING,
 ) -> go.Figure:
     """
-    Plot DataInstances against time with two independent y-axes (left and right).
+    Plot DataInstances against time as vertically stacked subplots sharing one time axis.
 
-    Useful for signals with different units or scales. Right-axis signals are drawn dashed.
+    Each subplot has a left y-axis and, optionally, an independent right y-axis for signals with different units or scales. A single row gives an ordinary one-panel plot. Zooming the time axis zooms every subplot together.
 
     Parameters
     ----------
-    left_data_instances : list[DataInstance]
-        Signals plotted against the left y-axis (solid lines).
-    right_data_instances : list[DataInstance]
-        Signals plotted against the right y-axis (dashed lines).
+    rows : list[list[DataInstance]]
+        Outer list is the subplots, top to bottom. Inner list is the signals drawn against that subplot's left y-axis (solid lines). An inner list may be empty if that subplot only uses its right axis.
     timestamp_unit : Timescale
         Unit of the raw timestamps in the DataInstances. They are converted to seconds for the x-axis. Pass ``aly.data.timestamp_unit``.
+    right_rows : list[list[DataInstance]] | None, optional
+        Signals drawn against each subplot's right y-axis (dashed lines), one inner list per subplot in the same order as ``rows``. An empty inner list means that subplot has no right axis. Default is None (no right axes anywhere).
     title : str | None, optional
-        Title shown above the plot. Default is None (no title).
-    left_y_axis_title : str | None, optional
-        Left y-axis label, e.g. ``"Speed (mph)"``. Default is None (no label).
-    right_y_axis_title : str | None, optional
-        Right y-axis label, e.g. ``"Torque (Nm)"``. Default is None (no label).
+        Title shown above the whole figure. Default is None (no title).
+    y_axis_titles : list[str | None] | None, optional
+        Left y-axis label for each subplot, e.g. ``["Speed (mph)", None]``. ``None`` entries leave that axis unlabeled. Default is None (no labels).
+    right_y_axis_titles : list[str | None] | None, optional
+        Right y-axis label for each subplot. Ignored for subplots without right-axis signals. Default is None (no labels).
     show_legend : bool, optional
         Whether to show the legend listing each signal. Default is True.
     vlines : list[float] | None, optional
-        Times in seconds at which to draw dashed vertical marker lines. Default is None (no lines).
+        Times in seconds at which to draw dashed vertical marker lines on every subplot. Default is None (no lines).
     max_points : int | None, optional
         Maximum number of points drawn per signal. Longer signals are evenly downsampled (every Nth point), which speeds up rendering of large logs. Default is None (draw every point).
     log_x : bool, optional
         Use a logarithmic time (x) axis. Default is False (linear).
     log_y : bool, optional
-        Use logarithmic scaling on both the left and right y-axes. Default is False (linear).
+        Use logarithmic scaling on every y-axis, left and right. Default is False (linear).
     width : int, optional
         Figure width in pixels. Default is PLOT_WIDTH (1200).
-    height : int, optional
-        Figure height in pixels. Default is PLOT_HEIGHT (700).
+    height : int | None, optional
+        Figure height in pixels. Default is None, which gives PLOT_HEIGHT (700) for one subplot and SUBPLOT_HEIGHT (350) per subplot otherwise.
+    vertical_spacing : float, optional
+        Gap between subplots as a fraction of the figure height (0 to 1). Default is SUBPLOT_VERTICAL_SPACING (0.12).
 
     Returns
     -------
     go.Figure
-        Plotly figure. Change anything not exposed here (fonts, colors, margins, axis ranges, ...) with ``fig.update_layout``, ``fig.update_xaxes``, ``fig.update_yaxes`` or ``fig.update_traces`` before calling ``fig.show()``. To log-scale only one side, use ``fig.update_yaxes(type="log", secondary_y=True)``.
+        Plotly figure. Change anything not exposed here (fonts, colors, margins, axis ranges, ...) with ``fig.update_layout``, ``fig.update_xaxes``, ``fig.update_yaxes`` or ``fig.update_traces`` before calling ``fig.show()``. Target one subplot with ``row=i, col=1``, and its right axis with ``secondary_y=True``, e.g. ``fig.update_yaxes(type="log", row=2, col=1, secondary_y=True)``.
 
     Examples
     --------
-    >>> from perda.plotting import plot_dual_axis
-    >>> fig = plot_dual_axis(
-    ...     [speed_di],
-    ...     [torque_di],
-    ...     left_y_axis_title="Speed (mph)",
-    ...     right_y_axis_title="Torque (Nm)",
+    >>> from perda.plotting import plot_time_series
+    >>> fig = plot_time_series(
+    ...     rows=[[speed_di], [roll_di, pitch_di]],
+    ...     right_rows=[[], [steering_di]],
+    ...     y_axis_titles=["Speed (m/s)", "Attitude (deg)"],
+    ...     right_y_axis_titles=[None, "Steering (deg)"],
     ...     timestamp_unit=aly.data.timestamp_unit,
     ... )
     """
-    if not left_data_instances and not right_data_instances:
-        print("Warning: No data instances provided for plotting")
-        return
+    n_rows = len(rows)
+    if right_rows is None:
+        right_rows = [[] for _ in rows]
+    if len(right_rows) != n_rows:
+        raise ValueError(
+            f"right_rows has {len(right_rows)} entries but rows has {n_rows}"
+        )
+    if not any(rows) and not any(right_rows):
+        raise ValueError("No data instances provided for plotting")
 
-    fig = make_subplots(specs=[[{"secondary_y": True}]])
+    left_titles = _axis_titles_per_subplot(y_axis_titles, n_rows)
+    right_titles = _axis_titles_per_subplot(right_y_axis_titles, n_rows)
 
-    for data_instances, on_right in (
-        (left_data_instances, False),
-        (right_data_instances, True),
-    ):
-        for di in data_instances:
-            if len(di) == 0:
-                print(f"Warning: No data points in DataInstance for {di.label}")
-                continue
+    fig = make_subplots(
+        rows=n_rows,
+        cols=1,
+        shared_xaxes=True,
+        vertical_spacing=vertical_spacing if n_rows > 1 else 0.0,
+        specs=[[{"secondary_y": bool(right_dis)}] for right_dis in right_rows],
+    )
 
-            timestamps_s, values_np = _time_series_xy(di, timestamp_unit, max_points)
-            fig.add_trace(
-                go.Scattergl(
-                    x=timestamps_s,
-                    y=values_np,
-                    mode="lines",
-                    name=di.label,
-                    line=dict(dash="dash") if on_right else None,
-                ),
-                secondary_y=on_right,
+    for row, (left_dis, right_dis) in enumerate(zip(rows, right_rows), start=1):
+        _add_row_traces(fig, left_dis, row, False, timestamp_unit, max_points)
+        _add_row_traces(fig, right_dis, row, True, timestamp_unit, max_points)
+        fig.update_yaxes(title_text=left_titles[row - 1], row=row, col=1)
+        if right_dis:
+            fig.update_yaxes(
+                title_text=right_titles[row - 1], row=row, col=1, secondary_y=True
             )
 
-    y_axis_type = "log" if log_y else "linear"
+    fig.update_xaxes(title_text="Time (s)", row=n_rows, col=1)
     fig.update_xaxes(
-        title_text="Time (s)",
         title_font=dict(size=FONT_SIZE_MEDIUM),
         tickfont=dict(size=FONT_SIZE_SMALL),
         type="log" if log_x else "linear",
     )
     fig.update_yaxes(
-        title_text=left_y_axis_title,
         title_font=dict(size=FONT_SIZE_MEDIUM),
         tickfont=dict(size=FONT_SIZE_SMALL),
-        type=y_axis_type,
-        secondary_y=False,
+        type="log" if log_y else "linear",
     )
-    fig.update_yaxes(
-        title_text=right_y_axis_title,
-        title_font=dict(size=FONT_SIZE_MEDIUM),
-        tickfont=dict(size=FONT_SIZE_SMALL),
-        type=y_axis_type,
-        secondary_y=True,
-    )
+
+    if height is None:
+        height = PLOT_HEIGHT if n_rows == 1 else SUBPLOT_HEIGHT * n_rows
 
     fig.update_layout(
         title=dict(

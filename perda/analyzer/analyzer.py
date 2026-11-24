@@ -1,19 +1,17 @@
 import io
 import sys
-from collections.abc import Sequence
 
 from plotly import graph_objects as go
 
 from ..core_data_structures.data_instance import DataInstance
 from ..core_data_structures.single_run_data import SingleRunData
-from ..plotting.data_instance_plotter import plot_dual_axis, plot_single_axis
+from ..plotting.data_instance_plotter import plot_time_series
 from ..plotting.defaults import (
     HISTOGRAM_BINS,
     PLOT_HEIGHT,
     PLOT_WIDTH,
     SUBPLOT_VERTICAL_SPACING,
 )
-from ..plotting.subplots import data_instance_subplots
 from ..units import from_seconds, to_seconds
 from ..utils.accel_calculator import *
 from ..utils.data_summary import single_run_summary
@@ -23,9 +21,13 @@ from ..utils.integrate import smoothed_filtered_integration
 from ..utils.preprocessing import PreprocessingStep, apply_preprocessing
 from ..utils.search import SearchResult, search
 from .csv import *
-
-VariableInput = str | int | DataInstance
-VariableInputs = VariableInput | Sequence[VariableInput]
+from .plot_inputs import (
+    AxisTitles,
+    PlotVariables,
+    axis_titles_per_subplot,
+    group_variables_by_subplot,
+    lookup_subplot_data_instances,
+)
 
 
 class Analyzer:
@@ -44,6 +46,12 @@ class Analyzer:
     Check membership
     ----------------
     >>> "pcm.wheelSpeeds.frontRight" in aly.data       # True / False
+
+    Wildcards and multiple variables at once
+    ----------------------------------------
+    >>> vel_x, vel_y, vel_z = aly.data["pcm.vnav.bodyVelocity.*"]   # sorted by name
+    >>> left, right = aly.data["pcm.wheelSpeeds.frontLeft", "pcm.wheelSpeeds.frontRight"]
+    >>> aly.data["derived.a", "derived.b"] = a_di, b_di
 
     Read raw arrays
     ---------------
@@ -174,41 +182,42 @@ class Analyzer:
 
     def plot(
         self,
-        var_1: VariableInputs,
-        var_2: VariableInputs | None = None,
+        vars: PlotVariables,
+        vars_alt: PlotVariables | None = None,
         ts_start: float | None = None,
         ts_end: float | None = None,
         title: str | None = None,
-        y_label_1: str | None = None,
-        y_label_2: str | None = None,
+        y_title: AxisTitles = None,
+        y_title_alt: AxisTitles = None,
         show_legend: bool = True,
         max_points: int | None = None,
         log_x: bool = False,
         log_y: bool = False,
         width: int = PLOT_WIDTH,
-        height: int = PLOT_HEIGHT,
+        height: int | None = None,
+        vertical_spacing: float = SUBPLOT_VERTICAL_SPACING,
     ) -> go.Figure:
         """
-        Plot variables from the log against time on an interactive Plotly figure.
+        Plot variables from the log against time, optionally as stacked subplots with split y-axes.
 
-        Pass one variable or a list for a single y-axis. Also pass ``var_2`` to put a second group of variables on an independent right-hand y-axis. Concat boundaries (if any) are drawn as dashed vertical lines.
+        The shape of ``vars`` decides the layout. A single variable or a flat list gives one plot. A list containing inner lists gives one subplot per entry, top to bottom, all sharing one time axis. ``vars_alt`` adds an independent right-hand y-axis, per subplot. Concat boundaries (if any) are drawn as dashed vertical lines.
 
         Parameters
         ----------
-        var_1 : str | int | DataInstance | Sequence[str | int | DataInstance]
-            Variable(s) for the left (or only) y-axis. Each item can be a variable name (``"pcm.wheelSpeeds.frontRight"``), a variable ID (``42``), or a DataInstance (e.g. a derived signal).
-        var_2 : str | int | DataInstance | Sequence[str | int | DataInstance] | None, optional
-            Variable(s) for a second, right-hand y-axis, drawn dashed. Same accepted types as ``var_1``. Default is None (single y-axis).
+        vars : str | int | DataInstance | list
+            Variables for the left (or only) y-axis. Each variable can be a name (``"pcm.wheelSpeeds.frontRight"``), a wildcard pattern matching several names (``"pcm.vnav.*"``), a variable ID (``42``), or a DataInstance (e.g. a derived signal). Pass a flat list for one plot, or a list of lists for subplots, e.g. ``[["a", "b"], "c"]`` gives two subplots; a non-list entry counts as a list of one.
+        vars_alt : str | int | DataInstance | list | None, optional
+            Variables for a right-hand y-axis, drawn dashed. Same forms and nesting rules as ``vars``, and must give the same number of subplots. A ``None`` (or ``[None]``) entry leaves that subplot with a single y-axis, e.g. ``[None, "steering"]``. Default is None (no right axes).
         ts_start : float | None, optional
-            Start of the time window in seconds on the log's clock. Earlier data is excluded. Default is None (from the start of the log).
+            Start of the time window in seconds on the log clock. Earlier data is excluded. Default is None (from the start of the log).
         ts_end : float | None, optional
-            End of the time window in seconds on the log's clock. Later data is excluded. Default is None (to the end of the log).
+            End of the time window in seconds on the log clock. Later data is excluded. Default is None (to the end of the log).
         title : str | None, optional
-            Title shown above the plot. Default is None (no title).
-        y_label_1 : str | None, optional
-            Left (or only) y-axis label, e.g. ``"Speed (mph)"``. Default is None (no label).
-        y_label_2 : str | None, optional
-            Right y-axis label. Only used with ``var_2``. Default is None (no label).
+            Title shown above the figure. Default is None (no title).
+        y_title : str | list[str | None] | None, optional
+            Left y-axis label, e.g. ``"Speed (mph)"``. With subplots, a list with one entry per subplot (``None`` for no label), or one string used on every subplot. Default is None (no labels).
+        y_title_alt : str | list[str | None] | None, optional
+            Right y-axis label, same forms as ``y_title``. Ignored for subplots without ``vars_alt``. Default is None (no labels).
         show_legend : bool, optional
             Whether to show the legend listing each variable. Default is True.
         max_points : int | None, optional
@@ -216,16 +225,18 @@ class Analyzer:
         log_x : bool, optional
             Use a logarithmic time (x) axis. Default is False (linear).
         log_y : bool, optional
-            Use logarithmic y-axes (both left and right when ``var_2`` is given). Default is False (linear).
+            Use logarithmic scaling on every y-axis, left and right. Default is False (linear).
         width : int, optional
             Figure width in pixels. Default is PLOT_WIDTH (1200).
-        height : int, optional
-            Figure height in pixels. Default is PLOT_HEIGHT (700).
+        height : int | None, optional
+            Figure height in pixels. Default is None, which gives PLOT_HEIGHT (700) for one plot and SUBPLOT_HEIGHT (350) per subplot otherwise.
+        vertical_spacing : float, optional
+            Gap between subplots as a fraction of the figure height (0 to 1). Default is SUBPLOT_VERTICAL_SPACING (0.12).
 
         Returns
         -------
         go.Figure
-            Plotly figure. Change anything not exposed here (fonts, colors, margins, axis ranges, ...) with ``fig.update_layout``, ``fig.update_xaxes``, ``fig.update_yaxes`` or ``fig.update_traces`` before calling ``fig.show()``.
+            Plotly figure. Change anything not exposed here (fonts, colors, margins, axis ranges, ...) with ``fig.update_layout``, ``fig.update_xaxes``, ``fig.update_yaxes`` or ``fig.update_traces`` before calling ``fig.show()``. Target one subplot with ``row=i, col=1``, and its right axis with ``secondary_y=True``.
 
         Notes
         -----
@@ -236,8 +247,15 @@ class Analyzer:
         Examples
         --------
         >>> fig = aly.plot("pcm.wheelSpeeds.frontRight")
-        >>> fig = aly.plot(["pcm.wheelSpeeds.frontRight", "pcm.wheelSpeeds.frontLeft"], title="Front Wheel Speeds")
-        >>> fig = aly.plot("pcm.moc.motor.requestedTorque", "pcm.wheelSpeeds.frontRight", ts_start=10.0, ts_end=30.0)
+        >>> fig = aly.plot("pcm.wheelSpeeds.*", title="Wheel Speeds")
+        >>> fig = aly.plot("pcm.moc.motor.requestedTorque", vars_alt="pcm.wheelSpeeds.frontRight", ts_start=10.0, ts_end=30.0)
+        >>> # Two subplots: velocities alone, then attitude with steering angle on a right axis
+        >>> fig = aly.plot(
+        ...     vars=[["pcm.vnav.bodyVelocity.*", "pcm.wheelSpeeds.frontRight"], ["pcm.vnav.rpy.*"]],
+        ...     vars_alt=[None, ["*.steeringWheel.angle"]],
+        ...     y_title=["Velocity (m/s)", "Attitude (deg)"],
+        ...     y_title_alt=[None, "Steering Angle (deg)"],
+        ... )
         >>> # Plot a derived DataInstance (e.g. average of two signals)
         >>> avg_speed = (aly.data["pcm.wheelSpeeds.frontRight"] + aly.data["pcm.wheelSpeeds.frontLeft"]) / 2.0
         >>> fig = aly.plot(avg_speed)
@@ -245,141 +263,41 @@ class Analyzer:
         >>> fig = aly.plot("bms.pack.current", log_y=True)
         >>> fig.update_layout(font_size=16)
         """
-        var_1_norm = self._normalize_input(var_1)
-        var_2_norm = self._normalize_input(var_2) if var_2 is not None else None
+        left_variables = group_variables_by_subplot(vars)
+        n_subplots = len(left_variables)
+        right_variables = (
+            [None] * n_subplots
+            if vars_alt is None
+            else group_variables_by_subplot(vars_alt)
+        )
 
         unit = self.data.timestamp_unit
-
-        # Convert concat boundaries to seconds for the plotter
-        vlines: list[float] | None = None
-        if self.data.concat_boundaries:
-            vlines = [to_seconds(float(b), unit) for b in self.data.concat_boundaries]
-
-        # Apply time range filter if specified (convert seconds -> raw units for trim)
-        if ts_start is not None or ts_end is not None:
-            start_raw = from_seconds(ts_start, unit) if ts_start is not None else None
-            end_raw = from_seconds(ts_end, unit) if ts_end is not None else None
-            var_1_norm = [di.trim(start_raw, end_raw) for di in var_1_norm]
-            if var_2_norm is not None:
-                var_2_norm = [di.trim(start_raw, end_raw) for di in var_2_norm]
-
-        if var_2_norm is not None:
-            return plot_dual_axis(
-                left_data_instances=var_1_norm,
-                right_data_instances=var_2_norm,
-                title=title,
-                left_y_axis_title=y_label_1,
-                right_y_axis_title=y_label_2,
-                show_legend=show_legend,
-                timestamp_unit=self.data.timestamp_unit,
-                vlines=vlines,
-                max_points=max_points,
-                log_x=log_x,
-                log_y=log_y,
-                width=width,
-                height=height,
-            )
-        else:
-            return plot_single_axis(
-                data_instances=var_1_norm,
-                title=title,
-                y_axis_title=y_label_1,
-                show_legend=show_legend,
-                timestamp_unit=self.data.timestamp_unit,
-                vlines=vlines,
-                max_points=max_points,
-                log_x=log_x,
-                log_y=log_y,
-                width=width,
-                height=height,
-            )
-
-    def subplots(
-        self,
-        rows: Sequence[VariableInputs],
-        title: str | None = None,
-        row_y_labels: list[str | None] | None = None,
-        ts_start: float | None = None,
-        ts_end: float | None = None,
-        show_legend: bool = True,
-        log_x: bool = False,
-        log_y: bool = False,
-        width: int = PLOT_WIDTH,
-        height: int | None = None,
-        vertical_spacing: float = SUBPLOT_VERTICAL_SPACING,
-    ) -> go.Figure:
-        """
-        Plot variables as vertically stacked subplots sharing one time axis.
-
-        Each entry in ``rows`` becomes one subplot row. Pass a list of variables for a row to overlay them on the same panel, or a single variable for a dedicated panel. Zooming the time axis zooms every row together.
-
-        Parameters
-        ----------
-        rows : Sequence[str | int | DataInstance | Sequence[str | int | DataInstance]]
-            One entry per subplot row, top to bottom. Each entry is a single variable (name, ID, or DataInstance) or a list of variables to overlay on that row.
-        title : str | None, optional
-            Title shown above the whole figure. Default is None (no title).
-        row_y_labels : list[str | None] | None, optional
-            Y-axis label for each row, in the same order as ``rows``. A ``None`` entry falls back to the variable names in that row. Default is None (every row uses its variable names).
-        ts_start : float | None, optional
-            Start of the time window in seconds on the log's clock. Earlier data is excluded from all rows. Default is None (from the start of the log).
-        ts_end : float | None, optional
-            End of the time window in seconds on the log's clock. Later data is excluded from all rows. Default is None (to the end of the log).
-        show_legend : bool, optional
-            Whether to show the legend listing each variable. Default is True.
-        log_x : bool, optional
-            Use a logarithmic time (x) axis. Default is False (linear).
-        log_y : bool, optional
-            Use logarithmic y-axes on every row. Default is False (linear).
-        width : int, optional
-            Figure width in pixels. Default is PLOT_WIDTH (1200).
-        height : int | None, optional
-            Figure height in pixels. Default is None, which gives SUBPLOT_HEIGHT (350) pixels per row.
-        vertical_spacing : float, optional
-            Gap between rows as a fraction of the figure height (0 to 1). Default is SUBPLOT_VERTICAL_SPACING (0.12).
-
-        Returns
-        -------
-        go.Figure
-            Plotly figure. Change anything not exposed here with ``fig.update_layout``, ``fig.update_xaxes``, ``fig.update_yaxes`` or ``fig.update_traces`` before calling ``fig.show()``. Target one row with ``row=i, col=1``, e.g. ``fig.update_yaxes(type="log", row=2, col=1)``.
-
-        Examples
-        --------
-        >>> fig = aly.subplots(["pcm.wheelSpeeds.frontRight", "pcm.moc.motor.requestedTorque"])
-        >>> fig = aly.subplots(
-        ...     rows=[
-        ...         ["pcm.wheelSpeeds.frontRight", "pcm.wheelSpeeds.frontLeft"],
-        ...         "pcm.moc.motor.requestedTorque",
-        ...     ],
-        ...     title="Run Overview",
-        ...     row_y_labels=["Wheel Speed (mph)", "Torque (Nm)"],
-        ...     ts_start=5.0,
-        ...     ts_end=30.0,
-        ... )
-        """
-        unit = self.data.timestamp_unit
-
         start_raw = from_seconds(ts_start, unit) if ts_start is not None else None
         end_raw = from_seconds(ts_end, unit) if ts_end is not None else None
 
-        normalized_rows: list[list[DataInstance]] = []
-        for row_entry in rows:
-            row_dis = self._normalize_input(row_entry)
-            if start_raw is not None or end_raw is not None:
-                row_dis = [di.trim(start_raw, end_raw) for di in row_dis]
-            normalized_rows.append(row_dis)
+        vlines = [to_seconds(float(b), unit) for b in self.data.concat_boundaries]
 
-        return data_instance_subplots(
-            rows=normalized_rows,
+        return plot_time_series(
+            rows=[
+                lookup_subplot_data_instances(self.data, v, start_raw, end_raw)
+                for v in left_variables
+            ],
+            right_rows=[
+                lookup_subplot_data_instances(self.data, v, start_raw, end_raw)
+                for v in right_variables
+            ],
+            timestamp_unit=unit,
             title=title,
-            row_y_labels=row_y_labels,
+            y_axis_titles=axis_titles_per_subplot(y_title, n_subplots),
+            right_y_axis_titles=axis_titles_per_subplot(y_title_alt, n_subplots),
             show_legend=show_legend,
+            vlines=vlines,
+            max_points=max_points,
             log_x=log_x,
             log_y=log_y,
             width=width,
             height=height,
             vertical_spacing=vertical_spacing,
-            timestamp_unit=unit,
         )
 
     def diff(
@@ -488,23 +406,6 @@ class Analyzer:
             width=width,
             height=height,
         )
-
-    def _normalize_input(
-        self,
-        input_data: VariableInputs,
-    ) -> list[DataInstance]:
-        """
-        Normalize various input types to a list of DataInstances.
-        """
-        if isinstance(input_data, DataInstance):
-            return [input_data]
-        elif isinstance(input_data, (str, int)):
-            return [self.data[input_data]]
-        else:
-            return [
-                item if isinstance(item, DataInstance) else self.data[item]
-                for item in input_data
-            ]
 
     def get_accel_times(self) -> list[AccelSegmentResult]:
         """

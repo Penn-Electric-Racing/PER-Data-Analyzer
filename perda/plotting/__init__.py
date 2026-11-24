@@ -6,7 +6,6 @@ from .map_trace import *
 from .parametric_overlay import *
 from .parametric_plot import *
 from .scatter_histogram_plotter import *
-from .subplots import *
 
 # Requires the notebook extra.
 try:

@@ -113,3 +113,8 @@ def test_plot_comparison_aligns_mixed_timestamp_units(write_log):
     fig = from_paths([ms_log, us_log]).plot_comparison(VOLTAGE)
     # A ms log and a us log, each spanning 1 second, must land on the same x-axis
     assert [list(trace.x) for trace in fig.data] == [[0.0, 1.0], [0.0, 1.0]]
+
+
+def test_plot_comparison_one_subplot_per_variable(two_run_collection):
+    fig = two_run_collection.plot_comparison([VOLTAGE, VOLTAGE])
+    assert [trace.yaxis for trace in fig.data] == ["y", "y", "y2", "y2"]
