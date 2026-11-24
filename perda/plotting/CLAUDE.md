@@ -8,14 +8,10 @@
 
 - All plotting functions should NOT render plots directly. Rather, they should return a Plotly figure object. Downstream users of the plotting library can then make custom modifications and control image rendering.
 
-- Graphing APIs should expose arguments that allow customization of important parts of the graph's appearance
+- Only expose options that are important, commonly changed, or tricky to change after the figure is built. Examples: titles, axis labels, log scaling (`log_x`, `log_y`), figure size, subplot spacing, outlier thresholds, bucket/bin sizes. Everything else (fonts, colors, margins) is hardcoded from `defaults.py`; users change it by modifying the returned figure.
 
-- Generic formatting and styling of the plots should be controlled with configuration objects.
+- `defaults.py` holds all default values as uppercase module-level constants. Use these constants as the default values in function signatures and for hardcoded styling. Reuse existing constants and argument names across plotting functions whenever possible.
 
-- These configuration objects should be strongly typed Pydantic V2 models. Keep the configuration objects in `plotting_constants.py`.
-
-- All config objects should have sensible default values for all fields. Keep the defaults as module-level constants in `plotting_constants.py`.
-
-- Always try to reuse the fields in existing configuration objects. It is okay to have the same field in a config object be used slightly differently in different contexts, however be consistent whenever possible. Only create new config objects if there if your requirements have no overlap with existing config objects.
+- Write docstrings for both human and agentic users: describe every argument in plain language, including its units, accepted values, and default. Longer docstrings are fine.
 
 - Each type of plot should live in its own descriptively-named file. In general, each file should contain one plotting function and its specific helpers.

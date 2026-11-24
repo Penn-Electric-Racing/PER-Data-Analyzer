@@ -7,16 +7,24 @@ from tqdm import tqdm
 from ..constants import SECTION_DIVIDER, title_block
 from ..core_data_structures.data_instance import DataInstance
 from ..core_data_structures.single_run_data import SingleRunData
-from ..plotting.diff_plotter import plot_diff_bars
-from ..plotting.plotting_constants import (
-    DEFAULT_DIFF_PLOT_CONFIG,
-    DEFAULT_FONT_CONFIG,
-    DEFAULT_LAYOUT_CONFIG,
-    DiffPlotConfig,
-    FontConfig,
-    LayoutConfig,
-)
+from ..plotting.binned_count_plotter import plot_binned_counts
+from ..plotting.defaults import PLOT_HEIGHT, PLOT_WIDTH
 from ..units import to_seconds
+
+DIFF_BUCKET_SIZE_S = 1.0
+
+DIFF_SERIES_TOTAL = "All Datapoints Present"
+DIFF_SERIES_BASE_EXTRA = "Base-Only Points"
+DIFF_SERIES_INCOMING_EXTRA = "Incoming-Only Points"
+DIFF_SERIES_VALUE_MISMATCH = "Value Mismatch Points"
+
+DIFF_SERIES_COLORS = {
+    DIFF_SERIES_TOTAL: "gray",
+    DIFF_SERIES_BASE_EXTRA: "blue",
+    DIFF_SERIES_INCOMING_EXTRA: "darkorange",
+    DIFF_SERIES_VALUE_MISMATCH: "crimson",
+}
+DIFF_TOTAL_OPACITY = 0.4
 
 
 def _pct(num: float, den: float) -> float:
@@ -156,15 +164,80 @@ def _get_diff_timestamps(
     )
 
 
+def plot_diff_counts(
+    base_extra_ts: npt.NDArray[np.float64],
+    incoming_extra_ts: npt.NDArray[np.float64],
+    value_mismatch_ts: npt.NDArray[np.float64],
+    total_present_ts: npt.NDArray[np.float64],
+    bucket_size_s: float = DIFF_BUCKET_SIZE_S,
+    log_y: bool = False,
+    width: int = PLOT_WIDTH,
+    height: int = PLOT_HEIGHT,
+) -> go.Figure:
+    """Plot how many diff events of each kind happened in each time bucket.
+
+    Draws total datapoints present as a faint gray background bar, with base-only extras, incoming-only extras and value mismatches overlaid on top.
+
+    Parameters
+    ----------
+    base_extra_ts : npt.NDArray[np.float64]
+        Timestamps (seconds) of datapoints present only in the base run.
+    incoming_extra_ts : npt.NDArray[np.float64]
+        Timestamps (seconds) of datapoints present only in the incoming run.
+    value_mismatch_ts : npt.NDArray[np.float64]
+        Timestamps (seconds) of datapoints present in both runs whose values differ.
+    total_present_ts : npt.NDArray[np.float64]
+        Timestamps (seconds) of all datapoints seen in either run.
+    bucket_size_s : float, optional
+        Width of each time bucket (bar) in seconds. Default is DIFF_BUCKET_SIZE_S (1.0).
+    log_y : bool, optional
+        Use a logarithmic count (y) axis. Default is False (linear).
+    width : int, optional
+        Figure width in pixels. Default is PLOT_WIDTH (1200).
+    height : int, optional
+        Figure height in pixels. Default is PLOT_HEIGHT (700).
+
+    Returns
+    -------
+    go.Figure
+        Bucketed bar chart of diff counts over time. Customize further with ``fig.update_layout`` or ``fig.update_traces`` before calling ``fig.show()``.
+
+    Examples
+    --------
+    >>> from perda.utils.diff import plot_diff_counts
+    >>> fig = plot_diff_counts(base_only_ts, incoming_only_ts, mismatch_ts, all_ts, bucket_size_s=0.5)
+    """
+    fig = plot_binned_counts(
+        {
+            DIFF_SERIES_TOTAL: total_present_ts,
+            DIFF_SERIES_BASE_EXTRA: base_extra_ts,
+            DIFF_SERIES_INCOMING_EXTRA: incoming_extra_ts,
+            DIFF_SERIES_VALUE_MISMATCH: value_mismatch_ts,
+        },
+        bin_width=bucket_size_s,
+        title="Diff Counts Over Time",
+        x_label="Time (s)",
+        y_label="Event Count",
+        log_y=log_y,
+        width=width,
+        height=height,
+    )
+    for series_name, color in DIFF_SERIES_COLORS.items():
+        fig.update_traces(marker_color=color, selector=dict(name=series_name))
+    fig.update_traces(opacity=DIFF_TOTAL_OPACITY, selector=dict(name=DIFF_SERIES_TOTAL))
+    return fig
+
+
 def diff(
     rpi_data: SingleRunData,
     server_data: SingleRunData,
     timestamp_tolerance_s: float = 0.002,
     diff_rtol: float = 1e-3,
     diff_atol: float = 1e-3,
-    diff_plot_config: DiffPlotConfig = DEFAULT_DIFF_PLOT_CONFIG,
-    layout_config: LayoutConfig = DEFAULT_LAYOUT_CONFIG,
-    font_config: FontConfig = DEFAULT_FONT_CONFIG,
+    bucket_size_s: float = DIFF_BUCKET_SIZE_S,
+    log_y: bool = False,
+    width: int = PLOT_WIDTH,
+    height: int = PLOT_HEIGHT,
 ) -> go.Figure:
     """Compare two SingleRunData objects and report differences.
 
@@ -193,6 +266,19 @@ def diff(
         Relative tolerance for value comparison via ``np.isclose``. Defaults to 1e-3.
     diff_atol:
         Absolute tolerance for value comparison via ``np.isclose``. Defaults to 1e-3.
+    bucket_size_s:
+        Width of each time bucket (bar) in the diff plot, in seconds. Defaults to DIFF_BUCKET_SIZE_S (1.0).
+    log_y:
+        Use a logarithmic count (y) axis in the diff plot. Defaults to False (linear).
+    width:
+        Figure width in pixels. Defaults to PLOT_WIDTH (1200).
+    height:
+        Figure height in pixels. Defaults to PLOT_HEIGHT (700).
+
+    Returns
+    -------
+    go.Figure
+        Bucketed bar chart of diff counts over time. Customize further with ``fig.update_layout`` before calling ``fig.show()``.
     """
     base_cpp_name_to_id = rpi_data.cpp_name_to_id
     base_id_to_instance = rpi_data.id_to_instance
@@ -330,15 +416,15 @@ def diff(
         print(f"{label:<{col_width}}  {value}")
     print(SECTION_DIVIDER)
 
-    fig = plot_diff_bars(
+    fig = plot_diff_counts(
         base_extra_ts=rpi_extra_all,
-        incom_extra_ts=server_extra_all,
+        incoming_extra_ts=server_extra_all,
         value_mismatch_ts=diff_all,
         total_present_ts=total_present_all,
-        title="Diff Counts Over Time",
-        diff_plot_config=diff_plot_config,
-        layout_config=layout_config,
-        font_config=font_config,
+        bucket_size_s=bucket_size_s,
+        log_y=log_y,
+        width=width,
+        height=height,
     )
 
     return fig

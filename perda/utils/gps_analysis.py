@@ -1,19 +1,16 @@
-from typing import List
-
 import numpy as np
 import plotly.graph_objects as go
 from numpy.typing import NDArray
 
 from ..constants import EARTH_RADIUS_METERS
 from ..core_data_structures.data_instance import DataInstance, left_join_data_instances
-from ..plotting.plotting_constants import (
-    DEFAULT_FONT_CONFIG,
-    DEFAULT_GPS_MAP_CONFIG,
-    DEFAULT_LAYOUT_CONFIG,
-    FontConfig,
-    GpsMapConfig,
-    LayoutConfig,
-)
+from ..plotting.defaults import MAP_STYLE, PLOT_HEIGHT
+from ..plotting.map_trace import plot_map_trace
+from ..plotting.parametric_overlay import plot_parametric_overlay
+
+# Outlier filtering thresholds (m). float("inf") disables a filter.
+GPS_MAX_RADIUS_M = 5_000.0
+GPS_MAX_JUMP_M = 30.0
 
 
 def gps_to_enu(
@@ -60,7 +57,8 @@ def gps_to_enu(
 def filter_gps_cartesian(
     lat: NDArray[np.float64],
     lon: NDArray[np.float64],
-    gps_map_config: GpsMapConfig = DEFAULT_GPS_MAP_CONFIG,
+    max_radius_m: float = GPS_MAX_RADIUS_M,
+    max_jump_m: float = GPS_MAX_JUMP_M,
 ) -> NDArray[np.bool_]:
     """
     Build a boolean mask that removes Cartesian GPS outliers.
@@ -68,9 +66,9 @@ def filter_gps_cartesian(
     Two independent filters are applied and combined with logical-AND:
 
     * **Radius filter** — discards points whose straight-line distance from the
-      centroid of all points exceeds ``gps_map_config.max_radius_m``.
+      centroid of all points exceeds ``max_radius_m``.
     * **Jump filter** — discards points where the step distance from the previous
-      point exceeds ``gps_map_config.max_jump_m``.
+      point exceeds ``max_jump_m``.
 
     Parameters
     ----------
@@ -78,7 +76,10 @@ def filter_gps_cartesian(
         Latitude values in degrees.
     lon : NDArray[np.float64]
         Longitude values in degrees.
-    gps_map_config : GpsMapConfig, optional
+    max_radius_m : float, optional
+        Points farther than this many metres from the centre of all points are dropped. Use ``float("inf")`` to disable. Default is GPS_MAX_RADIUS_M (5000).
+    max_jump_m : float, optional
+        Points more than this many metres from the previous point are dropped as GPS glitches. Use ``float("inf")`` to disable. Default is GPS_MAX_JUMP_M (30).
 
     Returns
     -------
@@ -88,47 +89,54 @@ def filter_gps_cartesian(
     Examples
     --------
     >>> from perda.utils import filter_gps_cartesian
-    >>> mask = filter_gps_cartesian(lat_array, lon_array)
+    >>> mask = filter_gps_cartesian(lat_array, lon_array, max_radius_m=1500.0)
     >>> lat_clean, lon_clean = lat_array[mask], lon_array[mask]
     """
     east, north = gps_to_enu(lat, lon)
-    radius_mask = np.sqrt(east**2 + north**2) <= gps_map_config.max_radius_m
+    radius_mask = np.sqrt(east**2 + north**2) <= max_radius_m
     dx = np.diff(east, prepend=east[0])
     dy = np.diff(north, prepend=north[0])
-    jump_mask = np.sqrt(dx**2 + dy**2) <= gps_map_config.max_jump_m
+    jump_mask = np.sqrt(dx**2 + dy**2) <= max_jump_m
     return (radius_mask & jump_mask).astype(np.bool_)
 
 
 def plot_gps_comparison(
-    runs: List[tuple[NDArray[np.float64], NDArray[np.float64], str]],
+    runs: list[tuple[NDArray[np.float64], NDArray[np.float64], str]],
     title: str | None = None,
-    gps_map_config: GpsMapConfig = DEFAULT_GPS_MAP_CONFIG,
-    layout_config: LayoutConfig = DEFAULT_LAYOUT_CONFIG,
-    font_config: FontConfig = DEFAULT_FONT_CONFIG,
-) -> go.Figure | None:
+    max_radius_m: float = GPS_MAX_RADIUS_M,
+    max_jump_m: float = GPS_MAX_JUMP_M,
+    width: int = PLOT_HEIGHT,
+    height: int = PLOT_HEIGHT,
+) -> go.Figure:
     """
-    Overlay GPS tracks from multiple runs on a shared East/North Cartesian frame.
+    Overlay GPS tracks from multiple runs on a shared East/North frame in metres.
 
-    Each run is projected to ENU coordinates using a single shared reference
-    point (median of all points across all runs), then filtered with
-    :func:`filter_gps_cartesian` before plotting.
+    Each run is projected to East/North coordinates around one shared reference point (median of all points across all runs), outliers are removed with :func:`filter_gps_cartesian`, and the result is plotted with :func:`perda.plotting.plot_parametric_overlay`. Runs with no points left after filtering are skipped.
 
     Parameters
     ----------
-    runs : List[tuple[NDArray[np.float64], NDArray[np.float64], str]]
-        Each element is ``(lat_array, lon_array, label)`` for one run.
-        ``lat_array`` and ``lon_array`` must be the same length.
+    runs : list[tuple[NDArray[np.float64], NDArray[np.float64], str]]
+        One ``(lat_array, lon_array, label)`` tuple per run, with latitude and longitude in degrees. ``lat_array`` and ``lon_array`` must be the same length. ``label`` is the legend name.
     title : str | None, optional
-    gps_map_config : GpsMapConfig, optional
-        Controls Cartesian outlier thresholds (``max_radius_m``, ``max_jump_m``)
-        and marker appearance.
-    layout_config : LayoutConfig, optional
-    font_config : FontConfig, optional
+        Title shown above the plot. Default is None (no title).
+    max_radius_m : float, optional
+        Outlier filter: points farther than this many metres from the centre of the run are dropped. Use ``float("inf")`` to disable. Default is GPS_MAX_RADIUS_M (5000).
+    max_jump_m : float, optional
+        Outlier filter: points more than this many metres from the previous point are dropped. Use ``float("inf")`` to disable. Default is GPS_MAX_JUMP_M (30).
+    width : int, optional
+        Figure width in pixels. Default is PLOT_HEIGHT (700), making a square plot.
+    height : int, optional
+        Figure height in pixels. Default is PLOT_HEIGHT (700).
 
     Returns
     -------
     go.Figure
-        Plotly figure with one scatter trace per run
+        Plotly figure with one marker trace per run, in metres East/North of a shared reference point. Change anything not exposed here (fonts, marker size, colors, ...) with ``fig.update_layout`` or ``fig.update_traces`` before calling ``fig.show()``.
+
+    Raises
+    ------
+    ValueError
+        If two runs share the same label.
 
     Examples
     --------
@@ -138,46 +146,36 @@ def plot_gps_comparison(
     ...     title="GPS Comparison",
     ... )
     """
+    labels = [label for _, _, label in runs]
+    if len(set(labels)) != len(labels):
+        raise ValueError(f"Run labels must be unique, got {labels}.")
 
     all_lat = np.concatenate([lat for lat, _, _ in runs])
     all_lon = np.concatenate([lon for _, lon, _ in runs])
     lat_ref = float(np.median(all_lat))
     lon_ref = float(np.median(all_lon))
 
-    fig = go.Figure()
-
+    east_by_run: dict[str, NDArray[np.float64]] = {}
+    north_by_run: dict[str, NDArray[np.float64]] = {}
     for lat, lon, label in runs:
         east, north = gps_to_enu(lat, lon, lat_ref=lat_ref, lon_ref=lon_ref)
-        mask = filter_gps_cartesian(lat, lon, gps_map_config)
+        mask = filter_gps_cartesian(lat, lon, max_radius_m, max_jump_m)
         if not mask.any():
             continue
-        fig.add_trace(
-            go.Scattergl(
-                x=east[mask],
-                y=north[mask],
-                mode="markers",
-                marker=dict(size=gps_map_config.marker_size),
-                name=label,
-            )
-        )
+        east_by_run[label] = east[mask]
+        north_by_run[label] = north[mask]
 
-    fig.update_layout(
-        title=dict(
-            text=title,
-            x=layout_config.title_x,
-            xanchor=layout_config.title_xanchor,
-            yanchor=layout_config.title_yanchor,
-            font=dict(size=font_config.large),
-        ),
-        xaxis_title=dict(text="East (m)", font=dict(size=font_config.medium)),
-        yaxis_title=dict(text="North (m)", font=dict(size=font_config.medium)),
-        yaxis=dict(scaleanchor="x", scaleratio=1),
-        width=layout_config.height,
-        height=layout_config.height,
-        margin=layout_config.margin,
-        legend=dict(font=dict(size=font_config.small)),
+    return plot_parametric_overlay(
+        east_by_run,
+        north_by_run,
+        x_label="East (m)",
+        y_label="North (m)",
+        title=title,
+        mode="markers",
+        equal_aspect=True,
+        width=width,
+        height=height,
     )
-    return fig
 
 
 def create_representative_gps_image(
@@ -186,39 +184,44 @@ def create_representative_gps_image(
     vel_raw: DataInstance | None = None,
     vel_thresh: float = 0.5,
     title: str | None = None,
-    layout_config: LayoutConfig = DEFAULT_LAYOUT_CONFIG,
-    font_config: FontConfig = DEFAULT_FONT_CONFIG,
-    gps_map_config: GpsMapConfig = DEFAULT_GPS_MAP_CONFIG,
+    max_radius_m: float = GPS_MAX_RADIUS_M,
+    max_jump_m: float = GPS_MAX_JUMP_M,
+    map_style: str = MAP_STYLE,
+    width: int = PLOT_HEIGHT,
+    height: int = PLOT_HEIGHT,
 ) -> go.Figure | None:
     """
-    Generate a GPS trace on an interactive map background.
+    Draw a log's GPS track on an interactive map background.
 
-    Outliers (large radius from centroid or sudden jumps) are removed via
-    :func:`filter_gps_cartesian`.  Uses OpenStreetMap tiles by default
-    (free, no API key required).
+    Aligns longitude (and speed) onto latitude's timestamps, trims away the stationary start and end of the log if speed is given, removes outliers with :func:`filter_gps_cartesian`, then plots with :func:`perda.plotting.plot_map_trace`.
 
     Parameters
     ----------
     lat_raw : DataInstance
-        Raw latitude data instance, timestamp alignment base.
+        Latitude in degrees. Its timestamps are the base that longitude and velocity are aligned to.
     lon_raw : DataInstance
-        Raw longitude data instance.
+        Longitude in degrees.
     vel_raw : DataInstance | None, optional
-        Raw velocity data instance.
+        Vehicle speed, used to cut off the stationary start and end of the log. Default is None (show every point).
     vel_thresh : float, optional
-        Velocity threshold for trimming, by default 0.5, same unit as velocity.
+        Only the span between the first and last moment speed exceeds this value is shown. Same unit as ``vel_raw``. Ignored if ``vel_raw`` is None. Default is 0.5.
     title : str | None, optional
-        Title for the plot.
-    layout_config : LayoutConfig, optional
-    font_config : FontConfig, optional
-    gps_map_config : GpsMapConfig, optional
-        Map overlay and outlier filtering configuration.
+        Title shown above the map. Default is None (no title).
+    max_radius_m : float, optional
+        Outlier filter: points farther than this many metres from the centre of the track are dropped. Use ``float("inf")`` to disable. Default is GPS_MAX_RADIUS_M (5000).
+    max_jump_m : float, optional
+        Outlier filter: points more than this many metres from the previous point are dropped. Use ``float("inf")`` to disable. Default is GPS_MAX_JUMP_M (30).
+    map_style : str, optional
+        Background map tiles, any Plotly MapLibre style name such as ``"open-street-map"``, ``"carto-positron"`` or ``"satellite"``. Default is MAP_STYLE (``"open-street-map"``, needs no API key).
+    width : int, optional
+        Figure width in pixels. Default is PLOT_HEIGHT (700), making a square map.
+    height : int, optional
+        Figure height in pixels. Default is PLOT_HEIGHT (700).
 
     Returns
     -------
     go.Figure | None
-        Plotly figure with map background, or None if velocity never exceeds
-        the threshold or no points remain after filtering.
+        Plotly figure with a map background, or None if speed never exceeds ``vel_thresh`` or no points remain after filtering. Change anything not exposed here (line color, zoom, ...) with ``fig.update_layout`` or ``fig.update_traces`` before calling ``fig.show()``.
 
     Examples
     --------
@@ -246,7 +249,9 @@ def create_representative_gps_image(
         lat_trimmed = lat_aligned.value_np
 
     # Filter outliers
-    cartesian_mask = filter_gps_cartesian(lat_trimmed, lon_trimmed, gps_map_config)
+    cartesian_mask = filter_gps_cartesian(
+        lat_trimmed, lon_trimmed, max_radius_m, max_jump_m
+    )
     lat_filtered = lat_trimmed[cartesian_mask]
     lon_filtered = lon_trimmed[cartesian_mask]
 
@@ -254,45 +259,11 @@ def create_representative_gps_image(
         print("No GPS points remain after outlier filtering, skip graphing")
         return None
 
-    fig = go.Figure()
-    fig.add_trace(
-        go.Scattermap(
-            lat=lat_filtered,
-            lon=lon_filtered,
-            mode="lines+markers",
-            marker=dict(size=gps_map_config.marker_size),
-            line=dict(
-                width=gps_map_config.line_width,
-                color=gps_map_config.line_color,
-            ),
-        )
+    return plot_map_trace(
+        lat_filtered,
+        lon_filtered,
+        title=title,
+        map_style=map_style,
+        width=width,
+        height=height,
     )
-
-    center_lat = (lat_filtered.min() + lat_filtered.max()) / 2
-    center_lon = (lon_filtered.min() + lon_filtered.max()) / 2
-
-    lat_span = lat_filtered.max() - lat_filtered.min()
-    lon_span = lon_filtered.max() - lon_filtered.min()
-    max_span = max(lat_span, lon_span) * (1 + gps_map_config.zoom_padding)
-    zoom = np.log2(360 / max_span) if max_span > 0 else 15
-
-    fig.update_layout(
-        title=dict(
-            text=title,
-            x=layout_config.title_x,
-            xanchor=layout_config.title_xanchor,
-            yanchor=layout_config.title_yanchor,
-            font=dict(size=font_config.large),
-        ),
-        map=dict(
-            style=gps_map_config.map_style,
-            center=dict(lat=float(center_lat), lon=float(center_lon)),
-            zoom=float(zoom),
-        ),
-        showlegend=False,
-        width=int(layout_config.height),
-        height=int(layout_config.height),
-        margin=layout_config.margin,
-    )
-
-    return fig

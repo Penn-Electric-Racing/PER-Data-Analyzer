@@ -6,13 +6,18 @@ from plotly import graph_objects as go
 
 from ..core_data_structures.data_instance import DataInstance
 from ..core_data_structures.single_run_data import SingleRunData
-from ..plotting.data_instance_plotter import *
-from ..plotting.plotting_constants import *
+from ..plotting.data_instance_plotter import plot_dual_axis, plot_single_axis
+from ..plotting.defaults import (
+    HISTOGRAM_BINS,
+    PLOT_HEIGHT,
+    PLOT_WIDTH,
+    SUBPLOT_VERTICAL_SPACING,
+)
 from ..plotting.subplots import data_instance_subplots
 from ..units import from_seconds, to_seconds
 from ..utils.accel_calculator import *
 from ..utils.data_summary import single_run_summary
-from ..utils.diff import diff
+from ..utils.diff import DIFF_BUCKET_SIZE_S, diff
 from ..utils.frequency_analysis import analyze_frequency as _analyze_frequency
 from ..utils.integrate import smoothed_filtered_integration
 from ..utils.preprocessing import PreprocessingStep, apply_preprocessing
@@ -177,46 +182,50 @@ class Analyzer:
         y_label_1: str | None = None,
         y_label_2: str | None = None,
         show_legend: bool = True,
-        font_config: FontConfig = DEFAULT_FONT_CONFIG,
-        layout_config: LayoutConfig = DEFAULT_LAYOUT_CONFIG,
-        vline_config: VLineConfig = DEFAULT_VLINE_CONFIG,
         max_points: int | None = None,
+        log_x: bool = False,
+        log_y: bool = False,
+        width: int = PLOT_WIDTH,
+        height: int = PLOT_HEIGHT,
     ) -> go.Figure:
         """
-        Display variables from the parsed data on an interactive Plotly plot.
+        Plot variables from the log against time on an interactive Plotly figure.
 
-        Concat boundaries (if any) are automatically shown as vertical lines.
+        Pass one variable or a list for a single y-axis. Also pass ``var_2`` to put a second group of variables on an independent right-hand y-axis. Concat boundaries (if any) are drawn as dashed vertical lines.
 
         Parameters
         ----------
         var_1 : str | int | DataInstance | Sequence[str | int | DataInstance]
-            Variable(s) to plot on the left y-axis. Can be variable name(s), variable ID(s), or DataInstance(s)
+            Variable(s) for the left (or only) y-axis. Each item can be a variable name (``"pcm.wheelSpeeds.frontRight"``), a variable ID (``42``), or a DataInstance (e.g. a derived signal).
         var_2 : str | int | DataInstance | Sequence[str | int | DataInstance] | None, optional
-            Optional variable(s) to plot on the right y-axis. Can be variable name(s), variable ID(s), or DataInstance(s).
+            Variable(s) for a second, right-hand y-axis, drawn dashed. Same accepted types as ``var_1``. Default is None (single y-axis).
         ts_start : float | None, optional
-            Start of the time window in seconds. Data points before this time are excluded. Default is None (no lower bound).
+            Start of the time window in seconds on the log's clock. Earlier data is excluded. Default is None (from the start of the log).
         ts_end : float | None, optional
-            End of the time window in seconds. Data points after this time are excluded. Default is None (no upper bound).
+            End of the time window in seconds on the log's clock. Later data is excluded. Default is None (to the end of the log).
         title : str | None, optional
+            Title shown above the plot. Default is None (no title).
         y_label_1 : str | None, optional
-            Label for left y-axis (or only y-axis if no right input).
+            Left (or only) y-axis label, e.g. ``"Speed (mph)"``. Default is None (no label).
         y_label_2 : str | None, optional
-            Label for right y-axis.
+            Right y-axis label. Only used with ``var_2``. Default is None (no label).
         show_legend : bool, optional
-            Whether to show plot legends. Default is True
-        font_config : FontConfig, optional
-            Font configuration for plot elements.
-        layout_config : LayoutConfig, optional
-            Layout configuration for plot dimensions.
-        vline_config : VLineConfig, optional
-            Visual configuration for concat boundary lines.
+            Whether to show the legend listing each variable. Default is True.
         max_points : int | None, optional
-            Maximum number of data points to plot per trace (enables zero-copy step downsampling). Default is None (full fidelity).
+            Maximum number of points drawn per variable. Longer signals are evenly downsampled (every Nth point), which speeds up rendering of large logs. Default is None (draw every point).
+        log_x : bool, optional
+            Use a logarithmic time (x) axis. Default is False (linear).
+        log_y : bool, optional
+            Use logarithmic y-axes (both left and right when ``var_2`` is given). Default is False (linear).
+        width : int, optional
+            Figure width in pixels. Default is PLOT_WIDTH (1200).
+        height : int, optional
+            Figure height in pixels. Default is PLOT_HEIGHT (700).
 
         Returns
         -------
         go.Figure
-            Plotly figure. Customize it with ``update_layout`` or ``add_trace``.
+            Plotly figure. Change anything not exposed here (fonts, colors, margins, axis ranges, ...) with ``fig.update_layout``, ``fig.update_xaxes``, ``fig.update_yaxes`` or ``fig.update_traces`` before calling ``fig.show()``.
 
         Notes
         -----
@@ -232,6 +241,9 @@ class Analyzer:
         >>> # Plot a derived DataInstance (e.g. average of two signals)
         >>> avg_speed = (aly.data["pcm.wheelSpeeds.frontRight"] + aly.data["pcm.wheelSpeeds.frontLeft"]) / 2.0
         >>> fig = aly.plot(avg_speed)
+        >>> # Log-scaled y-axis, then a custom font size
+        >>> fig = aly.plot("bms.pack.current", log_y=True)
+        >>> fig.update_layout(font_size=16)
         """
         var_1_norm = self._normalize_input(var_1)
         var_2_norm = self._normalize_input(var_2) if var_2 is not None else None
@@ -239,7 +251,7 @@ class Analyzer:
         unit = self.data.timestamp_unit
 
         # Convert concat boundaries to seconds for the plotter
-        vlines: List[float] | None = None
+        vlines: list[float] | None = None
         if self.data.concat_boundaries:
             vlines = [to_seconds(float(b), unit) for b in self.data.concat_boundaries]
 
@@ -259,12 +271,13 @@ class Analyzer:
                 left_y_axis_title=y_label_1,
                 right_y_axis_title=y_label_2,
                 show_legend=show_legend,
-                font_config=font_config,
-                layout_config=layout_config,
                 timestamp_unit=self.data.timestamp_unit,
                 vlines=vlines,
-                vline_config=vline_config,
                 max_points=max_points,
+                log_x=log_x,
+                log_y=log_y,
+                width=width,
+                height=height,
             )
         else:
             return plot_single_axis(
@@ -272,60 +285,63 @@ class Analyzer:
                 title=title,
                 y_axis_title=y_label_1,
                 show_legend=show_legend,
-                font_config=font_config,
-                layout_config=layout_config,
                 timestamp_unit=self.data.timestamp_unit,
                 vlines=vlines,
-                vline_config=vline_config,
                 max_points=max_points,
+                log_x=log_x,
+                log_y=log_y,
+                width=width,
+                height=height,
             )
 
     def subplots(
         self,
         rows: Sequence[VariableInputs],
         title: str | None = None,
-        row_y_labels: List[str | None] | None = None,
+        row_y_labels: list[str | None] | None = None,
         ts_start: float | None = None,
         ts_end: float | None = None,
         show_legend: bool = True,
-        layout_config: LayoutConfig = DEFAULT_LAYOUT_CONFIG,
-        font_config: FontConfig = DEFAULT_FONT_CONFIG,
+        log_x: bool = False,
+        log_y: bool = False,
+        width: int = PLOT_WIDTH,
+        height: int | None = None,
+        vertical_spacing: float = SUBPLOT_VERTICAL_SPACING,
     ) -> go.Figure:
         """
-        Plot multiple variables as stacked subplots on a shared time axis.
+        Plot variables as vertically stacked subplots sharing one time axis.
 
-        Each entry in ``rows`` becomes one subplot row. Pass a list of
-        variables for a row to overlay multiple signals on the same panel,
-        or a single variable for a dedicated panel.
+        Each entry in ``rows`` becomes one subplot row. Pass a list of variables for a row to overlay them on the same panel, or a single variable for a dedicated panel. Zooming the time axis zooms every row together.
 
         Parameters
         ----------
         rows : Sequence[str | int | DataInstance | Sequence[str | int | DataInstance]]
-            One entry per subplot row (top to bottom). Each entry may be a
-            single variable (name, ID, or DataInstance) or a list of variables
-            to overlay on that row.
+            One entry per subplot row, top to bottom. Each entry is a single variable (name, ID, or DataInstance) or a list of variables to overlay on that row.
         title : str | None, optional
-            Figure-level title. Default is None.
-        row_y_labels : List[str | None] | None, optional
-            Y-axis label for each row. ``None`` entries fall back to the
-            DataInstance labels. Must match the length of ``rows`` when
-            provided. Default is None.
+            Title shown above the whole figure. Default is None (no title).
+        row_y_labels : list[str | None] | None, optional
+            Y-axis label for each row, in the same order as ``rows``. A ``None`` entry falls back to the variable names in that row. Default is None (every row uses its variable names).
         ts_start : float | None, optional
-            Start of the time window in seconds. Data before this time is
-            excluded from all rows. Default is None (no lower bound).
+            Start of the time window in seconds on the log's clock. Earlier data is excluded from all rows. Default is None (from the start of the log).
         ts_end : float | None, optional
-            End of the time window in seconds. Data after this time is
-            excluded from all rows. Default is None (no upper bound).
+            End of the time window in seconds on the log's clock. Later data is excluded from all rows. Default is None (to the end of the log).
         show_legend : bool, optional
-            Whether to show the figure legend. Default is True.
-        layout_config : LayoutConfig, optional
-            Figure dimensions and spacing.
-        font_config : FontConfig, optional
-            Font sizes for plot elements.
+            Whether to show the legend listing each variable. Default is True.
+        log_x : bool, optional
+            Use a logarithmic time (x) axis. Default is False (linear).
+        log_y : bool, optional
+            Use logarithmic y-axes on every row. Default is False (linear).
+        width : int, optional
+            Figure width in pixels. Default is PLOT_WIDTH (1200).
+        height : int | None, optional
+            Figure height in pixels. Default is None, which gives SUBPLOT_HEIGHT (350) pixels per row.
+        vertical_spacing : float, optional
+            Gap between rows as a fraction of the figure height (0 to 1). Default is SUBPLOT_VERTICAL_SPACING (0.12).
 
         Returns
         -------
         go.Figure
+            Plotly figure. Change anything not exposed here with ``fig.update_layout``, ``fig.update_xaxes``, ``fig.update_yaxes`` or ``fig.update_traces`` before calling ``fig.show()``. Target one row with ``row=i, col=1``, e.g. ``fig.update_yaxes(type="log", row=2, col=1)``.
 
         Examples
         --------
@@ -358,8 +374,11 @@ class Analyzer:
             title=title,
             row_y_labels=row_y_labels,
             show_legend=show_legend,
-            layout_config=layout_config,
-            font_config=font_config,
+            log_x=log_x,
+            log_y=log_y,
+            width=width,
+            height=height,
+            vertical_spacing=vertical_spacing,
             timestamp_unit=unit,
         )
 
@@ -369,9 +388,10 @@ class Analyzer:
         timestamp_tolerance_s: float = 0.002,
         diff_rtol: float = 1e-3,
         diff_atol: float = 1e-3,
-        diff_plot_config: DiffPlotConfig = DEFAULT_DIFF_PLOT_CONFIG,
-        layout_config: LayoutConfig = DEFAULT_LAYOUT_CONFIG,
-        font_config: FontConfig = DEFAULT_FONT_CONFIG,
+        bucket_size_s: float = DIFF_BUCKET_SIZE_S,
+        log_y: bool = False,
+        width: int = PLOT_WIDTH,
+        height: int = PLOT_HEIGHT,
     ) -> go.Figure:
         """
         Compute the differences between the current data (assumed to be from RPI) and server data.
@@ -387,14 +407,19 @@ class Analyzer:
             Relative tolerance for value comparison (numpy.isclose).
         diff_atol : float, optional
             Absolute tolerance for value comparison (numpy.isclose).
-        diff_plot_config : DiffPlotConfig, optional
-        layout_config : LayoutConfig, optional
-        font_config : FontConfig, optional
+        bucket_size_s : float, optional
+            Width of each time bucket (bar) in the plot, in seconds. Default is DIFF_BUCKET_SIZE_S (1.0).
+        log_y : bool, optional
+            Use a logarithmic count (y) axis. Default is False (linear).
+        width : int, optional
+            Figure width in pixels. Default is PLOT_WIDTH (1200).
+        height : int, optional
+            Figure height in pixels. Default is PLOT_HEIGHT (700).
 
         Returns
         -------
         go.Figure
-            Bar chart of per-variable differences between the two streams.
+            Bar chart of diff counts over time between the two streams. Customize further with ``fig.update_layout`` before calling ``fig.show()``.
 
         Examples
         --------
@@ -406,9 +431,10 @@ class Analyzer:
             timestamp_tolerance_s=timestamp_tolerance_s,
             diff_rtol=diff_rtol,
             diff_atol=diff_atol,
-            diff_plot_config=diff_plot_config,
-            layout_config=layout_config,
-            font_config=font_config,
+            bucket_size_s=bucket_size_s,
+            log_y=log_y,
+            width=width,
+            height=height,
         )
 
     def analyze_frequency(
@@ -416,9 +442,9 @@ class Analyzer:
         var: str | int,
         expected_frequency_hz: float | None = None,
         gap_threshold_multiplier: float = 2.0,
-        font_config: FontConfig = DEFAULT_FONT_CONFIG,
-        layout_config: LayoutConfig = DEFAULT_LAYOUT_CONFIG,
-        plot_config: ScatterHistogramPlotConfig = DEFAULT_SCATTER_HISTOGRAM_PLOT_CONFIG,
+        histogram_bins: int = HISTOGRAM_BINS,
+        width: int = PLOT_WIDTH,
+        height: int = PLOT_HEIGHT,
     ) -> go.Figure:
         """
         Analyse the sampling frequency of a variable and return a diagnostic figure.
@@ -436,15 +462,17 @@ class Analyzer:
         gap_threshold_multiplier : float, optional
             Intervals exceeding this multiple of the expected (or median) interval
             are flagged as gaps. Default is 2.0.
-        font_config : FontConfig, optional
-            Font sizes for plot elements.
-        layout_config : LayoutConfig, optional
-            Plot dimensions and margins.
+        histogram_bins : int, optional
+            Maximum number of bins in the frequency histogram. Default is HISTOGRAM_BINS (80).
+        width : int, optional
+            Figure width in pixels. Default is PLOT_WIDTH (1200).
+        height : int, optional
+            Figure height in pixels. Default is PLOT_HEIGHT (700).
 
         Returns
         -------
         go.Figure
-            Plotly figure with frequency diagnostics.
+            Plotly figure with frequency diagnostics. Customize further with ``fig.update_layout`` before calling ``fig.show()``.
 
         Examples
         --------
@@ -456,9 +484,9 @@ class Analyzer:
             expected_frequency_hz=expected_frequency_hz,
             source_time_unit=self.data.timestamp_unit,
             gap_threshold_multiplier=gap_threshold_multiplier,
-            font_config=font_config,
-            layout_config=layout_config,
-            plot_config=plot_config,
+            histogram_bins=histogram_bins,
+            width=width,
+            height=height,
         )
 
     def _normalize_input(

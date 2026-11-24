@@ -242,7 +242,11 @@ class RunCollection:
         )
 
     def plot_comparison(
-        self, cpp_name: str, max_points: int | None = None
+        self,
+        cpp_name: str,
+        max_points: int | None = None,
+        log_x: bool = False,
+        log_y: bool = False,
     ) -> go.Figure:
         """
         Overlay a variable from every run in the collection on a single plot.
@@ -254,12 +258,16 @@ class RunCollection:
         cpp_name : str
             C++ name of the variable to compare.
         max_points : int | None, optional
-            Maximum data points to plot per run. Default is None (full fidelity).
+            Maximum number of points drawn per run. Longer signals are evenly downsampled (every Nth point), which speeds up rendering. Default is None (draw every point).
+        log_x : bool, optional
+            Use a logarithmic time (x) axis. Default is False (linear).
+        log_y : bool, optional
+            Use a logarithmic y-axis. Default is False (linear).
 
         Returns
         -------
         go.Figure
-            Plotly Figure with one trace per run that contains the variable.
+            Plotly figure with one trace per run that contains the variable. Change anything not exposed here (size, fonts, colors, ...) with ``fig.update_layout`` or ``fig.update_traces`` before calling ``fig.show()``.
 
         Examples
         --------
@@ -294,6 +302,8 @@ class RunCollection:
             y_axis_title=cpp_name,
             timestamp_unit=COMPARISON_TIMESTAMP_UNIT,
             max_points=max_points,
+            log_x=log_x,
+            log_y=log_y,
         )
 
     def compare_summary(self, cpp_name: str) -> dict[str, DataInstanceSummary]:
