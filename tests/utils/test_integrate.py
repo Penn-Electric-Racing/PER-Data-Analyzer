@@ -111,6 +111,25 @@ def test_integrate_parametrized(ts, vals, start, end, expected):
     assert result == pytest.approx(expected, abs=1e-9)
 
 
+@pytest.mark.parametrize(
+    "function", [integrate_over_time_range, average_over_time_range]
+)
+def test_tuple_input_returns_one_result_per_instance(function):
+    constant = DataInstance(
+        timestamp_np=np.array([0, 1000], dtype=np.int64),
+        value_np=np.array([5.0, 5.0], dtype=np.float64),
+    )
+    ramp = DataInstance(
+        timestamp_np=np.array([0, 1000], dtype=np.int64),
+        value_np=np.array([0.0, 2.0], dtype=np.float64),
+    )
+    results = function((constant, ramp), source_time_unit=Timescale.MS)
+    assert results == (
+        function(constant, source_time_unit=Timescale.MS),
+        function(ramp, source_time_unit=Timescale.MS),
+    )
+
+
 def test_average_constant_signal():
     di = DataInstance(
         timestamp_np=np.array([0, 1000], dtype=np.int64),

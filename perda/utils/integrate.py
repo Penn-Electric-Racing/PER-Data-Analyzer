@@ -1,3 +1,6 @@
+from collections.abc import Sequence
+from typing import overload
+
 import numpy as np
 import polars as pl
 from numpy import float64
@@ -9,20 +12,40 @@ from ..core_data_structures.data_instance import DataInstance
 from ..units import MAD_TO_STD, Timescale, convert_time
 
 
+@overload
 def integrate_over_time_range(
     data_instance: DataInstance,
     source_time_unit: Timescale,
     start_time: int = 0,
     end_time: int = -1,
     target_time_unit: Timescale = Timescale.S,
-) -> float:
+) -> float: ...
+
+
+@overload
+def integrate_over_time_range(
+    data_instance: Sequence[DataInstance],
+    source_time_unit: Timescale,
+    start_time: int = 0,
+    end_time: int = -1,
+    target_time_unit: Timescale = Timescale.S,
+) -> tuple[float, ...]: ...
+
+
+def integrate_over_time_range(
+    data_instance: DataInstance | Sequence[DataInstance],
+    source_time_unit: Timescale,
+    start_time: int = 0,
+    end_time: int = -1,
+    target_time_unit: Timescale = Timescale.S,
+) -> float | tuple[float, ...]:
     """
     Get integral of the value over time using the trapezoidal rule.
 
     Parameters
     ----------
-    data_instance : DataInstance
-        DataInstance to integrate
+    data_instance : DataInstance | Sequence[DataInstance]
+        DataInstance to integrate, or several DataInstances handled independently
     source_time_unit : Timescale
         Time unit of ``data_instance.timestamp_np``. Pass ``aly.data.timestamp_unit``.
     start_time : int, optional
@@ -35,7 +58,7 @@ def integrate_over_time_range(
 
     Returns
     -------
-    float
+    float | tuple[float, ...]
         Integral of the value over the time range
 
     Notes
@@ -50,6 +73,14 @@ def integrate_over_time_range(
     ...     current, source_time_unit=aly.data.timestamp_unit
     ... )
     """
+    if not isinstance(data_instance, DataInstance):
+        return tuple(
+            integrate_over_time_range(
+                instance, source_time_unit, start_time, end_time, target_time_unit
+            )
+            for instance in data_instance
+        )
+
     if len(data_instance.timestamp_np) < 2:
         return 0.0
 
@@ -80,20 +111,40 @@ def integrate_over_time_range(
     return float(integral)
 
 
+@overload
 def average_over_time_range(
     data_instance: DataInstance,
     source_time_unit: Timescale,
     start_time: int = 0,
     end_time: int = -1,
     target_time_unit: Timescale = Timescale.S,
-) -> float:
+) -> float: ...
+
+
+@overload
+def average_over_time_range(
+    data_instance: Sequence[DataInstance],
+    source_time_unit: Timescale,
+    start_time: int = 0,
+    end_time: int = -1,
+    target_time_unit: Timescale = Timescale.S,
+) -> tuple[float, ...]: ...
+
+
+def average_over_time_range(
+    data_instance: DataInstance | Sequence[DataInstance],
+    source_time_unit: Timescale,
+    start_time: int = 0,
+    end_time: int = -1,
+    target_time_unit: Timescale = Timescale.S,
+) -> float | tuple[float, ...]:
     """
     Get average value over time using integral divided by time range.
 
     Parameters
     ----------
-    data_instance : DataInstance
-        DataInstance to average
+    data_instance : DataInstance | Sequence[DataInstance]
+        DataInstance to average, or several DataInstances handled independently
     source_time_unit : Timescale
         Time unit of ``data_instance.timestamp_np``. Pass ``aly.data.timestamp_unit``.
     start_time : int, optional
@@ -106,7 +157,7 @@ def average_over_time_range(
 
     Returns
     -------
-    float
+    float | tuple[float, ...]
         Time-weighted average value over the time range
 
     Notes
@@ -121,6 +172,14 @@ def average_over_time_range(
     ...     voltage, source_time_unit=aly.data.timestamp_unit
     ... )
     """
+    if not isinstance(data_instance, DataInstance):
+        return tuple(
+            average_over_time_range(
+                instance, source_time_unit, start_time, end_time, target_time_unit
+            )
+            for instance in data_instance
+        )
+
     if len(data_instance.timestamp_np) == 1:
         return float(data_instance.value_np[0])
 

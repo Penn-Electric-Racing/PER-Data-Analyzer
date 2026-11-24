@@ -1,3 +1,5 @@
+from collections.abc import Sequence
+
 import plotly.graph_objects as go
 from numpy import float64
 from numpy.typing import NDArray
@@ -21,9 +23,9 @@ from .defaults import (
 
 
 def plot_fft_spectrum(
-    frequencies: list[NDArray[float64]],
-    magnitudes: list[NDArray[float64]],
-    series_names: list[str],
+    frequencies: Sequence[NDArray[float64]],
+    magnitudes: Sequence[NDArray[float64]],
+    series_names: Sequence[str],
     title: str | None = None,
     x_label: str = "Frequency (Hz)",
     y_label: str = "Magnitude",
@@ -38,11 +40,11 @@ def plot_fft_spectrum(
 
     Parameters
     ----------
-    frequencies : list[NDArray[float64]]
+    frequencies : Sequence[NDArray[float64]]
         Frequency axis (Hz) for each series, e.g. the first output of ``compute_fft``.
-    magnitudes : list[NDArray[float64]]
+    magnitudes : Sequence[NDArray[float64]]
         Magnitude array for each series, same length as the matching ``frequencies`` entry.
-    series_names : list[str]
+    series_names : Sequence[str]
         Display name for each series. Used as subplot titles when ``stacked=True`` and as legend entries when ``stacked=False``.
     title : str | None, optional
         Title shown above the whole figure. Default is None (no title).

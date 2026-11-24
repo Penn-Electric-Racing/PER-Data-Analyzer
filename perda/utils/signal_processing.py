@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+from collections.abc import Sequence
+from typing import overload
+
 import numpy as np
 from numpy import float64
 from numpy.typing import NDArray
@@ -53,15 +56,33 @@ def apply_sos_filter(
     return filtered
 
 
+@overload
 def lowpass_filter(
-    di: DataInstance | list[DataInstance],
+    di: DataInstance,
     cutoff_hz: float,
     source_time_unit: Timescale,
     order: int = 4,
-) -> DataInstance | list[DataInstance]:
+) -> DataInstance: ...
+
+
+@overload
+def lowpass_filter(
+    di: Sequence[DataInstance],
+    cutoff_hz: float,
+    source_time_unit: Timescale,
+    order: int = 4,
+) -> tuple[DataInstance, ...]: ...
+
+
+def lowpass_filter(
+    di: DataInstance | Sequence[DataInstance],
+    cutoff_hz: float,
+    source_time_unit: Timescale,
+    order: int = 4,
+) -> DataInstance | tuple[DataInstance, ...]:
     """Apply a Butterworth lowpass filter in the time domain.
 
-    Returns a new DataInstance (or list thereof) with filtered values.
+    Returns a new DataInstance (or tuple of them) with filtered values.
     Original timestamps and metadata are preserved. NaN positions in the
     input remain NaN in the output.
 
@@ -75,8 +96,8 @@ def lowpass_filter(
 
     Parameters
     ----------
-    di : DataInstance | list[DataInstance]
-        Input signal(s). Lists are processed independently.
+    di : DataInstance | Sequence[DataInstance]
+        Input signal, or several signals (e.g. from a wildcard lookup) filtered independently.
     cutoff_hz : float
         Cutoff frequency in Hz.
     source_time_unit : Timescale
@@ -87,67 +108,78 @@ def lowpass_filter(
 
     Returns
     -------
-    DataInstance | list[DataInstance]
-        New DataInstance(s) with filtered ``value_np``.
+    DataInstance | tuple[DataInstance, ...]
+        New DataInstance(s) with filtered ``value_np``, one per input.
 
     Examples
     --------
     >>> from perda.utils import lowpass_filter
     >>> unit = aly.data.timestamp_unit
     >>> di_filtered = lowpass_filter(di, cutoff_hz=10.0, source_time_unit=unit)
-    >>> di_filtered = lowpass_filter([di_a, di_b], cutoff_hz=5.0, source_time_unit=unit)
+    >>> aly.data["pcm.vnav.*"] = lowpass_filter(aly.data["pcm.vnav.*"], cutoff_hz=5.0, source_time_unit=unit)
     """
-    di_list = [di] if isinstance(di, DataInstance) else di
-
-    results: list[DataInstance] = []
-
-    for instance in di_list:
-        ts_s = to_seconds(instance.timestamp_np.astype(np.float64), source_time_unit)
-        dt = float(np.median(np.diff(ts_s)))
-        if dt <= 0 or not np.isfinite(dt):
-            raise ValueError(
-                "Non-positive median time step "
-                f"({dt:.6f} s). Cannot determine sample rate."
-            )
-
-        fs = 1.0 / dt
-        nyq = fs / 2.0
-
-        if cutoff_hz >= nyq:
-            print(
-                f"Cutoff frequency ({cutoff_hz} Hz) greater than Nyquist frequency"
-                f"({nyq:.1f} Hz), skipping filter"
-            )
-            results.append(instance)
-            continue
-
-        sos = butter(order, cutoff_hz / nyq, btype="low", output="sos")
-        signal = instance.value_np.astype(np.float64)
-        filtered = apply_sos_filter(signal, sos, order)
-
-        if filtered is None:
-            results.append(instance)
-            continue
-
-        results.append(
-            DataInstance(
-                timestamp_np=instance.timestamp_np,
-                value_np=filtered,
-                label=instance.label or f"var_id={instance.var_id}",
-                var_id=instance.var_id,
-                cpp_name=instance.cpp_name,
-            )
+    if not isinstance(di, DataInstance):
+        return tuple(
+            lowpass_filter(instance, cutoff_hz, source_time_unit, order)
+            for instance in di
         )
 
-    return results[0] if len(results) == 1 else results
+    ts_s = to_seconds(di.timestamp_np.astype(np.float64), source_time_unit)
+    dt = float(np.median(np.diff(ts_s)))
+    if dt <= 0 or not np.isfinite(dt):
+        raise ValueError(
+            "Non-positive median time step "
+            f"({dt:.6f} s). Cannot determine sample rate."
+        )
+
+    fs = 1.0 / dt
+    nyq = fs / 2.0
+
+    if cutoff_hz >= nyq:
+        print(
+            f"Cutoff frequency ({cutoff_hz} Hz) greater than Nyquist frequency"
+            f"({nyq:.1f} Hz), skipping filter"
+        )
+        return di
+
+    sos = butter(order, cutoff_hz / nyq, btype="low", output="sos")
+    filtered = apply_sos_filter(di.value_np.astype(np.float64), sos, order)
+    if filtered is None:
+        return di
+
+    return DataInstance(
+        timestamp_np=di.timestamp_np,
+        value_np=filtered,
+        label=di.label or f"var_id={di.var_id}",
+        var_id=di.var_id,
+        cpp_name=di.cpp_name,
+    )
 
 
+@overload
 def lowpass_filter_by_distance(
-    di: DataInstance | list[DataInstance],
+    di: DataInstance,
     distance_di: DataInstance,
     cutoff_freq_per_meter: float,
     order: int = 4,
-) -> DataInstance | list[DataInstance]:
+) -> DataInstance: ...
+
+
+@overload
+def lowpass_filter_by_distance(
+    di: Sequence[DataInstance],
+    distance_di: DataInstance,
+    cutoff_freq_per_meter: float,
+    order: int = 4,
+) -> tuple[DataInstance, ...]: ...
+
+
+def lowpass_filter_by_distance(
+    di: DataInstance | Sequence[DataInstance],
+    distance_di: DataInstance,
+    cutoff_freq_per_meter: float,
+    order: int = 4,
+) -> DataInstance | tuple[DataInstance, ...]:
     """Apply a Butterworth lowpass filter in the spatial domain.
 
     The sample rate is derived from a cumulative-distance DataInstance
@@ -157,8 +189,8 @@ def lowpass_filter_by_distance(
 
     Parameters
     ----------
-    di : DataInstance | list[DataInstance]
-        Input signal(s) to filter.
+    di : DataInstance | Sequence[DataInstance]
+        Input signal, or several signals filtered independently.
     distance_di : DataInstance
         Cumulative distance in meters on any timestamp grid.
     cutoff_freq_per_meter : float
@@ -168,77 +200,92 @@ def lowpass_filter_by_distance(
 
     Returns
     -------
-    DataInstance | list[DataInstance]
+    DataInstance | tuple[DataInstance, ...]
         New DataInstance(s) with spatially filtered ``value_np``, on the
-        original signal timestamp grid.
+        original signal timestamp grid, one per input.
 
     Examples
     --------
     >>> from perda.utils import lowpass_filter_by_distance
     >>> di_filtered = lowpass_filter_by_distance(di, distance_di, cutoff_freq_per_meter=0.05)
     """
-    di_list = [di] if isinstance(di, DataInstance) else di
-    results: list[DataInstance] = []
-
-    for instance in di_list:
-        # Align distance onto the signal's timestamp grid
-        _, distance_aligned = left_join_data_instances(instance, distance_di)
-        dist_values = distance_aligned.value_np.astype(np.float64)
-        signal = instance.value_np.astype(np.float64)
-
-        # Remove duplicate-distance samples (car stationary) before spatial filtering.
-        diffs = np.diff(dist_values)
-        moving = np.concatenate(([True], diffs > 0))
-        dist_dedup = dist_values[moving]
-        signal_dedup = signal[moving]
-
-        positive_diffs = diffs[diffs > 0]
-        if positive_diffs.size == 0:
-            raise ValueError(
-                "No positive distance steps found. Cannot determine spatial sample rate."
+    if not isinstance(di, DataInstance):
+        return tuple(
+            lowpass_filter_by_distance(
+                instance, distance_di, cutoff_freq_per_meter, order
             )
-
-        dx_median = float(np.median(positive_diffs))
-        fs = 1.0 / dx_median
-        nyq = fs / 2.0
-
-        if cutoff_freq_per_meter >= nyq:
-            print(
-                f"Cutoff frequency ({cutoff_freq_per_meter} 1/m) greater than Nyquist frequency"
-                f"({nyq:.4f} 1/m), skipping filter"
-            )
-            results.append(instance)
-            continue
-
-        sos = butter(order, cutoff_freq_per_meter / nyq, btype="low", output="sos")
-        filtered_dedup = apply_sos_filter(signal_dedup, sos, order)
-
-        if filtered_dedup is None:
-            results.append(instance)
-            continue
-
-        # Interpolate filtered values back onto the original distance grid
-        filtered = np.interp(dist_values, dist_dedup, filtered_dedup)
-
-        results.append(
-            DataInstance(
-                timestamp_np=instance.timestamp_np,
-                value_np=filtered,
-                label=instance.label or f"var_id={instance.var_id}",
-                var_id=instance.var_id,
-                cpp_name=instance.cpp_name,
-            )
+            for instance in di
         )
 
-    return results[0] if len(results) == 1 else results
+    # Align distance onto the signal's timestamp grid
+    _, distance_aligned = left_join_data_instances(di, distance_di)
+    dist_values = distance_aligned.value_np.astype(np.float64)
+    signal = di.value_np.astype(np.float64)
+
+    # Remove duplicate-distance samples (car stationary) before spatial filtering.
+    diffs = np.diff(dist_values)
+    moving = np.concatenate(([True], diffs > 0))
+    dist_dedup = dist_values[moving]
+    signal_dedup = signal[moving]
+
+    positive_diffs = diffs[diffs > 0]
+    if positive_diffs.size == 0:
+        raise ValueError(
+            "No positive distance steps found. Cannot determine spatial sample rate."
+        )
+
+    dx_median = float(np.median(positive_diffs))
+    fs = 1.0 / dx_median
+    nyq = fs / 2.0
+
+    if cutoff_freq_per_meter >= nyq:
+        print(
+            f"Cutoff frequency ({cutoff_freq_per_meter} 1/m) greater than Nyquist frequency"
+            f"({nyq:.4f} 1/m), skipping filter"
+        )
+        return di
+
+    sos = butter(order, cutoff_freq_per_meter / nyq, btype="low", output="sos")
+    filtered_dedup = apply_sos_filter(signal_dedup, sos, order)
+    if filtered_dedup is None:
+        return di
+
+    # Interpolate filtered values back onto the original distance grid
+    filtered = np.interp(dist_values, dist_dedup, filtered_dedup)
+
+    return DataInstance(
+        timestamp_np=di.timestamp_np,
+        value_np=filtered,
+        label=di.label or f"var_id={di.var_id}",
+        var_id=di.var_id,
+        cpp_name=di.cpp_name,
+    )
 
 
+@overload
 def zscore_filter(
-    di: DataInstance | list[DataInstance],
+    di: DataInstance,
     window_s: float,
     threshold: float,
     source_time_unit: Timescale,
-) -> DataInstance | list[DataInstance]:
+) -> DataInstance: ...
+
+
+@overload
+def zscore_filter(
+    di: Sequence[DataInstance],
+    window_s: float,
+    threshold: float,
+    source_time_unit: Timescale,
+) -> tuple[DataInstance, ...]: ...
+
+
+def zscore_filter(
+    di: DataInstance | Sequence[DataInstance],
+    window_s: float,
+    threshold: float,
+    source_time_unit: Timescale,
+) -> DataInstance | tuple[DataInstance, ...]:
     """Remove outliers using a rolling-window z-score and interpolate gaps.
 
     For each sample, a z-score is computed relative to the local rolling
@@ -247,8 +294,8 @@ def zscore_filter(
 
     Parameters
     ----------
-    di : DataInstance | list[DataInstance]
-        Input signal(s).
+    di : DataInstance | Sequence[DataInstance]
+        Input signal, or several signals filtered independently.
     window_s : float
         Rolling window size in seconds
     threshold : float
@@ -258,8 +305,8 @@ def zscore_filter(
 
     Returns
     -------
-    DataInstance | list[DataInstance]
-        New DataInstance(s) with outliers replaced by linear interpolation.
+    DataInstance | tuple[DataInstance, ...]
+        New DataInstance(s) with outliers replaced by linear interpolation, one per input.
 
     Examples
     --------
@@ -268,67 +315,82 @@ def zscore_filter(
     ...     di, window_s=1.0, threshold=3.0, source_time_unit=aly.data.timestamp_unit
     ... )
     """
-    di_list = [di] if isinstance(di, DataInstance) else di
-
-    results: list[DataInstance] = []
-
-    for instance in di_list:
-        ts_s = to_seconds(instance.timestamp_np.astype(np.float64), source_time_unit)
-        dt = float(np.median(np.diff(ts_s)))
-        if dt <= 0:
-            raise ValueError(
-                "Non-positive median time step "
-                f"({dt:.6f} s). Cannot determine sample rate."
-            )
-
-        fs = 1.0 / dt
-        win_samples = max(3, int(round(window_s * fs)))
-
-        signal = instance.value_np.astype(np.float64)
-
-        roll_mean = uniform_filter1d(signal, size=win_samples, mode="nearest")
-        roll_sq_mean = uniform_filter1d(signal**2, size=win_samples, mode="nearest")
-        # Guard against floating-point negatives inside sqrt
-        roll_std = np.sqrt(np.maximum(roll_sq_mean - roll_mean**2, 0.0))
-
-        z = np.zeros_like(signal, dtype=np.float64)
-        mask = roll_std > 0
-        z[mask] = np.abs((signal[mask] - roll_mean[mask]) / roll_std[mask])
-
-        outlier_mask = z > threshold
-        n_masked = int(outlier_mask.sum())
-
-        filtered = signal.copy()
-        filtered[outlier_mask] = np.nan
-
-        if n_masked > 0:
-            indices = np.arange(len(filtered), dtype=np.float64)
-            valid_mask = ~np.isnan(filtered)
-            if valid_mask.sum() >= 2:
-                filtered = np.interp(
-                    indices,
-                    indices[valid_mask],
-                    filtered[valid_mask],
-                )
-
-        results.append(
-            DataInstance(
-                timestamp_np=instance.timestamp_np,
-                value_np=filtered,
-                label=instance.label or f"var_id={instance.var_id}",
-                var_id=instance.var_id,
-                cpp_name=instance.cpp_name,
-            )
+    if not isinstance(di, DataInstance):
+        return tuple(
+            zscore_filter(instance, window_s, threshold, source_time_unit)
+            for instance in di
         )
 
-    return results[0] if len(results) == 1 else results
+    ts_s = to_seconds(di.timestamp_np.astype(np.float64), source_time_unit)
+    dt = float(np.median(np.diff(ts_s)))
+    if dt <= 0:
+        raise ValueError(
+            "Non-positive median time step "
+            f"({dt:.6f} s). Cannot determine sample rate."
+        )
+
+    fs = 1.0 / dt
+    win_samples = max(3, int(round(window_s * fs)))
+
+    signal = di.value_np.astype(np.float64)
+
+    roll_mean = uniform_filter1d(signal, size=win_samples, mode="nearest")
+    roll_sq_mean = uniform_filter1d(signal**2, size=win_samples, mode="nearest")
+    # Guard against floating-point negatives inside sqrt
+    roll_std = np.sqrt(np.maximum(roll_sq_mean - roll_mean**2, 0.0))
+
+    z = np.zeros_like(signal, dtype=np.float64)
+    mask = roll_std > 0
+    z[mask] = np.abs((signal[mask] - roll_mean[mask]) / roll_std[mask])
+
+    outlier_mask = z > threshold
+
+    filtered = signal.copy()
+    filtered[outlier_mask] = np.nan
+
+    if outlier_mask.any():
+        indices = np.arange(len(filtered), dtype=np.float64)
+        valid_mask = ~np.isnan(filtered)
+        if valid_mask.sum() >= 2:
+            filtered = np.interp(
+                indices,
+                indices[valid_mask],
+                filtered[valid_mask],
+            )
+
+    return DataInstance(
+        timestamp_np=di.timestamp_np,
+        value_np=filtered,
+        label=di.label or f"var_id={di.var_id}",
+        var_id=di.var_id,
+        cpp_name=di.cpp_name,
+    )
 
 
+@overload
 def compute_fft(
     di: DataInstance,
     source_time_unit: Timescale,
     distance_di: DataInstance | None = None,
-) -> tuple[NDArray[float64], NDArray[float64]]:
+) -> tuple[NDArray[float64], NDArray[float64]]: ...
+
+
+@overload
+def compute_fft(
+    di: Sequence[DataInstance],
+    source_time_unit: Timescale,
+    distance_di: DataInstance | None = None,
+) -> tuple[tuple[NDArray[float64], NDArray[float64]], ...]: ...
+
+
+def compute_fft(
+    di: DataInstance | Sequence[DataInstance],
+    source_time_unit: Timescale,
+    distance_di: DataInstance | None = None,
+) -> (
+    tuple[NDArray[float64], NDArray[float64]]
+    | tuple[tuple[NDArray[float64], NDArray[float64]], ...]
+):
     """Compute the real FFT magnitude spectrum of a DataInstance.
 
     NaN values are dropped before the transform.  The signal is
@@ -336,8 +398,8 @@ def compute_fft(
 
     Parameters
     ----------
-    di : DataInstance
-        Signal to transform.
+    di : DataInstance | Sequence[DataInstance]
+        Signal to transform, or several signals transformed independently.
     source_time_unit : Timescale
         Timestamp unit. Used only in time-domain mode. Pass ``aly.data.timestamp_unit``.
     distance_di : DataInstance | None, optional
@@ -353,13 +415,21 @@ def compute_fft(
     magnitudes : NDArray[float64]
         FFT magnitude (``abs(rfft(signal - mean))``).
 
+    Given several signals, returns one ``(frequencies, magnitudes)`` pair per signal.
+
     Examples
     --------
     >>> from perda.plotting import plot_fft_spectrum
     >>> from perda.utils import compute_fft
     >>> freqs, mags = compute_fft(di, source_time_unit=aly.data.timestamp_unit)
     >>> fig = plot_fft_spectrum([freqs], [mags], [di.label])
+    >>> freqs, mags = zip(*compute_fft(aly.data["pcm.vnav.*"], source_time_unit=aly.data.timestamp_unit))
     """
+    if not isinstance(di, DataInstance):
+        return tuple(
+            compute_fft(instance, source_time_unit, distance_di) for instance in di
+        )
+
     signal = di.value_np.astype(np.float64)
     valid = ~np.isnan(signal)
     signal_clean = signal[valid]
