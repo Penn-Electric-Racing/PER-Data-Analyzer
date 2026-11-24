@@ -237,21 +237,22 @@ def test_trim_returns_new_instance(di_simple):
 
 
 @pytest.mark.parametrize(
-    "unit, offset_s, expected_timestamps",
+    "unit, offset_s, expected_values",
     [
-        pytest.param(Timescale.MS, 0.002, [3, 4], id="ms_later"),
-        pytest.param(Timescale.MS, -0.001, [0, 1], id="ms_earlier"),
-        pytest.param(Timescale.S, 5.0, [6, 7], id="seconds"),
+        pytest.param(Timescale.MS, 0.001, [0.0, 1.0], id="later_by_one_sample"),
+        pytest.param(Timescale.MS, -0.001, [2.0, 3.0], id="earlier_by_one_sample"),
+        pytest.param(Timescale.MS, 0.0005, [0.5, 1.5], id="sub_sample"),
+        pytest.param(Timescale.S, 10.0, [0.0, 0.0], id="past_start_holds_first"),
     ],
 )
-def test_trim_offset_shifts_kept_timestamps(
-    di_simple, unit, offset_s, expected_timestamps
+def test_trim_offset_shifts_values_on_original_timestamps(
+    di_simple, unit, offset_s, expected_values
 ):
     result = di_simple.trim(
         ts_start=1, ts_end=2, offset_s=offset_s, source_time_unit=unit
     )
-    np.testing.assert_array_equal(result.timestamp_np, expected_timestamps)
-    np.testing.assert_allclose(result.value_np, [1.0, 2.0])
+    np.testing.assert_array_equal(result.timestamp_np, [1, 2])
+    np.testing.assert_allclose(result.value_np, expected_values)
 
 
 def test_trim_offset_requires_unit(di_simple):
