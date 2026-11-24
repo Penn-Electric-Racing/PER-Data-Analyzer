@@ -1,6 +1,3 @@
-import io
-import sys
-
 from plotly import graph_objects as go
 
 from ..core_data_structures.data_instance import DataInstance
@@ -14,7 +11,6 @@ from ..plotting.defaults import (
 )
 from ..units import from_seconds, to_seconds
 from ..utils.accel_calculator import *
-from ..utils.data_summary import single_run_summary
 from ..utils.diff import DIFF_BUCKET_SIZE_S, diff
 from ..utils.frequency_analysis import analyze_frequency as _analyze_frequency
 from ..utils.integrate import smoothed_filtered_integration
@@ -73,12 +69,7 @@ class Analyzer:
 
     Summary stats for one variable
     ------------------------------
-    >>> from perda.utils import data_instance_summary
-    >>> summary = data_instance_summary(
-    ...     aly.data["pcm.wheelSpeeds.frontRight"], source_time_unit=aly.data.timestamp_unit
-    ... )
-    >>> print(summary)          # formatted block
-    >>> summary.max_value       # or read the fields directly
+    >>> print(aly.data["pcm.wheelSpeeds.frontRight"])   # count, time range, min, max, average
     """
 
     def __init__(
@@ -132,20 +123,8 @@ class Analyzer:
             self.data = apply_preprocessing(self.data, preprocessing)
 
     def __str__(self) -> str:
-        """Return a summary of all variables in the loaded run data."""
-        old_stdout = sys.stdout
-
-        buffer = io.StringIO()
-        sys.stdout = buffer
-
-        single_run_summary(self.data)
-
-        output = buffer.getvalue()
-        buffer.close()
-
-        sys.stdout = old_stdout
-
-        return output
+        """Return a summary of the loaded run data."""
+        return str(self.data)
 
     def search(self, query: str, top_n: int = 10) -> list[SearchResult]:
         """

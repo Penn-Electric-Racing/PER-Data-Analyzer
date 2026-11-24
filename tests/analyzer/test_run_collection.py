@@ -81,8 +81,8 @@ def test_filters_chain(two_run_collection):
 def test_compare_summary(two_run_collection):
     summaries = two_run_collection.compare_summary(VOLTAGE)
     assert set(summaries) == {"log_old.csv", "log_new.csv"}
-    assert summaries["log_old.csv"].max_value == 6.0
-    assert summaries["log_new.csv"].count == 1
+    assert summaries["log_old.csv"].value_np.max() == 6.0
+    assert len(summaries["log_new.csv"]) == 1
 
 
 def test_compare_summary_skips_runs_missing_variable(two_run_collection):

@@ -9,6 +9,7 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator
 from ..units import Timescale, from_seconds
 from .joins import inner_join, left_join, outer_join
 from .resampling import ResampleMethod, _interpolate
+from .summarize import summarize_time_series
 
 
 class DataInstance(BaseModel):
@@ -82,14 +83,15 @@ class DataInstance(BaseModel):
 
     def __str__(self) -> str:
         """
-        Human-readable one-line summary of this DataInstance.
+        Summary of this DataInstance: name line, count, time range, min, max and average.
 
-        Returns
-        -------
-        str
-            ``Label | ID: <var_id> | C++ Name: <cpp_name>``
+        Timestamps are shown in raw units, since a DataInstance does not know its log's unit.
         """
-        return f"{self.label} | ID: {self.var_id} | C++ Name: {self.cpp_name}"
+        return summarize_time_series(
+            f"{self.label} | ID: {self.var_id} | C++ Name: {self.cpp_name}",
+            self.timestamp_np,
+            self.value_np,
+        )
 
     def __len__(self) -> int:
         """

@@ -99,7 +99,7 @@ def analyze_frequency(
 
     W = 10
     W_Label = 16
-    print(str(data_instance))
+    print(label)
     print(SECTION_DIVIDER)
     print(f"{'Duration:':<{W_Label}} {total_duration_s:{W}.3f} s")
     print(

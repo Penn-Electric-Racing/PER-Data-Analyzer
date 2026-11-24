@@ -11,7 +11,6 @@ from ..core_data_structures.data_instance import DataInstance
 from ..plotting.data_instance_plotter import plot_time_series
 from ..plotting.defaults import PLOT_WIDTH, SUBPLOT_VERTICAL_SPACING
 from ..units import Timescale, convert_time
-from ..utils.data_summary import DataInstanceSummary, data_instance_summary
 from .analyzer import Analyzer
 
 # Common unit that every run's timestamps are converted to before overlaying, so
@@ -305,9 +304,9 @@ class RunCollection:
             vertical_spacing=vertical_spacing,
         )
 
-    def compare_summary(self, cpp_name: str) -> dict[str, DataInstanceSummary]:
+    def compare_summary(self, cpp_name: str) -> dict[str, DataInstance]:
         """
-        Summarize a variable's statistics across every run in the collection.
+        Collect a variable from every run in the collection; print each one for its summary.
 
         Parameters
         ----------
@@ -316,18 +315,16 @@ class RunCollection:
 
         Returns
         -------
-        dict[str, DataInstanceSummary]
-            Summary per run filename, for runs that contain the variable.
+        dict[str, DataInstance]
+            The variable per run filename, for runs that contain the variable.
 
         Examples
         --------
-        >>> for filename, summary in col.compare_summary("bms.pack.voltage").items():
-        ...     print(f"{filename}: {summary.max_value}")
+        >>> for filename, di in col.compare_summary("bms.pack.voltage").items():
+        ...     print(f"{filename}\n{di}")
         """
         return {
-            run.file_path.name: data_instance_summary(
-                analyzer.data[cpp_name], source_time_unit=analyzer.data.timestamp_unit
-            )
+            run.file_path.name: analyzer.data[cpp_name]
             for run, analyzer in self._iter_analyzers()
             if cpp_name in analyzer.data
         }
