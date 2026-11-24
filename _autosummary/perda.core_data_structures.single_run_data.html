@@ -263,6 +263,7 @@
 <li class="toctree-l3"><a class="reference internal" href="perda.analyzer.analyzer_factory.html">perda.analyzer.analyzer_factory</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.analyzer.concat_helpers.html">perda.analyzer.concat_helpers</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.analyzer.csv.html">perda.analyzer.csv</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.analyzer.plot_inputs.html">perda.analyzer.plot_inputs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.analyzer.run_collection.html">perda.analyzer.run_collection</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.analyzer.run_collection_factory.html">perda.analyzer.run_collection_factory</a></li>
 </ul>
@@ -277,6 +278,7 @@
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.search_indexes.html">perda.core_data_structures.search_indexes</a></li>
 <li class="toctree-l3 current active"><a class="current reference internal" href="#">perda.core_data_structures.single_run_data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.split_helpers.html">perda.core_data_structures.split_helpers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.variable_patterns.html">perda.core_data_structures.variable_patterns</a></li>
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="perda.live.html">perda.live</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -294,7 +296,6 @@
 <li class="toctree-l3"><a class="reference internal" href="perda.plotting.parametric_plot.html">perda.plotting.parametric_plot</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.plotting.parametric_trimmer.html">perda.plotting.parametric_trimmer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.plotting.scatter_histogram_plotter.html">perda.plotting.scatter_histogram_plotter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="perda.plotting.subplots.html">perda.plotting.subplots</a></li>
 </ul>
 </details></li>
 <li class="toctree-l2"><a class="reference internal" href="perda.server.html">perda.server</a></li>
@@ -393,15 +394,20 @@
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
 <p>Pydantic model to store parsed CSV data with dictionary-like lookup.</p>
 <p class="rubric">Notes</p>
-<p>All timestamps (<code class="docutils literal notranslate"><span class="pre">data_start_time</span></code>, <code class="docutils literal notranslate"><span class="pre">data_end_time</span></code> and every DataInstance’s
-<code class="docutils literal notranslate"><span class="pre">timestamp_np</span></code>) are raw integers in <code class="docutils literal notranslate"><span class="pre">timestamp_unit</span></code>, which is microseconds for
-current logs. Helpers that take a <code class="docutils literal notranslate"><span class="pre">source_time_unit</span></code> or <code class="docutils literal notranslate"><span class="pre">timestamp_unit</span></code> argument
-require it; pass <code class="docutils literal notranslate"><span class="pre">data.timestamp_unit</span></code>.</p>
+<p>All timestamps (<code class="docutils literal notranslate"><span class="pre">data_start_time</span></code>, <code class="docutils literal notranslate"><span class="pre">data_end_time</span></code> and every DataInstance’s <code class="docutils literal notranslate"><span class="pre">timestamp_np</span></code>) are
+raw integers in <code class="docutils literal notranslate"><span class="pre">timestamp_unit</span></code> (milliseconds, microseconds, etc.). Helpers that take a <code class="docutils literal notranslate"><span class="pre">source_time_unit</span></code>
+or <code class="docutils literal notranslate"><span class="pre">timestamp_unit</span></code> argument require it; pass <code class="docutils literal notranslate"><span class="pre">data.timestamp_unit</span></code>.</p>
 <p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">perda.units</span><span class="w"> </span><span class="kn">import</span> <span class="n">to_seconds</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">aly</span><span class="o">.</span><span class="n">data</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">aly</span><span class="o">.</span><span class="n">data</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">di</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">"pcm.wheelSpeeds.frontRight"</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="s2">"pcm.wheelSpeeds.frontRight"</span> <span class="ow">in</span> <span class="n">data</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="p">[</span><span class="s2">"my.new.var"</span><span class="p">]</span> <span class="o">=</span> <span class="n">DataInstance</span><span class="p">(</span><span class="n">timestamp_np</span><span class="o">=</span><span class="n">ts</span><span class="p">,</span> <span class="n">value_np</span><span class="o">=</span><span class="n">vals</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"My var"</span><span class="p">,</span> <span class="n">cpp_name</span><span class="o">=</span><span class="s2">"my.new.var"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="p">[</span><span class="s2">"my.existing.var"</span><span class="p">]</span> <span class="o">=</span> <span class="n">updated_di</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">vel_x</span><span class="p">,</span> <span class="n">vel_y</span><span class="p">,</span> <span class="n">vel_z</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">"pcm.vnav.bodyVelocity.*"</span><span class="p">]</span>   <span class="c1"># wildcard, sorted by name</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">left</span><span class="p">,</span> <span class="n">right</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">"pcm.wheelSpeeds.frontLeft"</span><span class="p">,</span> <span class="s2">"pcm.wheelSpeeds.frontRight"</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="p">[</span><span class="s2">"pcm.vnav.bodyVelocity.*"</span><span class="p">]</span> <span class="o">=</span> <span class="n">vel_x</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span> <span class="n">vel_y</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span> <span class="n">vel_z</span> <span class="o">*</span> <span class="mi">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="p">[</span><span class="s2">"derived.a"</span><span class="p">,</span> <span class="s2">"derived.b"</span><span class="p">]</span> <span class="o">=</span> <span class="n">a_di</span><span class="p">,</span> <span class="n">b_di</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">perda.units</span><span class="w"> </span><span class="kn">import</span> <span class="n">to_seconds</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">duration_s</span> <span class="o">=</span> <span class="n">to_seconds</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">data_end_time</span> <span class="o">-</span> <span class="n">data</span><span class="o">.</span><span class="n">data_start_time</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">timestamp_unit</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -589,51 +595,6 @@ require it; pass <code class="docutils literal notranslate"><span class="pre">da
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt class="sig sig-object py" id="perda.core_data_structures.single_run_data.SingleRunData.add">
-<span class="sig-name descname"><span class="pre">add</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cpp_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">di</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/core_data_structures/single_run_data.html#SingleRunData.add"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.core_data_structures.single_run_data.SingleRunData.add" title="Link to this definition">#</a></dt>
-<dd><p>Insert a new derived DataInstance using a synthetic negative ID.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>cpp_name</strong> (<em>str</em>) – C++ variable name key for the new variable.</p></li>
-<li><p><strong>di</strong> (<a class="reference internal" href="perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance"><em>DataInstance</em></a>) – DataInstance to insert.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
-</dd>
-</dl>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">power</span> <span class="o">=</span> <span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">"bms.pack.voltage"</span><span class="p">]</span> <span class="o">*</span> <span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">"bms.pack.current"</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">"derived.pack.power"</span><span class="p">,</span> <span class="n">power</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span> <span class="o">=</span> <span class="n">aly</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s2">"derived.pack.power"</span><span class="p">)</span>
-</pre></div>
-</div>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="perda.core_data_structures.single_run_data.SingleRunData.replace">
-<span class="sig-name descname"><span class="pre">replace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cpp_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">di</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/core_data_structures/single_run_data.html#SingleRunData.replace"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.core_data_structures.single_run_data.SingleRunData.replace" title="Link to this definition">#</a></dt>
-<dd><p>Overwrite the values of an existing variable in-place.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>cpp_name</strong> (<em>str</em>) – C++ variable name of the variable to replace.</p></li>
-<li><p><strong>di</strong> (<a class="reference internal" href="perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance"><em>DataInstance</em></a>) – DataInstance whose <code class="docutils literal notranslate"><span class="pre">value_np</span></code> that replaces the stored one.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
-</dd>
-</dl>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">voltage</span> <span class="o">=</span> <span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">"bms.pack.voltage"</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"bms.pack.voltage"</span><span class="p">,</span> <span class="n">voltage</span> <span class="o">/</span> <span class="mf">1000.0</span><span class="p">)</span>
-</pre></div>
-</div>
-</dd></dl>
-
 </dd></dl>
 
 </section>
@@ -698,8 +659,6 @@ require it; pass <code class="docutils literal notranslate"><span class="pre">da
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.core_data_structures.single_run_data.SingleRunData.concat_boundaries"><code class="docutils literal notranslate"><span class="pre">SingleRunData.concat_boundaries</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.core_data_structures.single_run_data.SingleRunData.semantic_index"><code class="docutils literal notranslate"><span class="pre">SingleRunData.semantic_index</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.core_data_structures.single_run_data.SingleRunData.keyword_index"><code class="docutils literal notranslate"><span class="pre">SingleRunData.keyword_index</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.core_data_structures.single_run_data.SingleRunData.add"><code class="docutils literal notranslate"><span class="pre">SingleRunData.add()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.core_data_structures.single_run_data.SingleRunData.replace"><code class="docutils literal notranslate"><span class="pre">SingleRunData.replace()</span></code></a></li>
 </ul>
 </li>
 </ul>

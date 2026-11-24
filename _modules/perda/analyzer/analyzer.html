@@ -304,20 +304,18 @@
   <h1>Source code for perda.analyzer.analyzer</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">io</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Sequence</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">plotly</span><span class="w"> </span><span class="kn">import</span> <span class="n">graph_objects</span> <span class="k">as</span> <span class="n">go</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">..core_data_structures.data_instance</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataInstance</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..core_data_structures.single_run_data</span><span class="w"> </span><span class="kn">import</span> <span class="n">SingleRunData</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">..plotting.data_instance_plotter</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_dual_axis</span><span class="p">,</span> <span class="n">plot_single_axis</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..plotting.data_instance_plotter</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_time_series</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..plotting.defaults</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">HISTOGRAM_BINS</span><span class="p">,</span>
     <span class="n">PLOT_HEIGHT</span><span class="p">,</span>
     <span class="n">PLOT_WIDTH</span><span class="p">,</span>
     <span class="n">SUBPLOT_VERTICAL_SPACING</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">..plotting.subplots</span><span class="w"> </span><span class="kn">import</span> <span class="n">data_instance_subplots</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..units</span><span class="w"> </span><span class="kn">import</span> <span class="n">from_seconds</span><span class="p">,</span> <span class="n">to_seconds</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..utils.accel_calculator</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..utils.data_summary</span><span class="w"> </span><span class="kn">import</span> <span class="n">single_run_summary</span>
@@ -327,9 +325,13 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">..utils.preprocessing</span><span class="w"> </span><span class="kn">import</span> <span class="n">PreprocessingStep</span><span class="p">,</span> <span class="n">apply_preprocessing</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..utils.search</span><span class="w"> </span><span class="kn">import</span> <span class="n">SearchResult</span><span class="p">,</span> <span class="n">search</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.csv</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
-
-<span class="n">VariableInput</span> <span class="o">=</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">DataInstance</span>
-<span class="n">VariableInputs</span> <span class="o">=</span> <span class="n">VariableInput</span> <span class="o">|</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">VariableInput</span><span class="p">]</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.plot_inputs</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AxisTitles</span><span class="p">,</span>
+    <span class="n">PlotVariables</span><span class="p">,</span>
+    <span class="n">axis_titles_per_subplot</span><span class="p">,</span>
+    <span class="n">group_variables_by_subplot</span><span class="p">,</span>
+    <span class="n">lookup_subplot_data_instances</span><span class="p">,</span>
+<span class="p">)</span>
 
 
 <div class="viewcode-block" id="Analyzer">
@@ -350,6 +352,12 @@
 <span class="sd">    Check membership</span>
 <span class="sd">    ----------------</span>
 <span class="sd">    &gt;&gt;&gt; "pcm.wheelSpeeds.frontRight" in aly.data       # True / False</span>
+
+<span class="sd">    Wildcards and multiple variables at once</span>
+<span class="sd">    ----------------------------------------</span>
+<span class="sd">    &gt;&gt;&gt; vel_x, vel_y, vel_z = aly.data["pcm.vnav.bodyVelocity.*"]   # sorted by name</span>
+<span class="sd">    &gt;&gt;&gt; left, right = aly.data["pcm.wheelSpeeds.frontLeft", "pcm.wheelSpeeds.frontRight"]</span>
+<span class="sd">    &gt;&gt;&gt; aly.data["derived.a", "derived.b"] = a_di, b_di</span>
 
 <span class="sd">    Read raw arrays</span>
 <span class="sd">    ---------------</span>
@@ -485,41 +493,42 @@
 <a class="viewcode-back" href="../../../_autosummary/perda.analyzer.analyzer.html#perda.analyzer.analyzer.Analyzer.plot">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">plot</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">var_1</span><span class="p">:</span> <span class="n">VariableInputs</span><span class="p">,</span>
-        <span class="n">var_2</span><span class="p">:</span> <span class="n">VariableInputs</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="nb">vars</span><span class="p">:</span> <span class="n">PlotVariables</span><span class="p">,</span>
+        <span class="n">vars_alt</span><span class="p">:</span> <span class="n">PlotVariables</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">ts_start</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">ts_end</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">y_label_1</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">y_label_2</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">y_title</span><span class="p">:</span> <span class="n">AxisTitles</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">y_title_alt</span><span class="p">:</span> <span class="n">AxisTitles</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">show_legend</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">max_points</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">log_x</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">log_y</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">PLOT_WIDTH</span><span class="p">,</span>
-        <span class="n">height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">PLOT_HEIGHT</span><span class="p">,</span>
+        <span class="n">height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">vertical_spacing</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">SUBPLOT_VERTICAL_SPACING</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Plot variables from the log against time on an interactive Plotly figure.</span>
+<span class="sd">        Plot variables from the log against time, optionally as stacked subplots with split y-axes.</span>
 
-<span class="sd">        Pass one variable or a list for a single y-axis. Also pass ``var_2`` to put a second group of variables on an independent right-hand y-axis. Concat boundaries (if any) are drawn as dashed vertical lines.</span>
+<span class="sd">        The shape of ``vars`` decides the layout. A single variable or a flat list gives one plot. A list containing inner lists gives one subplot per entry, top to bottom, all sharing one time axis. ``vars_alt`` adds an independent right-hand y-axis, per subplot. Concat boundaries (if any) are drawn as dashed vertical lines.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        var_1 : str | int | DataInstance | Sequence[str | int | DataInstance]</span>
-<span class="sd">            Variable(s) for the left (or only) y-axis. Each item can be a variable name (``"pcm.wheelSpeeds.frontRight"``), a variable ID (``42``), or a DataInstance (e.g. a derived signal).</span>
-<span class="sd">        var_2 : str | int | DataInstance | Sequence[str | int | DataInstance] | None, optional</span>
-<span class="sd">            Variable(s) for a second, right-hand y-axis, drawn dashed. Same accepted types as ``var_1``. Default is None (single y-axis).</span>
+<span class="sd">        vars : str | int | DataInstance | list</span>
+<span class="sd">            Variables for the left (or only) y-axis. Each variable can be a name (``"pcm.wheelSpeeds.frontRight"``), a wildcard pattern matching several names (``"pcm.vnav.*"``), a variable ID (``42``), or a DataInstance (e.g. a derived signal). Pass a flat list for one plot, or a list of lists for subplots, e.g. ``[["a", "b"], "c"]`` gives two subplots; a non-list entry counts as a list of one.</span>
+<span class="sd">        vars_alt : str | int | DataInstance | list | None, optional</span>
+<span class="sd">            Variables for a right-hand y-axis, drawn dashed. Same forms and nesting rules as ``vars``, and must give the same number of subplots. A ``None`` (or ``[None]``) entry leaves that subplot with a single y-axis, e.g. ``[None, "steering"]``. Default is None (no right axes).</span>
 <span class="sd">        ts_start : float | None, optional</span>
-<span class="sd">            Start of the time window in seconds on the log's clock. Earlier data is excluded. Default is None (from the start of the log).</span>
+<span class="sd">            Start of the time window in seconds on the log clock. Earlier data is excluded. Default is None (from the start of the log).</span>
 <span class="sd">        ts_end : float | None, optional</span>
-<span class="sd">            End of the time window in seconds on the log's clock. Later data is excluded. Default is None (to the end of the log).</span>
+<span class="sd">            End of the time window in seconds on the log clock. Later data is excluded. Default is None (to the end of the log).</span>
 <span class="sd">        title : str | None, optional</span>
-<span class="sd">            Title shown above the plot. Default is None (no title).</span>
-<span class="sd">        y_label_1 : str | None, optional</span>
-<span class="sd">            Left (or only) y-axis label, e.g. ``"Speed (mph)"``. Default is None (no label).</span>
-<span class="sd">        y_label_2 : str | None, optional</span>
-<span class="sd">            Right y-axis label. Only used with ``var_2``. Default is None (no label).</span>
+<span class="sd">            Title shown above the figure. Default is None (no title).</span>
+<span class="sd">        y_title : str | list[str | None] | None, optional</span>
+<span class="sd">            Left y-axis label, e.g. ``"Speed (mph)"``. With subplots, a list with one entry per subplot (``None`` for no label), or one string used on every subplot. Default is None (no labels).</span>
+<span class="sd">        y_title_alt : str | list[str | None] | None, optional</span>
+<span class="sd">            Right y-axis label, same forms as ``y_title``. Ignored for subplots without ``vars_alt``. Default is None (no labels).</span>
 <span class="sd">        show_legend : bool, optional</span>
 <span class="sd">            Whether to show the legend listing each variable. Default is True.</span>
 <span class="sd">        max_points : int | None, optional</span>
@@ -527,16 +536,18 @@
 <span class="sd">        log_x : bool, optional</span>
 <span class="sd">            Use a logarithmic time (x) axis. Default is False (linear).</span>
 <span class="sd">        log_y : bool, optional</span>
-<span class="sd">            Use logarithmic y-axes (both left and right when ``var_2`` is given). Default is False (linear).</span>
+<span class="sd">            Use logarithmic scaling on every y-axis, left and right. Default is False (linear).</span>
 <span class="sd">        width : int, optional</span>
 <span class="sd">            Figure width in pixels. Default is PLOT_WIDTH (1200).</span>
-<span class="sd">        height : int, optional</span>
-<span class="sd">            Figure height in pixels. Default is PLOT_HEIGHT (700).</span>
+<span class="sd">        height : int | None, optional</span>
+<span class="sd">            Figure height in pixels. Default is None, which gives PLOT_HEIGHT (700) for one plot and SUBPLOT_HEIGHT (350) per subplot otherwise.</span>
+<span class="sd">        vertical_spacing : float, optional</span>
+<span class="sd">            Gap between subplots as a fraction of the figure height (0 to 1). Default is SUBPLOT_VERTICAL_SPACING (0.12).</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        go.Figure</span>
-<span class="sd">            Plotly figure. Change anything not exposed here (fonts, colors, margins, axis ranges, ...) with ``fig.update_layout``, ``fig.update_xaxes``, ``fig.update_yaxes`` or ``fig.update_traces`` before calling ``fig.show()``.</span>
+<span class="sd">            Plotly figure. Change anything not exposed here (fonts, colors, margins, axis ranges, ...) with ``fig.update_layout``, ``fig.update_xaxes``, ``fig.update_yaxes`` or ``fig.update_traces`` before calling ``fig.show()``. Target one subplot with ``row=i, col=1``, and its right axis with ``secondary_y=True``.</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
@@ -547,8 +558,15 @@
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
 <span class="sd">        &gt;&gt;&gt; fig = aly.plot("pcm.wheelSpeeds.frontRight")</span>
-<span class="sd">        &gt;&gt;&gt; fig = aly.plot(["pcm.wheelSpeeds.frontRight", "pcm.wheelSpeeds.frontLeft"], title="Front Wheel Speeds")</span>
-<span class="sd">        &gt;&gt;&gt; fig = aly.plot("pcm.moc.motor.requestedTorque", "pcm.wheelSpeeds.frontRight", ts_start=10.0, ts_end=30.0)</span>
+<span class="sd">        &gt;&gt;&gt; fig = aly.plot("pcm.wheelSpeeds.*", title="Wheel Speeds")</span>
+<span class="sd">        &gt;&gt;&gt; fig = aly.plot("pcm.moc.motor.requestedTorque", vars_alt="pcm.wheelSpeeds.frontRight", ts_start=10.0, ts_end=30.0)</span>
+<span class="sd">        &gt;&gt;&gt; # Two subplots: velocities alone, then attitude with steering angle on a right axis</span>
+<span class="sd">        &gt;&gt;&gt; fig = aly.plot(</span>
+<span class="sd">        ...     vars=[["pcm.vnav.bodyVelocity.*", "pcm.wheelSpeeds.frontRight"], ["pcm.vnav.rpy.*"]],</span>
+<span class="sd">        ...     vars_alt=[None, ["*.steeringWheel.angle"]],</span>
+<span class="sd">        ...     y_title=["Velocity (m/s)", "Attitude (deg)"],</span>
+<span class="sd">        ...     y_title_alt=[None, "Steering Angle (deg)"],</span>
+<span class="sd">        ... )</span>
 <span class="sd">        &gt;&gt;&gt; # Plot a derived DataInstance (e.g. average of two signals)</span>
 <span class="sd">        &gt;&gt;&gt; avg_speed = (aly.data["pcm.wheelSpeeds.frontRight"] + aly.data["pcm.wheelSpeeds.frontLeft"]) / 2.0</span>
 <span class="sd">        &gt;&gt;&gt; fig = aly.plot(avg_speed)</span>
@@ -556,144 +574,41 @@
 <span class="sd">        &gt;&gt;&gt; fig = aly.plot("bms.pack.current", log_y=True)</span>
 <span class="sd">        &gt;&gt;&gt; fig.update_layout(font_size=16)</span>
 <span class="sd">        """</span>
-        <span class="n">var_1_norm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_normalize_input</span><span class="p">(</span><span class="n">var_1</span><span class="p">)</span>
-        <span class="n">var_2_norm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_normalize_input</span><span class="p">(</span><span class="n">var_2</span><span class="p">)</span> <span class="k">if</span> <span class="n">var_2</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="n">left_variables</span> <span class="o">=</span> <span class="n">group_variables_by_subplot</span><span class="p">(</span><span class="nb">vars</span><span class="p">)</span>
+        <span class="n">n_subplots</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">left_variables</span><span class="p">)</span>
+        <span class="n">right_variables</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">n_subplots</span>
+            <span class="k">if</span> <span class="n">vars_alt</span> <span class="ow">is</span> <span class="kc">None</span>
+            <span class="k">else</span> <span class="n">group_variables_by_subplot</span><span class="p">(</span><span class="n">vars_alt</span><span class="p">)</span>
+        <span class="p">)</span>
 
         <span class="n">unit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">timestamp_unit</span>
-
-        <span class="c1"># Convert concat boundaries to seconds for the plotter</span>
-        <span class="n">vlines</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">concat_boundaries</span><span class="p">:</span>
-            <span class="n">vlines</span> <span class="o">=</span> <span class="p">[</span><span class="n">to_seconds</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">b</span><span class="p">),</span> <span class="n">unit</span><span class="p">)</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">concat_boundaries</span><span class="p">]</span>
-
-        <span class="c1"># Apply time range filter if specified (convert seconds -&gt; raw units for trim)</span>
-        <span class="k">if</span> <span class="n">ts_start</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">ts_end</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">start_raw</span> <span class="o">=</span> <span class="n">from_seconds</span><span class="p">(</span><span class="n">ts_start</span><span class="p">,</span> <span class="n">unit</span><span class="p">)</span> <span class="k">if</span> <span class="n">ts_start</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
-            <span class="n">end_raw</span> <span class="o">=</span> <span class="n">from_seconds</span><span class="p">(</span><span class="n">ts_end</span><span class="p">,</span> <span class="n">unit</span><span class="p">)</span> <span class="k">if</span> <span class="n">ts_end</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
-            <span class="n">var_1_norm</span> <span class="o">=</span> <span class="p">[</span><span class="n">di</span><span class="o">.</span><span class="n">trim</span><span class="p">(</span><span class="n">start_raw</span><span class="p">,</span> <span class="n">end_raw</span><span class="p">)</span> <span class="k">for</span> <span class="n">di</span> <span class="ow">in</span> <span class="n">var_1_norm</span><span class="p">]</span>
-            <span class="k">if</span> <span class="n">var_2_norm</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">var_2_norm</span> <span class="o">=</span> <span class="p">[</span><span class="n">di</span><span class="o">.</span><span class="n">trim</span><span class="p">(</span><span class="n">start_raw</span><span class="p">,</span> <span class="n">end_raw</span><span class="p">)</span> <span class="k">for</span> <span class="n">di</span> <span class="ow">in</span> <span class="n">var_2_norm</span><span class="p">]</span>
-
-        <span class="k">if</span> <span class="n">var_2_norm</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">plot_dual_axis</span><span class="p">(</span>
-                <span class="n">left_data_instances</span><span class="o">=</span><span class="n">var_1_norm</span><span class="p">,</span>
-                <span class="n">right_data_instances</span><span class="o">=</span><span class="n">var_2_norm</span><span class="p">,</span>
-                <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
-                <span class="n">left_y_axis_title</span><span class="o">=</span><span class="n">y_label_1</span><span class="p">,</span>
-                <span class="n">right_y_axis_title</span><span class="o">=</span><span class="n">y_label_2</span><span class="p">,</span>
-                <span class="n">show_legend</span><span class="o">=</span><span class="n">show_legend</span><span class="p">,</span>
-                <span class="n">timestamp_unit</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">timestamp_unit</span><span class="p">,</span>
-                <span class="n">vlines</span><span class="o">=</span><span class="n">vlines</span><span class="p">,</span>
-                <span class="n">max_points</span><span class="o">=</span><span class="n">max_points</span><span class="p">,</span>
-                <span class="n">log_x</span><span class="o">=</span><span class="n">log_x</span><span class="p">,</span>
-                <span class="n">log_y</span><span class="o">=</span><span class="n">log_y</span><span class="p">,</span>
-                <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span>
-                <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">,</span>
-            <span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">plot_single_axis</span><span class="p">(</span>
-                <span class="n">data_instances</span><span class="o">=</span><span class="n">var_1_norm</span><span class="p">,</span>
-                <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
-                <span class="n">y_axis_title</span><span class="o">=</span><span class="n">y_label_1</span><span class="p">,</span>
-                <span class="n">show_legend</span><span class="o">=</span><span class="n">show_legend</span><span class="p">,</span>
-                <span class="n">timestamp_unit</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">timestamp_unit</span><span class="p">,</span>
-                <span class="n">vlines</span><span class="o">=</span><span class="n">vlines</span><span class="p">,</span>
-                <span class="n">max_points</span><span class="o">=</span><span class="n">max_points</span><span class="p">,</span>
-                <span class="n">log_x</span><span class="o">=</span><span class="n">log_x</span><span class="p">,</span>
-                <span class="n">log_y</span><span class="o">=</span><span class="n">log_y</span><span class="p">,</span>
-                <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span>
-                <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">,</span>
-            <span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="Analyzer.subplots">
-<a class="viewcode-back" href="../../../_autosummary/perda.analyzer.analyzer.html#perda.analyzer.analyzer.Analyzer.subplots">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">subplots</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">rows</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">VariableInputs</span><span class="p">],</span>
-        <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">row_y_labels</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">ts_start</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">ts_end</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">show_legend</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-        <span class="n">log_x</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="n">log_y</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="n">width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">PLOT_WIDTH</span><span class="p">,</span>
-        <span class="n">height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">vertical_spacing</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">SUBPLOT_VERTICAL_SPACING</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Plot variables as vertically stacked subplots sharing one time axis.</span>
-
-<span class="sd">        Each entry in ``rows`` becomes one subplot row. Pass a list of variables for a row to overlay them on the same panel, or a single variable for a dedicated panel. Zooming the time axis zooms every row together.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        rows : Sequence[str | int | DataInstance | Sequence[str | int | DataInstance]]</span>
-<span class="sd">            One entry per subplot row, top to bottom. Each entry is a single variable (name, ID, or DataInstance) or a list of variables to overlay on that row.</span>
-<span class="sd">        title : str | None, optional</span>
-<span class="sd">            Title shown above the whole figure. Default is None (no title).</span>
-<span class="sd">        row_y_labels : list[str | None] | None, optional</span>
-<span class="sd">            Y-axis label for each row, in the same order as ``rows``. A ``None`` entry falls back to the variable names in that row. Default is None (every row uses its variable names).</span>
-<span class="sd">        ts_start : float | None, optional</span>
-<span class="sd">            Start of the time window in seconds on the log's clock. Earlier data is excluded from all rows. Default is None (from the start of the log).</span>
-<span class="sd">        ts_end : float | None, optional</span>
-<span class="sd">            End of the time window in seconds on the log's clock. Later data is excluded from all rows. Default is None (to the end of the log).</span>
-<span class="sd">        show_legend : bool, optional</span>
-<span class="sd">            Whether to show the legend listing each variable. Default is True.</span>
-<span class="sd">        log_x : bool, optional</span>
-<span class="sd">            Use a logarithmic time (x) axis. Default is False (linear).</span>
-<span class="sd">        log_y : bool, optional</span>
-<span class="sd">            Use logarithmic y-axes on every row. Default is False (linear).</span>
-<span class="sd">        width : int, optional</span>
-<span class="sd">            Figure width in pixels. Default is PLOT_WIDTH (1200).</span>
-<span class="sd">        height : int | None, optional</span>
-<span class="sd">            Figure height in pixels. Default is None, which gives SUBPLOT_HEIGHT (350) pixels per row.</span>
-<span class="sd">        vertical_spacing : float, optional</span>
-<span class="sd">            Gap between rows as a fraction of the figure height (0 to 1). Default is SUBPLOT_VERTICAL_SPACING (0.12).</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        go.Figure</span>
-<span class="sd">            Plotly figure. Change anything not exposed here with ``fig.update_layout``, ``fig.update_xaxes``, ``fig.update_yaxes`` or ``fig.update_traces`` before calling ``fig.show()``. Target one row with ``row=i, col=1``, e.g. ``fig.update_yaxes(type="log", row=2, col=1)``.</span>
-
-<span class="sd">        Examples</span>
-<span class="sd">        --------</span>
-<span class="sd">        &gt;&gt;&gt; fig = aly.subplots(["pcm.wheelSpeeds.frontRight", "pcm.moc.motor.requestedTorque"])</span>
-<span class="sd">        &gt;&gt;&gt; fig = aly.subplots(</span>
-<span class="sd">        ...     rows=[</span>
-<span class="sd">        ...         ["pcm.wheelSpeeds.frontRight", "pcm.wheelSpeeds.frontLeft"],</span>
-<span class="sd">        ...         "pcm.moc.motor.requestedTorque",</span>
-<span class="sd">        ...     ],</span>
-<span class="sd">        ...     title="Run Overview",</span>
-<span class="sd">        ...     row_y_labels=["Wheel Speed (mph)", "Torque (Nm)"],</span>
-<span class="sd">        ...     ts_start=5.0,</span>
-<span class="sd">        ...     ts_end=30.0,</span>
-<span class="sd">        ... )</span>
-<span class="sd">        """</span>
-        <span class="n">unit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">timestamp_unit</span>
-
         <span class="n">start_raw</span> <span class="o">=</span> <span class="n">from_seconds</span><span class="p">(</span><span class="n">ts_start</span><span class="p">,</span> <span class="n">unit</span><span class="p">)</span> <span class="k">if</span> <span class="n">ts_start</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
         <span class="n">end_raw</span> <span class="o">=</span> <span class="n">from_seconds</span><span class="p">(</span><span class="n">ts_end</span><span class="p">,</span> <span class="n">unit</span><span class="p">)</span> <span class="k">if</span> <span class="n">ts_end</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
 
-        <span class="n">normalized_rows</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">DataInstance</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">row_entry</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
-            <span class="n">row_dis</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_normalize_input</span><span class="p">(</span><span class="n">row_entry</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">start_raw</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">end_raw</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">row_dis</span> <span class="o">=</span> <span class="p">[</span><span class="n">di</span><span class="o">.</span><span class="n">trim</span><span class="p">(</span><span class="n">start_raw</span><span class="p">,</span> <span class="n">end_raw</span><span class="p">)</span> <span class="k">for</span> <span class="n">di</span> <span class="ow">in</span> <span class="n">row_dis</span><span class="p">]</span>
-            <span class="n">normalized_rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row_dis</span><span class="p">)</span>
+        <span class="n">vlines</span> <span class="o">=</span> <span class="p">[</span><span class="n">to_seconds</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">b</span><span class="p">),</span> <span class="n">unit</span><span class="p">)</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">concat_boundaries</span><span class="p">]</span>
 
-        <span class="k">return</span> <span class="n">data_instance_subplots</span><span class="p">(</span>
-            <span class="n">rows</span><span class="o">=</span><span class="n">normalized_rows</span><span class="p">,</span>
+        <span class="k">return</span> <span class="n">plot_time_series</span><span class="p">(</span>
+            <span class="n">rows</span><span class="o">=</span><span class="p">[</span>
+                <span class="n">lookup_subplot_data_instances</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">start_raw</span><span class="p">,</span> <span class="n">end_raw</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">left_variables</span>
+            <span class="p">],</span>
+            <span class="n">right_rows</span><span class="o">=</span><span class="p">[</span>
+                <span class="n">lookup_subplot_data_instances</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">start_raw</span><span class="p">,</span> <span class="n">end_raw</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">right_variables</span>
+            <span class="p">],</span>
+            <span class="n">timestamp_unit</span><span class="o">=</span><span class="n">unit</span><span class="p">,</span>
             <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
-            <span class="n">row_y_labels</span><span class="o">=</span><span class="n">row_y_labels</span><span class="p">,</span>
+            <span class="n">y_axis_titles</span><span class="o">=</span><span class="n">axis_titles_per_subplot</span><span class="p">(</span><span class="n">y_title</span><span class="p">,</span> <span class="n">n_subplots</span><span class="p">),</span>
+            <span class="n">right_y_axis_titles</span><span class="o">=</span><span class="n">axis_titles_per_subplot</span><span class="p">(</span><span class="n">y_title_alt</span><span class="p">,</span> <span class="n">n_subplots</span><span class="p">),</span>
             <span class="n">show_legend</span><span class="o">=</span><span class="n">show_legend</span><span class="p">,</span>
+            <span class="n">vlines</span><span class="o">=</span><span class="n">vlines</span><span class="p">,</span>
+            <span class="n">max_points</span><span class="o">=</span><span class="n">max_points</span><span class="p">,</span>
             <span class="n">log_x</span><span class="o">=</span><span class="n">log_x</span><span class="p">,</span>
             <span class="n">log_y</span><span class="o">=</span><span class="n">log_y</span><span class="p">,</span>
             <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span>
             <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">,</span>
             <span class="n">vertical_spacing</span><span class="o">=</span><span class="n">vertical_spacing</span><span class="p">,</span>
-            <span class="n">timestamp_unit</span><span class="o">=</span><span class="n">unit</span><span class="p">,</span>
         <span class="p">)</span></div>
 
 
@@ -809,23 +724,6 @@
             <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">,</span>
         <span class="p">)</span></div>
 
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">_normalize_input</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">input_data</span><span class="p">:</span> <span class="n">VariableInputs</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">DataInstance</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Normalize various input types to a list of DataInstances.</span>
-<span class="sd">        """</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_data</span><span class="p">,</span> <span class="n">DataInstance</span><span class="p">):</span>
-            <span class="k">return</span> <span class="p">[</span><span class="n">input_data</span><span class="p">]</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_data</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">)):</span>
-            <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">input_data</span><span class="p">]]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="p">[</span>
-                <span class="n">item</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">DataInstance</span><span class="p">)</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">item</span><span class="p">]</span>
-                <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">input_data</span>
-            <span class="p">]</span>
 
 <div class="viewcode-block" id="Analyzer.get_accel_times">
 <a class="viewcode-back" href="../../../_autosummary/perda.analyzer.analyzer.html#perda.analyzer.analyzer.Analyzer.get_accel_times">[docs]</a>

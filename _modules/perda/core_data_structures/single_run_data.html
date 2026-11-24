@@ -304,7 +304,9 @@
   <h1>Source code for perda.core_data_structures.single_run_data</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Sequence</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">overload</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">ConfigDict</span><span class="p">,</span> <span class="n">Field</span><span class="p">,</span> <span class="n">model_validator</span>
 
@@ -315,6 +317,9 @@
     <span class="n">VariableSemanticIndex</span><span class="p">,</span>
     <span class="n">variable_keyword_index_from_csv_mappings</span><span class="p">,</span>
 <span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.variable_patterns</span><span class="w"> </span><span class="kn">import</span> <span class="n">is_pattern</span><span class="p">,</span> <span class="n">match_pattern</span>
+
+<span class="n">VariableKey</span> <span class="o">=</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">DataInstance</span>
 
 
 <div class="viewcode-block" id="SingleRunData">
@@ -325,17 +330,22 @@
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
-<span class="sd">    All timestamps (``data_start_time``, ``data_end_time`` and every DataInstance's</span>
-<span class="sd">    ``timestamp_np``) are raw integers in ``timestamp_unit``, which is microseconds for</span>
-<span class="sd">    current logs. Helpers that take a ``source_time_unit`` or ``timestamp_unit`` argument</span>
-<span class="sd">    require it; pass ``data.timestamp_unit``.</span>
+<span class="sd">    All timestamps (``data_start_time``, ``data_end_time`` and every DataInstance's ``timestamp_np``) are</span>
+<span class="sd">    raw integers in ``timestamp_unit`` (milliseconds, microseconds, etc.). Helpers that take a ``source_time_unit``</span>
+<span class="sd">    or ``timestamp_unit`` argument require it; pass ``data.timestamp_unit``.</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
-<span class="sd">    &gt;&gt;&gt; from perda.units import to_seconds</span>
 <span class="sd">    &gt;&gt;&gt; data = aly.data</span>
 <span class="sd">    &gt;&gt;&gt; di = data["pcm.wheelSpeeds.frontRight"]</span>
 <span class="sd">    &gt;&gt;&gt; "pcm.wheelSpeeds.frontRight" in data</span>
+<span class="sd">    &gt;&gt;&gt; data["my.new.var"] = DataInstance(timestamp_np=ts, value_np=vals, label="My var", cpp_name="my.new.var")</span>
+<span class="sd">    &gt;&gt;&gt; data["my.existing.var"] = updated_di</span>
+<span class="sd">    &gt;&gt;&gt; vel_x, vel_y, vel_z = data["pcm.vnav.bodyVelocity.*"]   # wildcard, sorted by name</span>
+<span class="sd">    &gt;&gt;&gt; left, right = data["pcm.wheelSpeeds.frontLeft", "pcm.wheelSpeeds.frontRight"]</span>
+<span class="sd">    &gt;&gt;&gt; data["pcm.vnav.bodyVelocity.*"] = vel_x * 2, vel_y * 2, vel_z * 2</span>
+<span class="sd">    &gt;&gt;&gt; data["derived.a", "derived.b"] = a_di, b_di</span>
+<span class="sd">    &gt;&gt;&gt; from perda.units import to_seconds</span>
 <span class="sd">    &gt;&gt;&gt; duration_s = to_seconds(data.data_end_time - data.data_start_time, data.timestamp_unit)</span>
 <span class="sd">    """</span>
 
@@ -392,165 +402,122 @@
             <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_var_id_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">DataInstance</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataInstance</span><span class="p">:</span>
+    <span class="nd">@overload</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">VariableKey</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataInstance</span><span class="p">:</span> <span class="o">...</span>
+
+    <span class="nd">@overload</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">VariableKey</span><span class="p">,</span> <span class="o">...</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">DataInstance</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span> <span class="o">...</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">VariableKey</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">VariableKey</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataInstance</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">DataInstance</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Dictionary-like access to DataInstance by variable ID or variable name.</span>
+<span class="sd">        Dictionary-like access by variable name, variable ID, or ``*`` wildcard pattern.</span>
 
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        input_var_id_name : str | int | DataInstance</span>
-<span class="sd">            Variable ID (int), variable name (str), or DataInstance to retrieve</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        DataInstance</span>
-<span class="sd">            DataInstance corresponding to the input</span>
+<span class="sd">        A plain name, ID, or DataInstance returns one DataInstance. A wildcard pattern or a</span>
+<span class="sd">        tuple of keys returns a tuple of DataInstances, with each pattern expanded to its</span>
+<span class="sd">        matches in sorted name order. A DataInstance key is returned unchanged.</span>
 <span class="sd">        """</span>
-        <span class="c1"># Dummy return for plotting function for convenience</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_var_id_name</span><span class="p">,</span> <span class="n">DataInstance</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">input_var_id_name</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">di</span> <span class="k">for</span> <span class="n">sub_key</span> <span class="ow">in</span> <span class="n">key</span> <span class="k">for</span> <span class="n">di</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lookup</span><span class="p">(</span><span class="n">sub_key</span><span class="p">))</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">is_pattern</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lookup</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lookup</span><span class="p">(</span><span class="n">key</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
 
-        <span class="c1"># If input is a variable ID</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_var_id_name</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">input_var_id_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">id_to_instance</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Cannot find variable ID: </span><span class="si">{</span><span class="n">input_var_id_name</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">id_to_instance</span><span class="p">[</span><span class="n">input_var_id_name</span><span class="p">]</span>
-
-        <span class="c1"># If input is variable name</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_var_id_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">input_var_id_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cpp_name_to_id</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Cannot find variable name: </span><span class="si">{</span><span class="n">input_var_id_name</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">id_to_instance</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">cpp_name_to_id</span><span class="p">[</span><span class="n">input_var_id_name</span><span class="p">]]</span>
-
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Input must be a string, int, or DataInstance."</span><span class="p">)</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="fm">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cpp_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">di</span><span class="p">:</span> <span class="n">DataInstance</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__setitem__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
+        <span class="n">value</span><span class="p">:</span> <span class="n">DataInstance</span> <span class="o">|</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">DataInstance</span><span class="p">],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Add or replace a variable using dictionary-style assignment.</span>
+<span class="sd">        Add or replace one or more variables using dictionary-style assignment.</span>
 
-<span class="sd">        Dispatches to ``replace`` if ``cpp_name`` already exists, else ``add``.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        cpp_name : str</span>
-<span class="sd">            C++ variable name to insert or overwrite.</span>
-<span class="sd">        di : DataInstance</span>
-<span class="sd">            DataInstance to store. Must have non-None ``label`` and ``cpp_name``.</span>
-
-<span class="sd">        Examples</span>
-<span class="sd">        --------</span>
-<span class="sd">        &gt;&gt;&gt; data["my.new.var"] = DataInstance(timestamp_np=ts, value_np=vals, label="My var", cpp_name="my.new.var")</span>
-<span class="sd">        &gt;&gt;&gt; data["my.existing.var"] = updated_di</span>
+<span class="sd">        ``key`` may be a name, an existing ID, a ``*`` wildcard pattern, or a tuple of these. Patterns</span>
+<span class="sd">        expand to existing names in sorted order. A tuple of names in key are paired with the</span>
+<span class="sd">        DataInstances in ``value`` by position, so the counts must match.</span>
 <span class="sd">        """</span>
-        <span class="k">if</span> <span class="n">cpp_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">cpp_name</span><span class="p">,</span> <span class="n">di</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">cpp_name</span><span class="p">,</span> <span class="n">di</span><span class="p">)</span>
-
-<div class="viewcode-block" id="SingleRunData.add">
-<a class="viewcode-back" href="../../../_autosummary/perda.core_data_structures.single_run_data.html#perda.core_data_structures.single_run_data.SingleRunData.add">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cpp_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">di</span><span class="p">:</span> <span class="n">DataInstance</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Insert a new derived DataInstance using a synthetic negative ID.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        cpp_name : str</span>
-<span class="sd">            C++ variable name key for the new variable.</span>
-<span class="sd">        di : DataInstance</span>
-<span class="sd">            DataInstance to insert.</span>
-
-<span class="sd">        Examples</span>
-<span class="sd">        --------</span>
-<span class="sd">        &gt;&gt;&gt; power = aly.data["bms.pack.voltage"] * aly.data["bms.pack.current"]</span>
-<span class="sd">        &gt;&gt;&gt; aly.data.add("derived.pack.power", power)</span>
-<span class="sd">        &gt;&gt;&gt; fig = aly.plot("derived.pack.power")</span>
-<span class="sd">        """</span>
-        <span class="k">if</span> <span class="n">cpp_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"'</span><span class="si">{</span><span class="n">cpp_name</span><span class="si">}</span><span class="s2">' already exists; use replace() to overwrite."</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">di</span><span class="o">.</span><span class="n">cpp_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">di</span><span class="o">.</span><span class="n">cpp_name</span> <span class="o">!=</span> <span class="n">cpp_name</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Using </span><span class="si">{</span><span class="n">cpp_name</span><span class="si">}</span><span class="s2"> as DataInstance.cpp_name"</span><span class="p">)</span>
-
-        <span class="n">synthetic_id</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id_to_instance</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">di</span><span class="o">.</span><span class="n">var_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">di</span><span class="o">.</span><span class="n">var_id</span> <span class="o">!=</span> <span class="n">synthetic_id</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Inserting DataInstance with new var_id </span><span class="si">{</span><span class="n">synthetic_id</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-
-        <span class="n">stored</span> <span class="o">=</span> <span class="n">DataInstance</span><span class="p">(</span>
-            <span class="n">timestamp_np</span><span class="o">=</span><span class="n">di</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">,</span>
-            <span class="n">value_np</span><span class="o">=</span><span class="n">di</span><span class="o">.</span><span class="n">value_np</span><span class="p">,</span>
-            <span class="n">label</span><span class="o">=</span><span class="n">di</span><span class="o">.</span><span class="n">label</span><span class="p">,</span>
-            <span class="n">var_id</span><span class="o">=</span><span class="n">synthetic_id</span><span class="p">,</span>
-            <span class="n">cpp_name</span><span class="o">=</span><span class="n">cpp_name</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">id_to_instance</span><span class="p">[</span><span class="n">synthetic_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">stored</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">cpp_name_to_id</span><span class="p">[</span><span class="n">cpp_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">synthetic_id</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">id_to_cpp_name</span><span class="p">[</span><span class="n">synthetic_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">cpp_name</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">id_to_descript</span><span class="p">[</span><span class="n">synthetic_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">di</span><span class="o">.</span><span class="n">label</span> <span class="ow">or</span> <span class="s2">""</span></div>
-
-
-<div class="viewcode-block" id="SingleRunData.replace">
-<a class="viewcode-back" href="../../../_autosummary/perda.core_data_structures.single_run_data.html#perda.core_data_structures.single_run_data.SingleRunData.replace">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">replace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cpp_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">di</span><span class="p">:</span> <span class="n">DataInstance</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Overwrite the values of an existing variable in-place.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        cpp_name : str</span>
-<span class="sd">          C++ variable name of the variable to replace.</span>
-<span class="sd">        di : DataInstance</span>
-<span class="sd">          DataInstance whose ``value_np`` that replaces the stored one.</span>
-
-<span class="sd">        Examples</span>
-<span class="sd">        --------</span>
-<span class="sd">        &gt;&gt;&gt; voltage = aly.data["bms.pack.voltage"]</span>
-<span class="sd">        &gt;&gt;&gt; aly.data.replace("bms.pack.voltage", voltage / 1000.0)</span>
-<span class="sd">        """</span>
-        <span class="k">if</span> <span class="n">cpp_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">"'</span><span class="si">{</span><span class="n">cpp_name</span><span class="si">}</span><span class="s2">' not found; use add() to insert a new variable."</span>
+        <span class="n">sub_keys</span> <span class="o">=</span> <span class="n">key</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span> <span class="k">else</span> <span class="p">(</span><span class="n">key</span><span class="p">,)</span>
+        <span class="n">cpp_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">name</span> <span class="k">for</span> <span class="n">sub_key</span> <span class="ow">in</span> <span class="n">sub_keys</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolve</span><span class="p">(</span><span class="n">sub_key</span><span class="p">)]</span>
+        <span class="n">instances</span> <span class="o">=</span> <span class="p">[</span><span class="n">value</span><span class="p">]</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">DataInstance</span><span class="p">)</span> <span class="k">else</span> <span class="nb">list</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cpp_names</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">instances</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"Cannot assign </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">instances</span><span class="p">)</span><span class="si">}</span><span class="s2"> DataInstance(s) to </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">cpp_names</span><span class="p">)</span><span class="si">}</span><span class="s2"> variable(s): </span><span class="si">{</span><span class="n">cpp_names</span><span class="si">}</span><span class="s2">"</span>
             <span class="p">)</span>
+        <span class="k">for</span> <span class="n">cpp_name</span><span class="p">,</span> <span class="n">di</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">cpp_names</span><span class="p">,</span> <span class="n">instances</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_assign</span><span class="p">(</span><span class="n">cpp_name</span><span class="p">,</span> <span class="n">di</span><span class="p">)</span>
 
-        <span class="n">var_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cpp_name_to_id</span><span class="p">[</span><span class="n">cpp_name</span><span class="p">]</span>
-        <span class="n">old</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">id_to_instance</span><span class="p">[</span><span class="n">var_id</span><span class="p">]</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Check if a variable ID, variable name, or any match of a wildcard pattern exists."""</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="ne">AttributeError</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
 
-        <span class="k">if</span> <span class="n">di</span><span class="o">.</span><span class="n">cpp_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">di</span><span class="o">.</span><span class="n">cpp_name</span> <span class="o">!=</span> <span class="n">cpp_name</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Retaining old DataInstance.cpp_name </span><span class="si">{</span><span class="n">cpp_name</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">di</span><span class="o">.</span><span class="n">var_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">di</span><span class="o">.</span><span class="n">var_id</span> <span class="o">!=</span> <span class="n">var_id</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Retaining old DataInstance.var_id </span><span class="si">{</span><span class="n">var_id</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">di</span><span class="o">.</span><span class="n">label</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">di</span><span class="o">.</span><span class="n">label</span> <span class="o">!=</span> <span class="n">old</span><span class="o">.</span><span class="n">label</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Retaining old DataInstance.label </span><span class="si">{</span><span class="n">old</span><span class="o">.</span><span class="n">label</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_lookup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">VariableKey</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">DataInstance</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">DataInstance</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">key</span><span class="p">,)</span>
+        <span class="n">names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolve</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="n">missing</span> <span class="o">=</span> <span class="p">[</span><span class="n">name</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span> <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cpp_name_to_id</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">missing</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Cannot find variable name: </span><span class="si">{</span><span class="n">missing</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id_to_instance</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">cpp_name_to_id</span><span class="p">[</span><span class="n">name</span><span class="p">]]</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">)</span>
 
+    <span class="k">def</span><span class="w"> </span><span class="nf">_resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">id_to_cpp_name</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Cannot find variable ID: </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">id_to_cpp_name</span><span class="p">[</span><span class="n">key</span><span class="p">]]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Key must be a string, int, or DataInstance."</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">is_pattern</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="n">names</span> <span class="o">=</span> <span class="n">match_pattern</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cpp_name_to_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">names</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"No variable names match pattern: </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">names</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_assign</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cpp_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">di</span><span class="p">:</span> <span class="n">DataInstance</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">cpp_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cpp_name_to_id</span><span class="p">:</span>
+            <span class="n">var_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cpp_name_to_id</span><span class="p">[</span><span class="n">cpp_name</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">di</span><span class="o">.</span><span class="n">var_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">di</span><span class="o">.</span><span class="n">var_id</span> <span class="o">!=</span> <span class="n">var_id</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">"Cannot change var_id of '</span><span class="si">{</span><span class="n">cpp_name</span><span class="si">}</span><span class="s2">' from </span><span class="si">{</span><span class="n">var_id</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">di</span><span class="o">.</span><span class="n">var_id</span><span class="si">}</span><span class="s2">"</span>
+                <span class="p">)</span>
+            <span class="k">if</span> <span class="n">di</span><span class="o">.</span><span class="n">cpp_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">di</span><span class="o">.</span><span class="n">cpp_name</span> <span class="o">!=</span> <span class="n">cpp_name</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">"Cannot store DataInstance named '</span><span class="si">{</span><span class="n">di</span><span class="o">.</span><span class="n">cpp_name</span><span class="si">}</span><span class="s2">' under '</span><span class="si">{</span><span class="n">cpp_name</span><span class="si">}</span><span class="s2">'"</span>
+                <span class="p">)</span>
+            <span class="n">label</span> <span class="o">=</span> <span class="n">di</span><span class="o">.</span><span class="n">label</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">id_to_instance</span><span class="p">[</span><span class="n">var_id</span><span class="p">]</span><span class="o">.</span><span class="n">label</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">id_to_instance</span><span class="p">[</span><span class="n">var_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">DataInstance</span><span class="p">(</span>
+                <span class="n">timestamp_np</span><span class="o">=</span><span class="n">di</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">,</span>
+                <span class="n">value_np</span><span class="o">=</span><span class="n">di</span><span class="o">.</span><span class="n">value_np</span><span class="p">,</span>
+                <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span>
+                <span class="n">var_id</span><span class="o">=</span><span class="n">var_id</span><span class="p">,</span>
+                <span class="n">cpp_name</span><span class="o">=</span><span class="n">cpp_name</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">id_to_descript</span><span class="p">[</span><span class="n">var_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">label</span> <span class="ow">or</span> <span class="s2">""</span>
+            <span class="k">return</span>
+
+        <span class="n">var_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_free_var_id</span><span class="p">(</span><span class="n">di</span><span class="o">.</span><span class="n">var_id</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">id_to_instance</span><span class="p">[</span><span class="n">var_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">DataInstance</span><span class="p">(</span>
             <span class="n">timestamp_np</span><span class="o">=</span><span class="n">di</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">,</span>
             <span class="n">value_np</span><span class="o">=</span><span class="n">di</span><span class="o">.</span><span class="n">value_np</span><span class="p">,</span>
             <span class="n">label</span><span class="o">=</span><span class="n">di</span><span class="o">.</span><span class="n">label</span><span class="p">,</span>
-            <span class="n">var_id</span><span class="o">=</span><span class="n">old</span><span class="o">.</span><span class="n">var_id</span><span class="p">,</span>
-            <span class="n">cpp_name</span><span class="o">=</span><span class="n">old</span><span class="o">.</span><span class="n">cpp_name</span><span class="p">,</span>
-        <span class="p">)</span></div>
+            <span class="n">var_id</span><span class="o">=</span><span class="n">var_id</span><span class="p">,</span>
+            <span class="n">cpp_name</span><span class="o">=</span><span class="n">cpp_name</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cpp_name_to_id</span><span class="p">[</span><span class="n">cpp_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">var_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">id_to_cpp_name</span><span class="p">[</span><span class="n">var_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">cpp_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">id_to_descript</span><span class="p">[</span><span class="n">var_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">di</span><span class="o">.</span><span class="n">label</span> <span class="ow">or</span> <span class="s2">""</span>
 
-
-    <span class="k">def</span><span class="w"> </span><span class="fm">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_var_id_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Check if variable ID or variable name exists in the data.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        input_var_id_name : str | int</span>
-<span class="sd">            Variable ID or variable name to check</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        bool</span>
-<span class="sd">            True if the variable ID or variable name exists in the data</span>
-<span class="sd">        """</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="bp">self</span><span class="p">[</span><span class="n">input_var_id_name</span><span class="p">]</span>
-            <span class="k">return</span> <span class="kc">True</span>
-        <span class="k">except</span> <span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="ne">AttributeError</span><span class="p">):</span>
-            <span class="k">return</span> <span class="kc">False</span></div>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_free_var_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">preferred</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">preferred</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">preferred</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">id_to_instance</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">preferred</span>
+        <span class="n">var_id</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id_to_instance</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="k">while</span> <span class="n">var_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">id_to_instance</span><span class="p">:</span>
+            <span class="n">var_id</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">var_id</span></div>
 
 </pre></div>
 

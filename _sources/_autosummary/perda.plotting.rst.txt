@@ -22,4 +22,3 @@ perda.plotting
    parametric_plot
    parametric_trimmer
    scatter_histogram_plotter
-   subplots

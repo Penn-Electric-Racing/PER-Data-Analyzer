@@ -306,13 +306,14 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Iterator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">Sequence</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">plotly.graph_objects</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">go</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">Field</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">..core_data_structures.data_instance</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataInstance</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">..plotting.data_instance_plotter</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_single_axis</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..plotting.data_instance_plotter</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_time_series</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..plotting.defaults</span><span class="w"> </span><span class="kn">import</span> <span class="n">PLOT_WIDTH</span><span class="p">,</span> <span class="n">SUBPLOT_VERTICAL_SPACING</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..units</span><span class="w"> </span><span class="kn">import</span> <span class="n">Timescale</span><span class="p">,</span> <span class="n">convert_time</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..utils.data_summary</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataInstanceSummary</span><span class="p">,</span> <span class="n">data_instance_summary</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.analyzer</span><span class="w"> </span><span class="kn">import</span> <span class="n">Analyzer</span>
@@ -566,67 +567,65 @@
 <a class="viewcode-back" href="../../../_autosummary/perda.analyzer.run_collection.html#perda.analyzer.run_collection.RunCollection.plot_comparison">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">plot_comparison</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">cpp_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="nb">vars</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
         <span class="n">max_points</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">log_x</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">log_y</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">PLOT_WIDTH</span><span class="p">,</span>
+        <span class="n">height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">vertical_spacing</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">SUBPLOT_VERTICAL_SPACING</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Overlay a variable from every run in the collection on a single plot.</span>
+<span class="sd">        Overlay variables from every run in the collection, one stacked subplot per variable.</span>
 
-<span class="sd">        Each run's timestamps are shifted so that all runs start at t = 0.</span>
+<span class="sd">        Each run's timestamps are shifted so that all runs start at t = 0. Runs missing a</span>
+<span class="sd">        variable are skipped in that variable's subplot.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        cpp_name : str</span>
-<span class="sd">            C++ name of the variable to compare.</span>
+<span class="sd">        vars : str | Sequence[str]</span>
+<span class="sd">            C++ name of the variable to compare, or a list of names for one subplot each, top to bottom.</span>
 <span class="sd">        max_points : int | None, optional</span>
 <span class="sd">            Maximum number of points drawn per run. Longer signals are evenly downsampled (every Nth point), which speeds up rendering. Default is None (draw every point).</span>
 <span class="sd">        log_x : bool, optional</span>
 <span class="sd">            Use a logarithmic time (x) axis. Default is False (linear).</span>
 <span class="sd">        log_y : bool, optional</span>
-<span class="sd">            Use a logarithmic y-axis. Default is False (linear).</span>
+<span class="sd">            Use logarithmic y-axes. Default is False (linear).</span>
+<span class="sd">        width : int, optional</span>
+<span class="sd">            Figure width in pixels. Default is PLOT_WIDTH (1200).</span>
+<span class="sd">        height : int | None, optional</span>
+<span class="sd">            Figure height in pixels. Default is None, which gives PLOT_HEIGHT for one subplot and SUBPLOT_HEIGHT per subplot otherwise.</span>
+<span class="sd">        vertical_spacing : float, optional</span>
+<span class="sd">            Gap between subplots as a fraction of the figure height (0 to 1). Default is SUBPLOT_VERTICAL_SPACING (0.12).</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        go.Figure</span>
-<span class="sd">            Plotly figure with one trace per run that contains the variable. Change anything not exposed here (size, fonts, colors, ...) with ``fig.update_layout`` or ``fig.update_traces`` before calling ``fig.show()``.</span>
+<span class="sd">            Plotly figure with one trace per run and variable. Change anything not exposed here (fonts, colors, ...) with ``fig.update_layout`` or ``fig.update_traces`` before calling ``fig.show()``.</span>
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
 <span class="sd">        &gt;&gt;&gt; fig = col.plot_comparison("pcm.wheelSpeeds.frontLeft", max_points=20000)</span>
+<span class="sd">        &gt;&gt;&gt; fig = col.plot_comparison(["pcm.wheelSpeeds.frontLeft", "ludwig.steeringWheel.angle"])</span>
 <span class="sd">        """</span>
-        <span class="n">overlaid</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">cpp_names</span> <span class="o">=</span> <span class="p">[</span><span class="nb">vars</span><span class="p">]</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">vars</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">else</span> <span class="nb">list</span><span class="p">(</span><span class="nb">vars</span><span class="p">)</span>
+        <span class="n">rows</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">DataInstance</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[[]</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">cpp_names</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">run</span><span class="p">,</span> <span class="n">analyzer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iter_analyzers</span><span class="p">():</span>
-            <span class="k">if</span> <span class="n">cpp_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">analyzer</span><span class="o">.</span><span class="n">data</span><span class="p">:</span>
-                <span class="k">continue</span>
-            <span class="n">di</span> <span class="o">=</span> <span class="n">analyzer</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">cpp_name</span><span class="p">]</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">di</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="k">continue</span>
+            <span class="k">for</span> <span class="n">row</span><span class="p">,</span> <span class="n">cpp_name</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">rows</span><span class="p">,</span> <span class="n">cpp_names</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">cpp_name</span> <span class="ow">in</span> <span class="n">analyzer</span><span class="o">.</span><span class="n">data</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">analyzer</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">cpp_name</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">row</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_shift_to_run_start</span><span class="p">(</span><span class="n">run</span><span class="p">,</span> <span class="n">analyzer</span><span class="p">,</span> <span class="n">cpp_name</span><span class="p">))</span>
 
-            <span class="n">relative_timestamps</span> <span class="o">=</span> <span class="n">di</span><span class="o">.</span><span class="n">timestamp_np</span> <span class="o">-</span> <span class="n">analyzer</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">data_start_time</span>
-            <span class="n">overlaid</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                <span class="n">DataInstance</span><span class="p">(</span>
-                    <span class="n">timestamp_np</span><span class="o">=</span><span class="n">convert_time</span><span class="p">(</span>
-                        <span class="n">relative_timestamps</span><span class="p">,</span>
-                        <span class="n">analyzer</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">timestamp_unit</span><span class="p">,</span>
-                        <span class="n">COMPARISON_TIMESTAMP_UNIT</span><span class="p">,</span>
-                    <span class="p">),</span>
-                    <span class="n">value_np</span><span class="o">=</span><span class="n">di</span><span class="o">.</span><span class="n">value_np</span><span class="p">,</span>
-                    <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">run</span><span class="o">.</span><span class="n">file_path</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">di</span><span class="o">.</span><span class="n">label</span><span class="si">}</span><span class="s2">)"</span><span class="p">,</span>
-                    <span class="n">var_id</span><span class="o">=</span><span class="n">di</span><span class="o">.</span><span class="n">var_id</span><span class="p">,</span>
-                    <span class="n">cpp_name</span><span class="o">=</span><span class="n">di</span><span class="o">.</span><span class="n">cpp_name</span><span class="p">,</span>
-                <span class="p">)</span>
-            <span class="p">)</span>
-
-        <span class="k">return</span> <span class="n">plot_single_axis</span><span class="p">(</span>
-            <span class="n">overlaid</span><span class="p">,</span>
-            <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Multi-Log Comparison: </span><span class="si">{</span><span class="n">cpp_name</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
-            <span class="n">y_axis_title</span><span class="o">=</span><span class="n">cpp_name</span><span class="p">,</span>
+        <span class="k">return</span> <span class="n">plot_time_series</span><span class="p">(</span>
+            <span class="n">rows</span><span class="o">=</span><span class="n">rows</span><span class="p">,</span>
+            <span class="n">title</span><span class="o">=</span><span class="s2">"Multi-Log Comparison"</span><span class="p">,</span>
+            <span class="n">y_axis_titles</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">cpp_names</span><span class="p">),</span>
             <span class="n">timestamp_unit</span><span class="o">=</span><span class="n">COMPARISON_TIMESTAMP_UNIT</span><span class="p">,</span>
             <span class="n">max_points</span><span class="o">=</span><span class="n">max_points</span><span class="p">,</span>
             <span class="n">log_x</span><span class="o">=</span><span class="n">log_x</span><span class="p">,</span>
             <span class="n">log_y</span><span class="o">=</span><span class="n">log_y</span><span class="p">,</span>
+            <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span>
+            <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">,</span>
+            <span class="n">vertical_spacing</span><span class="o">=</span><span class="n">vertical_spacing</span><span class="p">,</span>
         <span class="p">)</span></div>
 
 
@@ -660,6 +659,24 @@
         <span class="p">}</span></div>
 </div>
 
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_shift_to_run_start</span><span class="p">(</span>
+    <span class="n">run</span><span class="p">:</span> <span class="n">RunMetadata</span><span class="p">,</span> <span class="n">analyzer</span><span class="p">:</span> <span class="n">Analyzer</span><span class="p">,</span> <span class="n">cpp_name</span><span class="p">:</span> <span class="nb">str</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataInstance</span><span class="p">:</span>
+    <span class="n">di</span> <span class="o">=</span> <span class="n">analyzer</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">cpp_name</span><span class="p">]</span>
+    <span class="n">relative_timestamps</span> <span class="o">=</span> <span class="n">di</span><span class="o">.</span><span class="n">timestamp_np</span> <span class="o">-</span> <span class="n">analyzer</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">data_start_time</span>
+    <span class="k">return</span> <span class="n">DataInstance</span><span class="p">(</span>
+        <span class="n">timestamp_np</span><span class="o">=</span><span class="n">convert_time</span><span class="p">(</span>
+            <span class="n">relative_timestamps</span><span class="p">,</span>
+            <span class="n">analyzer</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">timestamp_unit</span><span class="p">,</span>
+            <span class="n">COMPARISON_TIMESTAMP_UNIT</span><span class="p">,</span>
+        <span class="p">),</span>
+        <span class="n">value_np</span><span class="o">=</span><span class="n">di</span><span class="o">.</span><span class="n">value_np</span><span class="p">,</span>
+        <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">run</span><span class="o">.</span><span class="n">file_path</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">di</span><span class="o">.</span><span class="n">label</span><span class="si">}</span><span class="s2">)"</span><span class="p">,</span>
+        <span class="n">var_id</span><span class="o">=</span><span class="n">di</span><span class="o">.</span><span class="n">var_id</span><span class="p">,</span>
+        <span class="n">cpp_name</span><span class="o">=</span><span class="n">di</span><span class="o">.</span><span class="n">cpp_name</span><span class="p">,</span>
+    <span class="p">)</span>
 </pre></div>
 
                 </article>

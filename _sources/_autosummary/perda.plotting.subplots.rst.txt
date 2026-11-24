@@ -1,8 +1,0 @@
-perda.plotting.subplots
-=======================
-
-.. automodule:: perda.plotting.subplots
-   :members:
-   :undoc-members:
-   :show-inheritance:
-

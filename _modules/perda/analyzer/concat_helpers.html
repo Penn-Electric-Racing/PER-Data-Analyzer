@@ -437,7 +437,8 @@
             <span class="n">label</span> <span class="o">=</span> <span class="n">di_first</span><span class="o">.</span><span class="n">label</span>
             <span class="n">descript</span> <span class="o">=</span> <span class="n">first_descript</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">assert</span> <span class="n">di_second</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="n">di_second</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Variable '</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">' is missing from both runs"</span><span class="p">)</span>
             <span class="n">merged_ts</span> <span class="o">=</span> <span class="n">di_second</span><span class="o">.</span><span class="n">timestamp_np</span> <span class="o">+</span> <span class="n">shift</span>
             <span class="n">merged_vals</span> <span class="o">=</span> <span class="n">di_second</span><span class="o">.</span><span class="n">value_np</span>
             <span class="n">label</span> <span class="o">=</span> <span class="n">di_second</span><span class="o">.</span><span class="n">label</span>

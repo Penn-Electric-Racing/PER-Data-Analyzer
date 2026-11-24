@@ -51,7 +51,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="perda.analyzer.run_collection_factory" href="perda.analyzer.run_collection_factory.html" />
-    <link rel="prev" title="perda.analyzer.csv" href="perda.analyzer.csv.html" />
+    <link rel="prev" title="perda.analyzer.plot_inputs" href="perda.analyzer.plot_inputs.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
@@ -263,6 +263,7 @@
 <li class="toctree-l3"><a class="reference internal" href="perda.analyzer.analyzer_factory.html">perda.analyzer.analyzer_factory</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.analyzer.concat_helpers.html">perda.analyzer.concat_helpers</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.analyzer.csv.html">perda.analyzer.csv</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.analyzer.plot_inputs.html">perda.analyzer.plot_inputs</a></li>
 <li class="toctree-l3 current active"><a class="current reference internal" href="#">perda.analyzer.run_collection</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.analyzer.run_collection_factory.html">perda.analyzer.run_collection_factory</a></li>
 </ul>
@@ -277,6 +278,7 @@
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.search_indexes.html">perda.core_data_structures.search_indexes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.single_run_data.html">perda.core_data_structures.single_run_data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.split_helpers.html">perda.core_data_structures.split_helpers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.variable_patterns.html">perda.core_data_structures.variable_patterns</a></li>
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="perda.live.html">perda.live</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -294,7 +296,6 @@
 <li class="toctree-l3"><a class="reference internal" href="perda.plotting.parametric_plot.html">perda.plotting.parametric_plot</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.plotting.parametric_trimmer.html">perda.plotting.parametric_trimmer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.plotting.scatter_histogram_plotter.html">perda.plotting.scatter_histogram_plotter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="perda.plotting.subplots.html">perda.plotting.subplots</a></li>
 </ul>
 </details></li>
 <li class="toctree-l2"><a class="reference internal" href="perda.server.html">perda.server</a></li>
@@ -526,20 +527,24 @@ with <code class="docutils literal notranslate"><span class="pre">filter</span><
 
 <dl class="py method">
 <dt class="sig sig-object py" id="perda.analyzer.run_collection.RunCollection.plot_comparison">
-<span class="sig-name descname"><span class="pre">plot_comparison</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cpp_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/analyzer/run_collection.html#RunCollection.plot_comparison"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.analyzer.run_collection.RunCollection.plot_comparison" title="Link to this definition">#</a></dt>
-<dd><p>Overlay a variable from every run in the collection on a single plot.</p>
-<p>Each run’s timestamps are shifted so that all runs start at t = 0.</p>
+<span class="sig-name descname"><span class="pre">plot_comparison</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vars</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertical_spacing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.12</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/analyzer/run_collection.html#RunCollection.plot_comparison"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.analyzer.run_collection.RunCollection.plot_comparison" title="Link to this definition">#</a></dt>
+<dd><p>Overlay variables from every run in the collection, one stacked subplot per variable.</p>
+<p>Each run’s timestamps are shifted so that all runs start at t = 0. Runs missing a
+variable are skipped in that variable’s subplot.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>cpp_name</strong> (<em>str</em>) – C++ name of the variable to compare.</p></li>
+<li><p><strong>vars</strong> (<em>str</em><em> | </em><em>Sequence</em><em>[</em><em>str</em><em>]</em>) – C++ name of the variable to compare, or a list of names for one subplot each, top to bottom.</p></li>
 <li><p><strong>max_points</strong> (<em>int</em><em> | </em><em>None</em><em>, </em><em>optional</em>) – Maximum number of points drawn per run. Longer signals are evenly downsampled (every Nth point), which speeds up rendering. Default is None (draw every point).</p></li>
 <li><p><strong>log_x</strong> (<em>bool</em><em>, </em><em>optional</em>) – Use a logarithmic time (x) axis. Default is False (linear).</p></li>
-<li><p><strong>log_y</strong> (<em>bool</em><em>, </em><em>optional</em>) – Use a logarithmic y-axis. Default is False (linear).</p></li>
+<li><p><strong>log_y</strong> (<em>bool</em><em>, </em><em>optional</em>) – Use logarithmic y-axes. Default is False (linear).</p></li>
+<li><p><strong>width</strong> (<em>int</em><em>, </em><em>optional</em>) – Figure width in pixels. Default is PLOT_WIDTH (1200).</p></li>
+<li><p><strong>height</strong> (<em>int</em><em> | </em><em>None</em><em>, </em><em>optional</em>) – Figure height in pixels. Default is None, which gives PLOT_HEIGHT for one subplot and SUBPLOT_HEIGHT per subplot otherwise.</p></li>
+<li><p><strong>vertical_spacing</strong> (<em>float</em><em>, </em><em>optional</em>) – Gap between subplots as a fraction of the figure height (0 to 1). Default is SUBPLOT_VERTICAL_SPACING (0.12).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Plotly figure with one trace per run that contains the variable. Change anything not exposed here (size, fonts, colors, …) with <code class="docutils literal notranslate"><span class="pre">fig.update_layout</span></code> or <code class="docutils literal notranslate"><span class="pre">fig.update_traces</span></code> before calling <code class="docutils literal notranslate"><span class="pre">fig.show()</span></code>.</p>
+<dd class="field-even"><p>Plotly figure with one trace per run and variable. Change anything not exposed here (fonts, colors, …) with <code class="docutils literal notranslate"><span class="pre">fig.update_layout</span></code> or <code class="docutils literal notranslate"><span class="pre">fig.update_traces</span></code> before calling <code class="docutils literal notranslate"><span class="pre">fig.show()</span></code>.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>go.Figure</p>
@@ -547,6 +552,7 @@ with <code class="docutils literal notranslate"><span class="pre">filter</span><
 </dl>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span> <span class="o">=</span> <span class="n">col</span><span class="o">.</span><span class="n">plot_comparison</span><span class="p">(</span><span class="s2">"pcm.wheelSpeeds.frontLeft"</span><span class="p">,</span> <span class="n">max_points</span><span class="o">=</span><span class="mi">20000</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span> <span class="o">=</span> <span class="n">col</span><span class="o">.</span><span class="n">plot_comparison</span><span class="p">([</span><span class="s2">"pcm.wheelSpeeds.frontLeft"</span><span class="p">,</span> <span class="s2">"ludwig.steeringWheel.angle"</span><span class="p">])</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -593,12 +599,12 @@ with <code class="docutils literal notranslate"><span class="pre">filter</span><
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="perda.analyzer.csv.html"
+       href="perda.analyzer.plot_inputs.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">perda.analyzer.csv</p>
+        <p class="prev-next-title">perda.analyzer.plot_inputs</p>
       </div>
     </a>
     <a class="right-next"

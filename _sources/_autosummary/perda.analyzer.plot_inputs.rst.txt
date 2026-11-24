@@ -1,0 +1,8 @@
+perda.analyzer.plot\_inputs
+===========================
+
+.. automodule:: perda.analyzer.plot_inputs
+   :members:
+   :undoc-members:
+   :show-inheritance:
+

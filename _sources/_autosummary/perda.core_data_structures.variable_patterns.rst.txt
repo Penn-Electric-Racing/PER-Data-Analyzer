@@ -1,0 +1,8 @@
+perda.core\_data\_structures.variable\_patterns
+===============================================
+
+.. automodule:: perda.core_data_structures.variable_patterns
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
