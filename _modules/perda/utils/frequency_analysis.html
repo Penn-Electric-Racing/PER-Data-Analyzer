@@ -309,14 +309,7 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">..constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">SECTION_DIVIDER</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..core_data_structures.data_instance</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataInstance</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">..plotting.plotting_constants</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">DEFAULT_FONT_CONFIG</span><span class="p">,</span>
-    <span class="n">DEFAULT_LAYOUT_CONFIG</span><span class="p">,</span>
-    <span class="n">DEFAULT_SCATTER_HISTOGRAM_PLOT_CONFIG</span><span class="p">,</span>
-    <span class="n">FontConfig</span><span class="p">,</span>
-    <span class="n">LayoutConfig</span><span class="p">,</span>
-    <span class="n">ScatterHistogramPlotConfig</span><span class="p">,</span>
-<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..plotting.defaults</span><span class="w"> </span><span class="kn">import</span> <span class="n">HISTOGRAM_BINS</span><span class="p">,</span> <span class="n">PLOT_HEIGHT</span><span class="p">,</span> <span class="n">PLOT_WIDTH</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..plotting.scatter_histogram_plotter</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_scatter_and_histogram</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..units</span><span class="w"> </span><span class="kn">import</span> <span class="n">Timescale</span>
 
@@ -337,9 +330,9 @@
     <span class="n">source_time_unit</span><span class="p">:</span> <span class="n">Timescale</span><span class="p">,</span>
     <span class="n">expected_frequency_hz</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">gap_threshold_multiplier</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">,</span>
-    <span class="n">font_config</span><span class="p">:</span> <span class="n">FontConfig</span> <span class="o">=</span> <span class="n">DEFAULT_FONT_CONFIG</span><span class="p">,</span>
-    <span class="n">layout_config</span><span class="p">:</span> <span class="n">LayoutConfig</span> <span class="o">=</span> <span class="n">DEFAULT_LAYOUT_CONFIG</span><span class="p">,</span>
-    <span class="n">plot_config</span><span class="p">:</span> <span class="n">ScatterHistogramPlotConfig</span> <span class="o">=</span> <span class="n">DEFAULT_SCATTER_HISTOGRAM_PLOT_CONFIG</span><span class="p">,</span>
+    <span class="n">histogram_bins</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">HISTOGRAM_BINS</span><span class="p">,</span>
+    <span class="n">width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">PLOT_WIDTH</span><span class="p">,</span>
+    <span class="n">height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">PLOT_HEIGHT</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Analyse the sampling frequency of a DataInstance and return a diagnostic figure.</span>
@@ -362,17 +355,17 @@
 <span class="sd">        An interval is flagged as a gap when it exceeds this multiple of the</span>
 <span class="sd">        expected interval (if ``expected_frequency_hz`` is given) or the median</span>
 <span class="sd">        interval. Default is 2.0.</span>
-<span class="sd">    font_config : FontConfig, optional</span>
-<span class="sd">        Font sizes for plot elements.</span>
-<span class="sd">    layout_config : LayoutConfig, optional</span>
-<span class="sd">        Plot dimensions and margins.</span>
-<span class="sd">    plot_config : ScatterHistogramPlotConfig | None, optional</span>
-<span class="sd">        Colors and histogram bin count.</span>
+<span class="sd">    histogram_bins : int, optional</span>
+<span class="sd">        Maximum number of bins in the frequency histogram. Default is HISTOGRAM_BINS (80).</span>
+<span class="sd">    width : int, optional</span>
+<span class="sd">        Figure width in pixels. Default is PLOT_WIDTH (1200).</span>
+<span class="sd">    height : int, optional</span>
+<span class="sd">        Figure height in pixels. Default is PLOT_HEIGHT (700).</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    go.Figure</span>
-<span class="sd">        Plotly figure with frequency time-series and frequency histogram subplots.</span>
+<span class="sd">        Plotly figure with frequency time-series and frequency histogram subplots. Change anything not exposed here (fonts, colors, log axes, ...) with ``fig.update_layout``, ``fig.update_xaxes``, ``fig.update_yaxes`` or ``fig.update_traces`` before calling ``fig.show()``.</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
@@ -464,9 +457,9 @@
         <span class="n">hline_label</span><span class="o">=</span><span class="n">line_label</span><span class="p">,</span>
         <span class="n">vline</span><span class="o">=</span><span class="n">expected_frequency_hz</span><span class="p">,</span>
         <span class="n">vline_label</span><span class="o">=</span><span class="n">line_label</span><span class="p">,</span>
-        <span class="n">font_config</span><span class="o">=</span><span class="n">font_config</span><span class="p">,</span>
-        <span class="n">layout_config</span><span class="o">=</span><span class="n">layout_config</span><span class="p">,</span>
-        <span class="n">plot_config</span><span class="o">=</span><span class="n">plot_config</span><span class="p">,</span>
+        <span class="n">histogram_bins</span><span class="o">=</span><span class="n">histogram_bins</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">,</span>
     <span class="p">)</span></div>
 
 </pre></div>

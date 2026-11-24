@@ -285,12 +285,14 @@
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="perda.plotting.html">perda.plotting</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="perda.plotting.binned_count_plotter.html">perda.plotting.binned_count_plotter</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.plotting.data_instance_plotter.html">perda.plotting.data_instance_plotter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="perda.plotting.diff_plotter.html">perda.plotting.diff_plotter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.plotting.defaults.html">perda.plotting.defaults</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.plotting.fft_plotter.html">perda.plotting.fft_plotter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.plotting.map_trace.html">perda.plotting.map_trace</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.plotting.parametric_overlay.html">perda.plotting.parametric_overlay</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.plotting.parametric_plot.html">perda.plotting.parametric_plot</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.plotting.parametric_trimmer.html">perda.plotting.parametric_trimmer</a></li>
-<li class="toctree-l3"><a class="reference internal" href="perda.plotting.plotting_constants.html">perda.plotting.plotting_constants</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.plotting.scatter_histogram_plotter.html">perda.plotting.scatter_histogram_plotter</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.plotting.subplots.html">perda.plotting.subplots</a></li>
 </ul>
@@ -387,30 +389,39 @@
 <span id="perda-utils-gps-trimmer"></span><h1>perda.utils.gps_trimmer<a class="headerlink" href="#module-perda.utils.gps_trimmer" title="Link to this heading">#</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="perda.utils.gps_trimmer.plot_gps_trimmer">
-<span class="sig-prename descclassname"><span class="pre">perda.utils.gps_trimmer.</span></span><span class="sig-name descname"><span class="pre">plot_gps_trimmer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lon</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp_unit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layout_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">LayoutConfig(width=1200,</span> <span class="pre">height=700,</span> <span class="pre">margin={'l':</span> <span class="pre">70,</span> <span class="pre">'r':</span> <span class="pre">50,</span> <span class="pre">'t':</span> <span class="pre">90,</span> <span class="pre">'b':</span> <span class="pre">70},</span> <span class="pre">plot_bgcolor='white',</span> <span class="pre">title_x=0.5,</span> <span class="pre">title_xanchor='center',</span> <span class="pre">title_yanchor='top',</span> <span class="pre">grid_width_per_col=400,</span> <span class="pre">grid_height_per_row=350,</span> <span class="pre">grid_horizontal_spacing=0.08,</span> <span class="pre">grid_vertical_spacing=0.12,</span> <span class="pre">max_display_resolution=50)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">font_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">FontConfig(large=20,</span> <span class="pre">medium=14,</span> <span class="pre">small=10)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/utils/gps_trimmer.html#plot_gps_trimmer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.utils.gps_trimmer.plot_gps_trimmer" title="Link to this definition">#</a></dt>
-<dd><p>Interactive GPS coordinate trimmer with a dual-handle range slider.</p>
-<p>Displays a 2D scatter plot of GPS coordinates (longitude vs latitude) alongside
-an ipywidgets IntRangeSlider that trims which points are shown. Designed for use
-in Jupyter notebooks.</p>
+<span class="sig-prename descclassname"><span class="pre">perda.utils.gps_trimmer.</span></span><span class="sig-name descname"><span class="pre">plot_gps_trimmer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lon</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp_unit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">700</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/utils/gps_trimmer.html#plot_gps_trimmer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.utils.gps_trimmer.plot_gps_trimmer" title="Link to this definition">#</a></dt>
+<dd><p>Interactive GPS track plot (longitude vs latitude) with a range slider for picking a time window of the log.</p>
+<p>Drag the two slider handles to hide points outside the selected range. The labels under the slider show the sample index and the raw timestamp (in the log’s own unit, e.g. ms or us, not seconds) of the first and last visible point. Pass those timestamps straight to <code class="docutils literal notranslate"><span class="pre">trim_single_run_data(data,</span> <span class="pre">ts_start=...,</span> <span class="pre">ts_end=...)</span></code> or <code class="docutils literal notranslate"><span class="pre">DataInstance.trim</span></code> to cut the log to that window. Designed for Jupyter notebooks.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>lat</strong> (<a class="reference internal" href="perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance"><em>DataInstance</em></a>) – Latitude values. Must have the same length and identical timestamps as <cite>lon</cite>.</p></li>
-<li><p><strong>lon</strong> (<a class="reference internal" href="perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance"><em>DataInstance</em></a>) – Longitude values. Must have the same length and identical timestamps as <cite>lat</cite>.</p></li>
-<li><p><strong>timestamp_unit</strong> (<a class="reference internal" href="perda.units.html#perda.units.Timescale" title="perda.units.Timescale"><em>Timescale</em></a>) – Timestamp unit used for the slider timestamp labels. Pass <code class="docutils literal notranslate"><span class="pre">aly.data.timestamp_unit</span></code>.</p></li>
-<li><p><strong>title</strong> (<em>str</em><em> | </em><em>None</em><em>, </em><em>optional</em>)</p></li>
-<li><p><strong>layout_config</strong> (<a class="reference internal" href="perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.LayoutConfig" title="perda.plotting.plotting_constants.LayoutConfig"><em>LayoutConfig</em></a><em>, </em><em>optional</em>)</p></li>
-<li><p><strong>font_config</strong> (<a class="reference internal" href="perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.FontConfig" title="perda.plotting.plotting_constants.FontConfig"><em>FontConfig</em></a><em>, </em><em>optional</em>)</p></li>
+<li><p><strong>lat</strong> (<a class="reference internal" href="perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance"><em>DataInstance</em></a>) – Latitude in degrees. Its timestamps define the points shown and the timestamps in the slider labels.</p></li>
+<li><p><strong>lon</strong> (<a class="reference internal" href="perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance"><em>DataInstance</em></a>) – Longitude in degrees. Does not need to share timestamps with <code class="docutils literal notranslate"><span class="pre">lat</span></code>: it is automatically aligned onto <code class="docutils literal notranslate"><span class="pre">lat</span></code>’s timestamps with <code class="docutils literal notranslate"><span class="pre">left_join_data_instances</span></code> (linear interpolation).</p></li>
+<li><p><strong>timestamp_unit</strong> (<a class="reference internal" href="perda.units.html#perda.units.Timescale" title="perda.units.Timescale"><em>Timescale</em></a>) – Unit of the raw timestamps, shown next to the timestamps in the slider labels. Pass <code class="docutils literal notranslate"><span class="pre">aly.data.timestamp_unit</span></code>.</p></li>
+<li><p><strong>title</strong> (<em>str</em><em> | </em><em>None</em><em>, </em><em>optional</em>) – Title shown above the plot. Default is None (no title).</p></li>
+<li><p><strong>width</strong> (<em>int</em><em>, </em><em>optional</em>) – Figure width in pixels. Default is PLOT_WIDTH (1200).</p></li>
+<li><p><strong>height</strong> (<em>int</em><em>, </em><em>optional</em>) – Figure height in pixels. Default is PLOT_HEIGHT (700).</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>ipywidgets.VBox</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Widget containing the figure, the slider and the labels. Display it as the last expression in a notebook cell or with <code class="docutils literal notranslate"><span class="pre">display(widget)</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ipywidgets.VBox</p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">perda.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_gps_trimmer</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">widget</span> <span class="o">=</span> <span class="n">plot_gps_trimmer</span><span class="p">(</span><span class="n">lat_di</span><span class="p">,</span> <span class="n">lon_di</span><span class="p">,</span> <span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">timestamp_unit</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">"GPS Track"</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">perda.core_data_structures</span><span class="w"> </span><span class="kn">import</span> <span class="n">trim_single_run_data</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">perda.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_gps_trimmer</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">widget</span> <span class="o">=</span> <span class="n">plot_gps_trimmer</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">"pcm.vnav.posLla.latitude"</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">"pcm.vnav.posLla.longitude"</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">timestamp_unit</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">title</span><span class="o">=</span><span class="s2">"GPS Track"</span><span class="p">,</span>
+<span class="gp">... </span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">display</span><span class="p">(</span><span class="n">widget</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># After reading the start/end timestamps off the slider:</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">trimmed</span> <span class="o">=</span> <span class="n">trim_single_run_data</span><span class="p">(</span><span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">ts_start</span><span class="o">=</span><span class="mi">436_000</span><span class="p">,</span> <span class="n">ts_end</span><span class="o">=</span><span class="mi">1_552_000</span><span class="p">)</span>
 </pre></div>
 </div>
 </dd></dl>

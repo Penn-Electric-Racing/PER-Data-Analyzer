@@ -50,8 +50,8 @@
     <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/perda.plotting.fft_plotter';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="perda.plotting.parametric_plot" href="perda.plotting.parametric_plot.html" />
-    <link rel="prev" title="perda.plotting.diff_plotter" href="perda.plotting.diff_plotter.html" />
+    <link rel="next" title="perda.plotting.map_trace" href="perda.plotting.map_trace.html" />
+    <link rel="prev" title="perda.plotting.defaults" href="perda.plotting.defaults.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
@@ -285,12 +285,14 @@
 </ul>
 </details></li>
 <li class="toctree-l2 current active has-children"><a class="reference internal" href="perda.plotting.html">perda.plotting</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="perda.plotting.binned_count_plotter.html">perda.plotting.binned_count_plotter</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.plotting.data_instance_plotter.html">perda.plotting.data_instance_plotter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="perda.plotting.diff_plotter.html">perda.plotting.diff_plotter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.plotting.defaults.html">perda.plotting.defaults</a></li>
 <li class="toctree-l3 current active"><a class="current reference internal" href="#">perda.plotting.fft_plotter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.plotting.map_trace.html">perda.plotting.map_trace</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.plotting.parametric_overlay.html">perda.plotting.parametric_overlay</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.plotting.parametric_plot.html">perda.plotting.parametric_plot</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.plotting.parametric_trimmer.html">perda.plotting.parametric_trimmer</a></li>
-<li class="toctree-l3"><a class="reference internal" href="perda.plotting.plotting_constants.html">perda.plotting.plotting_constants</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.plotting.scatter_histogram_plotter.html">perda.plotting.scatter_histogram_plotter</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.plotting.subplots.html">perda.plotting.subplots</a></li>
 </ul>
@@ -387,35 +389,37 @@
 <span id="perda-plotting-fft-plotter"></span><h1>perda.plotting.fft_plotter<a class="headerlink" href="#module-perda.plotting.fft_plotter" title="Link to this heading">#</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="perda.plotting.fft_plotter.plot_fft_spectrum">
-<span class="sig-prename descclassname"><span class="pre">perda.plotting.fft_plotter.</span></span><span class="sig-name descname"><span class="pre">plot_fft_spectrum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frequencies</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">magnitudes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">series_names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Frequency</span> <span class="pre">(Hz)'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Magnitude'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stacked</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layout_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">LayoutConfig(width=1200,</span> <span class="pre">height=700,</span> <span class="pre">margin={'l':</span> <span class="pre">70,</span> <span class="pre">'r':</span> <span class="pre">50,</span> <span class="pre">'t':</span> <span class="pre">90,</span> <span class="pre">'b':</span> <span class="pre">70},</span> <span class="pre">plot_bgcolor='white',</span> <span class="pre">title_x=0.5,</span> <span class="pre">title_xanchor='center',</span> <span class="pre">title_yanchor='top',</span> <span class="pre">grid_width_per_col=400,</span> <span class="pre">grid_height_per_row=350,</span> <span class="pre">grid_horizontal_spacing=0.08,</span> <span class="pre">grid_vertical_spacing=0.12,</span> <span class="pre">max_display_resolution=50)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">font_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">FontConfig(large=20,</span> <span class="pre">medium=14,</span> <span class="pre">small=10)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fft_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">FFTPlotConfig(log_x=True,</span> <span class="pre">log_y=False,</span> <span class="pre">line_color='steelblue',</span> <span class="pre">height_single=500)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/plotting/fft_plotter.html#plot_fft_spectrum"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.plotting.fft_plotter.plot_fft_spectrum" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">perda.plotting.fft_plotter.</span></span><span class="sig-name descname"><span class="pre">plot_fft_spectrum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frequencies</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">magnitudes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">series_names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Frequency</span> <span class="pre">(Hz)'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Magnitude'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stacked</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertical_spacing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.12</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/plotting/fft_plotter.html#plot_fft_spectrum"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.plotting.fft_plotter.plot_fft_spectrum" title="Link to this definition">#</a></dt>
 <dd><p>Plot one or more pre-computed FFT magnitude spectra.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>frequencies</strong> (<em>list</em><em>[</em><em>NDArray</em><em>[</em><em>float64</em><em>]</em><em>]</em>) – Frequency axis arrays, one per series.</p></li>
-<li><p><strong>magnitudes</strong> (<em>list</em><em>[</em><em>NDArray</em><em>[</em><em>float64</em><em>]</em><em>]</em>) – Magnitude arrays (same length as corresponding <code class="docutils literal notranslate"><span class="pre">frequencies</span></code>
-entry), one per series.</p></li>
-<li><p><strong>series_names</strong> (<em>list</em><em>[</em><em>str</em><em>]</em>) – Display labels for each series, used as subplot titles when
-<code class="docutils literal notranslate"><span class="pre">stacked=True</span></code> and legend entries when <code class="docutils literal notranslate"><span class="pre">stacked=False</span></code>.</p></li>
-<li><p><strong>title</strong> (<em>str</em><em> | </em><em>None</em><em>, </em><em>optional</em>) – Overall figure title.</p></li>
-<li><p><strong>stacked</strong> (<em>bool</em><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, render one subplot per series sharing the x-axis.
-If <code class="docutils literal notranslate"><span class="pre">False</span></code>, overlay all series on a single plot. Default is True.</p></li>
-<li><p><strong>layout_config</strong> (<a class="reference internal" href="perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.LayoutConfig" title="perda.plotting.plotting_constants.LayoutConfig"><em>LayoutConfig</em></a><em>, </em><em>optional</em>) – Figure dimensions and spacing.</p></li>
-<li><p><strong>font_config</strong> (<a class="reference internal" href="perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.FontConfig" title="perda.plotting.plotting_constants.FontConfig"><em>FontConfig</em></a><em>, </em><em>optional</em>) – Font sizes for plot elements.</p></li>
-<li><p><strong>fft_config</strong> (<a class="reference internal" href="perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.FFTPlotConfig" title="perda.plotting.plotting_constants.FFTPlotConfig"><em>FFTPlotConfig</em></a><em>, </em><em>optional</em>) – Axis scaling, trace color</p></li>
-<li><p><strong>x_label</strong> (<em>str</em>)</p></li>
-<li><p><strong>y_label</strong> (<em>str</em>)</p></li>
+<li><p><strong>frequencies</strong> (<em>list</em><em>[</em><em>NDArray</em><em>[</em><em>float64</em><em>]</em><em>]</em>) – Frequency axis (Hz) for each series, e.g. the first output of <code class="docutils literal notranslate"><span class="pre">compute_fft</span></code>.</p></li>
+<li><p><strong>magnitudes</strong> (<em>list</em><em>[</em><em>NDArray</em><em>[</em><em>float64</em><em>]</em><em>]</em>) – Magnitude array for each series, same length as the matching <code class="docutils literal notranslate"><span class="pre">frequencies</span></code> entry.</p></li>
+<li><p><strong>series_names</strong> (<em>list</em><em>[</em><em>str</em><em>]</em>) – Display name for each series. Used as subplot titles when <code class="docutils literal notranslate"><span class="pre">stacked=True</span></code> and as legend entries when <code class="docutils literal notranslate"><span class="pre">stacked=False</span></code>.</p></li>
+<li><p><strong>title</strong> (<em>str</em><em> | </em><em>None</em><em>, </em><em>optional</em>) – Title shown above the whole figure. Default is None (no title).</p></li>
+<li><p><strong>x_label</strong> (<em>str</em><em>, </em><em>optional</em>) – X-axis label. Default is <code class="docutils literal notranslate"><span class="pre">&quot;Frequency</span> <span class="pre">(Hz)&quot;</span></code>.</p></li>
+<li><p><strong>y_label</strong> (<em>str</em><em>, </em><em>optional</em>) – Y-axis label. Default is <code class="docutils literal notranslate"><span class="pre">&quot;Magnitude&quot;</span></code>.</p></li>
+<li><p><strong>stacked</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, draw each series in its own subplot, stacked vertically with a shared frequency axis. If False, overlay all series on one plot. Default is True.</p></li>
+<li><p><strong>log_x</strong> (<em>bool</em><em>, </em><em>optional</em>) – Use a logarithmic frequency (x) axis. Default is True.</p></li>
+<li><p><strong>log_y</strong> (<em>bool</em><em>, </em><em>optional</em>) – Use a logarithmic magnitude (y) axis. Default is False (linear).</p></li>
+<li><p><strong>width</strong> (<em>int</em><em>, </em><em>optional</em>) – Figure width in pixels. Default is PLOT_WIDTH (1200).</p></li>
+<li><p><strong>height</strong> (<em>int</em><em> | </em><em>None</em><em>, </em><em>optional</em>) – Figure height in pixels. Default is None, which gives SUBPLOT_HEIGHT (350) pixels per series when stacked, or PLOT_HEIGHT (700) when overlaid.</p></li>
+<li><p><strong>vertical_spacing</strong> (<em>float</em><em>, </em><em>optional</em>) – Gap between stacked subplots as a fraction of the figure height (0 to 1). Ignored when <code class="docutils literal notranslate"><span class="pre">stacked=False</span></code>. Default is SUBPLOT_VERTICAL_SPACING (0.12).</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>go.Figure</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Plotly figure. Change anything not exposed here (fonts, colors, margins, axis ranges, …) with <code class="docutils literal notranslate"><span class="pre">fig.update_layout</span></code>, <code class="docutils literal notranslate"><span class="pre">fig.update_xaxes</span></code>, <code class="docutils literal notranslate"><span class="pre">fig.update_yaxes</span></code> or <code class="docutils literal notranslate"><span class="pre">fig.update_traces</span></code> before calling <code class="docutils literal notranslate"><span class="pre">fig.show()</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>go.Figure</p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">perda.plotting</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_fft_spectrum</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">perda.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">compute_fft</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">freqs</span><span class="p">,</span> <span class="n">mags</span> <span class="o">=</span> <span class="n">compute_fft</span><span class="p">(</span><span class="n">di</span><span class="p">,</span> <span class="n">source_time_unit</span><span class="o">=</span><span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">timestamp_unit</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span> <span class="o">=</span> <span class="n">plot_fft_spectrum</span><span class="p">([</span><span class="n">freqs</span><span class="p">],</span> <span class="p">[</span><span class="n">mags</span><span class="p">],</span> <span class="p">[</span><span class="n">di</span><span class="o">.</span><span class="n">label</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span> <span class="o">=</span> <span class="n">plot_fft_spectrum</span><span class="p">([</span><span class="n">freqs</span><span class="p">],</span> <span class="p">[</span><span class="n">mags</span><span class="p">],</span> <span class="p">[</span><span class="n">di</span><span class="o">.</span><span class="n">label</span><span class="p">],</span> <span class="n">log_x</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">log_y</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -433,20 +437,20 @@ If <code class="docutils literal notranslate"><span class="pre">False</span></co
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="perda.plotting.diff_plotter.html"
+       href="perda.plotting.defaults.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">perda.plotting.diff_plotter</p>
+        <p class="prev-next-title">perda.plotting.defaults</p>
       </div>
     </a>
     <a class="right-next"
-       href="perda.plotting.parametric_plot.html"
+       href="perda.plotting.map_trace.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">perda.plotting.parametric_plot</p>
+        <p class="prev-next-title">perda.plotting.map_trace</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

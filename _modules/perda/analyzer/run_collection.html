@@ -565,7 +565,11 @@
 <div class="viewcode-block" id="RunCollection.plot_comparison">
 <a class="viewcode-back" href="../../../_autosummary/perda.analyzer.run_collection.html#perda.analyzer.run_collection.RunCollection.plot_comparison">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">plot_comparison</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">cpp_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">max_points</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">cpp_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">max_points</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">log_x</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">log_y</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Overlay a variable from every run in the collection on a single plot.</span>
@@ -577,12 +581,16 @@
 <span class="sd">        cpp_name : str</span>
 <span class="sd">            C++ name of the variable to compare.</span>
 <span class="sd">        max_points : int | None, optional</span>
-<span class="sd">            Maximum data points to plot per run. Default is None (full fidelity).</span>
+<span class="sd">            Maximum number of points drawn per run. Longer signals are evenly downsampled (every Nth point), which speeds up rendering. Default is None (draw every point).</span>
+<span class="sd">        log_x : bool, optional</span>
+<span class="sd">            Use a logarithmic time (x) axis. Default is False (linear).</span>
+<span class="sd">        log_y : bool, optional</span>
+<span class="sd">            Use a logarithmic y-axis. Default is False (linear).</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        go.Figure</span>
-<span class="sd">            Plotly Figure with one trace per run that contains the variable.</span>
+<span class="sd">            Plotly figure with one trace per run that contains the variable. Change anything not exposed here (size, fonts, colors, ...) with ``fig.update_layout`` or ``fig.update_traces`` before calling ``fig.show()``.</span>
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
@@ -617,6 +625,8 @@
             <span class="n">y_axis_title</span><span class="o">=</span><span class="n">cpp_name</span><span class="p">,</span>
             <span class="n">timestamp_unit</span><span class="o">=</span><span class="n">COMPARISON_TIMESTAMP_UNIT</span><span class="p">,</span>
             <span class="n">max_points</span><span class="o">=</span><span class="n">max_points</span><span class="p">,</span>
+            <span class="n">log_x</span><span class="o">=</span><span class="n">log_x</span><span class="p">,</span>
+            <span class="n">log_y</span><span class="o">=</span><span class="n">log_y</span><span class="p">,</span>
         <span class="p">)</span></div>
 
 

@@ -1,0 +1,576 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>perda.plotting.binned_count_plotter &#8212; PERDA</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/autodoc_pydantic.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=8d563738"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/perda.plotting.binned_count_plotter';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="perda.plotting.data_instance_plotter" href="perda.plotting.data_instance_plotter.html" />
+    <link rel="prev" title="perda.plotting" href="perda.plotting.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">PERDA</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../getting_started/index.html">
+    Getting Started
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../api/index.html">
+    Code Documentation
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../getting_started/index.html">
+    Getting Started
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../api/index.html">
+    Code Documentation
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="perda.html">perda</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 has-children"><a class="reference internal" href="perda.analyzer.html">perda.analyzer</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="perda.analyzer.analyzer.html">perda.analyzer.analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.analyzer.analyzer_factory.html">perda.analyzer.analyzer_factory</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.analyzer.concat_helpers.html">perda.analyzer.concat_helpers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.analyzer.csv.html">perda.analyzer.csv</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.analyzer.run_collection.html">perda.analyzer.run_collection</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.analyzer.run_collection_factory.html">perda.analyzer.run_collection_factory</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="perda.constants.html">perda.constants</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="perda.core_data_structures.html">perda.core_data_structures</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.data_instance.html">perda.core_data_structures.data_instance</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.deduplication.html">perda.core_data_structures.deduplication</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.joins.html">perda.core_data_structures.joins</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.masking.html">perda.core_data_structures.masking</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.resampling.html">perda.core_data_structures.resampling</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.search_indexes.html">perda.core_data_structures.search_indexes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.single_run_data.html">perda.core_data_structures.single_run_data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.split_helpers.html">perda.core_data_structures.split_helpers</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="perda.live.html">perda.live</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="perda.live.cdp_client.html">perda.live.cdp_client</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.live.live_analyzer.html">perda.live.live_analyzer</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="perda.plotting.html">perda.plotting</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l3 current active"><a class="current reference internal" href="#">perda.plotting.binned_count_plotter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.plotting.data_instance_plotter.html">perda.plotting.data_instance_plotter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.plotting.defaults.html">perda.plotting.defaults</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.plotting.fft_plotter.html">perda.plotting.fft_plotter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.plotting.map_trace.html">perda.plotting.map_trace</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.plotting.parametric_overlay.html">perda.plotting.parametric_overlay</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.plotting.parametric_plot.html">perda.plotting.parametric_plot</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.plotting.parametric_trimmer.html">perda.plotting.parametric_trimmer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.plotting.scatter_histogram_plotter.html">perda.plotting.scatter_histogram_plotter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.plotting.subplots.html">perda.plotting.subplots</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="perda.server.html">perda.server</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="perda.timeline.html">perda.timeline</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="perda.timeline.client.html">perda.timeline.client</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="perda.units.html">perda.units</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="perda.utils.html">perda.utils</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="perda.utils.accel_calculator.html">perda.utils.accel_calculator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.utils.data_summary.html">perda.utils.data_summary</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.utils.diff.html">perda.utils.diff</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.utils.frequency_analysis.html">perda.utils.frequency_analysis</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.utils.gps_analysis.html">perda.utils.gps_analysis</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.utils.gps_trimmer.html">perda.utils.gps_trimmer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.utils.integrate.html">perda.utils.integrate</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.utils.preprocessing.html">perda.utils.preprocessing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.utils.search.html">perda.utils.search</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.utils.signal_processing.html">perda.utils.signal_processing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.utils.time_alignment.html">perda.utils.time_alignment</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../api/index.html" class="nav-link">Code Documentation</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="perda.html" class="nav-link">perda</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="perda.plotting.html" class="nav-link">perda.plotting</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">perda.plotting.binned_count_plotter</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="module-perda.plotting.binned_count_plotter">
+<span id="perda-plotting-binned-count-plotter"></span><h1>perda.plotting.binned_count_plotter<a class="headerlink" href="#module-perda.plotting.binned_count_plotter" title="Link to this heading">#</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="perda.plotting.binned_count_plotter.count_per_bin">
+<span class="sig-prename descclassname"><span class="pre">perda.plotting.binned_count_plotter.</span></span><span class="sig-name descname"><span class="pre">count_per_bin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bin_start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bin_width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_bins</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/plotting/binned_count_plotter.html#count_per_bin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.plotting.binned_count_plotter.count_per_bin" title="Link to this definition">#</a></dt>
+<dd><p>Count how many values fall into each of <code class="docutils literal notranslate"><span class="pre">n_bins</span></code> fixed-width bins starting at <code class="docutils literal notranslate"><span class="pre">bin_start</span></code>.</p>
+<p>Values outside the bin range are clamped into the first or last bin.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>values</strong> (<em>npt.NDArray</em><em>[</em><em>np.float64</em><em>]</em>) – Values to count, e.g. event timestamps in seconds.</p></li>
+<li><p><strong>bin_start</strong> (<em>float</em>) – Left edge of the first bin.</p></li>
+<li><p><strong>bin_width</strong> (<em>float</em>) – Width of every bin, in the same unit as <code class="docutils literal notranslate"><span class="pre">values</span></code>.</p></li>
+<li><p><strong>n_bins</strong> (<em>int</em>) – Total number of bins.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Array of length <code class="docutils literal notranslate"><span class="pre">n_bins</span></code> with the count in each bin.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>npt.NDArray[np.int64]</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">count_per_bin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">]),</span> <span class="n">bin_start</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">bin_width</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">n_bins</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="go">array([2, 1])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="perda.plotting.binned_count_plotter.plot_binned_counts">
+<span class="sig-prename descclassname"><span class="pre">perda.plotting.binned_count_plotter.</span></span><span class="sig-name descname"><span class="pre">plot_binned_counts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values_by_series</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bin_width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Count'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_legend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">700</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/plotting/binned_count_plotter.html#plot_binned_counts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.plotting.binned_count_plotter.plot_binned_counts" title="Link to this definition">#</a></dt>
+<dd><p>Count how many values of each series fall into fixed-width bins, and draw the counts as overlaid bar charts.</p>
+<p>Every series is binned on the same grid, which spans the smallest to largest value across all series, so bars line up for comparison. Typical use: how many events of each kind happened in each time window. Bars are drawn in the order given, so put the largest (background) series first.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>values_by_series</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>npt.NDArray</em><em>[</em><em>np.float64</em><em>]</em><em>]</em>) – Maps each series’ legend name to the values to count, e.g. <code class="docutils literal notranslate"><span class="pre">{&quot;Errors&quot;:</span> <span class="pre">error_times_s,</span> <span class="pre">&quot;Warnings&quot;:</span> <span class="pre">warning_times_s}</span></code>. Empty arrays are allowed and give all-zero bars.</p></li>
+<li><p><strong>bin_width</strong> (<em>float</em>) – Width of each bin (bar), in the same unit as the values, e.g. seconds. Smaller bins show finer detail but noisier counts.</p></li>
+<li><p><strong>title</strong> (<em>str</em><em> | </em><em>None</em><em>, </em><em>optional</em>) – Title shown above the plot. Default is None (no title).</p></li>
+<li><p><strong>x_label</strong> (<em>str</em><em> | </em><em>None</em><em>, </em><em>optional</em>) – X-axis label, e.g. <code class="docutils literal notranslate"><span class="pre">&quot;Time</span> <span class="pre">(s)&quot;</span></code>. Default is None (no label).</p></li>
+<li><p><strong>y_label</strong> (<em>str</em><em> | </em><em>None</em><em>, </em><em>optional</em>) – Y-axis label. Default is <code class="docutils literal notranslate"><span class="pre">&quot;Count&quot;</span></code>.</p></li>
+<li><p><strong>show_legend</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to show the legend listing each series. Default is True.</p></li>
+<li><p><strong>log_y</strong> (<em>bool</em><em>, </em><em>optional</em>) – Use a logarithmic count (y) axis, useful when some series are much rarer than others. Default is False (linear).</p></li>
+<li><p><strong>width</strong> (<em>int</em><em>, </em><em>optional</em>) – Figure width in pixels. Default is PLOT_WIDTH (1200).</p></li>
+<li><p><strong>height</strong> (<em>int</em><em>, </em><em>optional</em>) – Figure height in pixels. Default is PLOT_HEIGHT (700).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Plotly figure with one bar trace per series, named by its key. Change anything not exposed here with <code class="docutils literal notranslate"><span class="pre">fig.update_layout</span></code> or <code class="docutils literal notranslate"><span class="pre">fig.update_traces</span></code> before calling <code class="docutils literal notranslate"><span class="pre">fig.show()</span></code>. Style one series with <code class="docutils literal notranslate"><span class="pre">fig.update_traces(marker_color=&quot;gray&quot;,</span> <span class="pre">opacity=0.4,</span> <span class="pre">selector=dict(name=&quot;Errors&quot;))</span></code>. Returns an empty figure if every series is empty.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>go.Figure</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">perda.plotting</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_binned_counts</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span> <span class="o">=</span> <span class="n">plot_binned_counts</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="p">{</span><span class="s2">"All messages"</span><span class="p">:</span> <span class="n">all_times_s</span><span class="p">,</span> <span class="s2">"Dropped"</span><span class="p">:</span> <span class="n">dropped_times_s</span><span class="p">},</span>
+<span class="gp">... </span>    <span class="n">bin_width</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">x_label</span><span class="o">=</span><span class="s2">"Time (s)"</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">log_y</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="gp">... </span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="perda.plotting.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">perda.plotting</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="perda.plotting.data_instance_plotter.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">perda.plotting.data_instance_plotter</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.plotting.binned_count_plotter.count_per_bin"><code class="docutils literal notranslate"><span class="pre">count_per_bin()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.plotting.binned_count_plotter.plot_binned_counts"><code class="docutils literal notranslate"><span class="pre">plot_binned_counts()</span></code></a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/_autosummary/perda.plotting.binned_count_plotter.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2025, Penn Electric Racing.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

@@ -1,0 +1,8 @@
+perda.plotting.binned\_count\_plotter
+=====================================
+
+.. automodule:: perda.plotting.binned_count_plotter
+   :members:
+   :undoc-members:
+   :show-inheritance:
+

@@ -302,91 +302,99 @@
                 <article class="bd-article">
                   
   <h1>Source code for perda.plotting.data_instance_plotter</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span>
-
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">plotly.graph_objects</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">go</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">numpy.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">NDArray</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">plotly.subplots</span><span class="w"> </span><span class="kn">import</span> <span class="n">make_subplots</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">..core_data_structures.data_instance</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataInstance</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..units</span><span class="w"> </span><span class="kn">import</span> <span class="n">Timescale</span><span class="p">,</span> <span class="n">to_seconds</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">.plotting_constants</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">DEFAULT_FONT_CONFIG</span><span class="p">,</span>
-    <span class="n">DEFAULT_LAYOUT_CONFIG</span><span class="p">,</span>
-    <span class="n">DEFAULT_VLINE_CONFIG</span><span class="p">,</span>
-    <span class="n">FontConfig</span><span class="p">,</span>
-    <span class="n">LayoutConfig</span><span class="p">,</span>
-    <span class="n">VLineConfig</span><span class="p">,</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.defaults</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">FONT_SIZE_LARGE</span><span class="p">,</span>
+    <span class="n">FONT_SIZE_MEDIUM</span><span class="p">,</span>
+    <span class="n">FONT_SIZE_SMALL</span><span class="p">,</span>
+    <span class="n">MARGIN</span><span class="p">,</span>
+    <span class="n">PLOT_BGCOLOR</span><span class="p">,</span>
+    <span class="n">PLOT_HEIGHT</span><span class="p">,</span>
+    <span class="n">PLOT_WIDTH</span><span class="p">,</span>
+    <span class="n">TITLE_X</span><span class="p">,</span>
+    <span class="n">TITLE_XANCHOR</span><span class="p">,</span>
+    <span class="n">TITLE_YANCHOR</span><span class="p">,</span>
+    <span class="n">VLINE_COLOR</span><span class="p">,</span>
+    <span class="n">VLINE_DASH</span><span class="p">,</span>
+    <span class="n">VLINE_OPACITY</span><span class="p">,</span>
+    <span class="n">VLINE_WIDTH</span><span class="p">,</span>
 <span class="p">)</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_add_vlines</span><span class="p">(</span>
-    <span class="n">fig</span><span class="p">:</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">,</span>
-    <span class="n">vlines</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
-    <span class="n">vline_config</span><span class="p">:</span> <span class="s2">"VLineConfig"</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Add vertical lines to an existing Plotly figure.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    fig : go.Figure</span>
-<span class="sd">        Target figure</span>
-<span class="sd">    vlines : List[float]</span>
-<span class="sd">        X-axis positions (in seconds) where vertical lines are drawn</span>
-<span class="sd">    vline_config : VLineConfig</span>
-<span class="sd">        Visual configuration for the vertical lines</span>
-<span class="sd">    """</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_add_vlines</span><span class="p">(</span><span class="n">fig</span><span class="p">:</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">,</span> <span class="n">vlines</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">vlines</span><span class="p">:</span>
         <span class="n">fig</span><span class="o">.</span><span class="n">add_vline</span><span class="p">(</span>
             <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span>
-            <span class="n">line_dash</span><span class="o">=</span><span class="n">vline_config</span><span class="o">.</span><span class="n">dash</span><span class="p">,</span>
-            <span class="n">line_color</span><span class="o">=</span><span class="n">vline_config</span><span class="o">.</span><span class="n">color</span><span class="p">,</span>
-            <span class="n">line_width</span><span class="o">=</span><span class="n">vline_config</span><span class="o">.</span><span class="n">width</span><span class="p">,</span>
-            <span class="n">opacity</span><span class="o">=</span><span class="n">vline_config</span><span class="o">.</span><span class="n">opacity</span><span class="p">,</span>
+            <span class="n">line_dash</span><span class="o">=</span><span class="n">VLINE_DASH</span><span class="p">,</span>
+            <span class="n">line_color</span><span class="o">=</span><span class="n">VLINE_COLOR</span><span class="p">,</span>
+            <span class="n">line_width</span><span class="o">=</span><span class="n">VLINE_WIDTH</span><span class="p">,</span>
+            <span class="n">opacity</span><span class="o">=</span><span class="n">VLINE_OPACITY</span><span class="p">,</span>
         <span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_time_series_xy</span><span class="p">(</span>
+    <span class="n">di</span><span class="p">:</span> <span class="n">DataInstance</span><span class="p">,</span> <span class="n">timestamp_unit</span><span class="p">:</span> <span class="n">Timescale</span><span class="p">,</span> <span class="n">max_points</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
+    <span class="n">n_points</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">di</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">max_points</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">n_points</span> <span class="o">&gt;</span> <span class="n">max_points</span> <span class="ow">and</span> <span class="n">max_points</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">step</span> <span class="o">=</span> <span class="p">(</span><span class="n">n_points</span> <span class="o">+</span> <span class="n">max_points</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="n">max_points</span>
+        <span class="k">return</span> <span class="n">to_seconds</span><span class="p">(</span><span class="n">di</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">[::</span><span class="n">step</span><span class="p">],</span> <span class="n">timestamp_unit</span><span class="p">),</span> <span class="n">di</span><span class="o">.</span><span class="n">value_np</span><span class="p">[::</span><span class="n">step</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">to_seconds</span><span class="p">(</span><span class="n">di</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">,</span> <span class="n">timestamp_unit</span><span class="p">),</span> <span class="n">di</span><span class="o">.</span><span class="n">value_np</span>
 
 
 <div class="viewcode-block" id="plot_single_axis">
 <a class="viewcode-back" href="../../../_autosummary/perda.plotting.data_instance_plotter.html#perda.plotting.data_instance_plotter.plot_single_axis">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">plot_single_axis</span><span class="p">(</span>
-    <span class="n">data_instances</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">DataInstance</span><span class="p">],</span>
+    <span class="n">data_instances</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">DataInstance</span><span class="p">],</span>
     <span class="n">timestamp_unit</span><span class="p">:</span> <span class="n">Timescale</span><span class="p">,</span>
     <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">y_axis_title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">show_legend</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-    <span class="n">layout_config</span><span class="p">:</span> <span class="n">LayoutConfig</span> <span class="o">=</span> <span class="n">DEFAULT_LAYOUT_CONFIG</span><span class="p">,</span>
-    <span class="n">font_config</span><span class="p">:</span> <span class="n">FontConfig</span> <span class="o">=</span> <span class="n">DEFAULT_FONT_CONFIG</span><span class="p">,</span>
-    <span class="n">vlines</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">vline_config</span><span class="p">:</span> <span class="s2">"VLineConfig"</span> <span class="o">=</span> <span class="n">DEFAULT_VLINE_CONFIG</span><span class="p">,</span>
+    <span class="n">vlines</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">max_points</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">log_x</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">log_y</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">PLOT_WIDTH</span><span class="p">,</span>
+    <span class="n">height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">PLOT_HEIGHT</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Plot one or more DataInstances on a single y-axis using Plotly.</span>
+<span class="sd">    Plot one or more DataInstances against time on a single shared y-axis.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    data_instances : List[DataInstance]</span>
-<span class="sd">        List of DataInstance objects to plot</span>
+<span class="sd">    data_instances : list[DataInstance]</span>
+<span class="sd">        Signals to plot. Each becomes one line, named by its ``label`` in the legend.</span>
 <span class="sd">    timestamp_unit : Timescale</span>
-<span class="sd">        Timestamp unit in the underlying data. Converted to seconds for x-axis display. Pass ``aly.data.timestamp_unit``.</span>
+<span class="sd">        Unit of the raw timestamps in the DataInstances. They are converted to seconds for the x-axis. Pass ``aly.data.timestamp_unit``.</span>
 <span class="sd">    title : str | None, optional</span>
-<span class="sd">        Title for the entire plot.</span>
+<span class="sd">        Title shown above the plot. Default is None (no title).</span>
 <span class="sd">    y_axis_title : str | None, optional</span>
-<span class="sd">        Label for the y-axis.</span>
+<span class="sd">        Y-axis label, e.g. ``"Speed (mph)"``. Default is None (no label).</span>
 <span class="sd">    show_legend : bool, optional</span>
-<span class="sd">        Whether to show plot legends. Default is True</span>
-<span class="sd">    layout_config : LayoutConfig, optional</span>
-<span class="sd">    font_config : FontConfig, optional</span>
-<span class="sd">    vlines : List[float] | None, optional</span>
-<span class="sd">        X-axis positions (in seconds) where vertical lines are drawn. Default is None.</span>
-<span class="sd">    vline_config : VLineConfig, optional</span>
-<span class="sd">        Visual configuration for the vertical lines.</span>
+<span class="sd">        Whether to show the legend listing each signal. Default is True.</span>
+<span class="sd">    vlines : list[float] | None, optional</span>
+<span class="sd">        Times in seconds at which to draw dashed vertical marker lines. Default is None (no lines).</span>
 <span class="sd">    max_points : int | None, optional</span>
-<span class="sd">        Maximum number of data points to plot per trace (enables zero-copy step downsampling). Default is None (full fidelity).</span>
+<span class="sd">        Maximum number of points drawn per signal. Longer signals are evenly downsampled (every Nth point), which speeds up rendering of large logs. Default is None (draw every point).</span>
+<span class="sd">    log_x : bool, optional</span>
+<span class="sd">        Use a logarithmic time (x) axis. Default is False (linear).</span>
+<span class="sd">    log_y : bool, optional</span>
+<span class="sd">        Use a logarithmic y-axis. Default is False (linear).</span>
+<span class="sd">    width : int, optional</span>
+<span class="sd">        Figure width in pixels. Default is PLOT_WIDTH (1200).</span>
+<span class="sd">    height : int, optional</span>
+<span class="sd">        Figure height in pixels. Default is PLOT_HEIGHT (700).</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    go.Figure</span>
+<span class="sd">        Plotly figure. Change anything not exposed here (fonts, colors, margins, axis ranges, ...) with ``fig.update_layout``, ``fig.update_xaxes``, ``fig.update_yaxes`` or ``fig.update_traces`` before calling ``fig.show()``.</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
@@ -396,7 +404,9 @@
 <span class="sd">    ...     title="Speed &amp; Torque",</span>
 <span class="sd">    ...     y_axis_title="Value",</span>
 <span class="sd">    ...     timestamp_unit=aly.data.timestamp_unit,</span>
+<span class="sd">    ...     log_y=True,</span>
 <span class="sd">    ... )</span>
+<span class="sd">    &gt;&gt;&gt; fig.update_layout(font_size=16)  # further customization</span>
 <span class="sd">    """</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">data_instances</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">"Warning: No data instances provided for plotting"</span><span class="p">)</span>
@@ -409,16 +419,7 @@
             <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Warning: No data points in DataInstance for </span><span class="si">{</span><span class="n">di</span><span class="o">.</span><span class="n">label</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
             <span class="k">continue</span>
 
-        <span class="c1"># Convert timestamps from the log unit to seconds for plotting with optional downsampling.</span>
-        <span class="n">n_points</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">di</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">max_points</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">n_points</span> <span class="o">&gt;</span> <span class="n">max_points</span> <span class="ow">and</span> <span class="n">max_points</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">step</span> <span class="o">=</span> <span class="p">(</span><span class="n">n_points</span> <span class="o">+</span> <span class="n">max_points</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="n">max_points</span>
-            <span class="n">timestamps_s</span> <span class="o">=</span> <span class="n">to_seconds</span><span class="p">(</span><span class="n">di</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">[::</span><span class="n">step</span><span class="p">],</span> <span class="n">timestamp_unit</span><span class="p">)</span>
-            <span class="n">values_np</span> <span class="o">=</span> <span class="n">di</span><span class="o">.</span><span class="n">value_np</span><span class="p">[::</span><span class="n">step</span><span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">timestamps_s</span> <span class="o">=</span> <span class="n">to_seconds</span><span class="p">(</span><span class="n">di</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">,</span> <span class="n">timestamp_unit</span><span class="p">)</span>
-            <span class="n">values_np</span> <span class="o">=</span> <span class="n">di</span><span class="o">.</span><span class="n">value_np</span>
-
+        <span class="n">timestamps_s</span><span class="p">,</span> <span class="n">values_np</span> <span class="o">=</span> <span class="n">_time_series_xy</span><span class="p">(</span><span class="n">di</span><span class="p">,</span> <span class="n">timestamp_unit</span><span class="p">,</span> <span class="n">max_points</span><span class="p">)</span>
         <span class="n">fig</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span>
             <span class="n">go</span><span class="o">.</span><span class="n">Scattergl</span><span class="p">(</span>
                 <span class="n">x</span><span class="o">=</span><span class="n">timestamps_s</span><span class="p">,</span>
@@ -431,26 +432,30 @@
     <span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span>
         <span class="n">title</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
             <span class="n">text</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
-            <span class="n">x</span><span class="o">=</span><span class="n">layout_config</span><span class="o">.</span><span class="n">title_x</span><span class="p">,</span>
-            <span class="n">xanchor</span><span class="o">=</span><span class="n">layout_config</span><span class="o">.</span><span class="n">title_xanchor</span><span class="p">,</span>
-            <span class="n">yanchor</span><span class="o">=</span><span class="n">layout_config</span><span class="o">.</span><span class="n">title_yanchor</span><span class="p">,</span>
-            <span class="n">font</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">font_config</span><span class="o">.</span><span class="n">large</span><span class="p">),</span>
+            <span class="n">x</span><span class="o">=</span><span class="n">TITLE_X</span><span class="p">,</span>
+            <span class="n">xanchor</span><span class="o">=</span><span class="n">TITLE_XANCHOR</span><span class="p">,</span>
+            <span class="n">yanchor</span><span class="o">=</span><span class="n">TITLE_YANCHOR</span><span class="p">,</span>
+            <span class="n">font</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">FONT_SIZE_LARGE</span><span class="p">),</span>
         <span class="p">),</span>
-        <span class="n">xaxis_title</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="s2">"Time (s)"</span><span class="p">,</span> <span class="n">font</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">font_config</span><span class="o">.</span><span class="n">medium</span><span class="p">)),</span>
-        <span class="n">yaxis_title</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">y_axis_title</span><span class="p">,</span> <span class="n">font</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">font_config</span><span class="o">.</span><span class="n">medium</span><span class="p">)),</span>
+        <span class="n">xaxis_title</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="s2">"Time (s)"</span><span class="p">,</span> <span class="n">font</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">FONT_SIZE_MEDIUM</span><span class="p">)),</span>
+        <span class="n">yaxis_title</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">y_axis_title</span><span class="p">,</span> <span class="n">font</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">FONT_SIZE_MEDIUM</span><span class="p">)),</span>
         <span class="n">showlegend</span><span class="o">=</span><span class="n">show_legend</span><span class="p">,</span>
         <span class="n">hovermode</span><span class="o">=</span><span class="s2">"x unified"</span><span class="p">,</span>
-        <span class="n">width</span><span class="o">=</span><span class="n">layout_config</span><span class="o">.</span><span class="n">width</span><span class="p">,</span>
-        <span class="n">height</span><span class="o">=</span><span class="n">layout_config</span><span class="o">.</span><span class="n">height</span><span class="p">,</span>
-        <span class="n">margin</span><span class="o">=</span><span class="n">layout_config</span><span class="o">.</span><span class="n">margin</span><span class="p">,</span>
-        <span class="n">plot_bgcolor</span><span class="o">=</span><span class="n">layout_config</span><span class="o">.</span><span class="n">plot_bgcolor</span><span class="p">,</span>
-        <span class="n">xaxis</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">tickfont</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">font_config</span><span class="o">.</span><span class="n">small</span><span class="p">)),</span>
-        <span class="n">yaxis</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">tickfont</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">font_config</span><span class="o">.</span><span class="n">small</span><span class="p">)),</span>
-        <span class="n">legend</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">font</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">font_config</span><span class="o">.</span><span class="n">small</span><span class="p">)),</span>
+        <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">,</span>
+        <span class="n">margin</span><span class="o">=</span><span class="n">MARGIN</span><span class="p">,</span>
+        <span class="n">plot_bgcolor</span><span class="o">=</span><span class="n">PLOT_BGCOLOR</span><span class="p">,</span>
+        <span class="n">xaxis</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
+            <span class="n">tickfont</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">FONT_SIZE_SMALL</span><span class="p">),</span> <span class="nb">type</span><span class="o">=</span><span class="s2">"log"</span> <span class="k">if</span> <span class="n">log_x</span> <span class="k">else</span> <span class="s2">"linear"</span>
+        <span class="p">),</span>
+        <span class="n">yaxis</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
+            <span class="n">tickfont</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">FONT_SIZE_SMALL</span><span class="p">),</span> <span class="nb">type</span><span class="o">=</span><span class="s2">"log"</span> <span class="k">if</span> <span class="n">log_y</span> <span class="k">else</span> <span class="s2">"linear"</span>
+        <span class="p">),</span>
+        <span class="n">legend</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">font</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">FONT_SIZE_SMALL</span><span class="p">)),</span>
     <span class="p">)</span>
 
     <span class="k">if</span> <span class="n">vlines</span><span class="p">:</span>
-        <span class="n">_add_vlines</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">vlines</span><span class="p">,</span> <span class="n">vline_config</span><span class="p">)</span>
+        <span class="n">_add_vlines</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">vlines</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">fig</span></div>
 
@@ -459,52 +464,58 @@
 <div class="viewcode-block" id="plot_dual_axis">
 <a class="viewcode-back" href="../../../_autosummary/perda.plotting.data_instance_plotter.html#perda.plotting.data_instance_plotter.plot_dual_axis">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">plot_dual_axis</span><span class="p">(</span>
-    <span class="n">left_data_instances</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">DataInstance</span><span class="p">],</span>
-    <span class="n">right_data_instances</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">DataInstance</span><span class="p">],</span>
+    <span class="n">left_data_instances</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">DataInstance</span><span class="p">],</span>
+    <span class="n">right_data_instances</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">DataInstance</span><span class="p">],</span>
     <span class="n">timestamp_unit</span><span class="p">:</span> <span class="n">Timescale</span><span class="p">,</span>
     <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">left_y_axis_title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">right_y_axis_title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">show_legend</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-    <span class="n">font_config</span><span class="p">:</span> <span class="n">FontConfig</span> <span class="o">=</span> <span class="n">DEFAULT_FONT_CONFIG</span><span class="p">,</span>
-    <span class="n">layout_config</span><span class="p">:</span> <span class="n">LayoutConfig</span> <span class="o">=</span> <span class="n">DEFAULT_LAYOUT_CONFIG</span><span class="p">,</span>
-    <span class="n">vlines</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">vline_config</span><span class="p">:</span> <span class="n">VLineConfig</span> <span class="o">=</span> <span class="n">DEFAULT_VLINE_CONFIG</span><span class="p">,</span>
+    <span class="n">vlines</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">max_points</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">log_x</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">log_y</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">PLOT_WIDTH</span><span class="p">,</span>
+    <span class="n">height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">PLOT_HEIGHT</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Plot DataInstances on dual y-axes using Plotly.</span>
+<span class="sd">    Plot DataInstances against time with two independent y-axes (left and right).</span>
+
+<span class="sd">    Useful for signals with different units or scales. Right-axis signals are drawn dashed.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    left_data_instances : List[DataInstance]</span>
-<span class="sd">        List of DataInstance objects to plot on the left y-axis</span>
-<span class="sd">    right_data_instances : List[DataInstance]</span>
-<span class="sd">        List of DataInstance objects to plot on the right y-axis</span>
+<span class="sd">    left_data_instances : list[DataInstance]</span>
+<span class="sd">        Signals plotted against the left y-axis (solid lines).</span>
+<span class="sd">    right_data_instances : list[DataInstance]</span>
+<span class="sd">        Signals plotted against the right y-axis (dashed lines).</span>
 <span class="sd">    timestamp_unit : Timescale</span>
-<span class="sd">        Timestamp unit in the underlying data. Converted to seconds for x-axis display. Pass ``aly.data.timestamp_unit``.</span>
+<span class="sd">        Unit of the raw timestamps in the DataInstances. They are converted to seconds for the x-axis. Pass ``aly.data.timestamp_unit``.</span>
 <span class="sd">    title : str | None, optional</span>
-<span class="sd">        Title for the entire plot.</span>
+<span class="sd">        Title shown above the plot. Default is None (no title).</span>
 <span class="sd">    left_y_axis_title : str | None, optional</span>
-<span class="sd">        Label for the left y-axis.</span>
+<span class="sd">        Left y-axis label, e.g. ``"Speed (mph)"``. Default is None (no label).</span>
 <span class="sd">    right_y_axis_title : str | None, optional</span>
-<span class="sd">        Label for the right y-axis.</span>
+<span class="sd">        Right y-axis label, e.g. ``"Torque (Nm)"``. Default is None (no label).</span>
 <span class="sd">    show_legend : bool, optional</span>
-<span class="sd">        Whether to show plot legends. Default is True</span>
-<span class="sd">    font_config : FontConfig, optional</span>
-<span class="sd">        Font configuration for plot elements.</span>
-<span class="sd">    layout_config : LayoutConfig, optional</span>
-<span class="sd">        Layout configuration for plot dimensions.</span>
-<span class="sd">    vlines : List[float] | None, optional</span>
-<span class="sd">        X-axis positions (in seconds) where vertical lines are drawn. Default is None.</span>
-<span class="sd">    vline_config : VLineConfig, optional</span>
-<span class="sd">        Visual configuration for the vertical lines.</span>
+<span class="sd">        Whether to show the legend listing each signal. Default is True.</span>
+<span class="sd">    vlines : list[float] | None, optional</span>
+<span class="sd">        Times in seconds at which to draw dashed vertical marker lines. Default is None (no lines).</span>
 <span class="sd">    max_points : int | None, optional</span>
-<span class="sd">        Maximum number of data points to plot per trace (enables zero-copy step downsampling). Default is None (full fidelity).</span>
+<span class="sd">        Maximum number of points drawn per signal. Longer signals are evenly downsampled (every Nth point), which speeds up rendering of large logs. Default is None (draw every point).</span>
+<span class="sd">    log_x : bool, optional</span>
+<span class="sd">        Use a logarithmic time (x) axis. Default is False (linear).</span>
+<span class="sd">    log_y : bool, optional</span>
+<span class="sd">        Use logarithmic scaling on both the left and right y-axes. Default is False (linear).</span>
+<span class="sd">    width : int, optional</span>
+<span class="sd">        Figure width in pixels. Default is PLOT_WIDTH (1200).</span>
+<span class="sd">    height : int, optional</span>
+<span class="sd">        Figure height in pixels. Default is PLOT_HEIGHT (700).</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    go.Figure</span>
+<span class="sd">        Plotly figure. Change anything not exposed here (fonts, colors, margins, axis ranges, ...) with ``fig.update_layout``, ``fig.update_xaxes``, ``fig.update_yaxes`` or ``fig.update_traces`` before calling ``fig.show()``. To log-scale only one side, use ``fig.update_yaxes(type="log", secondary_y=True)``.</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
@@ -521,100 +532,70 @@
         <span class="nb">print</span><span class="p">(</span><span class="s2">"Warning: No data instances provided for plotting"</span><span class="p">)</span>
         <span class="k">return</span>
 
-    <span class="c1"># Create figure with secondary y-axis</span>
     <span class="n">fig</span> <span class="o">=</span> <span class="n">make_subplots</span><span class="p">(</span><span class="n">specs</span><span class="o">=</span><span class="p">[[{</span><span class="s2">"secondary_y"</span><span class="p">:</span> <span class="kc">True</span><span class="p">}]])</span>
 
-    <span class="c1"># Plot left axis data</span>
-    <span class="k">for</span> <span class="n">di</span> <span class="ow">in</span> <span class="n">left_data_instances</span><span class="p">:</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">di</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Warning: No data points in DataInstance for </span><span class="si">{</span><span class="n">di</span><span class="o">.</span><span class="n">label</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-            <span class="k">continue</span>
+    <span class="k">for</span> <span class="n">data_instances</span><span class="p">,</span> <span class="n">on_right</span> <span class="ow">in</span> <span class="p">(</span>
+        <span class="p">(</span><span class="n">left_data_instances</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+        <span class="p">(</span><span class="n">right_data_instances</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span>
+    <span class="p">):</span>
+        <span class="k">for</span> <span class="n">di</span> <span class="ow">in</span> <span class="n">data_instances</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">di</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Warning: No data points in DataInstance for </span><span class="si">{</span><span class="n">di</span><span class="o">.</span><span class="n">label</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+                <span class="k">continue</span>
 
-        <span class="c1"># Convert timestamps from the log unit to seconds for plotting with optional downsampling.</span>
-        <span class="n">n_points</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">di</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">max_points</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">n_points</span> <span class="o">&gt;</span> <span class="n">max_points</span> <span class="ow">and</span> <span class="n">max_points</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">step</span> <span class="o">=</span> <span class="p">(</span><span class="n">n_points</span> <span class="o">+</span> <span class="n">max_points</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="n">max_points</span>
-            <span class="n">timestamps_s</span> <span class="o">=</span> <span class="n">to_seconds</span><span class="p">(</span><span class="n">di</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">[::</span><span class="n">step</span><span class="p">],</span> <span class="n">timestamp_unit</span><span class="p">)</span>
-            <span class="n">values_np</span> <span class="o">=</span> <span class="n">di</span><span class="o">.</span><span class="n">value_np</span><span class="p">[::</span><span class="n">step</span><span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">timestamps_s</span> <span class="o">=</span> <span class="n">to_seconds</span><span class="p">(</span><span class="n">di</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">,</span> <span class="n">timestamp_unit</span><span class="p">)</span>
-            <span class="n">values_np</span> <span class="o">=</span> <span class="n">di</span><span class="o">.</span><span class="n">value_np</span>
+            <span class="n">timestamps_s</span><span class="p">,</span> <span class="n">values_np</span> <span class="o">=</span> <span class="n">_time_series_xy</span><span class="p">(</span><span class="n">di</span><span class="p">,</span> <span class="n">timestamp_unit</span><span class="p">,</span> <span class="n">max_points</span><span class="p">)</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span>
+                <span class="n">go</span><span class="o">.</span><span class="n">Scattergl</span><span class="p">(</span>
+                    <span class="n">x</span><span class="o">=</span><span class="n">timestamps_s</span><span class="p">,</span>
+                    <span class="n">y</span><span class="o">=</span><span class="n">values_np</span><span class="p">,</span>
+                    <span class="n">mode</span><span class="o">=</span><span class="s2">"lines"</span><span class="p">,</span>
+                    <span class="n">name</span><span class="o">=</span><span class="n">di</span><span class="o">.</span><span class="n">label</span><span class="p">,</span>
+                    <span class="n">line</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">dash</span><span class="o">=</span><span class="s2">"dash"</span><span class="p">)</span> <span class="k">if</span> <span class="n">on_right</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="n">secondary_y</span><span class="o">=</span><span class="n">on_right</span><span class="p">,</span>
+            <span class="p">)</span>
 
-        <span class="n">fig</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span>
-            <span class="n">go</span><span class="o">.</span><span class="n">Scattergl</span><span class="p">(</span>
-                <span class="n">x</span><span class="o">=</span><span class="n">timestamps_s</span><span class="p">,</span>
-                <span class="n">y</span><span class="o">=</span><span class="n">values_np</span><span class="p">,</span>
-                <span class="n">mode</span><span class="o">=</span><span class="s2">"lines"</span><span class="p">,</span>
-                <span class="n">name</span><span class="o">=</span><span class="n">di</span><span class="o">.</span><span class="n">label</span><span class="p">,</span>
-            <span class="p">),</span>
-            <span class="n">secondary_y</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="p">)</span>
-
-    <span class="c1"># Plot right axis data</span>
-    <span class="k">for</span> <span class="n">di</span> <span class="ow">in</span> <span class="n">right_data_instances</span><span class="p">:</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">di</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Warning: No data points in DataInstance for </span><span class="si">{</span><span class="n">di</span><span class="o">.</span><span class="n">label</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-            <span class="k">continue</span>
-
-        <span class="c1"># Convert timestamps from the log unit to seconds for plotting with optional downsampling.</span>
-        <span class="n">n_points</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">di</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">max_points</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">n_points</span> <span class="o">&gt;</span> <span class="n">max_points</span> <span class="ow">and</span> <span class="n">max_points</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">step</span> <span class="o">=</span> <span class="p">(</span><span class="n">n_points</span> <span class="o">+</span> <span class="n">max_points</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="n">max_points</span>
-            <span class="n">timestamps_s</span> <span class="o">=</span> <span class="n">to_seconds</span><span class="p">(</span><span class="n">di</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">[::</span><span class="n">step</span><span class="p">],</span> <span class="n">timestamp_unit</span><span class="p">)</span>
-            <span class="n">values_np</span> <span class="o">=</span> <span class="n">di</span><span class="o">.</span><span class="n">value_np</span><span class="p">[::</span><span class="n">step</span><span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">timestamps_s</span> <span class="o">=</span> <span class="n">to_seconds</span><span class="p">(</span><span class="n">di</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">,</span> <span class="n">timestamp_unit</span><span class="p">)</span>
-            <span class="n">values_np</span> <span class="o">=</span> <span class="n">di</span><span class="o">.</span><span class="n">value_np</span>
-
-        <span class="n">fig</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span>
-            <span class="n">go</span><span class="o">.</span><span class="n">Scattergl</span><span class="p">(</span>
-                <span class="n">x</span><span class="o">=</span><span class="n">timestamps_s</span><span class="p">,</span>
-                <span class="n">y</span><span class="o">=</span><span class="n">values_np</span><span class="p">,</span>
-                <span class="n">mode</span><span class="o">=</span><span class="s2">"lines"</span><span class="p">,</span>
-                <span class="n">name</span><span class="o">=</span><span class="n">di</span><span class="o">.</span><span class="n">label</span><span class="p">,</span>
-                <span class="n">line</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">dash</span><span class="o">=</span><span class="s2">"dash"</span><span class="p">),</span>
-            <span class="p">),</span>
-            <span class="n">secondary_y</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="p">)</span>
-
-    <span class="c1"># Set axis titles</span>
+    <span class="n">y_axis_type</span> <span class="o">=</span> <span class="s2">"log"</span> <span class="k">if</span> <span class="n">log_y</span> <span class="k">else</span> <span class="s2">"linear"</span>
     <span class="n">fig</span><span class="o">.</span><span class="n">update_xaxes</span><span class="p">(</span>
         <span class="n">title_text</span><span class="o">=</span><span class="s2">"Time (s)"</span><span class="p">,</span>
-        <span class="n">title_font</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">font_config</span><span class="o">.</span><span class="n">medium</span><span class="p">),</span>
-        <span class="n">tickfont</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">font_config</span><span class="o">.</span><span class="n">small</span><span class="p">),</span>
+        <span class="n">title_font</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">FONT_SIZE_MEDIUM</span><span class="p">),</span>
+        <span class="n">tickfont</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">FONT_SIZE_SMALL</span><span class="p">),</span>
+        <span class="nb">type</span><span class="o">=</span><span class="s2">"log"</span> <span class="k">if</span> <span class="n">log_x</span> <span class="k">else</span> <span class="s2">"linear"</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">fig</span><span class="o">.</span><span class="n">update_yaxes</span><span class="p">(</span>
         <span class="n">title_text</span><span class="o">=</span><span class="n">left_y_axis_title</span><span class="p">,</span>
-        <span class="n">title_font</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">font_config</span><span class="o">.</span><span class="n">medium</span><span class="p">),</span>
-        <span class="n">tickfont</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">font_config</span><span class="o">.</span><span class="n">small</span><span class="p">),</span>
+        <span class="n">title_font</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">FONT_SIZE_MEDIUM</span><span class="p">),</span>
+        <span class="n">tickfont</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">FONT_SIZE_SMALL</span><span class="p">),</span>
+        <span class="nb">type</span><span class="o">=</span><span class="n">y_axis_type</span><span class="p">,</span>
         <span class="n">secondary_y</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">fig</span><span class="o">.</span><span class="n">update_yaxes</span><span class="p">(</span>
         <span class="n">title_text</span><span class="o">=</span><span class="n">right_y_axis_title</span><span class="p">,</span>
-        <span class="n">title_font</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">font_config</span><span class="o">.</span><span class="n">medium</span><span class="p">),</span>
-        <span class="n">tickfont</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">font_config</span><span class="o">.</span><span class="n">small</span><span class="p">),</span>
+        <span class="n">title_font</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">FONT_SIZE_MEDIUM</span><span class="p">),</span>
+        <span class="n">tickfont</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">FONT_SIZE_SMALL</span><span class="p">),</span>
+        <span class="nb">type</span><span class="o">=</span><span class="n">y_axis_type</span><span class="p">,</span>
         <span class="n">secondary_y</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="p">)</span>
 
     <span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span>
         <span class="n">title</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
             <span class="n">text</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
-            <span class="n">x</span><span class="o">=</span><span class="n">layout_config</span><span class="o">.</span><span class="n">title_x</span><span class="p">,</span>
-            <span class="n">xanchor</span><span class="o">=</span><span class="n">layout_config</span><span class="o">.</span><span class="n">title_xanchor</span><span class="p">,</span>
-            <span class="n">yanchor</span><span class="o">=</span><span class="n">layout_config</span><span class="o">.</span><span class="n">title_yanchor</span><span class="p">,</span>
-            <span class="n">font</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">font_config</span><span class="o">.</span><span class="n">large</span><span class="p">),</span>
+            <span class="n">x</span><span class="o">=</span><span class="n">TITLE_X</span><span class="p">,</span>
+            <span class="n">xanchor</span><span class="o">=</span><span class="n">TITLE_XANCHOR</span><span class="p">,</span>
+            <span class="n">yanchor</span><span class="o">=</span><span class="n">TITLE_YANCHOR</span><span class="p">,</span>
+            <span class="n">font</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">FONT_SIZE_LARGE</span><span class="p">),</span>
         <span class="p">),</span>
         <span class="n">showlegend</span><span class="o">=</span><span class="n">show_legend</span><span class="p">,</span>
         <span class="n">hovermode</span><span class="o">=</span><span class="s2">"x unified"</span><span class="p">,</span>
-        <span class="n">width</span><span class="o">=</span><span class="n">layout_config</span><span class="o">.</span><span class="n">width</span><span class="p">,</span>
-        <span class="n">height</span><span class="o">=</span><span class="n">layout_config</span><span class="o">.</span><span class="n">height</span><span class="p">,</span>
-        <span class="n">margin</span><span class="o">=</span><span class="n">layout_config</span><span class="o">.</span><span class="n">margin</span><span class="p">,</span>
-        <span class="n">plot_bgcolor</span><span class="o">=</span><span class="n">layout_config</span><span class="o">.</span><span class="n">plot_bgcolor</span><span class="p">,</span>
-        <span class="n">legend</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">font</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">font_config</span><span class="o">.</span><span class="n">small</span><span class="p">)),</span>
+        <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">,</span>
+        <span class="n">margin</span><span class="o">=</span><span class="n">MARGIN</span><span class="p">,</span>
+        <span class="n">plot_bgcolor</span><span class="o">=</span><span class="n">PLOT_BGCOLOR</span><span class="p">,</span>
+        <span class="n">legend</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">font</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">FONT_SIZE_SMALL</span><span class="p">)),</span>
     <span class="p">)</span>
 
     <span class="k">if</span> <span class="n">vlines</span><span class="p">:</span>
-        <span class="n">_add_vlines</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">vlines</span><span class="p">,</span> <span class="n">vline_config</span><span class="p">)</span>
+        <span class="n">_add_vlines</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">vlines</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">fig</span></div>
 

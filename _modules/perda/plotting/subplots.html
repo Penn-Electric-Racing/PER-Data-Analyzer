@@ -302,9 +302,7 @@
                 <article class="bd-article">
                   
   <h1>Source code for perda.plotting.subplots</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>
-
-<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy.typing</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">npt</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">plotly.graph_objects</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">go</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">plotly.subplots</span><span class="w"> </span><span class="kn">import</span> <span class="n">make_subplots</span>
@@ -312,55 +310,67 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">..core_data_structures.data_instance</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataInstance</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..core_data_structures.single_run_data</span><span class="w"> </span><span class="kn">import</span> <span class="n">SingleRunData</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..units</span><span class="w"> </span><span class="kn">import</span> <span class="n">Timescale</span><span class="p">,</span> <span class="n">to_seconds</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">.plotting_constants</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">DEFAULT_FONT_CONFIG</span><span class="p">,</span>
-    <span class="n">DEFAULT_LAYOUT_CONFIG</span><span class="p">,</span>
-    <span class="n">FontConfig</span><span class="p">,</span>
-    <span class="n">LayoutConfig</span><span class="p">,</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.defaults</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">FONT_SIZE_LARGE</span><span class="p">,</span>
+    <span class="n">FONT_SIZE_MEDIUM</span><span class="p">,</span>
+    <span class="n">FONT_SIZE_SMALL</span><span class="p">,</span>
+    <span class="n">MARGIN</span><span class="p">,</span>
+    <span class="n">MAX_DISPLAY_RESOLUTION_HZ</span><span class="p">,</span>
+    <span class="n">PLOT_BGCOLOR</span><span class="p">,</span>
+    <span class="n">PLOT_WIDTH</span><span class="p">,</span>
+    <span class="n">SUBPLOT_HEIGHT</span><span class="p">,</span>
+    <span class="n">SUBPLOT_VERTICAL_SPACING</span><span class="p">,</span>
+    <span class="n">TITLE_X</span><span class="p">,</span>
+    <span class="n">TITLE_XANCHOR</span><span class="p">,</span>
+    <span class="n">TITLE_YANCHOR</span><span class="p">,</span>
 <span class="p">)</span>
 
 
 <div class="viewcode-block" id="data_instance_subplots">
 <a class="viewcode-back" href="../../../_autosummary/perda.plotting.subplots.html#perda.plotting.subplots.data_instance_subplots">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">data_instance_subplots</span><span class="p">(</span>
-    <span class="n">rows</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">DataInstance</span><span class="p">]],</span>
+    <span class="n">rows</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">DataInstance</span><span class="p">]],</span>
     <span class="n">timestamp_unit</span><span class="p">:</span> <span class="n">Timescale</span><span class="p">,</span>
     <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">row_y_labels</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">row_y_labels</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">show_legend</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-    <span class="n">layout_config</span><span class="p">:</span> <span class="n">LayoutConfig</span> <span class="o">=</span> <span class="n">DEFAULT_LAYOUT_CONFIG</span><span class="p">,</span>
-    <span class="n">font_config</span><span class="p">:</span> <span class="n">FontConfig</span> <span class="o">=</span> <span class="n">DEFAULT_FONT_CONFIG</span><span class="p">,</span>
+    <span class="n">log_x</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">log_y</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">PLOT_WIDTH</span><span class="p">,</span>
+    <span class="n">height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">vertical_spacing</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">SUBPLOT_VERTICAL_SPACING</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">"""Plot groups of DataInstances as stacked subplots on a shared time axis.</span>
+<span class="w">    </span><span class="sd">"""Plot groups of DataInstances as vertically stacked subplots sharing one time axis.</span>
 
-<span class="sd">    Each element of ``rows`` becomes one subplot row. Multiple DataInstances</span>
-<span class="sd">    in the same row are overlaid on that row's y-axis — useful for comparing</span>
-<span class="sd">    signals that share the same units or scale.</span>
+<span class="sd">    Each element of ``rows`` becomes one subplot row. Multiple DataInstances in the same row are overlaid on that row's y-axis, which is useful for comparing signals that share the same units or scale. Zooming the time axis zooms every row together.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    rows : List[List[DataInstance]]</span>
-<span class="sd">        Outer list defines subplot rows (top to bottom); inner list defines</span>
-<span class="sd">        the DataInstances overlaid within that row.</span>
+<span class="sd">    rows : list[list[DataInstance]]</span>
+<span class="sd">        Outer list is the subplot rows, top to bottom. Inner list is the signals overlaid within that row.</span>
 <span class="sd">    timestamp_unit : Timescale</span>
-<span class="sd">        Timestamp unit of the underlying DataInstances. Converted to seconds for x-axis display. Pass ``aly.data.timestamp_unit``.</span>
+<span class="sd">        Unit of the raw timestamps in the DataInstances. They are converted to seconds for the x-axis. Pass ``aly.data.timestamp_unit``.</span>
 <span class="sd">    title : str | None, optional</span>
-<span class="sd">        Figure-level title. Default is None (no title).</span>
-<span class="sd">    row_y_labels : List[str | None] | None, optional</span>
-<span class="sd">        Y-axis label for each row. Must match the length of ``rows`` when</span>
-<span class="sd">        provided. ``None`` entries fall back to auto-labelling from the</span>
-<span class="sd">        DataInstance labels in that row. Default is None (all rows auto-label).</span>
+<span class="sd">        Title shown above the whole figure. Default is None (no title).</span>
+<span class="sd">    row_y_labels : list[str | None] | None, optional</span>
+<span class="sd">        Y-axis label for each row, in the same order as ``rows``. A ``None`` entry falls back to the signal labels in that row. Default is None (every row uses its signal labels).</span>
 <span class="sd">    show_legend : bool, optional</span>
-<span class="sd">        Whether to show the figure legend. Default is True.</span>
-<span class="sd">    layout_config : LayoutConfig, optional</span>
-<span class="sd">        Dimensions, spacing, and style for the subplot grid.</span>
-<span class="sd">    font_config : FontConfig, optional</span>
-<span class="sd">        Font sizes for title, axis labels, tick labels, and legend.</span>
+<span class="sd">        Whether to show the legend listing each signal. Default is True.</span>
+<span class="sd">    log_x : bool, optional</span>
+<span class="sd">        Use a logarithmic time (x) axis. Default is False (linear).</span>
+<span class="sd">    log_y : bool, optional</span>
+<span class="sd">        Use logarithmic y-axes on every row. Default is False (linear).</span>
+<span class="sd">    width : int, optional</span>
+<span class="sd">        Figure width in pixels. Default is PLOT_WIDTH (1200).</span>
+<span class="sd">    height : int | None, optional</span>
+<span class="sd">        Figure height in pixels. Default is None, which gives SUBPLOT_HEIGHT (350) pixels per row.</span>
+<span class="sd">    vertical_spacing : float, optional</span>
+<span class="sd">        Gap between rows as a fraction of the figure height (0 to 1). Default is SUBPLOT_VERTICAL_SPACING (0.12).</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    go.Figure</span>
-<span class="sd">        Plotly figure containing the stacked subplot grid.</span>
+<span class="sd">        Plotly figure. Change anything not exposed here (fonts, colors, margins, axis ranges, ...) with ``fig.update_layout``, ``fig.update_xaxes``, ``fig.update_yaxes`` or ``fig.update_traces`` before calling ``fig.show()``. Target one row with ``row=i, col=1``.</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
@@ -390,7 +400,7 @@
         <span class="n">rows</span><span class="o">=</span><span class="n">n</span><span class="p">,</span>
         <span class="n">cols</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
         <span class="n">shared_xaxes</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">vertical_spacing</span><span class="o">=</span><span class="n">layout_config</span><span class="o">.</span><span class="n">grid_vertical_spacing</span><span class="p">,</span>
+        <span class="n">vertical_spacing</span><span class="o">=</span><span class="n">vertical_spacing</span><span class="p">,</span>
         <span class="n">subplot_titles</span><span class="o">=</span><span class="n">subplot_titles</span><span class="p">,</span>
     <span class="p">)</span>
 
@@ -416,7 +426,6 @@
                 <span class="n">col</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
             <span class="p">)</span>
 
-        <span class="c1"># Resolve y-axis label for this row</span>
         <span class="k">if</span> <span class="n">row_y_labels</span> <span class="ow">and</span> <span class="n">row_idx</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">row_y_labels</span><span class="p">):</span>
             <span class="n">y_label</span> <span class="o">=</span> <span class="n">row_y_labels</span><span class="p">[</span><span class="n">row_idx</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
@@ -425,35 +434,37 @@
 
         <span class="n">fig</span><span class="o">.</span><span class="n">update_yaxes</span><span class="p">(</span>
             <span class="n">title_text</span><span class="o">=</span><span class="n">y_label</span><span class="p">,</span>
-            <span class="n">title_font</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">font_config</span><span class="o">.</span><span class="n">medium</span><span class="p">),</span>
-            <span class="n">tickfont</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">font_config</span><span class="o">.</span><span class="n">small</span><span class="p">),</span>
+            <span class="n">title_font</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">FONT_SIZE_MEDIUM</span><span class="p">),</span>
+            <span class="n">tickfont</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">FONT_SIZE_SMALL</span><span class="p">),</span>
             <span class="n">row</span><span class="o">=</span><span class="n">row_idx</span><span class="p">,</span>
             <span class="n">col</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
         <span class="p">)</span>
 
     <span class="n">fig</span><span class="o">.</span><span class="n">update_xaxes</span><span class="p">(</span>
         <span class="n">title_text</span><span class="o">=</span><span class="s2">"Time (s)"</span><span class="p">,</span>
-        <span class="n">title_font</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">font_config</span><span class="o">.</span><span class="n">medium</span><span class="p">),</span>
-        <span class="n">tickfont</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">font_config</span><span class="o">.</span><span class="n">small</span><span class="p">),</span>
+        <span class="n">title_font</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">FONT_SIZE_MEDIUM</span><span class="p">),</span>
+        <span class="n">tickfont</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">FONT_SIZE_SMALL</span><span class="p">),</span>
         <span class="n">row</span><span class="o">=</span><span class="n">n</span><span class="p">,</span>
         <span class="n">col</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
     <span class="p">)</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">update_xaxes</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">"log"</span> <span class="k">if</span> <span class="n">log_x</span> <span class="k">else</span> <span class="s2">"linear"</span><span class="p">)</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">update_yaxes</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">"log"</span> <span class="k">if</span> <span class="n">log_y</span> <span class="k">else</span> <span class="s2">"linear"</span><span class="p">)</span>
 
     <span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span>
         <span class="n">title</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
             <span class="n">text</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
-            <span class="n">x</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
-            <span class="n">xanchor</span><span class="o">=</span><span class="s2">"center"</span><span class="p">,</span>
-            <span class="n">yanchor</span><span class="o">=</span><span class="s2">"top"</span><span class="p">,</span>
-            <span class="n">font</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">font_config</span><span class="o">.</span><span class="n">large</span><span class="p">),</span>
+            <span class="n">x</span><span class="o">=</span><span class="n">TITLE_X</span><span class="p">,</span>
+            <span class="n">xanchor</span><span class="o">=</span><span class="n">TITLE_XANCHOR</span><span class="p">,</span>
+            <span class="n">yanchor</span><span class="o">=</span><span class="n">TITLE_YANCHOR</span><span class="p">,</span>
+            <span class="n">font</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">FONT_SIZE_LARGE</span><span class="p">),</span>
         <span class="p">),</span>
-        <span class="n">height</span><span class="o">=</span><span class="n">layout_config</span><span class="o">.</span><span class="n">grid_height_per_row</span> <span class="o">*</span> <span class="n">n</span><span class="p">,</span>
-        <span class="n">width</span><span class="o">=</span><span class="n">layout_config</span><span class="o">.</span><span class="n">width</span><span class="p">,</span>
-        <span class="n">margin</span><span class="o">=</span><span class="n">layout_config</span><span class="o">.</span><span class="n">margin</span><span class="p">,</span>
-        <span class="n">plot_bgcolor</span><span class="o">=</span><span class="n">layout_config</span><span class="o">.</span><span class="n">plot_bgcolor</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="n">height</span> <span class="k">if</span> <span class="n">height</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">SUBPLOT_HEIGHT</span> <span class="o">*</span> <span class="n">n</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span>
+        <span class="n">margin</span><span class="o">=</span><span class="n">MARGIN</span><span class="p">,</span>
+        <span class="n">plot_bgcolor</span><span class="o">=</span><span class="n">PLOT_BGCOLOR</span><span class="p">,</span>
         <span class="n">showlegend</span><span class="o">=</span><span class="n">show_legend</span><span class="p">,</span>
         <span class="n">hovermode</span><span class="o">=</span><span class="s2">"x unified"</span><span class="p">,</span>
-        <span class="n">legend</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">font</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">font_config</span><span class="o">.</span><span class="n">small</span><span class="p">)),</span>
+        <span class="n">legend</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">font</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">FONT_SIZE_SMALL</span><span class="p">)),</span>
     <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">fig</span></div>
@@ -466,21 +477,21 @@
     <span class="n">timestamps_s</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">values</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">max_display_resolution</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">"""Return stride-downsampled arrays capped at *max_display_resolution*.</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">"""Keep every Nth sample so the effective sample rate is at most ``max_display_resolution``.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    timestamps_s : np.ndarray</span>
-<span class="sd">        Time values in seconds.</span>
-<span class="sd">    values : np.ndarray</span>
-<span class="sd">        Corresponding sample values.</span>
+<span class="sd">    timestamps_s : npt.NDArray[np.float64]</span>
+<span class="sd">        Sample times in seconds.</span>
+<span class="sd">    values : npt.NDArray[np.float64]</span>
+<span class="sd">        Sample values, same length as ``timestamps_s``.</span>
 <span class="sd">    max_display_resolution : float</span>
-<span class="sd">        Target display sample rate.</span>
+<span class="sd">        Maximum sample rate to keep, in Hz. Data already at or below this rate is returned unchanged.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    Tuple[np.ndarray, np.ndarray]</span>
+<span class="sd">    tuple[npt.NDArray[np.float64], npt.NDArray[np.float64]]</span>
 <span class="sd">        Downsampled ``(timestamps_s, values)``.</span>
 
 <span class="sd">    Examples</span>
@@ -509,37 +520,51 @@
 <div class="viewcode-block" id="plot_multi_log_subplots">
 <a class="viewcode-back" href="../../../_autosummary/perda.plotting.subplots.html#perda.plotting.subplots.plot_multi_log_subplots">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">plot_multi_log_subplots</span><span class="p">(</span>
-    <span class="n">logs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">SingleRunData</span><span class="p">],</span>
-    <span class="n">var_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="n">logs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">SingleRunData</span><span class="p">],</span>
+    <span class="n">var_names</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
     <span class="n">timestamp_unit</span><span class="p">:</span> <span class="n">Timescale</span><span class="p">,</span>
-    <span class="n">row_y_labels</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">row_y_labels</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">layout_config</span><span class="p">:</span> <span class="n">LayoutConfig</span> <span class="o">=</span> <span class="n">DEFAULT_LAYOUT_CONFIG</span><span class="p">,</span>
-    <span class="n">font_config</span><span class="p">:</span> <span class="n">FontConfig</span> <span class="o">=</span> <span class="n">DEFAULT_FONT_CONFIG</span><span class="p">,</span>
+    <span class="n">max_display_resolution_hz</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">MAX_DISPLAY_RESOLUTION_HZ</span><span class="p">,</span>
+    <span class="n">log_x</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">log_y</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">PLOT_WIDTH</span><span class="p">,</span>
+    <span class="n">height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">vertical_spacing</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">SUBPLOT_VERTICAL_SPACING</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">"""Plot the same set of variables across multiple logs as stacked subplots, with each</span>
-<span class="sd">    variable on one subplot.</span>
+<span class="w">    </span><span class="sd">"""Compare the same variables across multiple logs, one stacked subplot per variable.</span>
+
+<span class="sd">    Each subplot overlays one variable from every log. Variables missing from a log are skipped for that log.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    logs : List[SingleRunData]</span>
-<span class="sd">    var_names : List[str]</span>
-<span class="sd">        Ordered list of variable names to plot, one per subplot row.  Variables</span>
-<span class="sd">        absent from log are silently skipped.</span>
+<span class="sd">    logs : list[SingleRunData]</span>
+<span class="sd">        Logs to compare, e.g. ``[aly1.data, aly2.data]``.</span>
+<span class="sd">    var_names : list[str]</span>
+<span class="sd">        Variable names to plot, one subplot row per name, top to bottom.</span>
 <span class="sd">    timestamp_unit : Timescale</span>
-<span class="sd">        Timestamp unit of the underlying DataInstances. Pass ``aly.data.timestamp_unit``.</span>
-<span class="sd">    row_y_labels : List[str | None] | None, optional</span>
-<span class="sd">        Y-axis label for each row. Must match the length of ``var_names``</span>
+<span class="sd">        Unit of the raw timestamps in the logs. They are converted to seconds for the x-axis. Pass ``aly.data.timestamp_unit``.</span>
+<span class="sd">    row_y_labels : list[str | None] | None, optional</span>
+<span class="sd">        Y-axis label for each row, in the same order as ``var_names``. Ignored unless its length matches ``var_names``. Default is None (no y-axis labels; subplot titles show the variable names).</span>
 <span class="sd">    title : str | None, optional</span>
-<span class="sd">        Base figure title.  When multiple figures are produced a ``(1/N)``</span>
-<span class="sd">        suffix is appended automatically.</span>
-<span class="sd">    layout_config : LayoutConfig, optional</span>
-<span class="sd">    font_config : FontConfig, optional</span>
+<span class="sd">        Title shown above the whole figure. Default is None (no title).</span>
+<span class="sd">    max_display_resolution_hz : float, optional</span>
+<span class="sd">        Signals sampled faster than this rate (Hz) are downsampled before plotting to keep the figure responsive. Default is MAX_DISPLAY_RESOLUTION_HZ (50).</span>
+<span class="sd">    log_x : bool, optional</span>
+<span class="sd">        Use a logarithmic time (x) axis. Default is False (linear).</span>
+<span class="sd">    log_y : bool, optional</span>
+<span class="sd">        Use logarithmic y-axes on every row. Default is False (linear).</span>
+<span class="sd">    width : int, optional</span>
+<span class="sd">        Figure width in pixels. Default is PLOT_WIDTH (1200).</span>
+<span class="sd">    height : int | None, optional</span>
+<span class="sd">        Figure height in pixels. Default is None, which gives SUBPLOT_HEIGHT (350) pixels per row.</span>
+<span class="sd">    vertical_spacing : float, optional</span>
+<span class="sd">        Gap between rows as a fraction of the figure height (0 to 1). Default is SUBPLOT_VERTICAL_SPACING (0.12).</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    go.Figure</span>
-<span class="sd">        The combined figure with all subplots.</span>
+<span class="sd">        Plotly figure. Change anything not exposed here (fonts, colors, margins, axis ranges, ...) with ``fig.update_layout``, ``fig.update_xaxes``, ``fig.update_yaxes`` or ``fig.update_traces`` before calling ``fig.show()``.</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
@@ -561,7 +586,7 @@
         <span class="n">rows</span><span class="o">=</span><span class="n">n_vars</span><span class="p">,</span>
         <span class="n">cols</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
         <span class="n">shared_xaxes</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">vertical_spacing</span><span class="o">=</span><span class="n">layout_config</span><span class="o">.</span><span class="n">grid_vertical_spacing</span><span class="p">,</span>
+        <span class="n">vertical_spacing</span><span class="o">=</span><span class="n">vertical_spacing</span><span class="p">,</span>
         <span class="n">subplot_titles</span><span class="o">=</span><span class="n">var_names</span><span class="p">,</span>
     <span class="p">)</span>
 
@@ -578,9 +603,9 @@
                 <span class="n">di</span><span class="o">.</span><span class="n">timestamp_np</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span> <span class="n">timestamp_unit</span>
             <span class="p">)</span>
             <span class="n">values</span> <span class="o">=</span> <span class="n">di</span><span class="o">.</span><span class="n">value_np</span>
-            <span class="k">if</span> <span class="n">layout_config</span><span class="o">.</span><span class="n">max_display_resolution</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">max_display_resolution_hz</span><span class="p">:</span>
                 <span class="n">timestamps_s</span><span class="p">,</span> <span class="n">values</span> <span class="o">=</span> <span class="n">stride_downsample</span><span class="p">(</span>
-                    <span class="n">timestamps_s</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">layout_config</span><span class="o">.</span><span class="n">max_display_resolution</span>
+                    <span class="n">timestamps_s</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">max_display_resolution_hz</span>
                 <span class="p">)</span>
 
             <span class="n">fig</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span>
@@ -601,34 +626,36 @@
         <span class="k">for</span> <span class="n">var_idx</span><span class="p">,</span> <span class="n">y_label</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">row_y_labels</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
             <span class="n">fig</span><span class="o">.</span><span class="n">update_yaxes</span><span class="p">(</span>
                 <span class="n">title_text</span><span class="o">=</span><span class="n">y_label</span><span class="p">,</span>
-                <span class="n">title_font</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">font_config</span><span class="o">.</span><span class="n">medium</span><span class="p">),</span>
-                <span class="n">tickfont</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">font_config</span><span class="o">.</span><span class="n">small</span><span class="p">),</span>
+                <span class="n">title_font</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">FONT_SIZE_MEDIUM</span><span class="p">),</span>
+                <span class="n">tickfont</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">FONT_SIZE_SMALL</span><span class="p">),</span>
                 <span class="n">row</span><span class="o">=</span><span class="n">var_idx</span><span class="p">,</span>
                 <span class="n">col</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
             <span class="p">)</span>
 
     <span class="n">fig</span><span class="o">.</span><span class="n">update_xaxes</span><span class="p">(</span>
         <span class="n">title_text</span><span class="o">=</span><span class="s2">"Time (s)"</span><span class="p">,</span>
-        <span class="n">title_font</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">font_config</span><span class="o">.</span><span class="n">medium</span><span class="p">),</span>
-        <span class="n">tickfont</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">font_config</span><span class="o">.</span><span class="n">small</span><span class="p">),</span>
+        <span class="n">title_font</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">FONT_SIZE_MEDIUM</span><span class="p">),</span>
+        <span class="n">tickfont</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">FONT_SIZE_SMALL</span><span class="p">),</span>
         <span class="n">row</span><span class="o">=</span><span class="n">n_vars</span><span class="p">,</span>
         <span class="n">col</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
     <span class="p">)</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">update_xaxes</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">"log"</span> <span class="k">if</span> <span class="n">log_x</span> <span class="k">else</span> <span class="s2">"linear"</span><span class="p">)</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">update_yaxes</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">"log"</span> <span class="k">if</span> <span class="n">log_y</span> <span class="k">else</span> <span class="s2">"linear"</span><span class="p">)</span>
 
     <span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span>
         <span class="n">title</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
             <span class="n">text</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
-            <span class="n">x</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
-            <span class="n">xanchor</span><span class="o">=</span><span class="s2">"center"</span><span class="p">,</span>
-            <span class="n">yanchor</span><span class="o">=</span><span class="s2">"top"</span><span class="p">,</span>
-            <span class="n">font</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">font_config</span><span class="o">.</span><span class="n">large</span><span class="p">),</span>
+            <span class="n">x</span><span class="o">=</span><span class="n">TITLE_X</span><span class="p">,</span>
+            <span class="n">xanchor</span><span class="o">=</span><span class="n">TITLE_XANCHOR</span><span class="p">,</span>
+            <span class="n">yanchor</span><span class="o">=</span><span class="n">TITLE_YANCHOR</span><span class="p">,</span>
+            <span class="n">font</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">FONT_SIZE_LARGE</span><span class="p">),</span>
         <span class="p">),</span>
-        <span class="n">height</span><span class="o">=</span><span class="n">layout_config</span><span class="o">.</span><span class="n">grid_height_per_row</span> <span class="o">*</span> <span class="n">n_vars</span><span class="p">,</span>
-        <span class="n">width</span><span class="o">=</span><span class="n">layout_config</span><span class="o">.</span><span class="n">width</span><span class="p">,</span>
-        <span class="n">margin</span><span class="o">=</span><span class="n">layout_config</span><span class="o">.</span><span class="n">margin</span><span class="p">,</span>
-        <span class="n">plot_bgcolor</span><span class="o">=</span><span class="n">layout_config</span><span class="o">.</span><span class="n">plot_bgcolor</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="n">height</span> <span class="k">if</span> <span class="n">height</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">SUBPLOT_HEIGHT</span> <span class="o">*</span> <span class="n">n_vars</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span>
+        <span class="n">margin</span><span class="o">=</span><span class="n">MARGIN</span><span class="p">,</span>
+        <span class="n">plot_bgcolor</span><span class="o">=</span><span class="n">PLOT_BGCOLOR</span><span class="p">,</span>
         <span class="n">hovermode</span><span class="o">=</span><span class="s2">"x unified"</span><span class="p">,</span>
-        <span class="n">legend</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">font</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">font_config</span><span class="o">.</span><span class="n">small</span><span class="p">)),</span>
+        <span class="n">legend</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">font</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">FONT_SIZE_SMALL</span><span class="p">)),</span>
     <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">fig</span></div>

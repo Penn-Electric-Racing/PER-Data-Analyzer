@@ -50,7 +50,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/perda.plotting.parametric_trimmer';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="perda.plotting.plotting_constants" href="perda.plotting.plotting_constants.html" />
+    <link rel="next" title="perda.plotting.scatter_histogram_plotter" href="perda.plotting.scatter_histogram_plotter.html" />
     <link rel="prev" title="perda.plotting.parametric_plot" href="perda.plotting.parametric_plot.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -285,12 +285,14 @@
 </ul>
 </details></li>
 <li class="toctree-l2 current active has-children"><a class="reference internal" href="perda.plotting.html">perda.plotting</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="perda.plotting.binned_count_plotter.html">perda.plotting.binned_count_plotter</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.plotting.data_instance_plotter.html">perda.plotting.data_instance_plotter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="perda.plotting.diff_plotter.html">perda.plotting.diff_plotter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.plotting.defaults.html">perda.plotting.defaults</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.plotting.fft_plotter.html">perda.plotting.fft_plotter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.plotting.map_trace.html">perda.plotting.map_trace</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.plotting.parametric_overlay.html">perda.plotting.parametric_overlay</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.plotting.parametric_plot.html">perda.plotting.parametric_plot</a></li>
 <li class="toctree-l3 current active"><a class="current reference internal" href="#">perda.plotting.parametric_trimmer</a></li>
-<li class="toctree-l3"><a class="reference internal" href="perda.plotting.plotting_constants.html">perda.plotting.plotting_constants</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.plotting.scatter_histogram_plotter.html">perda.plotting.scatter_histogram_plotter</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.plotting.subplots.html">perda.plotting.subplots</a></li>
 </ul>
@@ -387,27 +389,31 @@
 <span id="perda-plotting-parametric-trimmer"></span><h1>perda.plotting.parametric_trimmer<a class="headerlink" href="#module-perda.plotting.parametric_trimmer" title="Link to this heading">#</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="perda.plotting.parametric_trimmer.plot_parametric_trimmer">
-<span class="sig-prename descclassname"><span class="pre">perda.plotting.parametric_trimmer.</span></span><span class="sig-name descname"><span class="pre">plot_parametric_trimmer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp_unit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'X'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Y'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layout_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">LayoutConfig(width=1200,</span> <span class="pre">height=700,</span> <span class="pre">margin={'l':</span> <span class="pre">70,</span> <span class="pre">'r':</span> <span class="pre">50,</span> <span class="pre">'t':</span> <span class="pre">90,</span> <span class="pre">'b':</span> <span class="pre">70},</span> <span class="pre">plot_bgcolor='white',</span> <span class="pre">title_x=0.5,</span> <span class="pre">title_xanchor='center',</span> <span class="pre">title_yanchor='top',</span> <span class="pre">grid_width_per_col=400,</span> <span class="pre">grid_height_per_row=350,</span> <span class="pre">grid_horizontal_spacing=0.08,</span> <span class="pre">grid_vertical_spacing=0.12,</span> <span class="pre">max_display_resolution=50)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">font_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">FontConfig(large=20,</span> <span class="pre">medium=14,</span> <span class="pre">small=10)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/plotting/parametric_trimmer.html#plot_parametric_trimmer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.plotting.parametric_trimmer.plot_parametric_trimmer" title="Link to this definition">#</a></dt>
-<dd><p>Interactive parametric curve trimmer with a dual-handle range slider.</p>
-<p>Displays a 2D parametric scatter plot alongside an ipywidgets IntRangeSlider
-that trims which points are shown. Designed for use in Jupyter notebooks.</p>
+<span class="sig-prename descclassname"><span class="pre">perda.plotting.parametric_trimmer.</span></span><span class="sig-name descname"><span class="pre">plot_parametric_trimmer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp_unit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'X'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Y'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">700</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/plotting/parametric_trimmer.html#plot_parametric_trimmer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.plotting.parametric_trimmer.plot_parametric_trimmer" title="Link to this definition">#</a></dt>
+<dd><p>Interactive parametric curve (y against x) with a range slider for picking a sub-window of samples.</p>
+<p>Drag the two slider handles to hide points outside the selected range. The labels under the slider show the index and raw timestamp of the first and last visible point, which can be passed directly to trimming functions such as <code class="docutils literal notranslate"><span class="pre">trim_single_run_data(ts_start=...,</span> <span class="pre">ts_end=...)</span></code>. Designed for Jupyter notebooks.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>x</strong> (<em>NDArray</em><em>[</em><em>float64</em><em>]</em>) – X-axis values.</p></li>
-<li><p><strong>y</strong> (<em>NDArray</em><em>[</em><em>float64</em><em>]</em>) – Y-axis values. Must have the same length as <cite>x</cite>.</p></li>
-<li><p><strong>timestamp_unit</strong> (<a class="reference internal" href="perda.units.html#perda.units.Timescale" title="perda.units.Timescale"><em>Timescale</em></a>) – Unit for timestamp labels in the slider. Ignored if <cite>timestamps</cite> is None. Pass <code class="docutils literal notranslate"><span class="pre">aly.data.timestamp_unit</span></code>.</p></li>
-<li><p><strong>timestamps</strong> (<em>NDArray</em><em>[</em><em>float64</em><em>] </em><em>| </em><em>None</em><em>, </em><em>optional</em>) – Timestamps corresponding to each point, shown in the slider labels.
-If None, slider labels show index only.</p></li>
-<li><p><strong>x_label</strong> (<em>str</em><em>, </em><em>optional</em>) – X-axis label.</p></li>
-<li><p><strong>y_label</strong> (<em>str</em><em>, </em><em>optional</em>) – Y-axis label.</p></li>
-<li><p><strong>title</strong> (<em>str</em><em> | </em><em>None</em><em>, </em><em>optional</em>) – Plot title.</p></li>
-<li><p><strong>layout_config</strong> (<a class="reference internal" href="perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.LayoutConfig" title="perda.plotting.plotting_constants.LayoutConfig"><em>LayoutConfig</em></a><em>, </em><em>optional</em>)</p></li>
-<li><p><strong>font_config</strong> (<a class="reference internal" href="perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.FontConfig" title="perda.plotting.plotting_constants.FontConfig"><em>FontConfig</em></a><em>, </em><em>optional</em>)</p></li>
+<li><p><strong>x</strong> (<em>NDArray</em><em>[</em><em>float64</em><em>]</em>) – X-axis values, e.g. longitude or East position.</p></li>
+<li><p><strong>y</strong> (<em>NDArray</em><em>[</em><em>float64</em><em>]</em>) – Y-axis values, e.g. latitude or North position. Must have the same length as <code class="docutils literal notranslate"><span class="pre">x</span></code>.</p></li>
+<li><p><strong>timestamp_unit</strong> (<a class="reference internal" href="perda.units.html#perda.units.Timescale" title="perda.units.Timescale"><em>Timescale</em></a>) – Unit of <code class="docutils literal notranslate"><span class="pre">timestamps</span></code>, shown next to the timestamp in the slider labels. Ignored if <code class="docutils literal notranslate"><span class="pre">timestamps</span></code> is None. Pass <code class="docutils literal notranslate"><span class="pre">aly.data.timestamp_unit</span></code>.</p></li>
+<li><p><strong>timestamps</strong> (<em>NDArray</em><em>[</em><em>float64</em><em>] </em><em>| </em><em>None</em><em>, </em><em>optional</em>) – Raw timestamp of each point (in <code class="docutils literal notranslate"><span class="pre">timestamp_unit</span></code>, not converted to seconds), shown in the slider labels. Default is None (labels show sample index only).</p></li>
+<li><p><strong>x_label</strong> (<em>str</em><em>, </em><em>optional</em>) – X-axis label. Default is <code class="docutils literal notranslate"><span class="pre">&quot;X&quot;</span></code>.</p></li>
+<li><p><strong>y_label</strong> (<em>str</em><em>, </em><em>optional</em>) – Y-axis label. Default is <code class="docutils literal notranslate"><span class="pre">&quot;Y&quot;</span></code>.</p></li>
+<li><p><strong>title</strong> (<em>str</em><em> | </em><em>None</em><em>, </em><em>optional</em>) – Title shown above the plot. Default is None (no title).</p></li>
+<li><p><strong>width</strong> (<em>int</em><em>, </em><em>optional</em>) – Figure width in pixels. Default is PLOT_WIDTH (1200).</p></li>
+<li><p><strong>height</strong> (<em>int</em><em>, </em><em>optional</em>) – Figure height in pixels. Default is PLOT_HEIGHT (700).</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>ipywidgets.VBox</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Widget containing the figure, the slider and the labels. Display it as the last expression in a notebook cell or with <code class="docutils literal notranslate"><span class="pre">display(widget)</span></code>. The figure is <code class="docutils literal notranslate"><span class="pre">widget.children[0]</span></code> and can be customized with <code class="docutils literal notranslate"><span class="pre">update_layout</span></code> like any Plotly figure.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ipywidgets.VBox</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If <code class="docutils literal notranslate"><span class="pre">x</span></code> is empty, or <code class="docutils literal notranslate"><span class="pre">y</span></code> (or <code class="docutils literal notranslate"><span class="pre">timestamps</span></code>, when given) does not have the same length as <code class="docutils literal notranslate"><span class="pre">x</span></code>.</p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
@@ -442,11 +448,11 @@ If None, slider labels show index only.</p></li>
       </div>
     </a>
     <a class="right-next"
-       href="perda.plotting.plotting_constants.html"
+       href="perda.plotting.scatter_histogram_plotter.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">perda.plotting.plotting_constants</p>
+        <p class="prev-next-title">perda.plotting.scatter_histogram_plotter</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

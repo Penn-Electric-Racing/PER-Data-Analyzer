@@ -1,0 +1,8 @@
+perda.plotting.defaults
+=======================
+
+.. automodule:: perda.plotting.defaults
+   :members:
+   :undoc-members:
+   :show-inheritance:
+

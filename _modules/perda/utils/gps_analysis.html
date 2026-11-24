@@ -302,22 +302,19 @@
                 <article class="bd-article">
                   
   <h1>Source code for perda.utils.gps_analysis</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span>
-
-<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">plotly.graph_objects</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">go</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">numpy.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">NDArray</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">..constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">EARTH_RADIUS_METERS</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..core_data_structures.data_instance</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataInstance</span><span class="p">,</span> <span class="n">left_join_data_instances</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">..plotting.plotting_constants</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">DEFAULT_FONT_CONFIG</span><span class="p">,</span>
-    <span class="n">DEFAULT_GPS_MAP_CONFIG</span><span class="p">,</span>
-    <span class="n">DEFAULT_LAYOUT_CONFIG</span><span class="p">,</span>
-    <span class="n">FontConfig</span><span class="p">,</span>
-    <span class="n">GpsMapConfig</span><span class="p">,</span>
-    <span class="n">LayoutConfig</span><span class="p">,</span>
-<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..plotting.defaults</span><span class="w"> </span><span class="kn">import</span> <span class="n">MAP_STYLE</span><span class="p">,</span> <span class="n">PLOT_HEIGHT</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..plotting.map_trace</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_map_trace</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..plotting.parametric_overlay</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_parametric_overlay</span>
+
+<span class="c1"># Outlier filtering thresholds (m). float("inf") disables a filter.</span>
+<span class="n">GPS_MAX_RADIUS_M</span> <span class="o">=</span> <span class="mf">5_000.0</span>
+<span class="n">GPS_MAX_JUMP_M</span> <span class="o">=</span> <span class="mf">30.0</span>
 
 
 <div class="viewcode-block" id="gps_to_enu">
@@ -369,7 +366,8 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">filter_gps_cartesian</span><span class="p">(</span>
     <span class="n">lat</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">lon</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-    <span class="n">gps_map_config</span><span class="p">:</span> <span class="n">GpsMapConfig</span> <span class="o">=</span> <span class="n">DEFAULT_GPS_MAP_CONFIG</span><span class="p">,</span>
+    <span class="n">max_radius_m</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">GPS_MAX_RADIUS_M</span><span class="p">,</span>
+    <span class="n">max_jump_m</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">GPS_MAX_JUMP_M</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Build a boolean mask that removes Cartesian GPS outliers.</span>
@@ -377,9 +375,9 @@
 <span class="sd">    Two independent filters are applied and combined with logical-AND:</span>
 
 <span class="sd">    * **Radius filter** — discards points whose straight-line distance from the</span>
-<span class="sd">      centroid of all points exceeds ``gps_map_config.max_radius_m``.</span>
+<span class="sd">      centroid of all points exceeds ``max_radius_m``.</span>
 <span class="sd">    * **Jump filter** — discards points where the step distance from the previous</span>
-<span class="sd">      point exceeds ``gps_map_config.max_jump_m``.</span>
+<span class="sd">      point exceeds ``max_jump_m``.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -387,7 +385,10 @@
 <span class="sd">        Latitude values in degrees.</span>
 <span class="sd">    lon : NDArray[np.float64]</span>
 <span class="sd">        Longitude values in degrees.</span>
-<span class="sd">    gps_map_config : GpsMapConfig, optional</span>
+<span class="sd">    max_radius_m : float, optional</span>
+<span class="sd">        Points farther than this many metres from the centre of all points are dropped. Use ``float("inf")`` to disable. Default is GPS_MAX_RADIUS_M (5000).</span>
+<span class="sd">    max_jump_m : float, optional</span>
+<span class="sd">        Points more than this many metres from the previous point are dropped as GPS glitches. Use ``float("inf")`` to disable. Default is GPS_MAX_JUMP_M (30).</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -397,14 +398,14 @@
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
 <span class="sd">    &gt;&gt;&gt; from perda.utils import filter_gps_cartesian</span>
-<span class="sd">    &gt;&gt;&gt; mask = filter_gps_cartesian(lat_array, lon_array)</span>
+<span class="sd">    &gt;&gt;&gt; mask = filter_gps_cartesian(lat_array, lon_array, max_radius_m=1500.0)</span>
 <span class="sd">    &gt;&gt;&gt; lat_clean, lon_clean = lat_array[mask], lon_array[mask]</span>
 <span class="sd">    """</span>
     <span class="n">east</span><span class="p">,</span> <span class="n">north</span> <span class="o">=</span> <span class="n">gps_to_enu</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">)</span>
-    <span class="n">radius_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">east</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">north</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">gps_map_config</span><span class="o">.</span><span class="n">max_radius_m</span>
+    <span class="n">radius_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">east</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">north</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">max_radius_m</span>
     <span class="n">dx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">east</span><span class="p">,</span> <span class="n">prepend</span><span class="o">=</span><span class="n">east</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
     <span class="n">dy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">north</span><span class="p">,</span> <span class="n">prepend</span><span class="o">=</span><span class="n">north</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-    <span class="n">jump_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">dx</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">dy</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">gps_map_config</span><span class="o">.</span><span class="n">max_jump_m</span>
+    <span class="n">jump_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">dx</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">dy</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">max_jump_m</span>
     <span class="k">return</span> <span class="p">(</span><span class="n">radius_mask</span> <span class="o">&amp;</span> <span class="n">jump_mask</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">)</span></div>
 
 
@@ -412,35 +413,42 @@
 <div class="viewcode-block" id="plot_gps_comparison">
 <a class="viewcode-back" href="../../../_autosummary/perda.utils.gps_analysis.html#perda.utils.gps_analysis.plot_gps_comparison">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">plot_gps_comparison</span><span class="p">(</span>
-    <span class="n">runs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="nb">str</span><span class="p">]],</span>
+    <span class="n">runs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="nb">str</span><span class="p">]],</span>
     <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">gps_map_config</span><span class="p">:</span> <span class="n">GpsMapConfig</span> <span class="o">=</span> <span class="n">DEFAULT_GPS_MAP_CONFIG</span><span class="p">,</span>
-    <span class="n">layout_config</span><span class="p">:</span> <span class="n">LayoutConfig</span> <span class="o">=</span> <span class="n">DEFAULT_LAYOUT_CONFIG</span><span class="p">,</span>
-    <span class="n">font_config</span><span class="p">:</span> <span class="n">FontConfig</span> <span class="o">=</span> <span class="n">DEFAULT_FONT_CONFIG</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">max_radius_m</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">GPS_MAX_RADIUS_M</span><span class="p">,</span>
+    <span class="n">max_jump_m</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">GPS_MAX_JUMP_M</span><span class="p">,</span>
+    <span class="n">width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">PLOT_HEIGHT</span><span class="p">,</span>
+    <span class="n">height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">PLOT_HEIGHT</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Overlay GPS tracks from multiple runs on a shared East/North Cartesian frame.</span>
+<span class="sd">    Overlay GPS tracks from multiple runs on a shared East/North frame in metres.</span>
 
-<span class="sd">    Each run is projected to ENU coordinates using a single shared reference</span>
-<span class="sd">    point (median of all points across all runs), then filtered with</span>
-<span class="sd">    :func:`filter_gps_cartesian` before plotting.</span>
+<span class="sd">    Each run is projected to East/North coordinates around one shared reference point (median of all points across all runs), outliers are removed with :func:`filter_gps_cartesian`, and the result is plotted with :func:`perda.plotting.plot_parametric_overlay`. Runs with no points left after filtering are skipped.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    runs : List[tuple[NDArray[np.float64], NDArray[np.float64], str]]</span>
-<span class="sd">        Each element is ``(lat_array, lon_array, label)`` for one run.</span>
-<span class="sd">        ``lat_array`` and ``lon_array`` must be the same length.</span>
+<span class="sd">    runs : list[tuple[NDArray[np.float64], NDArray[np.float64], str]]</span>
+<span class="sd">        One ``(lat_array, lon_array, label)`` tuple per run, with latitude and longitude in degrees. ``lat_array`` and ``lon_array`` must be the same length. ``label`` is the legend name.</span>
 <span class="sd">    title : str | None, optional</span>
-<span class="sd">    gps_map_config : GpsMapConfig, optional</span>
-<span class="sd">        Controls Cartesian outlier thresholds (``max_radius_m``, ``max_jump_m``)</span>
-<span class="sd">        and marker appearance.</span>
-<span class="sd">    layout_config : LayoutConfig, optional</span>
-<span class="sd">    font_config : FontConfig, optional</span>
+<span class="sd">        Title shown above the plot. Default is None (no title).</span>
+<span class="sd">    max_radius_m : float, optional</span>
+<span class="sd">        Outlier filter: points farther than this many metres from the centre of the run are dropped. Use ``float("inf")`` to disable. Default is GPS_MAX_RADIUS_M (5000).</span>
+<span class="sd">    max_jump_m : float, optional</span>
+<span class="sd">        Outlier filter: points more than this many metres from the previous point are dropped. Use ``float("inf")`` to disable. Default is GPS_MAX_JUMP_M (30).</span>
+<span class="sd">    width : int, optional</span>
+<span class="sd">        Figure width in pixels. Default is PLOT_HEIGHT (700), making a square plot.</span>
+<span class="sd">    height : int, optional</span>
+<span class="sd">        Figure height in pixels. Default is PLOT_HEIGHT (700).</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    go.Figure</span>
-<span class="sd">        Plotly figure with one scatter trace per run</span>
+<span class="sd">        Plotly figure with one marker trace per run, in metres East/North of a shared reference point. Change anything not exposed here (fonts, marker size, colors, ...) with ``fig.update_layout`` or ``fig.update_traces`` before calling ``fig.show()``.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If two runs share the same label.</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
@@ -450,46 +458,36 @@
 <span class="sd">    ...     title="GPS Comparison",</span>
 <span class="sd">    ... )</span>
 <span class="sd">    """</span>
+    <span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="n">label</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">runs</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">labels</span><span class="p">))</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">labels</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Run labels must be unique, got </span><span class="si">{</span><span class="n">labels</span><span class="si">}</span><span class="s2">."</span><span class="p">)</span>
 
     <span class="n">all_lat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">lat</span> <span class="k">for</span> <span class="n">lat</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">runs</span><span class="p">])</span>
     <span class="n">all_lon</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">lon</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">runs</span><span class="p">])</span>
     <span class="n">lat_ref</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">all_lat</span><span class="p">))</span>
     <span class="n">lon_ref</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">all_lon</span><span class="p">))</span>
 
-    <span class="n">fig</span> <span class="o">=</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">()</span>
-
+    <span class="n">east_by_run</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">north_by_run</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">for</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">runs</span><span class="p">:</span>
         <span class="n">east</span><span class="p">,</span> <span class="n">north</span> <span class="o">=</span> <span class="n">gps_to_enu</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">lat_ref</span><span class="o">=</span><span class="n">lat_ref</span><span class="p">,</span> <span class="n">lon_ref</span><span class="o">=</span><span class="n">lon_ref</span><span class="p">)</span>
-        <span class="n">mask</span> <span class="o">=</span> <span class="n">filter_gps_cartesian</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">gps_map_config</span><span class="p">)</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">filter_gps_cartesian</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">max_radius_m</span><span class="p">,</span> <span class="n">max_jump_m</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">mask</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
             <span class="k">continue</span>
-        <span class="n">fig</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span>
-            <span class="n">go</span><span class="o">.</span><span class="n">Scattergl</span><span class="p">(</span>
-                <span class="n">x</span><span class="o">=</span><span class="n">east</span><span class="p">[</span><span class="n">mask</span><span class="p">],</span>
-                <span class="n">y</span><span class="o">=</span><span class="n">north</span><span class="p">[</span><span class="n">mask</span><span class="p">],</span>
-                <span class="n">mode</span><span class="o">=</span><span class="s2">"markers"</span><span class="p">,</span>
-                <span class="n">marker</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">gps_map_config</span><span class="o">.</span><span class="n">marker_size</span><span class="p">),</span>
-                <span class="n">name</span><span class="o">=</span><span class="n">label</span><span class="p">,</span>
-            <span class="p">)</span>
-        <span class="p">)</span>
+        <span class="n">east_by_run</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="n">east</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span>
+        <span class="n">north_by_run</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="n">north</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span>
 
-    <span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span>
-        <span class="n">title</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
-            <span class="n">text</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
-            <span class="n">x</span><span class="o">=</span><span class="n">layout_config</span><span class="o">.</span><span class="n">title_x</span><span class="p">,</span>
-            <span class="n">xanchor</span><span class="o">=</span><span class="n">layout_config</span><span class="o">.</span><span class="n">title_xanchor</span><span class="p">,</span>
-            <span class="n">yanchor</span><span class="o">=</span><span class="n">layout_config</span><span class="o">.</span><span class="n">title_yanchor</span><span class="p">,</span>
-            <span class="n">font</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">font_config</span><span class="o">.</span><span class="n">large</span><span class="p">),</span>
-        <span class="p">),</span>
-        <span class="n">xaxis_title</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="s2">"East (m)"</span><span class="p">,</span> <span class="n">font</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">font_config</span><span class="o">.</span><span class="n">medium</span><span class="p">)),</span>
-        <span class="n">yaxis_title</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="s2">"North (m)"</span><span class="p">,</span> <span class="n">font</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">font_config</span><span class="o">.</span><span class="n">medium</span><span class="p">)),</span>
-        <span class="n">yaxis</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">scaleanchor</span><span class="o">=</span><span class="s2">"x"</span><span class="p">,</span> <span class="n">scaleratio</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
-        <span class="n">width</span><span class="o">=</span><span class="n">layout_config</span><span class="o">.</span><span class="n">height</span><span class="p">,</span>
-        <span class="n">height</span><span class="o">=</span><span class="n">layout_config</span><span class="o">.</span><span class="n">height</span><span class="p">,</span>
-        <span class="n">margin</span><span class="o">=</span><span class="n">layout_config</span><span class="o">.</span><span class="n">margin</span><span class="p">,</span>
-        <span class="n">legend</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">font</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">font_config</span><span class="o">.</span><span class="n">small</span><span class="p">)),</span>
-    <span class="p">)</span>
-    <span class="k">return</span> <span class="n">fig</span></div>
+    <span class="k">return</span> <span class="n">plot_parametric_overlay</span><span class="p">(</span>
+        <span class="n">east_by_run</span><span class="p">,</span>
+        <span class="n">north_by_run</span><span class="p">,</span>
+        <span class="n">x_label</span><span class="o">=</span><span class="s2">"East (m)"</span><span class="p">,</span>
+        <span class="n">y_label</span><span class="o">=</span><span class="s2">"North (m)"</span><span class="p">,</span>
+        <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
+        <span class="n">mode</span><span class="o">=</span><span class="s2">"markers"</span><span class="p">,</span>
+        <span class="n">equal_aspect</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">,</span>
+    <span class="p">)</span></div>
 
 
 
@@ -501,39 +499,44 @@
     <span class="n">vel_raw</span><span class="p">:</span> <span class="n">DataInstance</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">vel_thresh</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span>
     <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">layout_config</span><span class="p">:</span> <span class="n">LayoutConfig</span> <span class="o">=</span> <span class="n">DEFAULT_LAYOUT_CONFIG</span><span class="p">,</span>
-    <span class="n">font_config</span><span class="p">:</span> <span class="n">FontConfig</span> <span class="o">=</span> <span class="n">DEFAULT_FONT_CONFIG</span><span class="p">,</span>
-    <span class="n">gps_map_config</span><span class="p">:</span> <span class="n">GpsMapConfig</span> <span class="o">=</span> <span class="n">DEFAULT_GPS_MAP_CONFIG</span><span class="p">,</span>
+    <span class="n">max_radius_m</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">GPS_MAX_RADIUS_M</span><span class="p">,</span>
+    <span class="n">max_jump_m</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">GPS_MAX_JUMP_M</span><span class="p">,</span>
+    <span class="n">map_style</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">MAP_STYLE</span><span class="p">,</span>
+    <span class="n">width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">PLOT_HEIGHT</span><span class="p">,</span>
+    <span class="n">height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">PLOT_HEIGHT</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Generate a GPS trace on an interactive map background.</span>
+<span class="sd">    Draw a log's GPS track on an interactive map background.</span>
 
-<span class="sd">    Outliers (large radius from centroid or sudden jumps) are removed via</span>
-<span class="sd">    :func:`filter_gps_cartesian`.  Uses OpenStreetMap tiles by default</span>
-<span class="sd">    (free, no API key required).</span>
+<span class="sd">    Aligns longitude (and speed) onto latitude's timestamps, trims away the stationary start and end of the log if speed is given, removes outliers with :func:`filter_gps_cartesian`, then plots with :func:`perda.plotting.plot_map_trace`.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    lat_raw : DataInstance</span>
-<span class="sd">        Raw latitude data instance, timestamp alignment base.</span>
+<span class="sd">        Latitude in degrees. Its timestamps are the base that longitude and velocity are aligned to.</span>
 <span class="sd">    lon_raw : DataInstance</span>
-<span class="sd">        Raw longitude data instance.</span>
+<span class="sd">        Longitude in degrees.</span>
 <span class="sd">    vel_raw : DataInstance | None, optional</span>
-<span class="sd">        Raw velocity data instance.</span>
+<span class="sd">        Vehicle speed, used to cut off the stationary start and end of the log. Default is None (show every point).</span>
 <span class="sd">    vel_thresh : float, optional</span>
-<span class="sd">        Velocity threshold for trimming, by default 0.5, same unit as velocity.</span>
+<span class="sd">        Only the span between the first and last moment speed exceeds this value is shown. Same unit as ``vel_raw``. Ignored if ``vel_raw`` is None. Default is 0.5.</span>
 <span class="sd">    title : str | None, optional</span>
-<span class="sd">        Title for the plot.</span>
-<span class="sd">    layout_config : LayoutConfig, optional</span>
-<span class="sd">    font_config : FontConfig, optional</span>
-<span class="sd">    gps_map_config : GpsMapConfig, optional</span>
-<span class="sd">        Map overlay and outlier filtering configuration.</span>
+<span class="sd">        Title shown above the map. Default is None (no title).</span>
+<span class="sd">    max_radius_m : float, optional</span>
+<span class="sd">        Outlier filter: points farther than this many metres from the centre of the track are dropped. Use ``float("inf")`` to disable. Default is GPS_MAX_RADIUS_M (5000).</span>
+<span class="sd">    max_jump_m : float, optional</span>
+<span class="sd">        Outlier filter: points more than this many metres from the previous point are dropped. Use ``float("inf")`` to disable. Default is GPS_MAX_JUMP_M (30).</span>
+<span class="sd">    map_style : str, optional</span>
+<span class="sd">        Background map tiles, any Plotly MapLibre style name such as ``"open-street-map"``, ``"carto-positron"`` or ``"satellite"``. Default is MAP_STYLE (``"open-street-map"``, needs no API key).</span>
+<span class="sd">    width : int, optional</span>
+<span class="sd">        Figure width in pixels. Default is PLOT_HEIGHT (700), making a square map.</span>
+<span class="sd">    height : int, optional</span>
+<span class="sd">        Figure height in pixels. Default is PLOT_HEIGHT (700).</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    go.Figure | None</span>
-<span class="sd">        Plotly figure with map background, or None if velocity never exceeds</span>
-<span class="sd">        the threshold or no points remain after filtering.</span>
+<span class="sd">        Plotly figure with a map background, or None if speed never exceeds ``vel_thresh`` or no points remain after filtering. Change anything not exposed here (line color, zoom, ...) with ``fig.update_layout`` or ``fig.update_traces`` before calling ``fig.show()``.</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
@@ -561,7 +564,9 @@
         <span class="n">lat_trimmed</span> <span class="o">=</span> <span class="n">lat_aligned</span><span class="o">.</span><span class="n">value_np</span>
 
     <span class="c1"># Filter outliers</span>
-    <span class="n">cartesian_mask</span> <span class="o">=</span> <span class="n">filter_gps_cartesian</span><span class="p">(</span><span class="n">lat_trimmed</span><span class="p">,</span> <span class="n">lon_trimmed</span><span class="p">,</span> <span class="n">gps_map_config</span><span class="p">)</span>
+    <span class="n">cartesian_mask</span> <span class="o">=</span> <span class="n">filter_gps_cartesian</span><span class="p">(</span>
+        <span class="n">lat_trimmed</span><span class="p">,</span> <span class="n">lon_trimmed</span><span class="p">,</span> <span class="n">max_radius_m</span><span class="p">,</span> <span class="n">max_jump_m</span>
+    <span class="p">)</span>
     <span class="n">lat_filtered</span> <span class="o">=</span> <span class="n">lat_trimmed</span><span class="p">[</span><span class="n">cartesian_mask</span><span class="p">]</span>
     <span class="n">lon_filtered</span> <span class="o">=</span> <span class="n">lon_trimmed</span><span class="p">[</span><span class="n">cartesian_mask</span><span class="p">]</span>
 
@@ -569,48 +574,14 @@
         <span class="nb">print</span><span class="p">(</span><span class="s2">"No GPS points remain after outlier filtering, skip graphing"</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">None</span>
 
-    <span class="n">fig</span> <span class="o">=</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">()</span>
-    <span class="n">fig</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span>
-        <span class="n">go</span><span class="o">.</span><span class="n">Scattermap</span><span class="p">(</span>
-            <span class="n">lat</span><span class="o">=</span><span class="n">lat_filtered</span><span class="p">,</span>
-            <span class="n">lon</span><span class="o">=</span><span class="n">lon_filtered</span><span class="p">,</span>
-            <span class="n">mode</span><span class="o">=</span><span class="s2">"lines+markers"</span><span class="p">,</span>
-            <span class="n">marker</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">gps_map_config</span><span class="o">.</span><span class="n">marker_size</span><span class="p">),</span>
-            <span class="n">line</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
-                <span class="n">width</span><span class="o">=</span><span class="n">gps_map_config</span><span class="o">.</span><span class="n">line_width</span><span class="p">,</span>
-                <span class="n">color</span><span class="o">=</span><span class="n">gps_map_config</span><span class="o">.</span><span class="n">line_color</span><span class="p">,</span>
-            <span class="p">),</span>
-        <span class="p">)</span>
-    <span class="p">)</span>
-
-    <span class="n">center_lat</span> <span class="o">=</span> <span class="p">(</span><span class="n">lat_filtered</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="o">+</span> <span class="n">lat_filtered</span><span class="o">.</span><span class="n">max</span><span class="p">())</span> <span class="o">/</span> <span class="mi">2</span>
-    <span class="n">center_lon</span> <span class="o">=</span> <span class="p">(</span><span class="n">lon_filtered</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="o">+</span> <span class="n">lon_filtered</span><span class="o">.</span><span class="n">max</span><span class="p">())</span> <span class="o">/</span> <span class="mi">2</span>
-
-    <span class="n">lat_span</span> <span class="o">=</span> <span class="n">lat_filtered</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">-</span> <span class="n">lat_filtered</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
-    <span class="n">lon_span</span> <span class="o">=</span> <span class="n">lon_filtered</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">-</span> <span class="n">lon_filtered</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
-    <span class="n">max_span</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">lat_span</span><span class="p">,</span> <span class="n">lon_span</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">gps_map_config</span><span class="o">.</span><span class="n">zoom_padding</span><span class="p">)</span>
-    <span class="n">zoom</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log2</span><span class="p">(</span><span class="mi">360</span> <span class="o">/</span> <span class="n">max_span</span><span class="p">)</span> <span class="k">if</span> <span class="n">max_span</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">15</span>
-
-    <span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span>
-        <span class="n">title</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
-            <span class="n">text</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
-            <span class="n">x</span><span class="o">=</span><span class="n">layout_config</span><span class="o">.</span><span class="n">title_x</span><span class="p">,</span>
-            <span class="n">xanchor</span><span class="o">=</span><span class="n">layout_config</span><span class="o">.</span><span class="n">title_xanchor</span><span class="p">,</span>
-            <span class="n">yanchor</span><span class="o">=</span><span class="n">layout_config</span><span class="o">.</span><span class="n">title_yanchor</span><span class="p">,</span>
-            <span class="n">font</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">font_config</span><span class="o">.</span><span class="n">large</span><span class="p">),</span>
-        <span class="p">),</span>
-        <span class="nb">map</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
-            <span class="n">style</span><span class="o">=</span><span class="n">gps_map_config</span><span class="o">.</span><span class="n">map_style</span><span class="p">,</span>
-            <span class="n">center</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">lat</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">center_lat</span><span class="p">),</span> <span class="n">lon</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">center_lon</span><span class="p">)),</span>
-            <span class="n">zoom</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">zoom</span><span class="p">),</span>
-        <span class="p">),</span>
-        <span class="n">showlegend</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">width</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">layout_config</span><span class="o">.</span><span class="n">height</span><span class="p">),</span>
-        <span class="n">height</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">layout_config</span><span class="o">.</span><span class="n">height</span><span class="p">),</span>
-        <span class="n">margin</span><span class="o">=</span><span class="n">layout_config</span><span class="o">.</span><span class="n">margin</span><span class="p">,</span>
-    <span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">fig</span></div>
+    <span class="k">return</span> <span class="n">plot_map_trace</span><span class="p">(</span>
+        <span class="n">lat_filtered</span><span class="p">,</span>
+        <span class="n">lon_filtered</span><span class="p">,</span>
+        <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
+        <span class="n">map_style</span><span class="o">=</span><span class="n">map_style</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">,</span>
+    <span class="p">)</span></div>
 
 </pre></div>
 

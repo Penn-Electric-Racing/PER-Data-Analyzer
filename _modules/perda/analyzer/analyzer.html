@@ -310,13 +310,18 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">..core_data_structures.data_instance</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataInstance</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..core_data_structures.single_run_data</span><span class="w"> </span><span class="kn">import</span> <span class="n">SingleRunData</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">..plotting.data_instance_plotter</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">..plotting.plotting_constants</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..plotting.data_instance_plotter</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_dual_axis</span><span class="p">,</span> <span class="n">plot_single_axis</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..plotting.defaults</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">HISTOGRAM_BINS</span><span class="p">,</span>
+    <span class="n">PLOT_HEIGHT</span><span class="p">,</span>
+    <span class="n">PLOT_WIDTH</span><span class="p">,</span>
+    <span class="n">SUBPLOT_VERTICAL_SPACING</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..plotting.subplots</span><span class="w"> </span><span class="kn">import</span> <span class="n">data_instance_subplots</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..units</span><span class="w"> </span><span class="kn">import</span> <span class="n">from_seconds</span><span class="p">,</span> <span class="n">to_seconds</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..utils.accel_calculator</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..utils.data_summary</span><span class="w"> </span><span class="kn">import</span> <span class="n">single_run_summary</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">..utils.diff</span><span class="w"> </span><span class="kn">import</span> <span class="n">diff</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..utils.diff</span><span class="w"> </span><span class="kn">import</span> <span class="n">DIFF_BUCKET_SIZE_S</span><span class="p">,</span> <span class="n">diff</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..utils.frequency_analysis</span><span class="w"> </span><span class="kn">import</span> <span class="n">analyze_frequency</span> <span class="k">as</span> <span class="n">_analyze_frequency</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..utils.integrate</span><span class="w"> </span><span class="kn">import</span> <span class="n">smoothed_filtered_integration</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..utils.preprocessing</span><span class="w"> </span><span class="kn">import</span> <span class="n">PreprocessingStep</span><span class="p">,</span> <span class="n">apply_preprocessing</span>
@@ -488,46 +493,50 @@
         <span class="n">y_label_1</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">y_label_2</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">show_legend</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-        <span class="n">font_config</span><span class="p">:</span> <span class="n">FontConfig</span> <span class="o">=</span> <span class="n">DEFAULT_FONT_CONFIG</span><span class="p">,</span>
-        <span class="n">layout_config</span><span class="p">:</span> <span class="n">LayoutConfig</span> <span class="o">=</span> <span class="n">DEFAULT_LAYOUT_CONFIG</span><span class="p">,</span>
-        <span class="n">vline_config</span><span class="p">:</span> <span class="n">VLineConfig</span> <span class="o">=</span> <span class="n">DEFAULT_VLINE_CONFIG</span><span class="p">,</span>
         <span class="n">max_points</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">log_x</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">log_y</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">PLOT_WIDTH</span><span class="p">,</span>
+        <span class="n">height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">PLOT_HEIGHT</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Display variables from the parsed data on an interactive Plotly plot.</span>
+<span class="sd">        Plot variables from the log against time on an interactive Plotly figure.</span>
 
-<span class="sd">        Concat boundaries (if any) are automatically shown as vertical lines.</span>
+<span class="sd">        Pass one variable or a list for a single y-axis. Also pass ``var_2`` to put a second group of variables on an independent right-hand y-axis. Concat boundaries (if any) are drawn as dashed vertical lines.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        var_1 : str | int | DataInstance | Sequence[str | int | DataInstance]</span>
-<span class="sd">            Variable(s) to plot on the left y-axis. Can be variable name(s), variable ID(s), or DataInstance(s)</span>
+<span class="sd">            Variable(s) for the left (or only) y-axis. Each item can be a variable name (``"pcm.wheelSpeeds.frontRight"``), a variable ID (``42``), or a DataInstance (e.g. a derived signal).</span>
 <span class="sd">        var_2 : str | int | DataInstance | Sequence[str | int | DataInstance] | None, optional</span>
-<span class="sd">            Optional variable(s) to plot on the right y-axis. Can be variable name(s), variable ID(s), or DataInstance(s).</span>
+<span class="sd">            Variable(s) for a second, right-hand y-axis, drawn dashed. Same accepted types as ``var_1``. Default is None (single y-axis).</span>
 <span class="sd">        ts_start : float | None, optional</span>
-<span class="sd">            Start of the time window in seconds. Data points before this time are excluded. Default is None (no lower bound).</span>
+<span class="sd">            Start of the time window in seconds on the log's clock. Earlier data is excluded. Default is None (from the start of the log).</span>
 <span class="sd">        ts_end : float | None, optional</span>
-<span class="sd">            End of the time window in seconds. Data points after this time are excluded. Default is None (no upper bound).</span>
+<span class="sd">            End of the time window in seconds on the log's clock. Later data is excluded. Default is None (to the end of the log).</span>
 <span class="sd">        title : str | None, optional</span>
+<span class="sd">            Title shown above the plot. Default is None (no title).</span>
 <span class="sd">        y_label_1 : str | None, optional</span>
-<span class="sd">            Label for left y-axis (or only y-axis if no right input).</span>
+<span class="sd">            Left (or only) y-axis label, e.g. ``"Speed (mph)"``. Default is None (no label).</span>
 <span class="sd">        y_label_2 : str | None, optional</span>
-<span class="sd">            Label for right y-axis.</span>
+<span class="sd">            Right y-axis label. Only used with ``var_2``. Default is None (no label).</span>
 <span class="sd">        show_legend : bool, optional</span>
-<span class="sd">            Whether to show plot legends. Default is True</span>
-<span class="sd">        font_config : FontConfig, optional</span>
-<span class="sd">            Font configuration for plot elements.</span>
-<span class="sd">        layout_config : LayoutConfig, optional</span>
-<span class="sd">            Layout configuration for plot dimensions.</span>
-<span class="sd">        vline_config : VLineConfig, optional</span>
-<span class="sd">            Visual configuration for concat boundary lines.</span>
+<span class="sd">            Whether to show the legend listing each variable. Default is True.</span>
 <span class="sd">        max_points : int | None, optional</span>
-<span class="sd">            Maximum number of data points to plot per trace (enables zero-copy step downsampling). Default is None (full fidelity).</span>
+<span class="sd">            Maximum number of points drawn per variable. Longer signals are evenly downsampled (every Nth point), which speeds up rendering of large logs. Default is None (draw every point).</span>
+<span class="sd">        log_x : bool, optional</span>
+<span class="sd">            Use a logarithmic time (x) axis. Default is False (linear).</span>
+<span class="sd">        log_y : bool, optional</span>
+<span class="sd">            Use logarithmic y-axes (both left and right when ``var_2`` is given). Default is False (linear).</span>
+<span class="sd">        width : int, optional</span>
+<span class="sd">            Figure width in pixels. Default is PLOT_WIDTH (1200).</span>
+<span class="sd">        height : int, optional</span>
+<span class="sd">            Figure height in pixels. Default is PLOT_HEIGHT (700).</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        go.Figure</span>
-<span class="sd">            Plotly figure. Customize it with ``update_layout`` or ``add_trace``.</span>
+<span class="sd">            Plotly figure. Change anything not exposed here (fonts, colors, margins, axis ranges, ...) with ``fig.update_layout``, ``fig.update_xaxes``, ``fig.update_yaxes`` or ``fig.update_traces`` before calling ``fig.show()``.</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
@@ -543,6 +552,9 @@
 <span class="sd">        &gt;&gt;&gt; # Plot a derived DataInstance (e.g. average of two signals)</span>
 <span class="sd">        &gt;&gt;&gt; avg_speed = (aly.data["pcm.wheelSpeeds.frontRight"] + aly.data["pcm.wheelSpeeds.frontLeft"]) / 2.0</span>
 <span class="sd">        &gt;&gt;&gt; fig = aly.plot(avg_speed)</span>
+<span class="sd">        &gt;&gt;&gt; # Log-scaled y-axis, then a custom font size</span>
+<span class="sd">        &gt;&gt;&gt; fig = aly.plot("bms.pack.current", log_y=True)</span>
+<span class="sd">        &gt;&gt;&gt; fig.update_layout(font_size=16)</span>
 <span class="sd">        """</span>
         <span class="n">var_1_norm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_normalize_input</span><span class="p">(</span><span class="n">var_1</span><span class="p">)</span>
         <span class="n">var_2_norm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_normalize_input</span><span class="p">(</span><span class="n">var_2</span><span class="p">)</span> <span class="k">if</span> <span class="n">var_2</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
@@ -550,7 +562,7 @@
         <span class="n">unit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">timestamp_unit</span>
 
         <span class="c1"># Convert concat boundaries to seconds for the plotter</span>
-        <span class="n">vlines</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">vlines</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">concat_boundaries</span><span class="p">:</span>
             <span class="n">vlines</span> <span class="o">=</span> <span class="p">[</span><span class="n">to_seconds</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">b</span><span class="p">),</span> <span class="n">unit</span><span class="p">)</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">concat_boundaries</span><span class="p">]</span>
 
@@ -570,12 +582,13 @@
                 <span class="n">left_y_axis_title</span><span class="o">=</span><span class="n">y_label_1</span><span class="p">,</span>
                 <span class="n">right_y_axis_title</span><span class="o">=</span><span class="n">y_label_2</span><span class="p">,</span>
                 <span class="n">show_legend</span><span class="o">=</span><span class="n">show_legend</span><span class="p">,</span>
-                <span class="n">font_config</span><span class="o">=</span><span class="n">font_config</span><span class="p">,</span>
-                <span class="n">layout_config</span><span class="o">=</span><span class="n">layout_config</span><span class="p">,</span>
                 <span class="n">timestamp_unit</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">timestamp_unit</span><span class="p">,</span>
                 <span class="n">vlines</span><span class="o">=</span><span class="n">vlines</span><span class="p">,</span>
-                <span class="n">vline_config</span><span class="o">=</span><span class="n">vline_config</span><span class="p">,</span>
                 <span class="n">max_points</span><span class="o">=</span><span class="n">max_points</span><span class="p">,</span>
+                <span class="n">log_x</span><span class="o">=</span><span class="n">log_x</span><span class="p">,</span>
+                <span class="n">log_y</span><span class="o">=</span><span class="n">log_y</span><span class="p">,</span>
+                <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span>
+                <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">plot_single_axis</span><span class="p">(</span>
@@ -583,12 +596,13 @@
                 <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
                 <span class="n">y_axis_title</span><span class="o">=</span><span class="n">y_label_1</span><span class="p">,</span>
                 <span class="n">show_legend</span><span class="o">=</span><span class="n">show_legend</span><span class="p">,</span>
-                <span class="n">font_config</span><span class="o">=</span><span class="n">font_config</span><span class="p">,</span>
-                <span class="n">layout_config</span><span class="o">=</span><span class="n">layout_config</span><span class="p">,</span>
                 <span class="n">timestamp_unit</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">timestamp_unit</span><span class="p">,</span>
                 <span class="n">vlines</span><span class="o">=</span><span class="n">vlines</span><span class="p">,</span>
-                <span class="n">vline_config</span><span class="o">=</span><span class="n">vline_config</span><span class="p">,</span>
                 <span class="n">max_points</span><span class="o">=</span><span class="n">max_points</span><span class="p">,</span>
+                <span class="n">log_x</span><span class="o">=</span><span class="n">log_x</span><span class="p">,</span>
+                <span class="n">log_y</span><span class="o">=</span><span class="n">log_y</span><span class="p">,</span>
+                <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span>
+                <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">,</span>
             <span class="p">)</span></div>
 
 
@@ -598,48 +612,50 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">rows</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">VariableInputs</span><span class="p">],</span>
         <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">row_y_labels</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">row_y_labels</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">ts_start</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">ts_end</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">show_legend</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-        <span class="n">layout_config</span><span class="p">:</span> <span class="n">LayoutConfig</span> <span class="o">=</span> <span class="n">DEFAULT_LAYOUT_CONFIG</span><span class="p">,</span>
-        <span class="n">font_config</span><span class="p">:</span> <span class="n">FontConfig</span> <span class="o">=</span> <span class="n">DEFAULT_FONT_CONFIG</span><span class="p">,</span>
+        <span class="n">log_x</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">log_y</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">PLOT_WIDTH</span><span class="p">,</span>
+        <span class="n">height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">vertical_spacing</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">SUBPLOT_VERTICAL_SPACING</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Plot multiple variables as stacked subplots on a shared time axis.</span>
+<span class="sd">        Plot variables as vertically stacked subplots sharing one time axis.</span>
 
-<span class="sd">        Each entry in ``rows`` becomes one subplot row. Pass a list of</span>
-<span class="sd">        variables for a row to overlay multiple signals on the same panel,</span>
-<span class="sd">        or a single variable for a dedicated panel.</span>
+<span class="sd">        Each entry in ``rows`` becomes one subplot row. Pass a list of variables for a row to overlay them on the same panel, or a single variable for a dedicated panel. Zooming the time axis zooms every row together.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        rows : Sequence[str | int | DataInstance | Sequence[str | int | DataInstance]]</span>
-<span class="sd">            One entry per subplot row (top to bottom). Each entry may be a</span>
-<span class="sd">            single variable (name, ID, or DataInstance) or a list of variables</span>
-<span class="sd">            to overlay on that row.</span>
+<span class="sd">            One entry per subplot row, top to bottom. Each entry is a single variable (name, ID, or DataInstance) or a list of variables to overlay on that row.</span>
 <span class="sd">        title : str | None, optional</span>
-<span class="sd">            Figure-level title. Default is None.</span>
-<span class="sd">        row_y_labels : List[str | None] | None, optional</span>
-<span class="sd">            Y-axis label for each row. ``None`` entries fall back to the</span>
-<span class="sd">            DataInstance labels. Must match the length of ``rows`` when</span>
-<span class="sd">            provided. Default is None.</span>
+<span class="sd">            Title shown above the whole figure. Default is None (no title).</span>
+<span class="sd">        row_y_labels : list[str | None] | None, optional</span>
+<span class="sd">            Y-axis label for each row, in the same order as ``rows``. A ``None`` entry falls back to the variable names in that row. Default is None (every row uses its variable names).</span>
 <span class="sd">        ts_start : float | None, optional</span>
-<span class="sd">            Start of the time window in seconds. Data before this time is</span>
-<span class="sd">            excluded from all rows. Default is None (no lower bound).</span>
+<span class="sd">            Start of the time window in seconds on the log's clock. Earlier data is excluded from all rows. Default is None (from the start of the log).</span>
 <span class="sd">        ts_end : float | None, optional</span>
-<span class="sd">            End of the time window in seconds. Data after this time is</span>
-<span class="sd">            excluded from all rows. Default is None (no upper bound).</span>
+<span class="sd">            End of the time window in seconds on the log's clock. Later data is excluded from all rows. Default is None (to the end of the log).</span>
 <span class="sd">        show_legend : bool, optional</span>
-<span class="sd">            Whether to show the figure legend. Default is True.</span>
-<span class="sd">        layout_config : LayoutConfig, optional</span>
-<span class="sd">            Figure dimensions and spacing.</span>
-<span class="sd">        font_config : FontConfig, optional</span>
-<span class="sd">            Font sizes for plot elements.</span>
+<span class="sd">            Whether to show the legend listing each variable. Default is True.</span>
+<span class="sd">        log_x : bool, optional</span>
+<span class="sd">            Use a logarithmic time (x) axis. Default is False (linear).</span>
+<span class="sd">        log_y : bool, optional</span>
+<span class="sd">            Use logarithmic y-axes on every row. Default is False (linear).</span>
+<span class="sd">        width : int, optional</span>
+<span class="sd">            Figure width in pixels. Default is PLOT_WIDTH (1200).</span>
+<span class="sd">        height : int | None, optional</span>
+<span class="sd">            Figure height in pixels. Default is None, which gives SUBPLOT_HEIGHT (350) pixels per row.</span>
+<span class="sd">        vertical_spacing : float, optional</span>
+<span class="sd">            Gap between rows as a fraction of the figure height (0 to 1). Default is SUBPLOT_VERTICAL_SPACING (0.12).</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        go.Figure</span>
+<span class="sd">            Plotly figure. Change anything not exposed here with ``fig.update_layout``, ``fig.update_xaxes``, ``fig.update_yaxes`` or ``fig.update_traces`` before calling ``fig.show()``. Target one row with ``row=i, col=1``, e.g. ``fig.update_yaxes(type="log", row=2, col=1)``.</span>
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
@@ -672,8 +688,11 @@
             <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
             <span class="n">row_y_labels</span><span class="o">=</span><span class="n">row_y_labels</span><span class="p">,</span>
             <span class="n">show_legend</span><span class="o">=</span><span class="n">show_legend</span><span class="p">,</span>
-            <span class="n">layout_config</span><span class="o">=</span><span class="n">layout_config</span><span class="p">,</span>
-            <span class="n">font_config</span><span class="o">=</span><span class="n">font_config</span><span class="p">,</span>
+            <span class="n">log_x</span><span class="o">=</span><span class="n">log_x</span><span class="p">,</span>
+            <span class="n">log_y</span><span class="o">=</span><span class="n">log_y</span><span class="p">,</span>
+            <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span>
+            <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">,</span>
+            <span class="n">vertical_spacing</span><span class="o">=</span><span class="n">vertical_spacing</span><span class="p">,</span>
             <span class="n">timestamp_unit</span><span class="o">=</span><span class="n">unit</span><span class="p">,</span>
         <span class="p">)</span></div>
 
@@ -686,9 +705,10 @@
         <span class="n">timestamp_tolerance_s</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.002</span><span class="p">,</span>
         <span class="n">diff_rtol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-3</span><span class="p">,</span>
         <span class="n">diff_atol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-3</span><span class="p">,</span>
-        <span class="n">diff_plot_config</span><span class="p">:</span> <span class="n">DiffPlotConfig</span> <span class="o">=</span> <span class="n">DEFAULT_DIFF_PLOT_CONFIG</span><span class="p">,</span>
-        <span class="n">layout_config</span><span class="p">:</span> <span class="n">LayoutConfig</span> <span class="o">=</span> <span class="n">DEFAULT_LAYOUT_CONFIG</span><span class="p">,</span>
-        <span class="n">font_config</span><span class="p">:</span> <span class="n">FontConfig</span> <span class="o">=</span> <span class="n">DEFAULT_FONT_CONFIG</span><span class="p">,</span>
+        <span class="n">bucket_size_s</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">DIFF_BUCKET_SIZE_S</span><span class="p">,</span>
+        <span class="n">log_y</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">PLOT_WIDTH</span><span class="p">,</span>
+        <span class="n">height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">PLOT_HEIGHT</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Compute the differences between the current data (assumed to be from RPI) and server data.</span>
@@ -704,14 +724,19 @@
 <span class="sd">            Relative tolerance for value comparison (numpy.isclose).</span>
 <span class="sd">        diff_atol : float, optional</span>
 <span class="sd">            Absolute tolerance for value comparison (numpy.isclose).</span>
-<span class="sd">        diff_plot_config : DiffPlotConfig, optional</span>
-<span class="sd">        layout_config : LayoutConfig, optional</span>
-<span class="sd">        font_config : FontConfig, optional</span>
+<span class="sd">        bucket_size_s : float, optional</span>
+<span class="sd">            Width of each time bucket (bar) in the plot, in seconds. Default is DIFF_BUCKET_SIZE_S (1.0).</span>
+<span class="sd">        log_y : bool, optional</span>
+<span class="sd">            Use a logarithmic count (y) axis. Default is False (linear).</span>
+<span class="sd">        width : int, optional</span>
+<span class="sd">            Figure width in pixels. Default is PLOT_WIDTH (1200).</span>
+<span class="sd">        height : int, optional</span>
+<span class="sd">            Figure height in pixels. Default is PLOT_HEIGHT (700).</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        go.Figure</span>
-<span class="sd">            Bar chart of per-variable differences between the two streams.</span>
+<span class="sd">            Bar chart of diff counts over time between the two streams. Customize further with ``fig.update_layout`` before calling ``fig.show()``.</span>
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
@@ -723,9 +748,10 @@
             <span class="n">timestamp_tolerance_s</span><span class="o">=</span><span class="n">timestamp_tolerance_s</span><span class="p">,</span>
             <span class="n">diff_rtol</span><span class="o">=</span><span class="n">diff_rtol</span><span class="p">,</span>
             <span class="n">diff_atol</span><span class="o">=</span><span class="n">diff_atol</span><span class="p">,</span>
-            <span class="n">diff_plot_config</span><span class="o">=</span><span class="n">diff_plot_config</span><span class="p">,</span>
-            <span class="n">layout_config</span><span class="o">=</span><span class="n">layout_config</span><span class="p">,</span>
-            <span class="n">font_config</span><span class="o">=</span><span class="n">font_config</span><span class="p">,</span>
+            <span class="n">bucket_size_s</span><span class="o">=</span><span class="n">bucket_size_s</span><span class="p">,</span>
+            <span class="n">log_y</span><span class="o">=</span><span class="n">log_y</span><span class="p">,</span>
+            <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span>
+            <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">,</span>
         <span class="p">)</span></div>
 
 
@@ -736,9 +762,9 @@
         <span class="n">var</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">expected_frequency_hz</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">gap_threshold_multiplier</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">,</span>
-        <span class="n">font_config</span><span class="p">:</span> <span class="n">FontConfig</span> <span class="o">=</span> <span class="n">DEFAULT_FONT_CONFIG</span><span class="p">,</span>
-        <span class="n">layout_config</span><span class="p">:</span> <span class="n">LayoutConfig</span> <span class="o">=</span> <span class="n">DEFAULT_LAYOUT_CONFIG</span><span class="p">,</span>
-        <span class="n">plot_config</span><span class="p">:</span> <span class="n">ScatterHistogramPlotConfig</span> <span class="o">=</span> <span class="n">DEFAULT_SCATTER_HISTOGRAM_PLOT_CONFIG</span><span class="p">,</span>
+        <span class="n">histogram_bins</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">HISTOGRAM_BINS</span><span class="p">,</span>
+        <span class="n">width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">PLOT_WIDTH</span><span class="p">,</span>
+        <span class="n">height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">PLOT_HEIGHT</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Analyse the sampling frequency of a variable and return a diagnostic figure.</span>
@@ -756,15 +782,17 @@
 <span class="sd">        gap_threshold_multiplier : float, optional</span>
 <span class="sd">            Intervals exceeding this multiple of the expected (or median) interval</span>
 <span class="sd">            are flagged as gaps. Default is 2.0.</span>
-<span class="sd">        font_config : FontConfig, optional</span>
-<span class="sd">            Font sizes for plot elements.</span>
-<span class="sd">        layout_config : LayoutConfig, optional</span>
-<span class="sd">            Plot dimensions and margins.</span>
+<span class="sd">        histogram_bins : int, optional</span>
+<span class="sd">            Maximum number of bins in the frequency histogram. Default is HISTOGRAM_BINS (80).</span>
+<span class="sd">        width : int, optional</span>
+<span class="sd">            Figure width in pixels. Default is PLOT_WIDTH (1200).</span>
+<span class="sd">        height : int, optional</span>
+<span class="sd">            Figure height in pixels. Default is PLOT_HEIGHT (700).</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        go.Figure</span>
-<span class="sd">            Plotly figure with frequency diagnostics.</span>
+<span class="sd">            Plotly figure with frequency diagnostics. Customize further with ``fig.update_layout`` before calling ``fig.show()``.</span>
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
@@ -776,9 +804,9 @@
             <span class="n">expected_frequency_hz</span><span class="o">=</span><span class="n">expected_frequency_hz</span><span class="p">,</span>
             <span class="n">source_time_unit</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">timestamp_unit</span><span class="p">,</span>
             <span class="n">gap_threshold_multiplier</span><span class="o">=</span><span class="n">gap_threshold_multiplier</span><span class="p">,</span>
-            <span class="n">font_config</span><span class="o">=</span><span class="n">font_config</span><span class="p">,</span>
-            <span class="n">layout_config</span><span class="o">=</span><span class="n">layout_config</span><span class="p">,</span>
-            <span class="n">plot_config</span><span class="o">=</span><span class="n">plot_config</span><span class="p">,</span>
+            <span class="n">histogram_bins</span><span class="o">=</span><span class="n">histogram_bins</span><span class="p">,</span>
+            <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span>
+            <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">,</span>
         <span class="p">)</span></div>
 
 

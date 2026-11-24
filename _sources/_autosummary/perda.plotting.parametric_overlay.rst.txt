@@ -1,7 +1,7 @@
-perda.plotting.plotting\_constants
+perda.plotting.parametric\_overlay
 ==================================
 
-.. automodule:: perda.plotting.plotting_constants
+.. automodule:: perda.plotting.parametric_overlay
    :members:
    :undoc-members:
    :show-inheritance:

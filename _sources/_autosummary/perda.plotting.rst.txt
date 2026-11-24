@@ -13,11 +13,13 @@ perda.plotting
    :toctree:
    :recursive:
 
+   binned_count_plotter
    data_instance_plotter
-   diff_plotter
+   defaults
    fft_plotter
+   map_trace
+   parametric_overlay
    parametric_plot
    parametric_trimmer
-   plotting_constants
    scatter_histogram_plotter
    subplots

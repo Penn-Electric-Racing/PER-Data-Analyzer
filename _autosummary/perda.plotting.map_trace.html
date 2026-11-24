@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>perda.plotting.diff_plotter &#8212; PERDA</title>
+    <title>perda.plotting.map_trace &#8212; PERDA</title>
   
   
   
@@ -47,11 +47,11 @@
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=f281be69"></script>
     <script src="../_static/design-tabs.js?v=f930bc37"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/perda.plotting.diff_plotter';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/perda.plotting.map_trace';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="perda.plotting.fft_plotter" href="perda.plotting.fft_plotter.html" />
-    <link rel="prev" title="perda.plotting.data_instance_plotter" href="perda.plotting.data_instance_plotter.html" />
+    <link rel="next" title="perda.plotting.parametric_overlay" href="perda.plotting.parametric_overlay.html" />
+    <link rel="prev" title="perda.plotting.fft_plotter" href="perda.plotting.fft_plotter.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
@@ -285,12 +285,14 @@
 </ul>
 </details></li>
 <li class="toctree-l2 current active has-children"><a class="reference internal" href="perda.plotting.html">perda.plotting</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="perda.plotting.binned_count_plotter.html">perda.plotting.binned_count_plotter</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.plotting.data_instance_plotter.html">perda.plotting.data_instance_plotter</a></li>
-<li class="toctree-l3 current active"><a class="current reference internal" href="#">perda.plotting.diff_plotter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.plotting.defaults.html">perda.plotting.defaults</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.plotting.fft_plotter.html">perda.plotting.fft_plotter</a></li>
+<li class="toctree-l3 current active"><a class="current reference internal" href="#">perda.plotting.map_trace</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.plotting.parametric_overlay.html">perda.plotting.parametric_overlay</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.plotting.parametric_plot.html">perda.plotting.parametric_plot</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.plotting.parametric_trimmer.html">perda.plotting.parametric_trimmer</a></li>
-<li class="toctree-l3"><a class="reference internal" href="perda.plotting.plotting_constants.html">perda.plotting.plotting_constants</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.plotting.scatter_histogram_plotter.html">perda.plotting.scatter_histogram_plotter</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.plotting.subplots.html">perda.plotting.subplots</a></li>
 </ul>
@@ -366,7 +368,7 @@
     
     <li class="breadcrumb-item"><a href="perda.plotting.html" class="nav-link">perda.plotting</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">perda.plotting.diff_plotter</span></li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">perda.plotting.map_trace</span></li>
   </ul>
 </nav>
 </div>
@@ -383,37 +385,38 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="module-perda.plotting.diff_plotter">
-<span id="perda-plotting-diff-plotter"></span><h1>perda.plotting.diff_plotter<a class="headerlink" href="#module-perda.plotting.diff_plotter" title="Link to this heading">#</a></h1>
+  <section id="module-perda.plotting.map_trace">
+<span id="perda-plotting-map-trace"></span><h1>perda.plotting.map_trace<a class="headerlink" href="#module-perda.plotting.map_trace" title="Link to this heading">#</a></h1>
 <dl class="py function">
-<dt class="sig sig-object py" id="perda.plotting.diff_plotter.plot_diff_bars">
-<span class="sig-prename descclassname"><span class="pre">perda.plotting.diff_plotter.</span></span><span class="sig-name descname"><span class="pre">plot_diff_bars</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base_extra_ts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">incom_extra_ts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value_mismatch_ts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_present_ts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Diff</span> <span class="pre">Counts</span> <span class="pre">Over</span> <span class="pre">Time</span> <span class="pre">(bucketed)'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_axis_title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Event</span> <span class="pre">Count'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_legend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diff_plot_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">DiffPlotConfig(bucket_size_s=1.0,</span> <span class="pre">color_base_extra='blue',</span> <span class="pre">color_incom_extra='darkorange',</span> <span class="pre">color_value_mismatch='crimson',</span> <span class="pre">color_total='gray')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layout_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">LayoutConfig(width=1200,</span> <span class="pre">height=700,</span> <span class="pre">margin={'l':</span> <span class="pre">70,</span> <span class="pre">'r':</span> <span class="pre">50,</span> <span class="pre">'t':</span> <span class="pre">90,</span> <span class="pre">'b':</span> <span class="pre">70},</span> <span class="pre">plot_bgcolor='white',</span> <span class="pre">title_x=0.5,</span> <span class="pre">title_xanchor='center',</span> <span class="pre">title_yanchor='top',</span> <span class="pre">grid_width_per_col=400,</span> <span class="pre">grid_height_per_row=350,</span> <span class="pre">grid_horizontal_spacing=0.08,</span> <span class="pre">grid_vertical_spacing=0.12,</span> <span class="pre">max_display_resolution=50)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">font_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">FontConfig(large=20,</span> <span class="pre">medium=14,</span> <span class="pre">small=10)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/plotting/diff_plotter.html#plot_diff_bars"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.plotting.diff_plotter.plot_diff_bars" title="Link to this definition">#</a></dt>
-<dd><p>Plot diff results as bucketed bar charts.</p>
-<p>Renders four overlaid bar traces — total datapoints present (background),
-base-only extras, incoming-only extras, and value mismatches — bucketed
-into fixed-width time windows.</p>
+<dt class="sig sig-object py" id="perda.plotting.map_trace.plot_map_trace">
+<span class="sig-prename descclassname"><span class="pre">perda.plotting.map_trace.</span></span><span class="sig-name descname"><span class="pre">plot_map_trace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lon</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">map_style</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'open-street-map'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zoom_padding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">700</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">700</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/plotting/map_trace.html#plot_map_trace"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.plotting.map_trace.plot_map_trace" title="Link to this definition">#</a></dt>
+<dd><p>Draw a path of latitude/longitude points on top of an interactive background map.</p>
+<p>The map is automatically centered and zoomed to fit all points.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>base_extra_ts</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenericAlias</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float64</span></code>]</span>) – Timestamps (seconds) of datapoints present only in the base run.</p></li>
-<li><p><strong>incom_extra_ts</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenericAlias</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float64</span></code>]</span>) – Timestamps (seconds) of datapoints present only in the incoming run.</p></li>
-<li><p><strong>value_mismatch_ts</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenericAlias</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float64</span></code>]</span>) – Timestamps (seconds) of matched points whose values differ.</p></li>
-<li><p><strong>total_present_ts</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenericAlias</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float64</span></code>]</span>) – Timestamps (seconds) of all datapoints seen in either run.</p></li>
-<li><p><strong>title</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – Plot title.</p></li>
-<li><p><strong>y_axis_title</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – Label for the y-axis.</p></li>
-<li><p><strong>show_legend</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></span>) – Whether to show the legend.</p></li>
-<li><p><strong>diff_plot_config</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.DiffPlotConfig" title="perda.plotting.plotting_constants.DiffPlotConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">DiffPlotConfig</span></code></a></span>) – Colors and bucket size configuration.</p></li>
-<li><p><strong>layout_config</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.LayoutConfig" title="perda.plotting.plotting_constants.LayoutConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">LayoutConfig</span></code></a></span>) – Plot dimensions and margin configuration.</p></li>
-<li><p><strong>font_config</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.FontConfig" title="perda.plotting.plotting_constants.FontConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">FontConfig</span></code></a></span>) – Font sizes for titles, labels, and ticks.</p></li>
+<li><p><strong>lat</strong> (<em>NDArray</em><em>[</em><em>float64</em><em>]</em>) – Latitude of each point, in degrees.</p></li>
+<li><p><strong>lon</strong> (<em>NDArray</em><em>[</em><em>float64</em><em>]</em>) – Longitude of each point, in degrees. Must have the same length as <code class="docutils literal notranslate"><span class="pre">lat</span></code>.</p></li>
+<li><p><strong>title</strong> (<em>str</em><em> | </em><em>None</em><em>, </em><em>optional</em>) – Title shown above the map. Default is None (no title).</p></li>
+<li><p><strong>map_style</strong> (<em>str</em><em>, </em><em>optional</em>) – Background map tiles, any Plotly MapLibre style name such as <code class="docutils literal notranslate"><span class="pre">&quot;open-street-map&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;carto-positron&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;satellite&quot;</span></code>. Default is MAP_STYLE (<code class="docutils literal notranslate"><span class="pre">&quot;open-street-map&quot;</span></code>, needs no API key).</p></li>
+<li><p><strong>zoom_padding</strong> (<em>float</em><em>, </em><em>optional</em>) – Extra space shown around the points when auto-zooming, as a fraction of the path’s extent. 0 fits the path tightly. Default is MAP_ZOOM_PADDING (0.4).</p></li>
+<li><p><strong>width</strong> (<em>int</em><em>, </em><em>optional</em>) – Figure width in pixels. Default is PLOT_HEIGHT (700), making a square map.</p></li>
+<li><p><strong>height</strong> (<em>int</em><em>, </em><em>optional</em>) – Figure height in pixels. Default is PLOT_HEIGHT (700).</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>go.Figure</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Plotly figure with a map background. Change anything not exposed here (line color, marker size, zoom, …) with <code class="docutils literal notranslate"><span class="pre">fig.update_layout</span></code> or <code class="docutils literal notranslate"><span class="pre">fig.update_traces</span></code> before calling <code class="docutils literal notranslate"><span class="pre">fig.show()</span></code>, e.g. <code class="docutils literal notranslate"><span class="pre">fig.update_layout(map_zoom=16)</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>go.Figure</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If <code class="docutils literal notranslate"><span class="pre">lat</span></code> and <code class="docutils literal notranslate"><span class="pre">lon</span></code> have different lengths or are empty.</p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">perda.plotting</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_diff_bars</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span> <span class="o">=</span> <span class="n">plot_diff_bars</span><span class="p">(</span><span class="n">base_only_ts</span><span class="p">,</span> <span class="n">incoming_only_ts</span><span class="p">,</span> <span class="n">mismatch_ts</span><span class="p">,</span> <span class="n">all_ts</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">perda.plotting</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_map_trace</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span> <span class="o">=</span> <span class="n">plot_map_trace</span><span class="p">(</span><span class="n">lat_array</span><span class="p">,</span> <span class="n">lon_array</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">"Lap Track"</span><span class="p">,</span> <span class="n">map_style</span><span class="o">=</span><span class="s2">"carto-positron"</span><span class="p">)</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -431,20 +434,20 @@ into fixed-width time windows.</p>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="perda.plotting.data_instance_plotter.html"
+       href="perda.plotting.fft_plotter.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">perda.plotting.data_instance_plotter</p>
+        <p class="prev-next-title">perda.plotting.fft_plotter</p>
       </div>
     </a>
     <a class="right-next"
-       href="perda.plotting.fft_plotter.html"
+       href="perda.plotting.parametric_overlay.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">perda.plotting.fft_plotter</p>
+        <p class="prev-next-title">perda.plotting.parametric_overlay</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -467,7 +470,7 @@ into fixed-width time windows.</p>
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.plotting.diff_plotter.plot_diff_bars"><code class="docutils literal notranslate"><span class="pre">plot_diff_bars()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.plotting.map_trace.plot_map_trace"><code class="docutils literal notranslate"><span class="pre">plot_map_trace()</span></code></a></li>
 </ul>
   </nav></div>
 
@@ -475,7 +478,7 @@ into fixed-width time windows.</p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="../_sources/_autosummary/perda.plotting.diff_plotter.rst.txt"
+      <li><a href="../_sources/_autosummary/perda.plotting.map_trace.rst.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div></div>

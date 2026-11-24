@@ -308,11 +308,17 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">numpy.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">NDArray</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">..units</span><span class="w"> </span><span class="kn">import</span> <span class="n">Timescale</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">.plotting_constants</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">DEFAULT_FONT_CONFIG</span><span class="p">,</span>
-    <span class="n">DEFAULT_LAYOUT_CONFIG</span><span class="p">,</span>
-    <span class="n">FontConfig</span><span class="p">,</span>
-    <span class="n">LayoutConfig</span><span class="p">,</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.defaults</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">FONT_SIZE_LARGE</span><span class="p">,</span>
+    <span class="n">FONT_SIZE_MEDIUM</span><span class="p">,</span>
+    <span class="n">FONT_SIZE_SMALL</span><span class="p">,</span>
+    <span class="n">MARGIN</span><span class="p">,</span>
+    <span class="n">PLOT_BGCOLOR</span><span class="p">,</span>
+    <span class="n">PLOT_HEIGHT</span><span class="p">,</span>
+    <span class="n">PLOT_WIDTH</span><span class="p">,</span>
+    <span class="n">TITLE_X</span><span class="p">,</span>
+    <span class="n">TITLE_XANCHOR</span><span class="p">,</span>
+    <span class="n">TITLE_YANCHOR</span><span class="p">,</span>
 <span class="p">)</span>
 
 
@@ -326,38 +332,44 @@
     <span class="n">x_label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"X"</span><span class="p">,</span>
     <span class="n">y_label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"Y"</span><span class="p">,</span>
     <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">layout_config</span><span class="p">:</span> <span class="n">LayoutConfig</span> <span class="o">=</span> <span class="n">DEFAULT_LAYOUT_CONFIG</span><span class="p">,</span>
-    <span class="n">font_config</span><span class="p">:</span> <span class="n">FontConfig</span> <span class="o">=</span> <span class="n">DEFAULT_FONT_CONFIG</span><span class="p">,</span>
+    <span class="n">width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">PLOT_WIDTH</span><span class="p">,</span>
+    <span class="n">height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">PLOT_HEIGHT</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">widgets</span><span class="o">.</span><span class="n">VBox</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Interactive parametric curve trimmer with a dual-handle range slider.</span>
+<span class="sd">    Interactive parametric curve (y against x) with a range slider for picking a sub-window of samples.</span>
 
-<span class="sd">    Displays a 2D parametric scatter plot alongside an ipywidgets IntRangeSlider</span>
-<span class="sd">    that trims which points are shown. Designed for use in Jupyter notebooks.</span>
+<span class="sd">    Drag the two slider handles to hide points outside the selected range. The labels under the slider show the index and raw timestamp of the first and last visible point, which can be passed directly to trimming functions such as ``trim_single_run_data(ts_start=..., ts_end=...)``. Designed for Jupyter notebooks.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    x : NDArray[float64]</span>
-<span class="sd">        X-axis values.</span>
+<span class="sd">        X-axis values, e.g. longitude or East position.</span>
 <span class="sd">    y : NDArray[float64]</span>
-<span class="sd">        Y-axis values. Must have the same length as `x`.</span>
+<span class="sd">        Y-axis values, e.g. latitude or North position. Must have the same length as ``x``.</span>
 <span class="sd">    timestamp_unit : Timescale</span>
-<span class="sd">        Unit for timestamp labels in the slider. Ignored if `timestamps` is None. Pass ``aly.data.timestamp_unit``.</span>
+<span class="sd">        Unit of ``timestamps``, shown next to the timestamp in the slider labels. Ignored if ``timestamps`` is None. Pass ``aly.data.timestamp_unit``.</span>
 <span class="sd">    timestamps : NDArray[float64] | None, optional</span>
-<span class="sd">        Timestamps corresponding to each point, shown in the slider labels.</span>
-<span class="sd">        If None, slider labels show index only.</span>
+<span class="sd">        Raw timestamp of each point (in ``timestamp_unit``, not converted to seconds), shown in the slider labels. Default is None (labels show sample index only).</span>
 <span class="sd">    x_label : str, optional</span>
-<span class="sd">        X-axis label.</span>
+<span class="sd">        X-axis label. Default is ``"X"``.</span>
 <span class="sd">    y_label : str, optional</span>
-<span class="sd">        Y-axis label.</span>
+<span class="sd">        Y-axis label. Default is ``"Y"``.</span>
 <span class="sd">    title : str | None, optional</span>
-<span class="sd">        Plot title.</span>
-<span class="sd">    layout_config : LayoutConfig, optional</span>
-<span class="sd">    font_config : FontConfig, optional</span>
+<span class="sd">        Title shown above the plot. Default is None (no title).</span>
+<span class="sd">    width : int, optional</span>
+<span class="sd">        Figure width in pixels. Default is PLOT_WIDTH (1200).</span>
+<span class="sd">    height : int, optional</span>
+<span class="sd">        Figure height in pixels. Default is PLOT_HEIGHT (700).</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    ipywidgets.VBox</span>
+<span class="sd">        Widget containing the figure, the slider and the labels. Display it as the last expression in a notebook cell or with ``display(widget)``. The figure is ``widget.children[0]`` and can be customized with ``update_layout`` like any Plotly figure.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If ``x`` is empty, or ``y`` (or ``timestamps``, when given) does not have the same length as ``x``.</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
@@ -368,6 +380,14 @@
 <span class="sd">    &gt;&gt;&gt; display(widget)</span>
 <span class="sd">    """</span>
     <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"x and y are empty; there is nothing to trim."</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="o">!=</span> <span class="n">n</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"x and y have different lengths (</span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2"> vs </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">)</span><span class="si">}</span><span class="s2">)."</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">timestamps</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">timestamps</span><span class="p">)</span> <span class="o">!=</span> <span class="n">n</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"timestamps has </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">timestamps</span><span class="p">)</span><span class="si">}</span><span class="s2"> values but x and y have </span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">; there must be one timestamp per point."</span>
+        <span class="p">)</span>
 
     <span class="n">fig</span> <span class="o">=</span> <span class="n">go</span><span class="o">.</span><span class="n">FigureWidget</span><span class="p">()</span>
     <span class="n">fig</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span>
@@ -382,20 +402,20 @@
     <span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span>
         <span class="n">title</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
             <span class="n">text</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
-            <span class="n">x</span><span class="o">=</span><span class="n">layout_config</span><span class="o">.</span><span class="n">title_x</span><span class="p">,</span>
-            <span class="n">xanchor</span><span class="o">=</span><span class="n">layout_config</span><span class="o">.</span><span class="n">title_xanchor</span><span class="p">,</span>
-            <span class="n">yanchor</span><span class="o">=</span><span class="n">layout_config</span><span class="o">.</span><span class="n">title_yanchor</span><span class="p">,</span>
-            <span class="n">font</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">font_config</span><span class="o">.</span><span class="n">large</span><span class="p">),</span>
+            <span class="n">x</span><span class="o">=</span><span class="n">TITLE_X</span><span class="p">,</span>
+            <span class="n">xanchor</span><span class="o">=</span><span class="n">TITLE_XANCHOR</span><span class="p">,</span>
+            <span class="n">yanchor</span><span class="o">=</span><span class="n">TITLE_YANCHOR</span><span class="p">,</span>
+            <span class="n">font</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">FONT_SIZE_LARGE</span><span class="p">),</span>
         <span class="p">),</span>
-        <span class="n">xaxis_title</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">x_label</span><span class="p">,</span> <span class="n">font</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">font_config</span><span class="o">.</span><span class="n">medium</span><span class="p">)),</span>
-        <span class="n">yaxis_title</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">y_label</span><span class="p">,</span> <span class="n">font</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">font_config</span><span class="o">.</span><span class="n">medium</span><span class="p">)),</span>
+        <span class="n">xaxis_title</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">x_label</span><span class="p">,</span> <span class="n">font</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">FONT_SIZE_MEDIUM</span><span class="p">)),</span>
+        <span class="n">yaxis_title</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">y_label</span><span class="p">,</span> <span class="n">font</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">FONT_SIZE_MEDIUM</span><span class="p">)),</span>
         <span class="n">showlegend</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">width</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">layout_config</span><span class="o">.</span><span class="n">width</span><span class="p">),</span>
-        <span class="n">height</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">layout_config</span><span class="o">.</span><span class="n">height</span><span class="p">),</span>
-        <span class="n">margin</span><span class="o">=</span><span class="n">layout_config</span><span class="o">.</span><span class="n">margin</span><span class="p">,</span>
-        <span class="n">plot_bgcolor</span><span class="o">=</span><span class="n">layout_config</span><span class="o">.</span><span class="n">plot_bgcolor</span><span class="p">,</span>
-        <span class="n">xaxis</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">tickfont</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">font_config</span><span class="o">.</span><span class="n">small</span><span class="p">)),</span>
-        <span class="n">yaxis</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">tickfont</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">font_config</span><span class="o">.</span><span class="n">small</span><span class="p">)),</span>
+        <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">,</span>
+        <span class="n">margin</span><span class="o">=</span><span class="n">MARGIN</span><span class="p">,</span>
+        <span class="n">plot_bgcolor</span><span class="o">=</span><span class="n">PLOT_BGCOLOR</span><span class="p">,</span>
+        <span class="n">xaxis</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">tickfont</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">FONT_SIZE_SMALL</span><span class="p">)),</span>
+        <span class="n">yaxis</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">tickfont</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">FONT_SIZE_SMALL</span><span class="p">)),</span>
     <span class="p">)</span>
 
     <span class="n">range_slider</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">IntRangeSlider</span><span class="p">(</span>

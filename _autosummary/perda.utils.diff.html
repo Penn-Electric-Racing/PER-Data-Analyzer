@@ -285,12 +285,14 @@
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="perda.plotting.html">perda.plotting</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="perda.plotting.binned_count_plotter.html">perda.plotting.binned_count_plotter</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.plotting.data_instance_plotter.html">perda.plotting.data_instance_plotter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="perda.plotting.diff_plotter.html">perda.plotting.diff_plotter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.plotting.defaults.html">perda.plotting.defaults</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.plotting.fft_plotter.html">perda.plotting.fft_plotter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.plotting.map_trace.html">perda.plotting.map_trace</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.plotting.parametric_overlay.html">perda.plotting.parametric_overlay</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.plotting.parametric_plot.html">perda.plotting.parametric_plot</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.plotting.parametric_trimmer.html">perda.plotting.parametric_trimmer</a></li>
-<li class="toctree-l3"><a class="reference internal" href="perda.plotting.plotting_constants.html">perda.plotting.plotting_constants</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.plotting.scatter_histogram_plotter.html">perda.plotting.scatter_histogram_plotter</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.plotting.subplots.html">perda.plotting.subplots</a></li>
 </ul>
@@ -387,7 +389,7 @@
 <span id="perda-utils-diff"></span><h1>perda.utils.diff<a class="headerlink" href="#module-perda.utils.diff" title="Link to this heading">#</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="perda.utils.diff.diff">
-<span class="sig-prename descclassname"><span class="pre">perda.utils.diff.</span></span><span class="sig-name descname"><span class="pre">diff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rpi_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">server_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp_tolerance_s</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.002</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diff_rtol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diff_atol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diff_plot_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">DiffPlotConfig(bucket_size_s=1.0,</span> <span class="pre">color_base_extra='blue',</span> <span class="pre">color_incom_extra='darkorange',</span> <span class="pre">color_value_mismatch='crimson',</span> <span class="pre">color_total='gray')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layout_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">LayoutConfig(width=1200,</span> <span class="pre">height=700,</span> <span class="pre">margin={'l':</span> <span class="pre">70,</span> <span class="pre">'r':</span> <span class="pre">50,</span> <span class="pre">'t':</span> <span class="pre">90,</span> <span class="pre">'b':</span> <span class="pre">70},</span> <span class="pre">plot_bgcolor='white',</span> <span class="pre">title_x=0.5,</span> <span class="pre">title_xanchor='center',</span> <span class="pre">title_yanchor='top',</span> <span class="pre">grid_width_per_col=400,</span> <span class="pre">grid_height_per_row=350,</span> <span class="pre">grid_horizontal_spacing=0.08,</span> <span class="pre">grid_vertical_spacing=0.12,</span> <span class="pre">max_display_resolution=50)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">font_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">FontConfig(large=20,</span> <span class="pre">medium=14,</span> <span class="pre">small=10)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/utils/diff.html#diff"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.utils.diff.diff" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">perda.utils.diff.</span></span><span class="sig-name descname"><span class="pre">diff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rpi_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">server_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp_tolerance_s</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.002</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diff_rtol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diff_atol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bucket_size_s</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">700</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/utils/diff.html#diff"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.utils.diff.diff" title="Link to this definition">#</a></dt>
 <dd><p>Compare two SingleRunData objects and report differences.</p>
 <p>Performs a three-stage comparison:</p>
 <ol class="arabic simple">
@@ -409,15 +411,51 @@ logging units are handled correctly.</p>
 Defaults to 0.002 (2 ms).</p></li>
 <li><p><strong>diff_rtol</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span>) – Relative tolerance for value comparison via <code class="docutils literal notranslate"><span class="pre">np.isclose</span></code>. Defaults to 1e-3.</p></li>
 <li><p><strong>diff_atol</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span>) – Absolute tolerance for value comparison via <code class="docutils literal notranslate"><span class="pre">np.isclose</span></code>. Defaults to 1e-3.</p></li>
-<li><p><strong>diff_plot_config</strong> (<a class="reference internal" href="perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.DiffPlotConfig" title="perda.plotting.plotting_constants.DiffPlotConfig"><em>DiffPlotConfig</em></a>)</p></li>
-<li><p><strong>layout_config</strong> (<a class="reference internal" href="perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.LayoutConfig" title="perda.plotting.plotting_constants.LayoutConfig"><em>LayoutConfig</em></a>)</p></li>
-<li><p><strong>font_config</strong> (<a class="reference internal" href="perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.FontConfig" title="perda.plotting.plotting_constants.FontConfig"><em>FontConfig</em></a>)</p></li>
+<li><p><strong>bucket_size_s</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span>) – Width of each time bucket (bar) in the diff plot, in seconds. Defaults to DIFF_BUCKET_SIZE_S (1.0).</p></li>
+<li><p><strong>log_y</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></span>) – Use a logarithmic count (y) axis in the diff plot. Defaults to False (linear).</p></li>
+<li><p><strong>width</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span>) – Figure width in pixels. Defaults to PLOT_WIDTH (1200).</p></li>
+<li><p><strong>height</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span>) – Figure height in pixels. Defaults to PLOT_HEIGHT (700).</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Figure</span></code></span></p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Bucketed bar chart of diff counts over time. Customize further with <code class="docutils literal notranslate"><span class="pre">fig.update_layout</span></code> before calling <code class="docutils literal notranslate"><span class="pre">fig.show()</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>go.Figure</p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="perda.utils.diff.plot_diff_counts">
+<span class="sig-prename descclassname"><span class="pre">perda.utils.diff.</span></span><span class="sig-name descname"><span class="pre">plot_diff_counts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base_extra_ts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">incoming_extra_ts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value_mismatch_ts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_present_ts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bucket_size_s</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">700</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/utils/diff.html#plot_diff_counts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.utils.diff.plot_diff_counts" title="Link to this definition">#</a></dt>
+<dd><p>Plot how many diff events of each kind happened in each time bucket.</p>
+<p>Draws total datapoints present as a faint gray background bar, with base-only extras, incoming-only extras and value mismatches overlaid on top.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>base_extra_ts</strong> (<em>npt.NDArray</em><em>[</em><em>np.float64</em><em>]</em>) – Timestamps (seconds) of datapoints present only in the base run.</p></li>
+<li><p><strong>incoming_extra_ts</strong> (<em>npt.NDArray</em><em>[</em><em>np.float64</em><em>]</em>) – Timestamps (seconds) of datapoints present only in the incoming run.</p></li>
+<li><p><strong>value_mismatch_ts</strong> (<em>npt.NDArray</em><em>[</em><em>np.float64</em><em>]</em>) – Timestamps (seconds) of datapoints present in both runs whose values differ.</p></li>
+<li><p><strong>total_present_ts</strong> (<em>npt.NDArray</em><em>[</em><em>np.float64</em><em>]</em>) – Timestamps (seconds) of all datapoints seen in either run.</p></li>
+<li><p><strong>bucket_size_s</strong> (<em>float</em><em>, </em><em>optional</em>) – Width of each time bucket (bar) in seconds. Default is DIFF_BUCKET_SIZE_S (1.0).</p></li>
+<li><p><strong>log_y</strong> (<em>bool</em><em>, </em><em>optional</em>) – Use a logarithmic count (y) axis. Default is False (linear).</p></li>
+<li><p><strong>width</strong> (<em>int</em><em>, </em><em>optional</em>) – Figure width in pixels. Default is PLOT_WIDTH (1200).</p></li>
+<li><p><strong>height</strong> (<em>int</em><em>, </em><em>optional</em>) – Figure height in pixels. Default is PLOT_HEIGHT (700).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Bucketed bar chart of diff counts over time. Customize further with <code class="docutils literal notranslate"><span class="pre">fig.update_layout</span></code> or <code class="docutils literal notranslate"><span class="pre">fig.update_traces</span></code> before calling <code class="docutils literal notranslate"><span class="pre">fig.show()</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>go.Figure</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">perda.utils.diff</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_diff_counts</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span> <span class="o">=</span> <span class="n">plot_diff_counts</span><span class="p">(</span><span class="n">base_only_ts</span><span class="p">,</span> <span class="n">incoming_only_ts</span><span class="p">,</span> <span class="n">mismatch_ts</span><span class="p">,</span> <span class="n">all_ts</span><span class="p">,</span> <span class="n">bucket_size_s</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+</pre></div>
+</div>
 </dd></dl>
 
 </section>
@@ -470,6 +508,7 @@ Defaults to 0.002 (2 ms).</p></li>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.utils.diff.diff"><code class="docutils literal notranslate"><span class="pre">diff()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.utils.diff.plot_diff_counts"><code class="docutils literal notranslate"><span class="pre">plot_diff_counts()</span></code></a></li>
 </ul>
   </nav></div>
 

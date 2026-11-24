@@ -1,8 +1,0 @@
-perda.plotting.diff\_plotter
-============================
-
-.. automodule:: perda.plotting.diff_plotter
-   :members:
-   :undoc-members:
-   :show-inheritance:
-

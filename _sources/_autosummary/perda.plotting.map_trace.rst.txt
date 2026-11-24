@@ -1,0 +1,8 @@
+perda.plotting.map\_trace
+=========================
+
+.. automodule:: perda.plotting.map_trace
+   :members:
+   :undoc-members:
+   :show-inheritance:
+

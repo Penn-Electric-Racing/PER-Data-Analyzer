@@ -51,7 +51,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="perda.plotting.subplots" href="perda.plotting.subplots.html" />
-    <link rel="prev" title="perda.plotting.plotting_constants" href="perda.plotting.plotting_constants.html" />
+    <link rel="prev" title="perda.plotting.parametric_trimmer" href="perda.plotting.parametric_trimmer.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
@@ -285,12 +285,14 @@
 </ul>
 </details></li>
 <li class="toctree-l2 current active has-children"><a class="reference internal" href="perda.plotting.html">perda.plotting</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="perda.plotting.binned_count_plotter.html">perda.plotting.binned_count_plotter</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.plotting.data_instance_plotter.html">perda.plotting.data_instance_plotter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="perda.plotting.diff_plotter.html">perda.plotting.diff_plotter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.plotting.defaults.html">perda.plotting.defaults</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.plotting.fft_plotter.html">perda.plotting.fft_plotter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.plotting.map_trace.html">perda.plotting.map_trace</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.plotting.parametric_overlay.html">perda.plotting.parametric_overlay</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.plotting.parametric_plot.html">perda.plotting.parametric_plot</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.plotting.parametric_trimmer.html">perda.plotting.parametric_trimmer</a></li>
-<li class="toctree-l3"><a class="reference internal" href="perda.plotting.plotting_constants.html">perda.plotting.plotting_constants</a></li>
 <li class="toctree-l3 current active"><a class="current reference internal" href="#">perda.plotting.scatter_histogram_plotter</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.plotting.subplots.html">perda.plotting.subplots</a></li>
 </ul>
@@ -387,33 +389,31 @@
 <span id="perda-plotting-scatter-histogram-plotter"></span><h1>perda.plotting.scatter_histogram_plotter<a class="headerlink" href="#module-perda.plotting.scatter_histogram_plotter" title="Link to this heading">#</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="perda.plotting.scatter_histogram_plotter.plot_scatter_and_histogram">
-<span class="sig-prename descclassname"><span class="pre">perda.plotting.scatter_histogram_plotter.</span></span><span class="sig-name descname"><span class="pre">plot_scatter_and_histogram</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scatter_title</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">histogram_title</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scatter_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">histogram_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hline</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hline_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vline</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vline_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">font_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">FontConfig(large=20,</span> <span class="pre">medium=14,</span> <span class="pre">small=10)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layout_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">LayoutConfig(width=1200,</span> <span class="pre">height=700,</span> <span class="pre">margin={'l':</span> <span class="pre">70,</span> <span class="pre">'r':</span> <span class="pre">50,</span> <span class="pre">'t':</span> <span class="pre">90,</span> <span class="pre">'b':</span> <span class="pre">70},</span> <span class="pre">plot_bgcolor='white',</span> <span class="pre">title_x=0.5,</span> <span class="pre">title_xanchor='center',</span> <span class="pre">title_yanchor='top',</span> <span class="pre">grid_width_per_col=400,</span> <span class="pre">grid_height_per_row=350,</span> <span class="pre">grid_horizontal_spacing=0.08,</span> <span class="pre">grid_vertical_spacing=0.12,</span> <span class="pre">max_display_resolution=50)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">ScatterHistogramPlotConfig(color_scatter='blue',</span> <span class="pre">color_line='crimson',</span> <span class="pre">color_histogram='blue',</span> <span class="pre">histogram_bins=80)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/plotting/scatter_histogram_plotter.html#plot_scatter_and_histogram"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.plotting.scatter_histogram_plotter.plot_scatter_and_histogram" title="Link to this definition">#</a></dt>
-<dd><p>Build a figure with a scatter plot over time and a histogram of the same values.</p>
+<span class="sig-prename descclassname"><span class="pre">perda.plotting.scatter_histogram_plotter.</span></span><span class="sig-name descname"><span class="pre">plot_scatter_and_histogram</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scatter_title</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">histogram_title</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scatter_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">histogram_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hline</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hline_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vline</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vline_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">histogram_bins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">80</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">700</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/plotting/scatter_histogram_plotter.html#plot_scatter_and_histogram"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.plotting.scatter_histogram_plotter.plot_scatter_and_histogram" title="Link to this definition">#</a></dt>
+<dd><p>Build a two-panel figure: a line plot of <code class="docutils literal notranslate"><span class="pre">y</span></code> against <code class="docutils literal notranslate"><span class="pre">x</span></code> on top, and a histogram of the same <code class="docutils literal notranslate"><span class="pre">y</span></code> values below.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>x</strong> (<em>NDArray</em><em>[</em><em>float64</em><em>]</em>) – X-axis values for the scatter plot (e.g. time).</p></li>
-<li><p><strong>y</strong> (<em>NDArray</em><em>[</em><em>float64</em><em>]</em>) – Y-axis values shared between the scatter plot and histogram.</p></li>
-<li><p><strong>title</strong> (<em>str</em>) – Overall figure title.</p></li>
-<li><p><strong>scatter_title</strong> (<em>str</em>) – Subplot title for the scatter plot.</p></li>
-<li><p><strong>histogram_title</strong> (<em>str</em>) – Subplot title for the histogram.</p></li>
-<li><p><strong>x_label</strong> (<em>str</em>) – X-axis label for the scatter plot.</p></li>
-<li><p><strong>y_label</strong> (<em>str</em>) – Y-axis label for the scatter plot and X-axis label for the histogram.</p></li>
-<li><p><strong>scatter_name</strong> (<em>str</em>) – Legend name for the scatter trace.</p></li>
-<li><p><strong>histogram_name</strong> (<em>str</em>) – Legend name for the histogram trace.</p></li>
-<li><p><strong>hline</strong> (<em>float</em><em> | </em><em>None</em><em>, </em><em>optional</em>) – Y value at which to draw a horizontal reference line on the scatter plot.
-Default is None.</p></li>
-<li><p><strong>hline_label</strong> (<em>str</em><em> | </em><em>None</em><em>, </em><em>optional</em>) – Annotation text for the horizontal reference line. Default is None.</p></li>
-<li><p><strong>vline</strong> (<em>float</em><em> | </em><em>None</em><em>, </em><em>optional</em>) – X value at which to draw a vertical reference line on the histogram.
-Default is None.</p></li>
-<li><p><strong>vline_label</strong> (<em>str</em><em> | </em><em>None</em><em>, </em><em>optional</em>) – Annotation text for the vertical reference line. Default is None.</p></li>
-<li><p><strong>font_config</strong> (<a class="reference internal" href="perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.FontConfig" title="perda.plotting.plotting_constants.FontConfig"><em>FontConfig</em></a><em>, </em><em>optional</em>) – Font sizes for plot elements.</p></li>
-<li><p><strong>layout_config</strong> (<a class="reference internal" href="perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.LayoutConfig" title="perda.plotting.plotting_constants.LayoutConfig"><em>LayoutConfig</em></a><em>, </em><em>optional</em>) – Plot dimensions and margins.</p></li>
-<li><p><strong>plot_config</strong> (<a class="reference internal" href="perda.plotting.plotting_constants.html#perda.plotting.plotting_constants.ScatterHistogramPlotConfig" title="perda.plotting.plotting_constants.ScatterHistogramPlotConfig"><em>ScatterHistogramPlotConfig</em></a><em>, </em><em>optional</em>) – Colors and histogram bin count.</p></li>
+<li><p><strong>x</strong> (<em>NDArray</em><em>[</em><em>float64</em><em>]</em>) – X-axis values for the top line plot, e.g. time in seconds.</p></li>
+<li><p><strong>y</strong> (<em>NDArray</em><em>[</em><em>float64</em><em>]</em>) – Values shown in both panels: as the y-axis of the top plot and as the binned quantity of the histogram.</p></li>
+<li><p><strong>title</strong> (<em>str</em>) – Title shown above the whole figure.</p></li>
+<li><p><strong>scatter_title</strong> (<em>str</em>) – Title of the top (line plot) panel.</p></li>
+<li><p><strong>histogram_title</strong> (<em>str</em>) – Title of the bottom (histogram) panel.</p></li>
+<li><p><strong>x_label</strong> (<em>str</em>) – X-axis label of the top panel.</p></li>
+<li><p><strong>y_label</strong> (<em>str</em>) – Y-axis label of the top panel, also used as the x-axis label of the histogram.</p></li>
+<li><p><strong>scatter_name</strong> (<em>str</em>) – Legend name for the top panel’s line.</p></li>
+<li><p><strong>histogram_name</strong> (<em>str</em>) – Legend name for the histogram bars.</p></li>
+<li><p><strong>hline</strong> (<em>float</em><em> | </em><em>None</em><em>, </em><em>optional</em>) – Y value at which to draw a dashed horizontal reference line on the top panel. Default is None (no line).</p></li>
+<li><p><strong>hline_label</strong> (<em>str</em><em> | </em><em>None</em><em>, </em><em>optional</em>) – Text shown next to the horizontal reference line. Default is None (no text).</p></li>
+<li><p><strong>vline</strong> (<em>float</em><em> | </em><em>None</em><em>, </em><em>optional</em>) – X value at which to draw a dashed vertical reference line on the histogram. Default is None (no line).</p></li>
+<li><p><strong>vline_label</strong> (<em>str</em><em> | </em><em>None</em><em>, </em><em>optional</em>) – Text shown next to the vertical reference line. Default is None (no text).</p></li>
+<li><p><strong>histogram_bins</strong> (<em>int</em><em>, </em><em>optional</em>) – Maximum number of histogram bins. Default is HISTOGRAM_BINS (80).</p></li>
+<li><p><strong>width</strong> (<em>int</em><em>, </em><em>optional</em>) – Figure width in pixels. Default is PLOT_WIDTH (1200).</p></li>
+<li><p><strong>height</strong> (<em>int</em><em>, </em><em>optional</em>) – Figure height in pixels. Default is PLOT_HEIGHT (700).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Plotly figure with scatter and histogram subplots.</p>
+<dd class="field-even"><p>Plotly figure. Change anything not exposed here (fonts, colors, margins, log axes, …) with <code class="docutils literal notranslate"><span class="pre">fig.update_layout</span></code>, <code class="docutils literal notranslate"><span class="pre">fig.update_xaxes</span></code>, <code class="docutils literal notranslate"><span class="pre">fig.update_yaxes</span></code> or <code class="docutils literal notranslate"><span class="pre">fig.update_traces</span></code> before calling <code class="docutils literal notranslate"><span class="pre">fig.show()</span></code>. Target one panel with <code class="docutils literal notranslate"><span class="pre">row=1</span></code> (line plot) or <code class="docutils literal notranslate"><span class="pre">row=2</span></code> (histogram) and <code class="docutils literal notranslate"><span class="pre">col=1</span></code>.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>go.Figure</p>
@@ -454,12 +454,12 @@ Default is None.</p></li>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="perda.plotting.plotting_constants.html"
+       href="perda.plotting.parametric_trimmer.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">perda.plotting.plotting_constants</p>
+        <p class="prev-next-title">perda.plotting.parametric_trimmer</p>
       </div>
     </a>
     <a class="right-next"

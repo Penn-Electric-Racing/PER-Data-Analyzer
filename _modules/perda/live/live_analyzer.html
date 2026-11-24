@@ -302,33 +302,16 @@
                 <article class="bd-article">
                   
   <h1>Source code for perda.live.live_analyzer</h1><div class="highlight"><pre>
-<span></span><span class="sd">"""</span>
-<span class="sd">perda.live.live_analyzer</span>
-<span class="sd">------------------------</span>
-<span class="sd">Live data analysis using the CDP IPC server, mirroring the Analyzer interface.</span>
-<span class="sd">"""</span>
-
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">plotly</span><span class="w"> </span><span class="kn">import</span> <span class="n">graph_objects</span> <span class="k">as</span> <span class="n">go</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">..core_data_structures.data_instance</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataInstance</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..plotting.data_instance_plotter</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_dual_axis</span><span class="p">,</span> <span class="n">plot_single_axis</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">..plotting.plotting_constants</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">DEFAULT_FONT_CONFIG</span><span class="p">,</span>
-    <span class="n">DEFAULT_LAYOUT_CONFIG</span><span class="p">,</span>
-    <span class="n">DEFAULT_SCATTER_HISTOGRAM_PLOT_CONFIG</span><span class="p">,</span>
-    <span class="n">FontConfig</span><span class="p">,</span>
-    <span class="n">LayoutConfig</span><span class="p">,</span>
-    <span class="n">ScatterHistogramPlotConfig</span><span class="p">,</span>
-<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..plotting.defaults</span><span class="w"> </span><span class="kn">import</span> <span class="n">HISTOGRAM_BINS</span><span class="p">,</span> <span class="n">PLOT_HEIGHT</span><span class="p">,</span> <span class="n">PLOT_WIDTH</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..units</span><span class="w"> </span><span class="kn">import</span> <span class="n">Timescale</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..utils.frequency_analysis</span><span class="w"> </span><span class="kn">import</span> <span class="n">analyze_frequency</span> <span class="k">as</span> <span class="n">_analyze_frequency</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.cdp_client</span><span class="w"> </span><span class="kn">import</span> <span class="n">CDPClient</span><span class="p">,</span> <span class="n">CDPException</span><span class="p">,</span> <span class="n">ValueType</span>
-
-<span class="c1"># ---------------------------------------------------------------------------</span>
-<span class="c1"># Types</span>
-<span class="c1"># ---------------------------------------------------------------------------</span>
 
 <span class="n">PlotInput</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span>
     <span class="nb">str</span><span class="p">,</span>
@@ -360,10 +343,6 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_connected</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_connection</span><span class="p">()</span>
-
-    <span class="c1"># ------------------------------------------------------------------</span>
-    <span class="c1"># Named constructors</span>
-    <span class="c1"># ------------------------------------------------------------------</span>
 
 <div class="viewcode-block" id="LiveAnalyzer.local">
 <a class="viewcode-back" href="../../../_autosummary/perda.live.live_analyzer.html#perda.live.LiveAnalyzer.local">[docs]</a>
@@ -402,10 +381,6 @@
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">,</span> <span class="n">timeout</span><span class="p">,</span> <span class="n">range_timeout</span><span class="p">)</span></div>
 
 
-    <span class="c1"># ------------------------------------------------------------------</span>
-    <span class="c1"># Connection management</span>
-    <span class="c1"># ------------------------------------------------------------------</span>
-
     <span class="k">def</span><span class="w"> </span><span class="nf">_check_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="p">():</span>
@@ -434,10 +409,6 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_connected</span><span class="p">(</span><span class="n">refresh</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
             <span class="k">raise</span> <span class="n">CDPException</span><span class="p">(</span><span class="s2">"Lost connection to CDP server"</span><span class="p">)</span></div>
 
-
-    <span class="c1"># ------------------------------------------------------------------</span>
-    <span class="c1"># Public API</span>
-    <span class="c1"># ------------------------------------------------------------------</span>
 
 <div class="viewcode-block" id="LiveAnalyzer.fetch">
 <a class="viewcode-back" href="../../../_autosummary/perda.live.live_analyzer.html#perda.live.LiveAnalyzer.fetch">[docs]</a>
@@ -487,8 +458,10 @@
         <span class="n">y_label_1</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">y_label_2</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">show_legend</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-        <span class="n">font_config</span><span class="p">:</span> <span class="n">FontConfig</span> <span class="o">=</span> <span class="n">DEFAULT_FONT_CONFIG</span><span class="p">,</span>
-        <span class="n">layout_config</span><span class="p">:</span> <span class="n">LayoutConfig</span> <span class="o">=</span> <span class="n">DEFAULT_LAYOUT_CONFIG</span><span class="p">,</span>
+        <span class="n">log_x</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">log_y</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">PLOT_WIDTH</span><span class="p">,</span>
+        <span class="n">height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">PLOT_HEIGHT</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ensure_connected</span><span class="p">()</span>
 
@@ -504,9 +477,11 @@
                 <span class="n">left_y_axis_title</span><span class="o">=</span><span class="n">y_label_1</span><span class="p">,</span>
                 <span class="n">right_y_axis_title</span><span class="o">=</span><span class="n">y_label_2</span><span class="p">,</span>
                 <span class="n">show_legend</span><span class="o">=</span><span class="n">show_legend</span><span class="p">,</span>
-                <span class="n">font_config</span><span class="o">=</span><span class="n">font_config</span><span class="p">,</span>
-                <span class="n">layout_config</span><span class="o">=</span><span class="n">layout_config</span><span class="p">,</span>
                 <span class="n">timestamp_unit</span><span class="o">=</span><span class="n">_TIMESTAMP_UNIT</span><span class="p">,</span>
+                <span class="n">log_x</span><span class="o">=</span><span class="n">log_x</span><span class="p">,</span>
+                <span class="n">log_y</span><span class="o">=</span><span class="n">log_y</span><span class="p">,</span>
+                <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span>
+                <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">plot_single_axis</span><span class="p">(</span>
@@ -514,9 +489,11 @@
                 <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
                 <span class="n">y_axis_title</span><span class="o">=</span><span class="n">y_label_1</span><span class="p">,</span>
                 <span class="n">show_legend</span><span class="o">=</span><span class="n">show_legend</span><span class="p">,</span>
-                <span class="n">font_config</span><span class="o">=</span><span class="n">font_config</span><span class="p">,</span>
-                <span class="n">layout_config</span><span class="o">=</span><span class="n">layout_config</span><span class="p">,</span>
                 <span class="n">timestamp_unit</span><span class="o">=</span><span class="n">_TIMESTAMP_UNIT</span><span class="p">,</span>
+                <span class="n">log_x</span><span class="o">=</span><span class="n">log_x</span><span class="p">,</span>
+                <span class="n">log_y</span><span class="o">=</span><span class="n">log_y</span><span class="p">,</span>
+                <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span>
+                <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">,</span>
             <span class="p">)</span></div>
 
 
@@ -528,9 +505,9 @@
         <span class="n">time_secs</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">_DEFAULT_TIME_SECS</span><span class="p">,</span>
         <span class="n">expected_frequency_hz</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">gap_threshold_multiplier</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">,</span>
-        <span class="n">font_config</span><span class="p">:</span> <span class="n">FontConfig</span> <span class="o">=</span> <span class="n">DEFAULT_FONT_CONFIG</span><span class="p">,</span>
-        <span class="n">layout_config</span><span class="p">:</span> <span class="n">LayoutConfig</span> <span class="o">=</span> <span class="n">DEFAULT_LAYOUT_CONFIG</span><span class="p">,</span>
-        <span class="n">plot_config</span><span class="p">:</span> <span class="n">ScatterHistogramPlotConfig</span> <span class="o">=</span> <span class="n">DEFAULT_SCATTER_HISTOGRAM_PLOT_CONFIG</span><span class="p">,</span>
+        <span class="n">histogram_bins</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">HISTOGRAM_BINS</span><span class="p">,</span>
+        <span class="n">width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">PLOT_WIDTH</span><span class="p">,</span>
+        <span class="n">height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">PLOT_HEIGHT</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
         <span class="n">di</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="n">time_secs</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">_analyze_frequency</span><span class="p">(</span>
@@ -538,18 +515,14 @@
             <span class="n">expected_frequency_hz</span><span class="o">=</span><span class="n">expected_frequency_hz</span><span class="p">,</span>
             <span class="n">source_time_unit</span><span class="o">=</span><span class="n">_TIMESTAMP_UNIT</span><span class="p">,</span>
             <span class="n">gap_threshold_multiplier</span><span class="o">=</span><span class="n">gap_threshold_multiplier</span><span class="p">,</span>
-            <span class="n">font_config</span><span class="o">=</span><span class="n">font_config</span><span class="p">,</span>
-            <span class="n">layout_config</span><span class="o">=</span><span class="n">layout_config</span><span class="p">,</span>
-            <span class="n">plot_config</span><span class="o">=</span><span class="n">plot_config</span><span class="p">,</span>
+            <span class="n">histogram_bins</span><span class="o">=</span><span class="n">histogram_bins</span><span class="p">,</span>
+            <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span>
+            <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">,</span>
         <span class="p">)</span></div>
 
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="sa">f</span><span class="s2">"LiveAnalyzer(host=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_host</span><span class="si">!r}</span><span class="s2">, port=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_port</span><span class="si">}</span><span class="s2">)"</span>
-
-    <span class="c1"># ------------------------------------------------------------------</span>
-    <span class="c1"># Internal helpers</span>
-    <span class="c1"># ------------------------------------------------------------------</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_client</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CDPClient</span><span class="p">:</span>
         <span class="n">client</span> <span class="o">=</span> <span class="n">CDPClient</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_timeout</span><span class="p">,</span> <span class="n">range_timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_range_timeout</span><span class="p">)</span>

@@ -307,13 +307,21 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">plotly</span><span class="w"> </span><span class="kn">import</span> <span class="n">graph_objects</span> <span class="k">as</span> <span class="n">go</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">plotly.subplots</span><span class="w"> </span><span class="kn">import</span> <span class="n">make_subplots</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">.plotting_constants</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">DEFAULT_FONT_CONFIG</span><span class="p">,</span>
-    <span class="n">DEFAULT_LAYOUT_CONFIG</span><span class="p">,</span>
-    <span class="n">DEFAULT_SCATTER_HISTOGRAM_PLOT_CONFIG</span><span class="p">,</span>
-    <span class="n">FontConfig</span><span class="p">,</span>
-    <span class="n">LayoutConfig</span><span class="p">,</span>
-    <span class="n">ScatterHistogramPlotConfig</span><span class="p">,</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.defaults</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">FONT_SIZE_LARGE</span><span class="p">,</span>
+    <span class="n">FONT_SIZE_MEDIUM</span><span class="p">,</span>
+    <span class="n">FONT_SIZE_SMALL</span><span class="p">,</span>
+    <span class="n">HISTOGRAM_BINS</span><span class="p">,</span>
+    <span class="n">HISTOGRAM_COLOR</span><span class="p">,</span>
+    <span class="n">MARGIN</span><span class="p">,</span>
+    <span class="n">PLOT_BGCOLOR</span><span class="p">,</span>
+    <span class="n">PLOT_HEIGHT</span><span class="p">,</span>
+    <span class="n">PLOT_WIDTH</span><span class="p">,</span>
+    <span class="n">REFERENCE_LINE_COLOR</span><span class="p">,</span>
+    <span class="n">SCATTER_COLOR</span><span class="p">,</span>
+    <span class="n">TITLE_X</span><span class="p">,</span>
+    <span class="n">TITLE_XANCHOR</span><span class="p">,</span>
+    <span class="n">TITLE_YANCHOR</span><span class="p">,</span>
 <span class="p">)</span>
 
 
@@ -333,54 +341,52 @@
     <span class="n">hline_label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">vline</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">vline_label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">font_config</span><span class="p">:</span> <span class="n">FontConfig</span> <span class="o">=</span> <span class="n">DEFAULT_FONT_CONFIG</span><span class="p">,</span>
-    <span class="n">layout_config</span><span class="p">:</span> <span class="n">LayoutConfig</span> <span class="o">=</span> <span class="n">DEFAULT_LAYOUT_CONFIG</span><span class="p">,</span>
-    <span class="n">plot_config</span><span class="p">:</span> <span class="n">ScatterHistogramPlotConfig</span> <span class="o">=</span> <span class="n">DEFAULT_SCATTER_HISTOGRAM_PLOT_CONFIG</span><span class="p">,</span>
+    <span class="n">histogram_bins</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">HISTOGRAM_BINS</span><span class="p">,</span>
+    <span class="n">width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">PLOT_WIDTH</span><span class="p">,</span>
+    <span class="n">height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">PLOT_HEIGHT</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Build a figure with a scatter plot over time and a histogram of the same values.</span>
+<span class="sd">    Build a two-panel figure: a line plot of ``y`` against ``x`` on top, and a histogram of the same ``y`` values below.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    x : NDArray[float64]</span>
-<span class="sd">        X-axis values for the scatter plot (e.g. time).</span>
+<span class="sd">        X-axis values for the top line plot, e.g. time in seconds.</span>
 <span class="sd">    y : NDArray[float64]</span>
-<span class="sd">        Y-axis values shared between the scatter plot and histogram.</span>
+<span class="sd">        Values shown in both panels: as the y-axis of the top plot and as the binned quantity of the histogram.</span>
 <span class="sd">    title : str</span>
-<span class="sd">        Overall figure title.</span>
+<span class="sd">        Title shown above the whole figure.</span>
 <span class="sd">    scatter_title : str</span>
-<span class="sd">        Subplot title for the scatter plot.</span>
+<span class="sd">        Title of the top (line plot) panel.</span>
 <span class="sd">    histogram_title : str</span>
-<span class="sd">        Subplot title for the histogram.</span>
+<span class="sd">        Title of the bottom (histogram) panel.</span>
 <span class="sd">    x_label : str</span>
-<span class="sd">        X-axis label for the scatter plot.</span>
+<span class="sd">        X-axis label of the top panel.</span>
 <span class="sd">    y_label : str</span>
-<span class="sd">        Y-axis label for the scatter plot and X-axis label for the histogram.</span>
+<span class="sd">        Y-axis label of the top panel, also used as the x-axis label of the histogram.</span>
 <span class="sd">    scatter_name : str</span>
-<span class="sd">        Legend name for the scatter trace.</span>
+<span class="sd">        Legend name for the top panel's line.</span>
 <span class="sd">    histogram_name : str</span>
-<span class="sd">        Legend name for the histogram trace.</span>
+<span class="sd">        Legend name for the histogram bars.</span>
 <span class="sd">    hline : float | None, optional</span>
-<span class="sd">        Y value at which to draw a horizontal reference line on the scatter plot.</span>
-<span class="sd">        Default is None.</span>
+<span class="sd">        Y value at which to draw a dashed horizontal reference line on the top panel. Default is None (no line).</span>
 <span class="sd">    hline_label : str | None, optional</span>
-<span class="sd">        Annotation text for the horizontal reference line. Default is None.</span>
+<span class="sd">        Text shown next to the horizontal reference line. Default is None (no text).</span>
 <span class="sd">    vline : float | None, optional</span>
-<span class="sd">        X value at which to draw a vertical reference line on the histogram.</span>
-<span class="sd">        Default is None.</span>
+<span class="sd">        X value at which to draw a dashed vertical reference line on the histogram. Default is None (no line).</span>
 <span class="sd">    vline_label : str | None, optional</span>
-<span class="sd">        Annotation text for the vertical reference line. Default is None.</span>
-<span class="sd">    font_config : FontConfig, optional</span>
-<span class="sd">        Font sizes for plot elements.</span>
-<span class="sd">    layout_config : LayoutConfig, optional</span>
-<span class="sd">        Plot dimensions and margins.</span>
-<span class="sd">    plot_config : ScatterHistogramPlotConfig, optional</span>
-<span class="sd">        Colors and histogram bin count.</span>
+<span class="sd">        Text shown next to the vertical reference line. Default is None (no text).</span>
+<span class="sd">    histogram_bins : int, optional</span>
+<span class="sd">        Maximum number of histogram bins. Default is HISTOGRAM_BINS (80).</span>
+<span class="sd">    width : int, optional</span>
+<span class="sd">        Figure width in pixels. Default is PLOT_WIDTH (1200).</span>
+<span class="sd">    height : int, optional</span>
+<span class="sd">        Figure height in pixels. Default is PLOT_HEIGHT (700).</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    go.Figure</span>
-<span class="sd">        Plotly figure with scatter and histogram subplots.</span>
+<span class="sd">        Plotly figure. Change anything not exposed here (fonts, colors, margins, log axes, ...) with ``fig.update_layout``, ``fig.update_xaxes``, ``fig.update_yaxes`` or ``fig.update_traces`` before calling ``fig.show()``. Target one panel with ``row=1`` (line plot) or ``row=2`` (histogram) and ``col=1``.</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
@@ -415,7 +421,7 @@
             <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span>
             <span class="n">mode</span><span class="o">=</span><span class="s2">"lines"</span><span class="p">,</span>
             <span class="n">name</span><span class="o">=</span><span class="n">scatter_name</span><span class="p">,</span>
-            <span class="n">line</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="n">plot_config</span><span class="o">.</span><span class="n">color_scatter</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+            <span class="n">line</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="n">SCATTER_COLOR</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
         <span class="p">),</span>
         <span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
         <span class="n">col</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
@@ -424,9 +430,9 @@
     <span class="k">if</span> <span class="n">hline</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">fig</span><span class="o">.</span><span class="n">add_hline</span><span class="p">(</span>
             <span class="n">y</span><span class="o">=</span><span class="n">hline</span><span class="p">,</span>
-            <span class="n">line</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="n">plot_config</span><span class="o">.</span><span class="n">color_line</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">dash</span><span class="o">=</span><span class="s2">"dash"</span><span class="p">),</span>
+            <span class="n">line</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="n">REFERENCE_LINE_COLOR</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">dash</span><span class="o">=</span><span class="s2">"dash"</span><span class="p">),</span>
             <span class="n">annotation_text</span><span class="o">=</span><span class="n">hline_label</span><span class="p">,</span>
-            <span class="n">annotation_font_size</span><span class="o">=</span><span class="n">font_config</span><span class="o">.</span><span class="n">small</span><span class="p">,</span>
+            <span class="n">annotation_font_size</span><span class="o">=</span><span class="n">FONT_SIZE_SMALL</span><span class="p">,</span>
             <span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
             <span class="n">col</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
         <span class="p">)</span>
@@ -434,9 +440,9 @@
     <span class="n">fig</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span>
         <span class="n">go</span><span class="o">.</span><span class="n">Histogram</span><span class="p">(</span>
             <span class="n">x</span><span class="o">=</span><span class="n">y</span><span class="p">,</span>
-            <span class="n">nbinsx</span><span class="o">=</span><span class="n">plot_config</span><span class="o">.</span><span class="n">histogram_bins</span><span class="p">,</span>
+            <span class="n">nbinsx</span><span class="o">=</span><span class="n">histogram_bins</span><span class="p">,</span>
             <span class="n">name</span><span class="o">=</span><span class="n">histogram_name</span><span class="p">,</span>
-            <span class="n">marker_color</span><span class="o">=</span><span class="n">plot_config</span><span class="o">.</span><span class="n">color_histogram</span><span class="p">,</span>
+            <span class="n">marker_color</span><span class="o">=</span><span class="n">HISTOGRAM_COLOR</span><span class="p">,</span>
             <span class="n">opacity</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span>
         <span class="p">),</span>
         <span class="n">row</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
@@ -446,38 +452,30 @@
     <span class="k">if</span> <span class="n">vline</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">fig</span><span class="o">.</span><span class="n">add_vline</span><span class="p">(</span>
             <span class="n">x</span><span class="o">=</span><span class="n">vline</span><span class="p">,</span>
-            <span class="n">line</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="n">plot_config</span><span class="o">.</span><span class="n">color_line</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">dash</span><span class="o">=</span><span class="s2">"dash"</span><span class="p">),</span>
+            <span class="n">line</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="n">REFERENCE_LINE_COLOR</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">dash</span><span class="o">=</span><span class="s2">"dash"</span><span class="p">),</span>
             <span class="n">annotation_text</span><span class="o">=</span><span class="n">vline_label</span><span class="p">,</span>
-            <span class="n">annotation_font_size</span><span class="o">=</span><span class="n">font_config</span><span class="o">.</span><span class="n">small</span><span class="p">,</span>
+            <span class="n">annotation_font_size</span><span class="o">=</span><span class="n">FONT_SIZE_SMALL</span><span class="p">,</span>
             <span class="n">row</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
             <span class="n">col</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="n">fig</span><span class="o">.</span><span class="n">update_xaxes</span><span class="p">(</span>
-        <span class="n">title_text</span><span class="o">=</span><span class="n">x_label</span><span class="p">,</span> <span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">title_font_size</span><span class="o">=</span><span class="n">font_config</span><span class="o">.</span><span class="n">medium</span>
-    <span class="p">)</span>
-    <span class="n">fig</span><span class="o">.</span><span class="n">update_yaxes</span><span class="p">(</span>
-        <span class="n">title_text</span><span class="o">=</span><span class="n">y_label</span><span class="p">,</span> <span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">title_font_size</span><span class="o">=</span><span class="n">font_config</span><span class="o">.</span><span class="n">medium</span>
-    <span class="p">)</span>
-    <span class="n">fig</span><span class="o">.</span><span class="n">update_xaxes</span><span class="p">(</span>
-        <span class="n">title_text</span><span class="o">=</span><span class="n">y_label</span><span class="p">,</span> <span class="n">row</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">title_font_size</span><span class="o">=</span><span class="n">font_config</span><span class="o">.</span><span class="n">medium</span>
-    <span class="p">)</span>
-    <span class="n">fig</span><span class="o">.</span><span class="n">update_yaxes</span><span class="p">(</span>
-        <span class="n">title_text</span><span class="o">=</span><span class="s2">"Count"</span><span class="p">,</span> <span class="n">row</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">title_font_size</span><span class="o">=</span><span class="n">font_config</span><span class="o">.</span><span class="n">medium</span>
-    <span class="p">)</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">update_xaxes</span><span class="p">(</span><span class="n">title_text</span><span class="o">=</span><span class="n">x_label</span><span class="p">,</span> <span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">title_font_size</span><span class="o">=</span><span class="n">FONT_SIZE_MEDIUM</span><span class="p">)</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">update_yaxes</span><span class="p">(</span><span class="n">title_text</span><span class="o">=</span><span class="n">y_label</span><span class="p">,</span> <span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">title_font_size</span><span class="o">=</span><span class="n">FONT_SIZE_MEDIUM</span><span class="p">)</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">update_xaxes</span><span class="p">(</span><span class="n">title_text</span><span class="o">=</span><span class="n">y_label</span><span class="p">,</span> <span class="n">row</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">title_font_size</span><span class="o">=</span><span class="n">FONT_SIZE_MEDIUM</span><span class="p">)</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">update_yaxes</span><span class="p">(</span><span class="n">title_text</span><span class="o">=</span><span class="s2">"Count"</span><span class="p">,</span> <span class="n">row</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">title_font_size</span><span class="o">=</span><span class="n">FONT_SIZE_MEDIUM</span><span class="p">)</span>
 
     <span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span>
         <span class="n">title</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
             <span class="n">text</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
-            <span class="n">x</span><span class="o">=</span><span class="n">layout_config</span><span class="o">.</span><span class="n">title_x</span><span class="p">,</span>
-            <span class="n">xanchor</span><span class="o">=</span><span class="n">layout_config</span><span class="o">.</span><span class="n">title_xanchor</span><span class="p">,</span>
-            <span class="n">yanchor</span><span class="o">=</span><span class="n">layout_config</span><span class="o">.</span><span class="n">title_yanchor</span><span class="p">,</span>
-            <span class="n">font</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">font_config</span><span class="o">.</span><span class="n">large</span><span class="p">),</span>
+            <span class="n">x</span><span class="o">=</span><span class="n">TITLE_X</span><span class="p">,</span>
+            <span class="n">xanchor</span><span class="o">=</span><span class="n">TITLE_XANCHOR</span><span class="p">,</span>
+            <span class="n">yanchor</span><span class="o">=</span><span class="n">TITLE_YANCHOR</span><span class="p">,</span>
+            <span class="n">font</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">FONT_SIZE_LARGE</span><span class="p">),</span>
         <span class="p">),</span>
-        <span class="n">width</span><span class="o">=</span><span class="n">layout_config</span><span class="o">.</span><span class="n">width</span><span class="p">,</span>
-        <span class="n">height</span><span class="o">=</span><span class="n">layout_config</span><span class="o">.</span><span class="n">height</span><span class="p">,</span>
-        <span class="n">margin</span><span class="o">=</span><span class="n">layout_config</span><span class="o">.</span><span class="n">margin</span><span class="p">,</span>
-        <span class="n">plot_bgcolor</span><span class="o">=</span><span class="n">layout_config</span><span class="o">.</span><span class="n">plot_bgcolor</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">,</span>
+        <span class="n">margin</span><span class="o">=</span><span class="n">MARGIN</span><span class="p">,</span>
+        <span class="n">plot_bgcolor</span><span class="o">=</span><span class="n">PLOT_BGCOLOR</span><span class="p">,</span>
         <span class="n">showlegend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="p">)</span>
 

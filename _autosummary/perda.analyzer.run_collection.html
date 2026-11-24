@@ -285,12 +285,14 @@
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="perda.plotting.html">perda.plotting</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="perda.plotting.binned_count_plotter.html">perda.plotting.binned_count_plotter</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.plotting.data_instance_plotter.html">perda.plotting.data_instance_plotter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="perda.plotting.diff_plotter.html">perda.plotting.diff_plotter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.plotting.defaults.html">perda.plotting.defaults</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.plotting.fft_plotter.html">perda.plotting.fft_plotter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.plotting.map_trace.html">perda.plotting.map_trace</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.plotting.parametric_overlay.html">perda.plotting.parametric_overlay</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.plotting.parametric_plot.html">perda.plotting.parametric_plot</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.plotting.parametric_trimmer.html">perda.plotting.parametric_trimmer</a></li>
-<li class="toctree-l3"><a class="reference internal" href="perda.plotting.plotting_constants.html">perda.plotting.plotting_constants</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.plotting.scatter_histogram_plotter.html">perda.plotting.scatter_histogram_plotter</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.plotting.subplots.html">perda.plotting.subplots</a></li>
 </ul>
@@ -524,18 +526,20 @@ with <code class="docutils literal notranslate"><span class="pre">filter</span><
 
 <dl class="py method">
 <dt class="sig sig-object py" id="perda.analyzer.run_collection.RunCollection.plot_comparison">
-<span class="sig-name descname"><span class="pre">plot_comparison</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cpp_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/analyzer/run_collection.html#RunCollection.plot_comparison"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.analyzer.run_collection.RunCollection.plot_comparison" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">plot_comparison</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cpp_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/analyzer/run_collection.html#RunCollection.plot_comparison"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.analyzer.run_collection.RunCollection.plot_comparison" title="Link to this definition">#</a></dt>
 <dd><p>Overlay a variable from every run in the collection on a single plot.</p>
 <p>Each run’s timestamps are shifted so that all runs start at t = 0.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>cpp_name</strong> (<em>str</em>) – C++ name of the variable to compare.</p></li>
-<li><p><strong>max_points</strong> (<em>int</em><em> | </em><em>None</em><em>, </em><em>optional</em>) – Maximum data points to plot per run. Default is None (full fidelity).</p></li>
+<li><p><strong>max_points</strong> (<em>int</em><em> | </em><em>None</em><em>, </em><em>optional</em>) – Maximum number of points drawn per run. Longer signals are evenly downsampled (every Nth point), which speeds up rendering. Default is None (draw every point).</p></li>
+<li><p><strong>log_x</strong> (<em>bool</em><em>, </em><em>optional</em>) – Use a logarithmic time (x) axis. Default is False (linear).</p></li>
+<li><p><strong>log_y</strong> (<em>bool</em><em>, </em><em>optional</em>) – Use a logarithmic y-axis. Default is False (linear).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Plotly Figure with one trace per run that contains the variable.</p>
+<dd class="field-even"><p>Plotly figure with one trace per run that contains the variable. Change anything not exposed here (size, fonts, colors, …) with <code class="docutils literal notranslate"><span class="pre">fig.update_layout</span></code> or <code class="docutils literal notranslate"><span class="pre">fig.update_traces</span></code> before calling <code class="docutils literal notranslate"><span class="pre">fig.show()</span></code>.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>go.Figure</p>
