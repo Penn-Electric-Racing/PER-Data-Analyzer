@@ -4,7 +4,6 @@ from .gps_analysis import *
 from .integrate import *
 from .preprocessing import *
 from .signal_processing import *
-from .time_alignment import *
 
 # Requires the notebook extra.
 try:

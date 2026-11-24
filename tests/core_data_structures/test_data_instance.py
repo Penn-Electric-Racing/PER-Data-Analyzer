@@ -236,6 +236,29 @@ def test_trim_returns_new_instance(di_simple):
     assert result is not di_simple
 
 
+@pytest.mark.parametrize(
+    "unit, offset_s, expected_timestamps",
+    [
+        pytest.param(Timescale.MS, 0.002, [3, 4], id="ms_later"),
+        pytest.param(Timescale.MS, -0.001, [0, 1], id="ms_earlier"),
+        pytest.param(Timescale.S, 5.0, [6, 7], id="seconds"),
+    ],
+)
+def test_trim_offset_shifts_kept_timestamps(
+    di_simple, unit, offset_s, expected_timestamps
+):
+    result = di_simple.trim(
+        ts_start=1, ts_end=2, offset_s=offset_s, source_time_unit=unit
+    )
+    np.testing.assert_array_equal(result.timestamp_np, expected_timestamps)
+    np.testing.assert_allclose(result.value_np, [1.0, 2.0])
+
+
+def test_trim_offset_requires_unit(di_simple):
+    with pytest.raises(ValueError):
+        di_simple.trim(offset_s=1.0)
+
+
 def test_apply_ufunc_left_join_add_matches_operator(di_simple, di_sparse):
     result_ufunc = apply_ufunc_left_join(di_simple, di_sparse, np.add)
     result_op = di_simple + di_sparse

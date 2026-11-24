@@ -187,9 +187,11 @@ class DataInstance(BaseModel):
         self,
         ts_start: float | None = None,
         ts_end: float | None = None,
+        offset_s: float = 0.0,
+        source_time_unit: Timescale | None = None,
     ) -> DataInstance:
         """
-        Return a new DataInstance containing only points within the given timestamp range.
+        Return a new DataInstance with only the points in a timestamp range, optionally shifted in time.
 
         Parameters
         ----------
@@ -197,24 +199,40 @@ class DataInstance(BaseModel):
             Lower bound in raw timestamp units (inclusive). Default is None (no lower bound).
         ts_end : float | None, optional
             Upper bound in raw timestamp units (inclusive). Default is None (no upper bound).
+        offset_s : float, optional
+            Seconds to add to every kept timestamp (positive moves the signal later). Default is 0.0.
+        source_time_unit : Timescale | None, optional
+            Timestamp unit, needed to convert ``offset_s``. Pass ``aly.data.timestamp_unit``.
+            Default is None, which is only allowed when ``offset_s`` is 0.
 
         Returns
         -------
         DataInstance
-            New DataInstance with only in-range data points.
+            New DataInstance with only in-range data points, shifted by ``offset_s``.
+
+        Notes
+        -----
+        ``ts_start`` and ``ts_end`` select points by their original timestamps, before the shift.
 
         Examples
         --------
         >>> clipped = di.trim(ts_start=10_000, ts_end=30_000)
+        >>> delayed = di.trim(offset_s=0.08, source_time_unit=aly.data.timestamp_unit)
         """
-        if ts_start is not None and ts_end is not None:
-            mask = (self.timestamp_np >= ts_start) & (self.timestamp_np <= ts_end)
-        elif ts_start is not None:
-            mask = self.timestamp_np >= ts_start
-        else:
-            mask = self.timestamp_np <= ts_end  # type: ignore[operator]
+        mask = np.ones(len(self), dtype=np.bool_)
+        if ts_start is not None:
+            mask &= self.timestamp_np >= ts_start
+        if ts_end is not None:
+            mask &= self.timestamp_np <= ts_end
+
+        offset_raw = 0
+        if offset_s != 0.0:
+            if source_time_unit is None:
+                raise ValueError("source_time_unit is required to apply offset_s.")
+            offset_raw = int(round(from_seconds(offset_s, source_time_unit)))
+
         return DataInstance(
-            timestamp_np=self.timestamp_np[mask],
+            timestamp_np=self.timestamp_np[mask] + offset_raw,
             value_np=self.value_np[mask],
             label=self.label,
             var_id=self.var_id,
