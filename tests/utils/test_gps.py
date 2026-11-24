@@ -1,14 +1,13 @@
 import numpy as np
 import pytest
 
-pytest.importorskip("ipywidgets")
-
 from perda.core_data_structures.data_instance import DataInstance
 from perda.units import Timescale
-from perda.utils.gps_trimmer import plot_gps_trimmer
+from perda.utils.gps import plot_gps_trimmer
 
 
-def test_aligns_longitude_onto_latitude_timestamps():
+def test_gps_trimmer_aligns_longitude_onto_latitude_timestamps():
+    pytest.importorskip("ipywidgets")
     lat = DataInstance(
         timestamp_np=np.array([0, 10, 20], dtype=np.int64),
         value_np=np.array([40.0, 40.1, 40.2]),
