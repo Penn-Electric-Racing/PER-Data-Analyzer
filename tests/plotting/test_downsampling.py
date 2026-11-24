@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 
 from perda.core_data_structures.data_instance import DataInstance
-from perda.plotting.data_instance_plotter import plot_single_axis
+from perda.plotting.data_instance_plotter import plot_time_series
 from perda.units import Timescale
 
 
@@ -26,8 +26,8 @@ def long_data_instance():
     ],
 )
 def test_downsampling_point_count(long_data_instance, max_points, expected_points):
-    fig = plot_single_axis(
-        [long_data_instance], max_points=max_points, timestamp_unit=Timescale.MS
+    fig = plot_time_series(
+        [[long_data_instance]], max_points=max_points, timestamp_unit=Timescale.MS
     )
     assert len(fig.data) == 1
     assert len(fig.data[0].x) == expected_points

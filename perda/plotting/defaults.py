@@ -20,14 +20,14 @@ TITLE_X = 0.5
 TITLE_XANCHOR = "center"
 TITLE_YANCHOR = "top"
 
-# Cap on display sample rate (Hz) when downsampling multi-log subplots
-MAX_DISPLAY_RESOLUTION_HZ = 50.0
-
 # Vertical marker lines (e.g. concat boundaries)
 VLINE_COLOR = "gray"
 VLINE_WIDTH = 2
 VLINE_DASH = "dash"
 VLINE_OPACITY = 0.7
+
+# Line style for signals on a right-hand (secondary) y-axis
+RIGHT_AXIS_LINE_DASH = "dash"
 
 # Scatter + histogram
 SCATTER_COLOR = "blue"

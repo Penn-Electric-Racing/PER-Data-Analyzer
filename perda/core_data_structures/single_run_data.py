@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+from collections.abc import Sequence
 from datetime import datetime
+from typing import overload
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
@@ -11,6 +13,9 @@ from .search_indexes import (
     VariableSemanticIndex,
     variable_keyword_index_from_csv_mappings,
 )
+from .variable_patterns import is_pattern, match_pattern
+
+VariableKey = str | int | DataInstance
 
 
 class SingleRunData(BaseModel):
@@ -19,17 +24,22 @@ class SingleRunData(BaseModel):
 
     Notes
     -----
-    All timestamps (``data_start_time``, ``data_end_time`` and every DataInstance's
-    ``timestamp_np``) are raw integers in ``timestamp_unit``, which is microseconds for
-    current logs. Helpers that take a ``source_time_unit`` or ``timestamp_unit`` argument
-    require it; pass ``data.timestamp_unit``.
+    All timestamps (``data_start_time``, ``data_end_time`` and every DataInstance's ``timestamp_np``) are
+    raw integers in ``timestamp_unit`` (milliseconds, microseconds, etc.). Helpers that take a ``source_time_unit``
+    or ``timestamp_unit`` argument require it; pass ``data.timestamp_unit``.
 
     Examples
     --------
-    >>> from perda.units import to_seconds
     >>> data = aly.data
     >>> di = data["pcm.wheelSpeeds.frontRight"]
     >>> "pcm.wheelSpeeds.frontRight" in data
+    >>> data["my.new.var"] = DataInstance(timestamp_np=ts, value_np=vals, label="My var", cpp_name="my.new.var")
+    >>> data["my.existing.var"] = updated_di
+    >>> vel_x, vel_y, vel_z = data["pcm.vnav.bodyVelocity.*"]   # wildcard, sorted by name
+    >>> left, right = data["pcm.wheelSpeeds.frontLeft", "pcm.wheelSpeeds.frontRight"]
+    >>> data["pcm.vnav.bodyVelocity.*"] = vel_x * 2, vel_y * 2, vel_z * 2
+    >>> data["derived.a", "derived.b"] = a_di, b_di
+    >>> from perda.units import to_seconds
     >>> duration_s = to_seconds(data.data_end_time - data.data_start_time, data.timestamp_unit)
     """
 
@@ -86,156 +96,119 @@ class SingleRunData(BaseModel):
             )
         return self
 
-    def __getitem__(self, input_var_id_name: str | int | DataInstance) -> DataInstance:
+    @overload
+    def __getitem__(self, key: VariableKey) -> DataInstance: ...
+
+    @overload
+    def __getitem__(self, key: tuple[VariableKey, ...]) -> tuple[DataInstance, ...]: ...
+
+    def __getitem__(
+        self, key: VariableKey | tuple[VariableKey, ...]
+    ) -> DataInstance | tuple[DataInstance, ...]:
         """
-        Dictionary-like access to DataInstance by variable ID or variable name.
+        Dictionary-like access by variable name, variable ID, or ``*`` wildcard pattern.
 
-        Parameters
-        ----------
-        input_var_id_name : str | int | DataInstance
-            Variable ID (int), variable name (str), or DataInstance to retrieve
-
-        Returns
-        -------
-        DataInstance
-            DataInstance corresponding to the input
+        A plain name, ID, or DataInstance returns one DataInstance. A wildcard pattern or a
+        tuple of keys returns a tuple of DataInstances, with each pattern expanded to its
+        matches in sorted name order. A DataInstance key is returned unchanged.
         """
-        # Dummy return for plotting function for convenience
-        if isinstance(input_var_id_name, DataInstance):
-            return input_var_id_name
+        if isinstance(key, tuple):
+            return tuple(di for sub_key in key for di in self._lookup(sub_key))
+        if isinstance(key, str) and is_pattern(key):
+            return self._lookup(key)
+        return self._lookup(key)[0]
 
-        # If input is a variable ID
-        if isinstance(input_var_id_name, int):
-            if input_var_id_name not in self.id_to_instance:
-                raise KeyError(f"Cannot find variable ID: {input_var_id_name}")
-            return self.id_to_instance[input_var_id_name]
-
-        # If input is variable name
-        elif isinstance(input_var_id_name, str):
-            if input_var_id_name not in self.cpp_name_to_id:
-                raise KeyError(f"Cannot find variable name: {input_var_id_name}")
-            return self.id_to_instance[self.cpp_name_to_id[input_var_id_name]]
-
-        else:
-            raise ValueError("Input must be a string, int, or DataInstance.")
-
-    def __setitem__(self, cpp_name: str, di: DataInstance) -> None:
+    def __setitem__(
+        self,
+        key: str | int | tuple[str | int, ...],
+        value: DataInstance | Sequence[DataInstance],
+    ) -> None:
         """
-        Add or replace a variable using dictionary-style assignment.
+        Add or replace one or more variables using dictionary-style assignment.
 
-        Dispatches to ``replace`` if ``cpp_name`` already exists, else ``add``.
-
-        Parameters
-        ----------
-        cpp_name : str
-            C++ variable name to insert or overwrite.
-        di : DataInstance
-            DataInstance to store. Must have non-None ``label`` and ``cpp_name``.
-
-        Examples
-        --------
-        >>> data["my.new.var"] = DataInstance(timestamp_np=ts, value_np=vals, label="My var", cpp_name="my.new.var")
-        >>> data["my.existing.var"] = updated_di
+        ``key`` may be a name, an existing ID, a ``*`` wildcard pattern, or a tuple of these. Patterns
+        expand to existing names in sorted order. A tuple of names in key are paired with the
+        DataInstances in ``value`` by position, so the counts must match.
         """
-        if cpp_name in self:
-            self.replace(cpp_name, di)
-        else:
-            self.add(cpp_name, di)
-
-    def add(self, cpp_name: str, di: DataInstance) -> None:
-        """
-        Insert a new derived DataInstance using a synthetic negative ID.
-
-        Parameters
-        ----------
-        cpp_name : str
-            C++ variable name key for the new variable.
-        di : DataInstance
-            DataInstance to insert.
-
-        Examples
-        --------
-        >>> power = aly.data["bms.pack.voltage"] * aly.data["bms.pack.current"]
-        >>> aly.data.add("derived.pack.power", power)
-        >>> fig = aly.plot("derived.pack.power")
-        """
-        if cpp_name in self:
-            raise KeyError(f"'{cpp_name}' already exists; use replace() to overwrite.")
-
-        if di.cpp_name is not None and di.cpp_name != cpp_name:
-            print(f"Using {cpp_name} as DataInstance.cpp_name")
-
-        synthetic_id = -(len(self.id_to_instance) + 1)
-        if di.var_id is not None and di.var_id != synthetic_id:
-            print(f"Inserting DataInstance with new var_id {synthetic_id}")
-
-        stored = DataInstance(
-            timestamp_np=di.timestamp_np,
-            value_np=di.value_np,
-            label=di.label,
-            var_id=synthetic_id,
-            cpp_name=cpp_name,
-        )
-        self.id_to_instance[synthetic_id] = stored
-        self.cpp_name_to_id[cpp_name] = synthetic_id
-        self.id_to_cpp_name[synthetic_id] = cpp_name
-        self.id_to_descript[synthetic_id] = di.label or ""
-
-    def replace(self, cpp_name: str, di: DataInstance) -> None:
-        """
-        Overwrite the values of an existing variable in-place.
-
-        Parameters
-        ----------
-        cpp_name : str
-          C++ variable name of the variable to replace.
-        di : DataInstance
-          DataInstance whose ``value_np`` that replaces the stored one.
-
-        Examples
-        --------
-        >>> voltage = aly.data["bms.pack.voltage"]
-        >>> aly.data.replace("bms.pack.voltage", voltage / 1000.0)
-        """
-        if cpp_name not in self:
-            raise KeyError(
-                f"'{cpp_name}' not found; use add() to insert a new variable."
+        sub_keys = key if isinstance(key, tuple) else (key,)
+        cpp_names = [name for sub_key in sub_keys for name in self._resolve(sub_key)]
+        instances = [value] if isinstance(value, DataInstance) else list(value)
+        if len(cpp_names) != len(instances):
+            raise ValueError(
+                f"Cannot assign {len(instances)} DataInstance(s) to {len(cpp_names)} variable(s): {cpp_names}"
             )
+        for cpp_name, di in zip(cpp_names, instances):
+            self._assign(cpp_name, di)
 
-        var_id = self.cpp_name_to_id[cpp_name]
-        old = self.id_to_instance[var_id]
+    def __contains__(self, key: str | int) -> bool:
+        """Check if a variable ID, variable name, or any match of a wildcard pattern exists."""
+        try:
+            self[key]
+            return True
+        except (KeyError, AttributeError):
+            return False
 
-        if di.cpp_name is not None and di.cpp_name != cpp_name:
-            print(f"Retaining old DataInstance.cpp_name {cpp_name}")
-        if di.var_id is not None and di.var_id != var_id:
-            print(f"Retaining old DataInstance.var_id {var_id}")
-        if di.label is not None and di.label != old.label:
-            print(f"Retaining old DataInstance.label {old.label}")
+    def _lookup(self, key: VariableKey) -> tuple[DataInstance, ...]:
+        if isinstance(key, DataInstance):
+            return (key,)
+        names = self._resolve(key)
+        missing = [name for name in names if name not in self.cpp_name_to_id]
+        if missing:
+            raise KeyError(f"Cannot find variable name: {missing[0]}")
+        return tuple(self.id_to_instance[self.cpp_name_to_id[name]] for name in names)
 
+    def _resolve(self, key: str | int) -> list[str]:
+        if isinstance(key, int):
+            if key not in self.id_to_cpp_name:
+                raise KeyError(f"Cannot find variable ID: {key}")
+            return [self.id_to_cpp_name[key]]
+        if not isinstance(key, str):
+            raise ValueError("Key must be a string, int, or DataInstance.")
+        if not is_pattern(key):
+            return [key]
+        names = match_pattern(key, self.cpp_name_to_id)
+        if not names:
+            raise KeyError(f"No variable names match pattern: {key}")
+        return names
+
+    def _assign(self, cpp_name: str, di: DataInstance) -> None:
+        if cpp_name in self.cpp_name_to_id:
+            var_id = self.cpp_name_to_id[cpp_name]
+            if di.var_id is not None and di.var_id != var_id:
+                raise ValueError(
+                    f"Cannot change var_id of '{cpp_name}' from {var_id} to {di.var_id}"
+                )
+            if di.cpp_name is not None and di.cpp_name != cpp_name:
+                raise ValueError(
+                    f"Cannot store DataInstance named '{di.cpp_name}' under '{cpp_name}'"
+                )
+            label = di.label or self.id_to_instance[var_id].label
+            self.id_to_instance[var_id] = DataInstance(
+                timestamp_np=di.timestamp_np,
+                value_np=di.value_np,
+                label=label,
+                var_id=var_id,
+                cpp_name=cpp_name,
+            )
+            self.id_to_descript[var_id] = label or ""
+            return
+
+        var_id = self._free_var_id(di.var_id)
         self.id_to_instance[var_id] = DataInstance(
             timestamp_np=di.timestamp_np,
             value_np=di.value_np,
             label=di.label,
-            var_id=old.var_id,
-            cpp_name=old.cpp_name,
+            var_id=var_id,
+            cpp_name=cpp_name,
         )
+        self.cpp_name_to_id[cpp_name] = var_id
+        self.id_to_cpp_name[var_id] = cpp_name
+        self.id_to_descript[var_id] = di.label or ""
 
-    def __contains__(self, input_var_id_name: str | int) -> bool:
-        """
-        Check if variable ID or variable name exists in the data.
-
-        Parameters
-        ----------
-        input_var_id_name : str | int
-            Variable ID or variable name to check
-
-        Returns
-        -------
-        bool
-            True if the variable ID or variable name exists in the data
-        """
-        try:
-            self[input_var_id_name]
-            return True
-        except (KeyError, AttributeError):
-            return False
+    def _free_var_id(self, preferred: int | None) -> int:
+        if preferred is not None and preferred not in self.id_to_instance:
+            return preferred
+        var_id = len(self.id_to_instance) + 1
+        while var_id in self.id_to_instance:
+            var_id += 1
+        return var_id

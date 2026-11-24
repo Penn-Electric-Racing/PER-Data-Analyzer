@@ -92,13 +92,10 @@ def test_keyword_index_not_rebuilt_on_add(search_csv):
     srd = parse_csv(search_csv(), verbose=0)
     rows_before = list(srd.keyword_index.row_to_var_id)
 
-    srd.add(
-        "test.newVar",
-        DataInstance(
-            timestamp_np=np.array([0]),
-            value_np=np.array([1.0]),
-            label="New custom variable",
-        ),
+    srd["test.newVar"] = DataInstance(
+        timestamp_np=np.array([0]),
+        value_np=np.array([1.0]),
+        label="New custom variable",
     )
 
     assert srd.keyword_index.row_to_var_id == rows_before

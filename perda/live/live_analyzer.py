@@ -3,7 +3,7 @@ from typing import List, Union
 from plotly import graph_objects as go
 
 from ..core_data_structures.data_instance import DataInstance
-from ..plotting.data_instance_plotter import plot_dual_axis, plot_single_axis
+from ..plotting.data_instance_plotter import plot_time_series
 from ..plotting.defaults import HISTOGRAM_BINS, PLOT_HEIGHT, PLOT_WIDTH
 from ..units import Timescale
 from ..utils.frequency_analysis import analyze_frequency as _analyze_frequency
@@ -134,35 +134,21 @@ class LiveAnalyzer:
         self.ensure_connected()
 
         left_dis = self._normalize_input(var_1, time_secs)
+        right_dis = self._normalize_input(var_2, time_secs) if var_2 is not None else []
 
-        if var_2 is not None:
-            right_dis = self._normalize_input(var_2, time_secs)
-
-            return plot_dual_axis(
-                left_data_instances=left_dis,
-                right_data_instances=right_dis,
-                title=title,
-                left_y_axis_title=y_label_1,
-                right_y_axis_title=y_label_2,
-                show_legend=show_legend,
-                timestamp_unit=_TIMESTAMP_UNIT,
-                log_x=log_x,
-                log_y=log_y,
-                width=width,
-                height=height,
-            )
-        else:
-            return plot_single_axis(
-                data_instances=left_dis,
-                title=title,
-                y_axis_title=y_label_1,
-                show_legend=show_legend,
-                timestamp_unit=_TIMESTAMP_UNIT,
-                log_x=log_x,
-                log_y=log_y,
-                width=width,
-                height=height,
-            )
+        return plot_time_series(
+            rows=[left_dis],
+            right_rows=[right_dis],
+            timestamp_unit=_TIMESTAMP_UNIT,
+            title=title,
+            y_axis_titles=[y_label_1],
+            right_y_axis_titles=[y_label_2],
+            show_legend=show_legend,
+            log_x=log_x,
+            log_y=log_y,
+            width=width,
+            height=height,
+        )
 
     def analyze_frequency(
         self,
@@ -198,10 +184,7 @@ class LiveAnalyzer:
         input_data: PlotInput,
         time_secs: int,
     ) -> List[DataInstance]:
-        """
-        Normalize input into a list of DataInstances.
-        Fetch missing signals in a single connection.
-        """
+        """Normalize input into a list of DataInstances. Fetch missing signals in a single connection."""
         if isinstance(input_data, DataInstance):
             return [input_data]
 
