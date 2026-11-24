@@ -309,7 +309,6 @@ def plot_gps_trimmer(
 
     Examples
     --------
-    >>> from perda.core_data_structures import trim_single_run_data
     >>> from perda.utils import plot_gps_trimmer
     >>> widget = plot_gps_trimmer(
     ...     aly.data["pcm.vnav.posLla.latitude"],
@@ -319,7 +318,7 @@ def plot_gps_trimmer(
     ... )
     >>> display(widget)
     >>> # After reading the start/end timestamps off the slider:
-    >>> trimmed = trim_single_run_data(aly.data, ts_start=436_000, ts_end=1_552_000)
+    >>> trimmed = aly.data.trim(ts_start=436_000, ts_end=1_552_000)
     """
     from ..plotting.parametric_trimmer import plot_parametric_trimmer
 
