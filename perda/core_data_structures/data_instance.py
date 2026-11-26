@@ -8,7 +8,7 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from ..units import Timescale, from_seconds
 from .joins import inner_join, left_join, outer_join
-from .resampling import ResampleMethod, _interpolate
+from .resampling import ResampleMethod, interpolate_onto_timestamps
 from .summarize import summarize_time_series
 
 
@@ -276,7 +276,7 @@ class DataInstance(BaseModel):
         target_ts = np.arange(
             self.timestamp_np[0], self.timestamp_np[-1], dt, dtype=np.float64
         ).astype(np.int64)
-        resampled_val = _interpolate(
+        resampled_val = interpolate_onto_timestamps(
             target_ts.astype(np.float64),
             self.timestamp_np.astype(np.float64),
             self.value_np,
@@ -362,7 +362,7 @@ def left_join_data_instances(
     # Interpolate remaining right series onto the already-computed target grid
     target_f = ts.astype(np.float64)
     for di in rights[1:]:
-        vals = _interpolate(
+        vals = interpolate_onto_timestamps(
             target_f, di.timestamp_np.astype(np.float64), di.value_np, method
         )
         results.append(
