@@ -12,6 +12,7 @@ from .data_instance import DataInstance
 from .search_indexes import (
     VariableKeywordIndex,
     VariableSemanticIndex,
+    keyword_search_text,
     variable_keyword_index_from_csv_mappings,
 )
 from .summarize import summarize_run
@@ -87,15 +88,13 @@ class SingleRunData(BaseModel):
         description="Vector index over variable descriptions. None when semantic search is disabled or unavailable",
     )
     keyword_index: VariableKeywordIndex = Field(
-        default_factory=lambda: VariableKeywordIndex(
-            row_to_var_id=[], normalized_text=[]
-        ),
+        default_factory=lambda: VariableKeywordIndex(id_to_normalized_text={}),
         description="Normalized name and description text backing keyword search",
     )
 
     @model_validator(mode="after")
     def _build_keyword_index(self) -> SingleRunData:
-        if not self.keyword_index.row_to_var_id:
+        if not self.keyword_index.id_to_normalized_text:
             self.keyword_index = variable_keyword_index_from_csv_mappings(
                 self.id_to_cpp_name, self.id_to_descript
             )
@@ -142,8 +141,10 @@ class SingleRunData(BaseModel):
             raise ValueError(
                 f"Cannot assign {len(instances)} DataInstance(s) to {len(cpp_names)} variable(s): {cpp_names}"
             )
-        for cpp_name, di in zip(cpp_names, instances):
-            self._assign(cpp_name, di)
+        var_ids = [
+            self._assign(cpp_name, di) for cpp_name, di in zip(cpp_names, instances)
+        ]
+        self._update_search_indexes(var_ids)
 
     def __str__(self) -> str:
         """Summary of the run: logging unit, time range in seconds, and variable and point counts."""
@@ -192,7 +193,7 @@ class SingleRunData(BaseModel):
             data_end_time=end,
             timestamp_unit=self.timestamp_unit,
             semantic_index=self.semantic_index,
-            keyword_index=self.keyword_index,
+            keyword_index=self.keyword_index.model_copy(deep=True),
         )
 
     def split(self, split_timestamps: Sequence[float]) -> list[SingleRunData]:
@@ -253,7 +254,7 @@ class SingleRunData(BaseModel):
             raise KeyError(f"No variable names match pattern: {key}")
         return names
 
-    def _assign(self, cpp_name: str, di: DataInstance) -> None:
+    def _assign(self, cpp_name: str, di: DataInstance) -> int:
         if cpp_name in self.cpp_name_to_id:
             var_id = self.cpp_name_to_id[cpp_name]
             if di.var_id is not None and di.var_id != var_id:
@@ -274,7 +275,7 @@ class SingleRunData(BaseModel):
                 cpp_name=cpp_name,
             )
             self.id_to_descript[var_id] = label or ""
-            return
+            return var_id
 
         var_id = self._free_var_id(di.var_id)
         self.total_data_points += len(di)
@@ -288,6 +289,13 @@ class SingleRunData(BaseModel):
         self.cpp_name_to_id[cpp_name] = var_id
         self.id_to_cpp_name[var_id] = cpp_name
         self.id_to_descript[var_id] = di.label or ""
+        return var_id
+
+    def _update_search_indexes(self, var_ids: list[int]) -> None:
+        for var_id in var_ids:
+            self.keyword_index.id_to_normalized_text[var_id] = keyword_search_text(
+                self.id_to_cpp_name[var_id], self.id_to_descript[var_id]
+            )
 
     def _free_var_id(self, preferred: int | None) -> int:
         if preferred is not None and preferred not in self.id_to_instance:

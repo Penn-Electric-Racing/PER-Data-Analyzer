@@ -84,18 +84,41 @@ def test_normalize_search_text(raw, expected):
 
 def test_keyword_index_covers_all_variables(search_csv):
     srd = parse_csv(search_csv(), verbose=0)
-    assert srd.keyword_index.row_to_var_id == list(srd.id_to_cpp_name.keys())
-    assert len(srd.keyword_index.normalized_text) == len(srd.id_to_cpp_name)
+    assert list(srd.keyword_index.id_to_normalized_text) == list(srd.id_to_cpp_name)
 
 
-def test_keyword_index_not_rebuilt_on_add(search_csv):
+def test_keyword_index_updated_on_add(search_csv):
     srd = parse_csv(search_csv(), verbose=0)
-    rows_before = list(srd.keyword_index.row_to_var_id)
-
     srd["test.newVar"] = DataInstance(
         timestamp_np=np.array([0]),
         value_np=np.array([1.0]),
-        label="New custom variable",
+        label="Brake pressure",
     )
 
-    assert srd.keyword_index.row_to_var_id == rows_before
+    assert search(srd, "brake pressure", top_n=1)[0].cpp_name == "test.newVar"
+
+
+def test_keyword_index_updated_on_relabel(search_csv):
+    srd = parse_csv(search_csv(), verbose=0)
+    srd["ams.pack.voltage"] = DataInstance(
+        timestamp_np=np.array([0]),
+        value_np=np.array([1.0]),
+        label="Accumulator potential",
+    )
+
+    var_id = srd.cpp_name_to_id["ams.pack.voltage"]
+    assert srd.keyword_index.id_to_normalized_text[var_id] == (
+        "ams pack voltage accumulator potential"
+    )
+
+
+def test_keyword_index_not_shared_with_trimmed_copy(search_csv):
+    srd = parse_csv(search_csv(), verbose=0)
+    trimmed = srd.trim()
+    srd["test.newVar"] = DataInstance(
+        timestamp_np=np.array([0]), value_np=np.array([1.0])
+    )
+
+    assert list(trimmed.keyword_index.id_to_normalized_text) == list(
+        trimmed.id_to_cpp_name
+    )

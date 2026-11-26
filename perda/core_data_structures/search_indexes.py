@@ -23,13 +23,15 @@ def normalize_search_text(text: str) -> str:
     return " ".join(spaced.split()).lower()
 
 
-class VariableKeywordIndex(BaseModel):
-    """Normalized searchable text per variable, built once at parse time."""
+def keyword_search_text(cpp_name: str, descript: str) -> str:
+    """Normalized keyword text for one variable's name and description."""
+    return normalize_search_text(f"{cpp_name} {descript}")
 
-    row_to_var_id: list[int] = Field(
-        description="Maps index row position to variable ID"
-    )
-    normalized_text: list[str] = Field(
+
+class VariableKeywordIndex(BaseModel):
+    """Normalized searchable text per variable."""
+
+    id_to_normalized_text: dict[int, str] = Field(
         description="Lower-cased text of each variable's name and description, with "
         "camelCase and period boundaries split into separate words"
     )
@@ -64,16 +66,11 @@ def variable_keyword_index_from_csv_mappings(
     Returns
     -------
     VariableKeywordIndex
-        Normalized text for each variable, aligned with ``row_to_var_id``.
+        Normalized text for each variable, keyed by variable ID.
     """
-    var_ids = list(id_to_cpp_name.keys())
-
     return VariableKeywordIndex(
-        row_to_var_id=var_ids,
-        normalized_text=[
-            normalize_search_text(
-                f"{id_to_cpp_name[var_id]} {id_to_descript.get(var_id, '')}"
-            )
-            for var_id in var_ids
-        ],
+        id_to_normalized_text={
+            var_id: keyword_search_text(cpp_name, id_to_descript.get(var_id, ""))
+            for var_id, cpp_name in id_to_cpp_name.items()
+        }
     )

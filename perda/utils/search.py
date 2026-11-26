@@ -202,12 +202,11 @@ def _semantic_search(
 def _keyword_search(data: SingleRunData, query: str, top_n: int) -> list[SearchResult]:
     """Rank variables by fuzzy matching query terms against normalized text."""
     query_terms = normalize_search_text(query).split()
-    index = data.keyword_index
 
     ranked = sorted(
         (
-            (keyword_score(query_terms, text), index.row_to_var_id[row])
-            for row, text in enumerate(index.normalized_text)
+            (keyword_score(query_terms, text), var_id)
+            for var_id, text in data.keyword_index.id_to_normalized_text.items()
         ),
         key=lambda scored: scored[0],
         reverse=True,
