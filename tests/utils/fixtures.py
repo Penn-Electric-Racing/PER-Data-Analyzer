@@ -1,13 +1,15 @@
 import builtins
 import textwrap
+import zlib
 
 import numpy as np
 import pytest
 
+from perda.constants import SENTENCE_EMBEDDING_DIMENSION
 from perda.core_data_structures.data_instance import DataInstance
+from perda.core_data_structures.semantic_embedding import load_encoder
 from perda.core_data_structures.single_run_data import SingleRunData
 from perda.units import Timescale
-from perda.utils.search import _load_encoder
 
 
 @pytest.fixture
@@ -384,10 +386,10 @@ def no_sentence_transformers(monkeypatch):
             raise ImportError(f"No module named {name!r}")
         return real_import(name, *args, **kwargs)
 
-    _load_encoder.cache_clear()
+    load_encoder.cache_clear()
     monkeypatch.setattr(builtins, "__import__", blocked_import)
     yield
-    _load_encoder.cache_clear()
+    load_encoder.cache_clear()
 
 
 @pytest.fixture
@@ -397,7 +399,34 @@ def failing_encoder(monkeypatch):
     def blow_up(model_id):
         raise RuntimeError("model load failure")
 
-    _load_encoder.cache_clear()
-    monkeypatch.setattr("perda.utils.search._load_encoder", blow_up)
+    load_encoder.cache_clear()
+    monkeypatch.setattr(
+        "perda.core_data_structures.semantic_embedding.load_encoder", blow_up
+    )
     yield
-    _load_encoder.cache_clear()
+    load_encoder.cache_clear()
+
+
+@pytest.fixture
+def fake_encoder(monkeypatch):
+    """Replace the sentence model with a bag-of-words hashing encoder.
+
+    Yields the list of text batches it was asked to encode.
+    """
+    batches = []
+
+    def encode(texts):
+        batches.append(list(texts))
+        vectors = np.zeros((len(texts), SENTENCE_EMBEDDING_DIMENSION))
+        for row, text in enumerate(texts):
+            for word in text.lower().split():
+                vectors[
+                    row, zlib.crc32(word.encode()) % SENTENCE_EMBEDDING_DIMENSION
+                ] += 1
+        return vectors
+
+    monkeypatch.setattr(
+        "perda.core_data_structures.semantic_embedding.load_encoder",
+        lambda model_id: encode,
+    )
+    yield batches

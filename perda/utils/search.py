@@ -1,25 +1,16 @@
 from __future__ import annotations
 
 import re
-from functools import lru_cache
-from typing import Callable
 
-import faiss
-import numpy as np
-from numpy.typing import NDArray
 from pydantic import BaseModel, Field
 from rapidfuzz import fuzz
 
-from ..constants import (
-    SECTION_DIVIDER,
-    SENTENCE_EMBEDDING_DIMENSION,
-    SENTENCE_EMBEDDING_MODEL_ID,
-    title_block,
-)
+from ..constants import SECTION_DIVIDER, title_block
 from ..core_data_structures.search_indexes import (
     VariableSemanticIndex,
     normalize_search_text,
 )
+from ..core_data_structures.semantic_embedding import embed_texts
 from ..core_data_structures.single_run_data import SingleRunData
 
 SCORE_COLUMN_WIDTH = 7
@@ -43,82 +34,6 @@ class SearchResult(BaseModel):
             f"{self.cpp_name:<{NAME_COLUMN_WIDTH}}  "
             f"{self.descript}"
         )
-
-
-@lru_cache(maxsize=1)
-def _load_encoder(model_id: str) -> Callable[[list[str]], NDArray]:
-    """
-    Load a sentence-transformers model and return its bound encode callable. Cached so
-    the model is loaded at most once per process and shared by every run.
-
-    Parameters
-    ----------
-    model_id : str
-        HuggingFace identifier of the model to load.
-
-    Notes
-    -----
-    Raises ImportError when the ``semantic`` extra is absent; callers are expected to
-    catch that and fall back to keyword search. Callers coerce the returned vectors to
-    float32, so the encoder's own dtype is not relied on.
-    """
-    from sentence_transformers import SentenceTransformer
-
-    return SentenceTransformer(model_id).encode
-
-
-def build_semantic_index(
-    id_to_descript: dict[int, str], verbose: int = 1
-) -> VariableSemanticIndex | None:
-    """
-    Encode every variable description into a L2-normalized and FAISS inner-product index.
-    Cosine similarity scores range [-1, 1].
-
-    Parameters
-    ----------
-    id_to_descript : dict[int, str]
-        Mapping from variable ID to its human-readable description.
-    verbose : int, optional
-        Verbosity level. 0 for no output, 1 or higher for status and warnings. Default is 1.
-
-    Returns
-    -------
-    VariableSemanticIndex | None
-        The built index, or None if the optional dependencies or model are unavailable.
-    """
-    if not id_to_descript:
-        return None
-
-    try:
-        if verbose >= 1:
-            print("Building semantic search index...")
-
-        encode = _load_encoder(SENTENCE_EMBEDDING_MODEL_ID)
-        descriptions = list(id_to_descript.values())
-        vectors = np.asarray(encode(descriptions), dtype=np.float32)
-
-        faiss.normalize_L2(vectors)
-        faiss_index = faiss.IndexFlatIP(SENTENCE_EMBEDDING_DIMENSION)
-        faiss_index.add(vectors)
-
-        return VariableSemanticIndex(
-            faiss_index=faiss_index,
-            row_to_var_id=list(id_to_descript.keys()),
-        )
-    except ImportError:
-        if verbose >= 1:
-            print(
-                "Warning: sentence-transformers is not installed. "
-                "Falling back to keyword-only search."
-            )
-        return None
-    except Exception as e:
-        if verbose >= 1:
-            print(
-                f"Warning: semantic index unavailable ({e}). "
-                "Falling back to keyword-only search."
-            )
-        return None
 
 
 def search(data: SingleRunData, query: str, top_n: int = 10) -> list[SearchResult]:
@@ -179,23 +94,19 @@ def _semantic_search(
     query: str,
     top_n: int,
 ) -> list[SearchResult]:
-    encode = _load_encoder(SENTENCE_EMBEDDING_MODEL_ID)
-    query_vector = np.asarray(encode([query]), dtype=np.float32)
-    faiss.normalize_L2(query_vector)
-
     num_results = min(top_n, index.faiss_index.ntotal)
-    scores, rows = index.faiss_index.search(query_vector, num_results)
+    scores, var_ids = index.faiss_index.search(embed_texts([query]), num_results)
 
     return [
         SearchResult(
             rank=rank + 1,
             score=float(score),
-            var_id=index.row_to_var_id[row],
-            cpp_name=data.id_to_cpp_name[index.row_to_var_id[row]],
-            descript=data.id_to_descript[index.row_to_var_id[row]],
+            var_id=int(var_id),
+            cpp_name=data.id_to_cpp_name[int(var_id)],
+            descript=data.id_to_descript[int(var_id)],
         )
-        for rank, (score, row) in enumerate(zip(scores[0], rows[0]))
-        if row != -1
+        for rank, (score, var_id) in enumerate(zip(scores[0], var_ids[0]))
+        if var_id != -1
     ]
 
 

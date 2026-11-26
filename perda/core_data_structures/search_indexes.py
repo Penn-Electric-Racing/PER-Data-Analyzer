@@ -38,15 +38,16 @@ class VariableKeywordIndex(BaseModel):
 
 
 class VariableSemanticIndex(BaseModel):
-    """Vector index over variable description embeddings, built once at parse time."""
+    """Vector index over variable description embeddings, keyed by variable ID."""
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
-    faiss_index: faiss.IndexFlatIP = Field(
-        description="Inner-product index holding L2-normalized description vectors"
+    faiss_index: faiss.IndexIDMap2 = Field(
+        description="Inner-product index holding L2-normalized description vectors, "
+        "with variable IDs as FAISS IDs"
     )
-    row_to_var_id: list[int] = Field(
-        description="Maps index row position to variable ID"
+    id_to_descript: dict[int, str] = Field(
+        description="Description each stored vector was embedded from"
     )
 
 

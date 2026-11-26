@@ -15,6 +15,7 @@ from .search_indexes import (
     keyword_search_text,
     variable_keyword_index_from_csv_mappings,
 )
+from .semantic_embedding import clone_semantic_index, update_semantic_index
 from .summarize import summarize_run
 from .variable_patterns import is_pattern, match_pattern
 
@@ -192,7 +193,11 @@ class SingleRunData(BaseModel):
             data_start_time=start,
             data_end_time=end,
             timestamp_unit=self.timestamp_unit,
-            semantic_index=self.semantic_index,
+            semantic_index=(
+                None
+                if self.semantic_index is None
+                else clone_semantic_index(self.semantic_index)
+            ),
             keyword_index=self.keyword_index.model_copy(deep=True),
         )
 
@@ -295,6 +300,11 @@ class SingleRunData(BaseModel):
         for var_id in var_ids:
             self.keyword_index.id_to_normalized_text[var_id] = keyword_search_text(
                 self.id_to_cpp_name[var_id], self.id_to_descript[var_id]
+            )
+        if self.semantic_index is not None:
+            update_semantic_index(
+                self.semantic_index,
+                {var_id: self.id_to_descript[var_id] for var_id in var_ids},
             )
 
     def _free_var_id(self, preferred: int | None) -> int:

@@ -10,9 +10,9 @@ from pydantic import BaseModel, ConfigDict, Field
 from tqdm import tqdm
 
 from ..core_data_structures.data_instance import DataInstance
+from ..core_data_structures.semantic_embedding import build_semantic_index
 from ..core_data_structures.single_run_data import SingleRunData
 from ..units import Timescale
-from ..utils.search import build_semantic_index
 
 DATA_COLUMN_SCHEMA = {
     "timestamp": pl.Int64,
