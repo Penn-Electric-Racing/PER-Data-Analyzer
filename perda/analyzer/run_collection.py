@@ -321,7 +321,8 @@ class RunCollection:
         Examples
         --------
         >>> for filename, di in col.compare_summary("bms.pack.voltage").items():
-        ...     print(f"{filename}\n{di}")
+        ...     print(filename)
+        ...     print(di)
         """
         return {
             run.file_path.name: analyzer.data[cpp_name]
