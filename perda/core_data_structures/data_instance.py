@@ -187,8 +187,7 @@ class DataInstance(BaseModel):
         self,
         ts_start: float | None = None,
         ts_end: float | None = None,
-        offset_s: float = 0.0,
-        source_time_unit: Timescale | None = None,
+        offset: float = 0.0,
     ) -> DataInstance:
         """
         Return a new DataInstance with only the points in a timestamp range, optionally time-shifted.
@@ -199,20 +198,17 @@ class DataInstance(BaseModel):
             Lower bound in raw timestamp units (inclusive). Default is None (no lower bound).
         ts_end : float | None, optional
             Upper bound in raw timestamp units (inclusive). Default is None (no upper bound).
-        offset_s : float, optional
-            Seconds to shift the signal by (positive moves it later). Default is 0.0.
-        source_time_unit : Timescale | None, optional
-            Timestamp unit, needed to convert ``offset_s``. Pass ``aly.data.timestamp_unit``.
-            Default is None, which is only allowed when ``offset_s`` is 0.
+        offset : float, optional
+            Amount to shift the signal by in raw timestamp units (positive moves it later). Default is 0.0.
 
         Returns
         -------
         DataInstance
-            New DataInstance with only in-range data points, with values shifted by ``offset_s``.
+            New DataInstance with only in-range data points, with values shifted by ``offset``.
 
         Notes
         -----
-        The shift moves values, not timestamps: each value becomes the signal's value ``offset_s`` earlier,
+        The shift moves values, not timestamps: each value becomes the signal's value ``offset`` earlier,
         linearly interpolated, so the result keeps the original timestamp grid. Values shifted in past either
         end hold the first or last value, and NaN samples are ignored when interpolating. The shift happens
         before trimming, so values from just outside the window can move into it.
@@ -220,18 +216,16 @@ class DataInstance(BaseModel):
         Examples
         --------
         >>> clipped = di.trim(ts_start=10_000, ts_end=30_000)
-        >>> delayed = di.trim(offset_s=0.08, source_time_unit=aly.data.timestamp_unit)
+        >>> delayed = di.trim(offset=from_seconds(0.08, aly.data.timestamp_unit))
         """
         values = self.value_np
-        if offset_s != 0.0:
-            if source_time_unit is None:
-                raise ValueError("source_time_unit is required to apply offset_s.")
+        if offset != 0.0:
             valid = ~np.isnan(values)
             if valid.any():
                 timestamps = self.timestamp_np.astype(np.float64)
                 values = np.interp(
                     timestamps,
-                    timestamps[valid] + from_seconds(offset_s, source_time_unit),
+                    timestamps[valid] + offset,
                     values[valid],
                 )
 
