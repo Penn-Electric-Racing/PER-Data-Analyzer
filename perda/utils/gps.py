@@ -4,7 +4,6 @@ import numpy as np
 import plotly.graph_objects as go
 from numpy.typing import NDArray
 
-# Only needed for the plot_gps_trimmer return type; the notebook extra provides it.
 try:
     import ipywidgets as widgets
 except ModuleNotFoundError:
@@ -12,12 +11,11 @@ except ModuleNotFoundError:
 
 from ..constants import EARTH_RADIUS_METERS
 from ..core_data_structures.data_instance import DataInstance, left_join_data_instances
-from ..plotting.defaults import MAP_STYLE, PLOT_HEIGHT, PLOT_WIDTH
+from ..plotting.defaults import PLOT_HEIGHT, PLOT_WIDTH
 from ..plotting.map_trace import plot_map_trace
 from ..plotting.parametric_overlay import plot_parametric_overlay
 from ..units import Timescale
 
-# Outlier filtering thresholds (m). float("inf") disables a filter.
 GPS_MAX_RADIUS_M = 5_000.0
 GPS_MAX_JUMP_M = 30.0
 
@@ -86,9 +84,11 @@ def filter_gps_cartesian(
     lon : NDArray[np.float64]
         Longitude values in degrees.
     max_radius_m : float, optional
-        Points farther than this many metres from the centre of all points are dropped. Use ``float("inf")`` to disable. Default is GPS_MAX_RADIUS_M (5000).
+        Points farther than this many metres from the centre of all points are dropped.
+        Use ``float("inf")`` to disable. Default is GPS_MAX_RADIUS_M (5000).
     max_jump_m : float, optional
-        Points more than this many metres from the previous point are dropped as GPS glitches. Use ``float("inf")`` to disable. Default is GPS_MAX_JUMP_M (30).
+        Points more than this many metres from the previous point are dropped as GPS glitches.
+        Use ``float("inf")`` to disable. Default is GPS_MAX_JUMP_M (30).
 
     Returns
     -------
@@ -118,20 +118,22 @@ def plot_gps_comparison(
     height: int = PLOT_HEIGHT,
 ) -> go.Figure:
     """
-    Overlay GPS tracks from multiple runs on a shared East/North frame in metres.
-
-    Each run is projected to East/North coordinates around one shared reference point (median of all points across all runs), outliers are removed with :func:`filter_gps_cartesian`, and the result is plotted with :func:`perda.plotting.plot_parametric_overlay`. Runs with no points left after filtering are skipped.
+    Plot GPS tracks from multiple runs on a shared East/North frame in metres, using the median
+    of all points across all runs as the origin reference, and with outliers filtered out.
 
     Parameters
     ----------
     runs : list[tuple[NDArray[np.float64], NDArray[np.float64], str]]
-        One ``(lat_array, lon_array, label)`` tuple per run, with latitude and longitude in degrees. ``lat_array`` and ``lon_array`` must be the same length. ``label`` is the legend name.
+        One ``(lat_array, lon_array, label)`` tuple per run, with latitude and longitude in degrees.
+        ``lat_array`` and ``lon_array`` must be the same length. ``label`` is the legend name.
     title : str | None, optional
         Title shown above the plot. Default is None (no title).
     max_radius_m : float, optional
-        Outlier filter: points farther than this many metres from the centre of the run are dropped. Use ``float("inf")`` to disable. Default is GPS_MAX_RADIUS_M (5000).
+        Outlier filter: points farther than this many metres from the centre of the run are dropped.
+        Use ``float("inf")`` to disable. Default is GPS_MAX_RADIUS_M (5000).
     max_jump_m : float, optional
-        Outlier filter: points more than this many metres from the previous point are dropped. Use ``float("inf")`` to disable. Default is GPS_MAX_JUMP_M (30).
+        Outlier filter: points more than this many metres from the previous point are dropped.
+        Use ``float("inf")`` to disable. Default is GPS_MAX_JUMP_M (30).
     width : int, optional
         Figure width in pixels. Default is PLOT_HEIGHT (700), making a square plot.
     height : int, optional
@@ -140,12 +142,8 @@ def plot_gps_comparison(
     Returns
     -------
     go.Figure
-        Plotly figure with one marker trace per run, in metres East/North of a shared reference point. Change anything not exposed here (fonts, marker size, colors, ...) with ``fig.update_layout`` or ``fig.update_traces`` before calling ``fig.show()``.
-
-    Raises
-    ------
-    ValueError
-        If two runs share the same label.
+        Plotly figure with one marker trace per run. Change anything not exposed here (fonts, marker size, colors, ...)
+        with ``fig.update_layout`` or ``fig.update_traces`` before calling ``fig.show()``.
 
     Examples
     --------
@@ -195,14 +193,12 @@ def create_representative_gps_image(
     title: str | None = None,
     max_radius_m: float = GPS_MAX_RADIUS_M,
     max_jump_m: float = GPS_MAX_JUMP_M,
-    map_style: str = MAP_STYLE,
     width: int = PLOT_HEIGHT,
     height: int = PLOT_HEIGHT,
 ) -> go.Figure | None:
     """
-    Draw a log's GPS track on an interactive map background.
-
-    Aligns longitude (and speed) onto latitude's timestamps, trims away the stationary start and end of the log if speed is given, removes outliers with :func:`filter_gps_cartesian`, then plots with :func:`perda.plotting.plot_map_trace`.
+    Plot a log's GPS track on an interactive map background, with outliers filtered out. Additionally
+    applies a velocity threshold to show only the span of the log where the vehicle is moving, if velocity data is provided.
 
     Parameters
     ----------
@@ -211,17 +207,19 @@ def create_representative_gps_image(
     lon_raw : DataInstance
         Longitude in degrees.
     vel_raw : DataInstance | None, optional
-        Vehicle speed, used to cut off the stationary start and end of the log. Default is None (show every point).
+        Vehicle speed, used to cut off the stationary start and end of the log.
+        Default is None (show every point).
     vel_thresh : float, optional
-        Only the span between the first and last moment speed exceeds this value is shown. Same unit as ``vel_raw``. Ignored if ``vel_raw`` is None. Default is 0.5.
+        Only the span between the first and last moment speed exceeds this value is shown.
+        Same unit as ``vel_raw``. Ignored if ``vel_raw`` is None. Default is 0.5.
     title : str | None, optional
         Title shown above the map. Default is None (no title).
     max_radius_m : float, optional
-        Outlier filter: points farther than this many metres from the centre of the track are dropped. Use ``float("inf")`` to disable. Default is GPS_MAX_RADIUS_M (5000).
+        Outlier filter: points farther than this many metres from the centre of the track are dropped.
+        Use ``float("inf")`` to disable. Default is GPS_MAX_RADIUS_M (5000).
     max_jump_m : float, optional
-        Outlier filter: points more than this many metres from the previous point are dropped. Use ``float("inf")`` to disable. Default is GPS_MAX_JUMP_M (30).
-    map_style : str, optional
-        Background map tiles, any Plotly MapLibre style name such as ``"open-street-map"``, ``"carto-positron"`` or ``"satellite"``. Default is MAP_STYLE (``"open-street-map"``, needs no API key).
+        Outlier filter: points more than this many metres from the previous point are dropped.
+        Use ``float("inf")`` to disable. Default is GPS_MAX_JUMP_M (30).
     width : int, optional
         Figure width in pixels. Default is PLOT_HEIGHT (700), making a square map.
     height : int, optional
@@ -272,7 +270,6 @@ def create_representative_gps_image(
         lat_filtered,
         lon_filtered,
         title=title,
-        map_style=map_style,
         width=width,
         height=height,
     )
@@ -289,14 +286,12 @@ def plot_gps_trimmer(
     """
     Interactive GPS track plot (longitude vs latitude) with a range slider for picking a time window of the log.
 
-    Drag the two slider handles to hide points outside the selected range. The labels under the slider show the sample index and the raw timestamp (in the log's own unit, e.g. ms or us, not seconds) of the first and last visible point. Pass those timestamps straight to ``trim_single_run_data(data, ts_start=..., ts_end=...)`` or ``DataInstance.trim`` to cut the log to that window. Designed for Jupyter notebooks, and requires the ``notebook`` extra (ipywidgets).
-
     Parameters
     ----------
     lat : DataInstance
         Latitude in degrees. Its timestamps define the points shown and the timestamps in the slider labels.
     lon : DataInstance
-        Longitude in degrees. Does not need to share timestamps with ``lat``: it is automatically aligned onto ``lat``'s timestamps with ``left_join_data_instances`` (linear interpolation).
+        Longitude in degrees.
     timestamp_unit : Timescale
         Unit of the raw timestamps, shown next to the timestamps in the slider labels. Pass ``aly.data.timestamp_unit``.
     title : str | None, optional
@@ -309,7 +304,7 @@ def plot_gps_trimmer(
     Returns
     -------
     ipywidgets.VBox
-        Widget containing the figure, the slider and the labels. Display it as the last expression in a notebook cell or with ``display(widget)``.
+        Widget containing the figure, the slider and the labels.
 
     Examples
     --------

@@ -23,15 +23,13 @@ def plot_map_trace(
     lat: NDArray[float64],
     lon: NDArray[float64],
     title: str | None = None,
-    map_style: str = MAP_STYLE,
     zoom_padding: float = MAP_ZOOM_PADDING,
     width: int = PLOT_HEIGHT,
     height: int = PLOT_HEIGHT,
 ) -> go.Figure:
     """
-    Draw a path of latitude/longitude points on top of an interactive background map.
-
-    The map is automatically centered and zoomed to fit all points.
+    Draw a path of latitude/longitude points on top of an interactive background map. The map is
+    automatically centered and zoomed to fit all points.
 
     Parameters
     ----------
@@ -41,10 +39,9 @@ def plot_map_trace(
         Longitude of each point, in degrees. Must have the same length as ``lat``.
     title : str | None, optional
         Title shown above the map. Default is None (no title).
-    map_style : str, optional
-        Background map tiles, any Plotly MapLibre style name such as ``"open-street-map"``, ``"carto-positron"`` or ``"satellite"``. Default is MAP_STYLE (``"open-street-map"``, needs no API key).
     zoom_padding : float, optional
-        Extra space shown around the points when auto-zooming, as a fraction of the path's extent. 0 fits the path tightly. Default is MAP_ZOOM_PADDING (0.4).
+        Extra space shown around the points when auto-zooming, as a fraction of the path's extent.
+        Default is MAP_ZOOM_PADDING (0.4).
     width : int, optional
         Figure width in pixels. Default is PLOT_HEIGHT (700), making a square map.
     height : int, optional
@@ -63,7 +60,7 @@ def plot_map_trace(
     Examples
     --------
     >>> from perda.plotting import plot_map_trace
-    >>> fig = plot_map_trace(lat_array, lon_array, title="Lap Track", map_style="carto-positron")
+    >>> fig = plot_map_trace(lat_array, lon_array, title="Lap Track")
     """
     if len(lat) != len(lon):
         raise ValueError(
@@ -97,7 +94,7 @@ def plot_map_trace(
             font=dict(size=FONT_SIZE_LARGE),
         ),
         map=dict(
-            style=map_style,
+            style=MAP_STYLE,
             center=dict(lat=float(center_lat), lon=float(center_lon)),
             zoom=float(zoom),
         ),
