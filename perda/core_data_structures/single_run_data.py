@@ -264,6 +264,7 @@ class SingleRunData(BaseModel):
                 raise ValueError(
                     f"Cannot store DataInstance named '{di.cpp_name}' under '{cpp_name}'"
                 )
+            self.total_data_points += len(di) - len(self.id_to_instance[var_id])
             label = di.label or self.id_to_instance[var_id].label
             self.id_to_instance[var_id] = DataInstance(
                 timestamp_np=di.timestamp_np,
@@ -276,6 +277,7 @@ class SingleRunData(BaseModel):
             return
 
         var_id = self._free_var_id(di.var_id)
+        self.total_data_points += len(di)
         self.id_to_instance[var_id] = DataInstance(
             timestamp_np=di.timestamp_np,
             value_np=di.value_np,

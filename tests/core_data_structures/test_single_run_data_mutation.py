@@ -143,3 +143,17 @@ def test_setitem_multiple_invalid_raises(srd_basic, key, value_count, exc_type):
             )
             for _ in range(value_count)
         )
+
+
+@pytest.mark.parametrize(
+    "key, expected_total",
+    [
+        pytest.param("cpp.new", 8, id="add"),
+        pytest.param("cpp.var_a", 5, id="replace"),
+    ],
+)
+def test_setitem_updates_total_data_points(srd_basic, key, expected_total):
+    srd_basic[key] = DataInstance(
+        timestamp_np=np.array([0, 1], dtype=np.int64), value_np=np.array([0.0, 1.0])
+    )
+    assert srd_basic.total_data_points == expected_total
