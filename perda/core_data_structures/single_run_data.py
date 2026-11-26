@@ -197,20 +197,17 @@ class SingleRunData(BaseModel):
 
     def split(self, split_timestamps: Sequence[float]) -> list[SingleRunData]:
         """
-        Split into consecutive runs at the given timestamps; ``n`` split points give ``n + 1`` runs.
-
-        Each run covers ``[previous split, next split)``, so a sample exactly on a split point goes to the later run.
-        The first run starts at the beginning of the data and the last one ends at the end.
+        Split into consecutive runs at the given timestamps/
 
         Parameters
         ----------
         split_timestamps : Sequence[float]
-            Split points in raw timestamp units, in increasing order.
+            Split points, interpreted in timestamp units of the current run.
+            Must be strictly increasing. A sample exactly on a split point goes to the later run.
 
         Returns
         -------
         list[SingleRunData]
-            The runs in time order.
         """
         if any(
             later < earlier
