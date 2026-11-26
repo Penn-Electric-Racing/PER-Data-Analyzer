@@ -107,3 +107,36 @@ def test_id_to_cpp_name_consistent(srd_basic):
 def test_all_ids_have_instances(srd_basic):
     for var_id in srd_basic.id_to_cpp_name:
         assert var_id in srd_basic.id_to_instance
+
+
+def test_trim_clips_every_variable_and_updates_metadata(srd_basic):
+    result = srd_basic.trim(ts_start=1, ts_end=2)
+    for di in result.id_to_instance.values():
+        np.testing.assert_array_equal(di.timestamp_np, [1, 2])
+    assert (result.data_start_time, result.data_end_time) == (1, 2)
+    assert result.total_data_points == 4
+    assert result.cpp_name_to_id == srd_basic.cpp_name_to_id
+    assert len(srd_basic["cpp.var_a"]) == 3
+
+
+@pytest.mark.parametrize(
+    "split_timestamps, expected_timestamps",
+    [
+        pytest.param([], [[0, 1, 2]], id="no_split"),
+        pytest.param([1], [[0], [1, 2]], id="point_on_split_goes_later"),
+        pytest.param([0.5, 1.5], [[0], [1], [2]], id="between_samples"),
+        pytest.param([1, 1], [[0], [], [1, 2]], id="repeated_split"),
+    ],
+)
+def test_split_gives_one_more_run_than_split_points(
+    srd_basic, split_timestamps, expected_timestamps
+):
+    runs = srd_basic.split(split_timestamps)
+    assert [
+        run["cpp.var_a"].timestamp_np.tolist() for run in runs
+    ] == expected_timestamps
+
+
+def test_split_rejects_unsorted_points(srd_basic):
+    with pytest.raises(ValueError):
+        srd_basic.split([2, 1])

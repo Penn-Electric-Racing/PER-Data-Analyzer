@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 from collections.abc import Sequence
 from datetime import datetime
 from typing import overload
@@ -41,6 +42,8 @@ class SingleRunData(BaseModel):
     >>> left, right = data["pcm.wheelSpeeds.frontLeft", "pcm.wheelSpeeds.frontRight"]
     >>> data["pcm.vnav.bodyVelocity.*"] = vel_x * 2, vel_y * 2, vel_z * 2
     >>> data["derived.a", "derived.b"] = a_di, b_di
+    >>> first_minute = data.trim(data.data_start_time, data.data_start_time + 60_000)
+    >>> before, after = data.split([split_timestamp])
     >>> from perda.units import to_seconds
     >>> duration_s = to_seconds(data.data_end_time - data.data_start_time, data.timestamp_unit)
     """
@@ -151,6 +154,73 @@ class SingleRunData(BaseModel):
             len(self.id_to_instance),
             self.total_data_points,
         )
+
+    def trim(
+        self,
+        ts_start: float | None = None,
+        ts_end: float | None = None,
+    ) -> SingleRunData:
+        """
+        Return a new SingleRunData with every variable trimmed to a timestamp range.
+
+        Parameters
+        ----------
+        ts_start : float | None, optional
+            Lower bound in raw timestamp units (inclusive). Default is None (no lower bound).
+        ts_end : float | None, optional
+            Upper bound in raw timestamp units (inclusive). Default is None (no upper bound).
+
+        Returns
+        -------
+        SingleRunData
+            New run data; the original is not changed.
+        """
+        trimmed = {
+            var_id: di.trim(ts_start, ts_end)
+            for var_id, di in self.id_to_instance.items()
+        }
+        start = self.data_start_time if ts_start is None else int(ts_start)
+        end = self.data_end_time if ts_end is None else int(ts_end)
+        return SingleRunData(
+            id_to_instance=trimmed,
+            cpp_name_to_id=dict(self.cpp_name_to_id),
+            id_to_cpp_name=dict(self.id_to_cpp_name),
+            id_to_descript=dict(self.id_to_descript),
+            creation_time=self.creation_time,
+            total_data_points=sum(len(di) for di in trimmed.values()),
+            data_start_time=start,
+            data_end_time=end,
+            timestamp_unit=self.timestamp_unit,
+            semantic_index=self.semantic_index,
+            keyword_index=self.keyword_index,
+        )
+
+    def split(self, split_timestamps: Sequence[float]) -> list[SingleRunData]:
+        """
+        Split into consecutive runs at the given timestamps/
+
+        Parameters
+        ----------
+        split_timestamps : Sequence[float]
+            Split points, interpreted in timestamp units of the current run.
+            Must be strictly increasing. A sample exactly on a split point goes to the later run.
+
+        Returns
+        -------
+        list[SingleRunData]
+        """
+        if any(
+            later < earlier
+            for earlier, later in zip(split_timestamps, split_timestamps[1:])
+        ):
+            raise ValueError(
+                f"split_timestamps must be in increasing order: {list(split_timestamps)}"
+            )
+        # Timestamps are integers: ">= split" is ">= ceil(split)" and "< split" is "<= ceil(split) - 1".
+        first_kept = [math.ceil(split) for split in split_timestamps]
+        starts: list[int | None] = [None, *first_kept]
+        ends: list[int | None] = [*(timestamp - 1 for timestamp in first_kept), None]
+        return [self.trim(start, end) for start, end in zip(starts, ends)]
 
     def __contains__(self, key: str | int) -> bool:
         """Check if a variable ID, variable name, or any match of a wildcard pattern exists."""
