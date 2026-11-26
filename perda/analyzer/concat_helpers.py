@@ -3,6 +3,12 @@ from typing import List
 import numpy as np
 
 from ..core_data_structures.data_instance import DataInstance
+from ..core_data_structures.search_indexes import VariableSemanticIndex
+from ..core_data_structures.semantic_embedding import (
+    copy_semantic_vectors,
+    empty_semantic_index,
+    update_semantic_index,
+)
 from ..core_data_structures.single_run_data import SingleRunData
 from ..units import Timescale
 from .analyzer import Analyzer
@@ -42,7 +48,37 @@ def _upscale_to_us(data: SingleRunData) -> SingleRunData:
         data_end_time=data.data_end_time * 1000,
         timestamp_unit=Timescale.US,
         concat_boundaries=list(data.concat_boundaries),
+        semantic_index=data.semantic_index,
     )
+
+
+def _merge_semantic_indexes(
+    first: SingleRunData,
+    second: SingleRunData,
+    first_id_to_new: dict[int, int],
+    second_id_to_new: dict[int, int],
+    merged_id_to_descript: dict[int, str],
+) -> VariableSemanticIndex | None:
+    """
+    Combine both runs' semantic indexes under the merged variable IDs.
+
+    Notes
+    -----
+    Stored vectors are copied rather than re-embedded. Only variables whose run had no
+    index are embedded. Returns None when neither run has an index.
+    """
+    if first.semantic_index is None and second.semantic_index is None:
+        return None
+
+    merged = empty_semantic_index()
+    for source, id_map in (
+        (first.semantic_index, first_id_to_new),
+        (second.semantic_index, second_id_to_new),
+    ):
+        if source is not None:
+            copy_semantic_vectors(source, merged, id_map)
+    update_semantic_index(merged, merged_id_to_descript)
+    return merged
 
 
 def _concat_single_run_data(
@@ -92,17 +128,21 @@ def _concat_single_run_data(
     # Build cpp_name -> DataInstance maps for both runs
     first_by_name: dict[str, DataInstance] = {}
     first_descript: dict[str, str] = {}
+    first_ids: dict[str, int] = {}
     for var_id, di in first.id_to_instance.items():
         name = first.id_to_cpp_name.get(var_id, di.cpp_name or "")
         first_by_name[name] = di
         first_descript[name] = first.id_to_descript.get(var_id, "")
+        first_ids[name] = var_id
 
     second_by_name: dict[str, DataInstance] = {}
     second_descript: dict[str, str] = {}
+    second_ids: dict[str, int] = {}
     for var_id, di in second.id_to_instance.items():
         name = second.id_to_cpp_name.get(var_id, di.cpp_name or "")
         second_by_name[name] = di
         second_descript[name] = second.id_to_descript.get(var_id, "")
+        second_ids[name] = var_id
 
     # Union of all cpp_names, preserving first-run order then second-run extras
     all_names: List[str] = list(first_by_name.keys())
@@ -115,6 +155,8 @@ def _concat_single_run_data(
     cpp_name_to_id: dict[str, int] = {}
     id_to_cpp_name: dict[int, str] = {}
     id_to_descript: dict[int, str] = {}
+    first_id_to_new: dict[int, int] = {}
+    second_id_to_new: dict[int, int] = {}
     total_points = 0
 
     for new_id, name in enumerate(all_names):
@@ -127,11 +169,13 @@ def _concat_single_run_data(
             merged_vals = np.concatenate([di_first.value_np, di_second.value_np])
             label = di_first.label
             descript = first_descript[name]
+            first_id_to_new[first_ids[name]] = new_id
         elif di_first is not None:
             merged_ts = di_first.timestamp_np
             merged_vals = di_first.value_np
             label = di_first.label
             descript = first_descript[name]
+            first_id_to_new[first_ids[name]] = new_id
         else:
             if di_second is None:
                 raise KeyError(f"Variable '{name}' is missing from both runs")
@@ -139,6 +183,7 @@ def _concat_single_run_data(
             merged_vals = di_second.value_np
             label = di_second.label
             descript = second_descript[name]
+            second_id_to_new[second_ids[name]] = new_id
 
         id_to_instance[new_id] = DataInstance(
             timestamp_np=merged_ts,
@@ -169,6 +214,9 @@ def _concat_single_run_data(
         data_end_time=second.data_end_time + shift,
         timestamp_unit=ts_unit,
         concat_boundaries=concat_boundaries,
+        semantic_index=_merge_semantic_indexes(
+            first, second, first_id_to_new, second_id_to_new, id_to_descript
+        ),
     )
 
 

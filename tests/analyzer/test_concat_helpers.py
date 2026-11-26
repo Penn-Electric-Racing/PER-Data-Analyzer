@@ -1,12 +1,15 @@
 import numpy as np
+import pytest
 
 from perda.analyzer.concat_helpers import _concat_single_run_data, _upscale_to_us
 from perda.core_data_structures.data_instance import DataInstance
+from perda.core_data_structures.semantic_embedding import build_semantic_index
 from perda.core_data_structures.single_run_data import SingleRunData
 from perda.units import Timescale
+from perda.utils.search import search
 
 
-def _make_srd(names_vals, ts_unit=Timescale.MS, start=0, end=None):
+def _make_srd(names_vals, ts_unit=Timescale.MS, start=0, end=None, descripts={}):
     """Build a minimal SingleRunData from {cpp_name: (ts_list, val_list)} dict."""
     instances = {}
     cpp_name_to_id = {}
@@ -23,7 +26,7 @@ def _make_srd(names_vals, ts_unit=Timescale.MS, start=0, end=None):
         )
         cpp_name_to_id[name] = var_id
         id_to_cpp_name[var_id] = name
-        id_to_descript[var_id] = ""
+        id_to_descript[var_id] = descripts.get(name, "")
 
     data_end = end if end is not None else (max(all_ts) if all_ts else 0)
     return SingleRunData(
@@ -147,3 +150,43 @@ def test_concat_same_unit_no_upscale():
     second = _make_srd({"x": ([0, 1], [3.0, 4.0])}, ts_unit=Timescale.MS)
     result = _concat_single_run_data(first, second)
     assert result.timestamp_unit == Timescale.MS
+
+
+@pytest.mark.parametrize(
+    "first_indexed, second_indexed, expected_embedded",
+    [
+        pytest.param(True, True, [], id="both_indexed"),
+        pytest.param(True, False, [["rear speed"]], id="first_indexed"),
+        pytest.param(
+            False, True, [["front speed", "shared signal"]], id="second_indexed"
+        ),
+    ],
+)
+def test_concat_merges_semantic_indexes(
+    fake_encoder, first_indexed, second_indexed, expected_embedded
+):
+    first = _make_srd(
+        {"a": ([0], [1.0]), "shared": ([0], [1.0])},
+        descripts={"a": "front speed", "shared": "shared signal"},
+    )
+    second = _make_srd(
+        {"shared": ([0], [1.0]), "b": ([0], [1.0])},
+        descripts={"shared": "shared signal", "b": "rear speed"},
+    )
+    if first_indexed:
+        first.semantic_index = build_semantic_index(first.id_to_descript, verbose=0)
+    if second_indexed:
+        second.semantic_index = build_semantic_index(second.id_to_descript, verbose=0)
+    batches_before = len(fake_encoder)
+
+    result = _concat_single_run_data(first, second)
+
+    assert fake_encoder[batches_before:] == expected_embedded
+    assert result.semantic_index.id_to_descript == result.id_to_descript
+    assert search(result, "rear speed", top_n=1)[0].cpp_name == "b"
+
+
+def test_concat_without_semantic_indexes_has_none():
+    first = _make_srd({"a": ([0], [1.0])})
+    second = _make_srd({"b": ([0], [1.0])})
+    assert _concat_single_run_data(first, second).semantic_index is None
