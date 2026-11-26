@@ -284,7 +284,8 @@ def plot_gps_trimmer(
     height: int = PLOT_HEIGHT,
 ) -> widgets.VBox:
     """
-    Interactive GPS track plot (longitude vs latitude) with a range slider for picking a time window of the log.
+    Interactive GPS track plot in metres, colored by time, with a range slider for picking a time window of the log.
+    Latitude and longitude are projected to East/North metres around the track's median point.
 
     Parameters
     ----------
@@ -293,7 +294,7 @@ def plot_gps_trimmer(
     lon : DataInstance
         Longitude in degrees.
     timestamp_unit : Timescale
-        Unit of the raw timestamps, shown next to the timestamps in the slider labels. Pass ``aly.data.timestamp_unit``.
+        Unit of the raw timestamps. Pass ``aly.data.timestamp_unit``.
     title : str | None, optional
         Title shown above the plot. Default is None (no title).
     width : int, optional
@@ -323,15 +324,16 @@ def plot_gps_trimmer(
     from ..plotting.parametric_trimmer import plot_parametric_trimmer
 
     lat_aligned, lon_aligned = left_join_data_instances(lat, lon)
+    east_m, north_m = gps_to_enu(lat_aligned.value_np, lon_aligned.value_np)
 
     return plot_parametric_trimmer(
-        x=lon_aligned.value_np,
-        y=lat_aligned.value_np,
+        x=east_m,
+        y=north_m,
         timestamps=lat_aligned.timestamp_np,
-        x_label="Longitude",
-        y_label="Latitude",
-        title=title,
         timestamp_unit=timestamp_unit,
+        x_label="East (m)",
+        y_label="North (m)",
+        title=title,
         width=width,
         height=height,
     )
