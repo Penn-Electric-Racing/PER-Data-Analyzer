@@ -157,3 +157,58 @@ def test_setitem_updates_total_data_points(srd_basic, key, expected_total):
         timestamp_np=np.array([0, 1], dtype=np.int64), value_np=np.array([0.0, 1.0])
     )
     assert srd_basic.total_data_points == expected_total
+
+
+@pytest.mark.parametrize(
+    "key, labels, expected_text, expected_batches",
+    [
+        pytest.param(
+            "cpp.new",
+            ["Brake pressure"],
+            {3: "cpp new brake pressure"},
+            [["Brake pressure"]],
+            id="add",
+        ),
+        pytest.param(
+            "cpp.var_a",
+            ["Brake pressure"],
+            {1: "cpp var_a brake pressure"},
+            [["Brake pressure"]],
+            id="relabel",
+        ),
+        pytest.param(
+            ("cpp.new_a", "cpp.new_b"),
+            ["a", "b"],
+            {3: "cpp new_a a", 4: "cpp new_b b"},
+            [["a", "b"]],
+            id="multiple_in_one_batch",
+        ),
+    ],
+)
+def test_setitem_updates_search_indexes(
+    srd_semantic, fake_encoder, key, labels, expected_text, expected_batches
+):
+    batches_before = len(fake_encoder)
+    srd_semantic[key] = tuple(
+        DataInstance(timestamp_np=np.array([0]), value_np=np.array([1.0]), label=label)
+        for label in labels
+    )
+
+    keyword_text = srd_semantic.keyword_index.id_to_normalized_text
+    assert {var_id: keyword_text[var_id] for var_id in expected_text} == expected_text
+    assert fake_encoder[batches_before:] == expected_batches
+    assert srd_semantic.semantic_index.id_to_descript == srd_semantic.id_to_descript
+    assert srd_semantic.semantic_index.faiss_index.ntotal == len(
+        srd_semantic.id_to_cpp_name
+    )
+
+
+def test_setitem_skips_embedding_when_description_unchanged(srd_semantic, fake_encoder):
+    srd_semantic["cpp.var_a"] = DataInstance(
+        timestamp_np=np.array([0]), value_np=np.array([1.0]), label="Brake pressure"
+    )
+    batches_before = len(fake_encoder)
+    srd_semantic["cpp.var_a"] = DataInstance(
+        timestamp_np=np.array([0, 1]), value_np=np.array([1.0, 2.0])
+    )
+    assert len(fake_encoder) == batches_before

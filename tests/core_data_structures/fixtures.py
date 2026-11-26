@@ -2,6 +2,7 @@ import numpy as np
 import pytest
 
 from perda.core_data_structures.data_instance import DataInstance
+from perda.core_data_structures.semantic_embedding import build_semantic_index
 
 
 @pytest.fixture
@@ -38,3 +39,10 @@ def di_two_points():
         var_id=6,
         cpp_name="test.two_pts",
     )
+
+
+@pytest.fixture
+def srd_semantic(srd_basic, fake_encoder):
+    """srd_basic with a semantic index built by the fake encoder."""
+    srd_basic.semantic_index = build_semantic_index(srd_basic.id_to_descript, verbose=0)
+    return srd_basic

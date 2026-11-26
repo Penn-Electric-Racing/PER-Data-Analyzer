@@ -140,3 +140,16 @@ def test_split_gives_one_more_run_than_split_points(
 def test_split_rejects_unsorted_points(srd_basic):
     with pytest.raises(ValueError):
         srd_basic.split([2, 1])
+
+
+def test_trim_copies_search_indexes(srd_semantic):
+    trimmed = srd_semantic.trim()
+    srd_semantic["cpp.new"] = DataInstance(
+        timestamp_np=np.array([0]), value_np=np.array([1.0]), label="Brake pressure"
+    )
+
+    assert list(trimmed.keyword_index.id_to_normalized_text) == list(
+        trimmed.id_to_cpp_name
+    )
+    assert trimmed.semantic_index.id_to_descript == trimmed.id_to_descript
+    assert trimmed.semantic_index.faiss_index.ntotal == len(trimmed.id_to_cpp_name)

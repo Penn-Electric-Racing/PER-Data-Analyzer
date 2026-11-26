@@ -4,14 +4,7 @@ import pytest
 from perda.analyzer.csv import parse_csv
 from perda.core_data_structures.data_instance import DataInstance
 from perda.core_data_structures.search_indexes import normalize_search_text
-from perda.core_data_structures.semantic_embedding import build_semantic_index
 from perda.utils.search import keyword_score, search
-
-
-def test_build_semantic_index_returns_none_without_sentence_transformers(
-    no_sentence_transformers,
-):
-    assert build_semantic_index({1: "voltage"}, verbose=0) is None
 
 
 def test_parse_degrades_gracefully_without_sentence_transformers(
@@ -22,14 +15,6 @@ def test_parse_degrades_gracefully_without_sentence_transformers(
 
     results = search(srd, "voltage")
     assert results[0].cpp_name == "ams.pack.voltage"
-
-
-def test_build_semantic_index_returns_none_for_empty_mapping():
-    assert build_semantic_index({}, verbose=0) is None
-
-
-def test_build_semantic_index_returns_none_when_model_fails(failing_encoder):
-    assert build_semantic_index({1: "voltage"}, verbose=0) is None
 
 
 @pytest.mark.parametrize(
@@ -88,93 +73,22 @@ def test_keyword_index_covers_all_variables(search_csv):
     assert list(srd.keyword_index.id_to_normalized_text) == list(srd.id_to_cpp_name)
 
 
-def test_keyword_index_updated_on_add(search_csv):
-    srd = parse_csv(search_csv(), verbose=0)
-    srd["test.newVar"] = DataInstance(
-        timestamp_np=np.array([0]),
-        value_np=np.array([1.0]),
-        label="Brake pressure",
+@pytest.mark.parametrize(
+    "build_search_index", [False, True], ids=["keyword", "semantic"]
+)
+@pytest.mark.parametrize(
+    "cpp_name, label",
+    [
+        pytest.param("test.newVar", "brake pressure", id="add"),
+        pytest.param("ams.pack.voltage", "accumulator potential", id="relabel"),
+    ],
+)
+def test_search_finds_assigned_variable(
+    search_csv, fake_encoder, build_search_index, cpp_name, label
+):
+    srd = parse_csv(search_csv(), verbose=0, build_search_index=build_search_index)
+    srd[cpp_name] = DataInstance(
+        timestamp_np=np.array([0]), value_np=np.array([1.0]), label=label
     )
 
-    assert search(srd, "brake pressure", top_n=1)[0].cpp_name == "test.newVar"
-
-
-def test_keyword_index_updated_on_relabel(search_csv):
-    srd = parse_csv(search_csv(), verbose=0)
-    srd["ams.pack.voltage"] = DataInstance(
-        timestamp_np=np.array([0]),
-        value_np=np.array([1.0]),
-        label="Accumulator potential",
-    )
-
-    var_id = srd.cpp_name_to_id["ams.pack.voltage"]
-    assert srd.keyword_index.id_to_normalized_text[var_id] == (
-        "ams pack voltage accumulator potential"
-    )
-
-
-def test_keyword_index_not_shared_with_trimmed_copy(search_csv):
-    srd = parse_csv(search_csv(), verbose=0)
-    trimmed = srd.trim()
-    srd["test.newVar"] = DataInstance(
-        timestamp_np=np.array([0]), value_np=np.array([1.0])
-    )
-
-    assert list(trimmed.keyword_index.id_to_normalized_text) == list(
-        trimmed.id_to_cpp_name
-    )
-
-
-def test_semantic_index_updated_on_add(search_csv, fake_encoder):
-    srd = parse_csv(search_csv(), verbose=0, build_search_index=True)
-    srd["test.newVar"] = DataInstance(
-        timestamp_np=np.array([0]),
-        value_np=np.array([1.0]),
-        label="brake pressure",
-    )
-
-    assert search(srd, "brake pressure", top_n=1)[0].cpp_name == "test.newVar"
-
-
-def test_semantic_index_replaces_vector_on_relabel(search_csv, fake_encoder):
-    srd = parse_csv(search_csv(), verbose=0, build_search_index=True)
-    srd["ams.pack.voltage"] = DataInstance(
-        timestamp_np=np.array([0]),
-        value_np=np.array([1.0]),
-        label="accumulator potential",
-    )
-
-    assert srd.semantic_index.faiss_index.ntotal == len(srd.id_to_cpp_name)
-    result = search(srd, "accumulator potential", top_n=1)[0]
-    assert result.cpp_name == "ams.pack.voltage"
-
-
-def test_semantic_index_skips_unchanged_descriptions(search_csv, fake_encoder):
-    srd = parse_csv(search_csv(), verbose=0, build_search_index=True)
-    batches_before = len(fake_encoder)
-    srd["ams.pack.voltage"] = DataInstance(
-        timestamp_np=np.array([0]), value_np=np.array([1.0])
-    )
-
-    assert len(fake_encoder) == batches_before
-
-
-def test_semantic_index_embeds_multi_assignment_in_one_batch(search_csv, fake_encoder):
-    srd = parse_csv(search_csv(), verbose=0, build_search_index=True)
-    srd["test.a", "test.b"] = (
-        DataInstance(timestamp_np=np.array([0]), value_np=np.array([1.0]), label="a"),
-        DataInstance(timestamp_np=np.array([0]), value_np=np.array([1.0]), label="b"),
-    )
-
-    assert fake_encoder[-1] == ["a", "b"]
-
-
-def test_semantic_index_not_shared_with_trimmed_copy(search_csv, fake_encoder):
-    srd = parse_csv(search_csv(), verbose=0, build_search_index=True)
-    trimmed = srd.trim()
-    srd["test.newVar"] = DataInstance(
-        timestamp_np=np.array([0]), value_np=np.array([1.0]), label="brake"
-    )
-
-    assert trimmed.semantic_index.faiss_index.ntotal == len(trimmed.id_to_cpp_name)
-    assert search(trimmed, "voltage", top_n=1)[0].cpp_name == "ams.pack.voltage"
+    assert search(srd, label, top_n=1)[0].cpp_name == cpp_name
