@@ -50,7 +50,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/perda.core_data_structures.single_run_data';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="perda.core_data_structures.split_helpers" href="perda.core_data_structures.split_helpers.html" />
+    <link rel="next" title="perda.core_data_structures.summarize" href="perda.core_data_structures.summarize.html" />
     <link rel="prev" title="perda.core_data_structures.search_indexes" href="perda.core_data_structures.search_indexes.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -277,7 +277,6 @@
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.resampling.html">perda.core_data_structures.resampling</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.search_indexes.html">perda.core_data_structures.search_indexes</a></li>
 <li class="toctree-l3 current active"><a class="current reference internal" href="#">perda.core_data_structures.single_run_data</a></li>
-<li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.split_helpers.html">perda.core_data_structures.split_helpers</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.summarize.html">perda.core_data_structures.summarize</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.variable_patterns.html">perda.core_data_structures.variable_patterns</a></li>
 </ul>
@@ -406,6 +405,8 @@ or <code class="docutils literal notranslate"><span class="pre">timestamp_unit</
 <span class="gp">&gt;&gt;&gt; </span><span class="n">left</span><span class="p">,</span> <span class="n">right</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">"pcm.wheelSpeeds.frontLeft"</span><span class="p">,</span> <span class="s2">"pcm.wheelSpeeds.frontRight"</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="p">[</span><span class="s2">"pcm.vnav.bodyVelocity.*"</span><span class="p">]</span> <span class="o">=</span> <span class="n">vel_x</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span> <span class="n">vel_y</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span> <span class="n">vel_z</span> <span class="o">*</span> <span class="mi">2</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="p">[</span><span class="s2">"derived.a"</span><span class="p">,</span> <span class="s2">"derived.b"</span><span class="p">]</span> <span class="o">=</span> <span class="n">a_di</span><span class="p">,</span> <span class="n">b_di</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">first_minute</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">trim</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">data_start_time</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">data_start_time</span> <span class="o">+</span> <span class="mi">60_000</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">before</span><span class="p">,</span> <span class="n">after</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">split</span><span class="p">([</span><span class="n">split_timestamp</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">perda.units</span><span class="w"> </span><span class="kn">import</span> <span class="n">to_seconds</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">duration_s</span> <span class="o">=</span> <span class="n">to_seconds</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">data_end_time</span> <span class="o">-</span> <span class="n">data</span><span class="o">.</span><span class="n">data_start_time</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">timestamp_unit</span><span class="p">)</span>
 </pre></div>
@@ -594,6 +595,41 @@ or <code class="docutils literal notranslate"><span class="pre">timestamp_unit</
 </dl>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="perda.core_data_structures.single_run_data.SingleRunData.trim">
+<span class="sig-name descname"><span class="pre">trim</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts_start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts_end</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/core_data_structures/single_run_data.html#SingleRunData.trim"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.core_data_structures.single_run_data.SingleRunData.trim" title="Link to this definition">#</a></dt>
+<dd><p>Return a new SingleRunData with every variable trimmed to a timestamp range.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ts_start</strong> (<em>float</em><em> | </em><em>None</em><em>, </em><em>optional</em>) – Lower bound in raw timestamp units (inclusive). Default is None (no lower bound).</p></li>
+<li><p><strong>ts_end</strong> (<em>float</em><em> | </em><em>None</em><em>, </em><em>optional</em>) – Upper bound in raw timestamp units (inclusive). Default is None (no upper bound).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>New run data; the original is not changed.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#perda.core_data_structures.single_run_data.SingleRunData" title="perda.core_data_structures.single_run_data.SingleRunData">SingleRunData</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="perda.core_data_structures.single_run_data.SingleRunData.split">
+<span class="sig-name descname"><span class="pre">split</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">split_timestamps</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/core_data_structures/single_run_data.html#SingleRunData.split"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.core_data_structures.single_run_data.SingleRunData.split" title="Link to this definition">#</a></dt>
+<dd><p>Split into consecutive runs at the given timestamps/</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>split_timestamps</strong> (<em>Sequence</em><em>[</em><em>float</em><em>]</em>) – Split points, interpreted in timestamp units of the current run.
+Must be strictly increasing. A sample exactly on a split point goes to the later run.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list[<a class="reference internal" href="#perda.core_data_structures.single_run_data.SingleRunData" title="perda.core_data_structures.single_run_data.SingleRunData">SingleRunData</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 </section>
@@ -618,11 +654,11 @@ or <code class="docutils literal notranslate"><span class="pre">timestamp_unit</
       </div>
     </a>
     <a class="right-next"
-       href="perda.core_data_structures.split_helpers.html"
+       href="perda.core_data_structures.summarize.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">perda.core_data_structures.split_helpers</p>
+        <p class="prev-next-title">perda.core_data_structures.summarize</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -658,6 +694,8 @@ or <code class="docutils literal notranslate"><span class="pre">timestamp_unit</
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.core_data_structures.single_run_data.SingleRunData.concat_boundaries"><code class="docutils literal notranslate"><span class="pre">SingleRunData.concat_boundaries</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.core_data_structures.single_run_data.SingleRunData.semantic_index"><code class="docutils literal notranslate"><span class="pre">SingleRunData.semantic_index</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.core_data_structures.single_run_data.SingleRunData.keyword_index"><code class="docutils literal notranslate"><span class="pre">SingleRunData.keyword_index</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.core_data_structures.single_run_data.SingleRunData.trim"><code class="docutils literal notranslate"><span class="pre">SingleRunData.trim()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.core_data_structures.single_run_data.SingleRunData.split"><code class="docutils literal notranslate"><span class="pre">SingleRunData.split()</span></code></a></li>
 </ul>
 </li>
 </ul>

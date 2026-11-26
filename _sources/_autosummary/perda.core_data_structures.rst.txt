@@ -20,6 +20,5 @@ perda.core\_data\_structures
    resampling
    search_indexes
    single_run_data
-   split_helpers
    summarize
    variable_patterns

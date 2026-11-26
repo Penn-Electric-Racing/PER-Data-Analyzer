@@ -304,6 +304,7 @@
   <h1>Source code for perda.core_data_structures.single_run_data</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Sequence</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">overload</span>
@@ -347,6 +348,8 @@
 <span class="sd">    &gt;&gt;&gt; left, right = data["pcm.wheelSpeeds.frontLeft", "pcm.wheelSpeeds.frontRight"]</span>
 <span class="sd">    &gt;&gt;&gt; data["pcm.vnav.bodyVelocity.*"] = vel_x * 2, vel_y * 2, vel_z * 2</span>
 <span class="sd">    &gt;&gt;&gt; data["derived.a", "derived.b"] = a_di, b_di</span>
+<span class="sd">    &gt;&gt;&gt; first_minute = data.trim(data.data_start_time, data.data_start_time + 60_000)</span>
+<span class="sd">    &gt;&gt;&gt; before, after = data.split([split_timestamp])</span>
 <span class="sd">    &gt;&gt;&gt; from perda.units import to_seconds</span>
 <span class="sd">    &gt;&gt;&gt; duration_s = to_seconds(data.data_end_time - data.data_start_time, data.timestamp_unit)</span>
 <span class="sd">    """</span>
@@ -457,6 +460,79 @@
             <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id_to_instance</span><span class="p">),</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">total_data_points</span><span class="p">,</span>
         <span class="p">)</span>
+
+<div class="viewcode-block" id="SingleRunData.trim">
+<a class="viewcode-back" href="../../../_autosummary/perda.core_data_structures.single_run_data.html#perda.core_data_structures.single_run_data.SingleRunData.trim">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">trim</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">ts_start</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">ts_end</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SingleRunData</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Return a new SingleRunData with every variable trimmed to a timestamp range.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        ts_start : float | None, optional</span>
+<span class="sd">            Lower bound in raw timestamp units (inclusive). Default is None (no lower bound).</span>
+<span class="sd">        ts_end : float | None, optional</span>
+<span class="sd">            Upper bound in raw timestamp units (inclusive). Default is None (no upper bound).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        SingleRunData</span>
+<span class="sd">            New run data; the original is not changed.</span>
+<span class="sd">        """</span>
+        <span class="n">trimmed</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">var_id</span><span class="p">:</span> <span class="n">di</span><span class="o">.</span><span class="n">trim</span><span class="p">(</span><span class="n">ts_start</span><span class="p">,</span> <span class="n">ts_end</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">var_id</span><span class="p">,</span> <span class="n">di</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">id_to_instance</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+        <span class="p">}</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_start_time</span> <span class="k">if</span> <span class="n">ts_start</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">int</span><span class="p">(</span><span class="n">ts_start</span><span class="p">)</span>
+        <span class="n">end</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_end_time</span> <span class="k">if</span> <span class="n">ts_end</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">int</span><span class="p">(</span><span class="n">ts_end</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">SingleRunData</span><span class="p">(</span>
+            <span class="n">id_to_instance</span><span class="o">=</span><span class="n">trimmed</span><span class="p">,</span>
+            <span class="n">cpp_name_to_id</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cpp_name_to_id</span><span class="p">),</span>
+            <span class="n">id_to_cpp_name</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id_to_cpp_name</span><span class="p">),</span>
+            <span class="n">id_to_descript</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id_to_descript</span><span class="p">),</span>
+            <span class="n">creation_time</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">creation_time</span><span class="p">,</span>
+            <span class="n">total_data_points</span><span class="o">=</span><span class="nb">sum</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">di</span><span class="p">)</span> <span class="k">for</span> <span class="n">di</span> <span class="ow">in</span> <span class="n">trimmed</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span>
+            <span class="n">data_start_time</span><span class="o">=</span><span class="n">start</span><span class="p">,</span>
+            <span class="n">data_end_time</span><span class="o">=</span><span class="n">end</span><span class="p">,</span>
+            <span class="n">timestamp_unit</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timestamp_unit</span><span class="p">,</span>
+            <span class="n">semantic_index</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">semantic_index</span><span class="p">,</span>
+            <span class="n">keyword_index</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">keyword_index</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SingleRunData.split">
+<a class="viewcode-back" href="../../../_autosummary/perda.core_data_structures.single_run_data.html#perda.core_data_structures.single_run_data.SingleRunData.split">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">split</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">split_timestamps</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">SingleRunData</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Split into consecutive runs at the given timestamps/</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        split_timestamps : Sequence[float]</span>
+<span class="sd">            Split points, interpreted in timestamp units of the current run.</span>
+<span class="sd">            Must be strictly increasing. A sample exactly on a split point goes to the later run.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list[SingleRunData]</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span>
+            <span class="n">later</span> <span class="o">&lt;</span> <span class="n">earlier</span>
+            <span class="k">for</span> <span class="n">earlier</span><span class="p">,</span> <span class="n">later</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">split_timestamps</span><span class="p">,</span> <span class="n">split_timestamps</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+        <span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"split_timestamps must be in increasing order: </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">split_timestamps</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
+            <span class="p">)</span>
+        <span class="c1"># Timestamps are integers: "&gt;= split" is "&gt;= ceil(split)" and "&lt; split" is "&lt;= ceil(split) - 1".</span>
+        <span class="n">first_kept</span> <span class="o">=</span> <span class="p">[</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">split</span><span class="p">)</span> <span class="k">for</span> <span class="n">split</span> <span class="ow">in</span> <span class="n">split_timestamps</span><span class="p">]</span>
+        <span class="n">starts</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="n">first_kept</span><span class="p">]</span>
+        <span class="n">ends</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="o">*</span><span class="p">(</span><span class="n">timestamp</span> <span class="o">-</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">timestamp</span> <span class="ow">in</span> <span class="n">first_kept</span><span class="p">),</span> <span class="kc">None</span><span class="p">]</span>
+        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">trim</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span> <span class="k">for</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">starts</span><span class="p">,</span> <span class="n">ends</span><span class="p">)]</span></div>
+
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""Check if a variable ID, variable name, or any match of a wildcard pattern exists."""</span>

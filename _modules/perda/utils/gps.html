@@ -627,7 +627,6 @@
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
-<span class="sd">    &gt;&gt;&gt; from perda.core_data_structures import trim_single_run_data</span>
 <span class="sd">    &gt;&gt;&gt; from perda.utils import plot_gps_trimmer</span>
 <span class="sd">    &gt;&gt;&gt; widget = plot_gps_trimmer(</span>
 <span class="sd">    ...     aly.data["pcm.vnav.posLla.latitude"],</span>
@@ -637,7 +636,7 @@
 <span class="sd">    ... )</span>
 <span class="sd">    &gt;&gt;&gt; display(widget)</span>
 <span class="sd">    &gt;&gt;&gt; # After reading the start/end timestamps off the slider:</span>
-<span class="sd">    &gt;&gt;&gt; trimmed = trim_single_run_data(aly.data, ts_start=436_000, ts_end=1_552_000)</span>
+<span class="sd">    &gt;&gt;&gt; trimmed = aly.data.trim(ts_start=436_000, ts_end=1_552_000)</span>
 <span class="sd">    """</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">..plotting.parametric_trimmer</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_parametric_trimmer</span>
 

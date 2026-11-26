@@ -277,7 +277,6 @@
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.resampling.html">perda.core_data_structures.resampling</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.search_indexes.html">perda.core_data_structures.search_indexes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.single_run_data.html">perda.core_data_structures.single_run_data</a></li>
-<li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.split_helpers.html">perda.core_data_structures.split_helpers</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.summarize.html">perda.core_data_structures.summarize</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.variable_patterns.html">perda.core_data_structures.variable_patterns</a></li>
 </ul>
@@ -551,8 +550,7 @@ Latitude and longitude are projected to East/North metres around the track’s m
 </dd>
 </dl>
 <p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">perda.core_data_structures</span><span class="w"> </span><span class="kn">import</span> <span class="n">trim_single_run_data</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">perda.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_gps_trimmer</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">perda.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_gps_trimmer</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">widget</span> <span class="o">=</span> <span class="n">plot_gps_trimmer</span><span class="p">(</span>
 <span class="gp">... </span>    <span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">"pcm.vnav.posLla.latitude"</span><span class="p">],</span>
 <span class="gp">... </span>    <span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">"pcm.vnav.posLla.longitude"</span><span class="p">],</span>
@@ -561,7 +559,7 @@ Latitude and longitude are projected to East/North metres around the track’s m
 <span class="gp">... </span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">display</span><span class="p">(</span><span class="n">widget</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># After reading the start/end timestamps off the slider:</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">trimmed</span> <span class="o">=</span> <span class="n">trim_single_run_data</span><span class="p">(</span><span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">ts_start</span><span class="o">=</span><span class="mi">436_000</span><span class="p">,</span> <span class="n">ts_end</span><span class="o">=</span><span class="mi">1_552_000</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">trimmed</span> <span class="o">=</span> <span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">trim</span><span class="p">(</span><span class="n">ts_start</span><span class="o">=</span><span class="mi">436_000</span><span class="p">,</span> <span class="n">ts_end</span><span class="o">=</span><span class="mi">1_552_000</span><span class="p">)</span>
 </pre></div>
 </div>
 </dd></dl>
