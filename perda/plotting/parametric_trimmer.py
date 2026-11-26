@@ -36,11 +36,6 @@ def plot_parametric_trimmer(
     """
     Interactive parametric curve (y against x), colored by time, with a range slider for picking a time window.
 
-    Drag the two slider handles to hide points outside the selected window. The label under the slider shows the window in
-    seconds since the first point, the number of points, and the raw timestamps of the first and last visible point, which
-    can be passed directly to ``trim_single_run_data(ts_start=..., ts_end=...)`` or ``DataInstance.trim``. Designed for
-    Jupyter notebooks.
-
     Parameters
     ----------
     x : NDArray[float64]
@@ -67,13 +62,7 @@ def plot_parametric_trimmer(
     Returns
     -------
     ipywidgets.VBox
-        Widget containing the figure, the slider and the label. Display it as the last expression in a notebook cell or
-        with ``display(widget)``. The figure is ``widget.children[0]`` and can be customized with ``update_layout``.
-
-    Raises
-    ------
-    ValueError
-        If ``x`` is empty, or ``y`` or ``timestamps`` does not have the same length as ``x``.
+        Widget containing the figure, the slider and the label.
 
     Examples
     --------
