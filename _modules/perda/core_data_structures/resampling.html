@@ -302,9 +302,7 @@
                 <article class="bd-article">
                   
   <h1>Source code for perda.core_data_structures.resampling</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
-
-<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">numpy.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">NDArray</span>
@@ -323,64 +321,60 @@
 
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_interpolate</span><span class="p">(</span>
-    <span class="n">target</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">,</span>
-    <span class="n">src_t</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">,</span>
-    <span class="n">src_v</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">,</span>
+<span class="n">INTERP1D_KIND</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">ResampleMethod</span><span class="o">.</span><span class="n">ZOH</span><span class="p">:</span> <span class="s2">"previous"</span><span class="p">,</span>
+    <span class="n">ResampleMethod</span><span class="o">.</span><span class="n">NEAREST</span><span class="p">:</span> <span class="s2">"nearest"</span><span class="p">,</span>
+    <span class="n">ResampleMethod</span><span class="o">.</span><span class="n">CUBIC</span><span class="p">:</span> <span class="s2">"cubic"</span><span class="p">,</span>
+<span class="p">}</span>
+<span class="n">CUBIC_MIN_POINTS</span> <span class="o">=</span> <span class="mi">4</span>
+
+
+<div class="viewcode-block" id="interpolate_onto_timestamps">
+<a class="viewcode-back" href="../../../_autosummary/perda.core_data_structures.resampling.html#perda.core_data_structures.resampling.interpolate_onto_timestamps">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">interpolate_onto_timestamps</span><span class="p">(</span>
+    <span class="n">target_timestamps</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
+    <span class="n">source_timestamps</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
+    <span class="n">source_values</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">method</span><span class="p">:</span> <span class="n">ResampleMethod</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">:</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Interpolate src_v (sampled at src_t) onto target timestamps.</span>
+<span class="sd">    Interpolate values sampled at ``source_timestamps`` onto ``target_timestamps``.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    target : NDArray</span>
-<span class="sd">        Target timestamps (float64)</span>
-<span class="sd">    src_t : NDArray</span>
-<span class="sd">        Source timestamps (float64)</span>
-<span class="sd">    src_v : NDArray</span>
-<span class="sd">        Source values</span>
+<span class="sd">    target_timestamps : NDArray[np.float64]</span>
+<span class="sd">        Timestamps to produce values at.</span>
+<span class="sd">    source_timestamps : NDArray[np.float64]</span>
+<span class="sd">        Timestamps the source values were sampled at.</span>
+<span class="sd">    source_values : NDArray[np.float64]</span>
+<span class="sd">        Source values, same length as ``source_timestamps``.</span>
 <span class="sd">    method : ResampleMethod</span>
-<span class="sd">        Interpolation strategy</span>
+<span class="sd">        Interpolation strategy.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    NDArray</span>
-<span class="sd">        Interpolated values at target timestamps</span>
+<span class="sd">    NDArray[np.float64]</span>
+<span class="sd">        Values at ``target_timestamps``. Targets outside the source range take the nearest end value.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Cubic interpolation falls back to linear when there are fewer than 4 source points.</span>
 <span class="sd">    """</span>
-    <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="n">ResampleMethod</span><span class="o">.</span><span class="n">LINEAR</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">src_t</span><span class="p">,</span> <span class="n">src_v</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="n">ResampleMethod</span><span class="o">.</span><span class="n">ZOH</span><span class="p">:</span>
-        <span class="n">f</span> <span class="o">=</span> <span class="n">interp1d</span><span class="p">(</span>
-            <span class="n">src_t</span><span class="p">,</span>
-            <span class="n">src_v</span><span class="p">,</span>
-            <span class="n">kind</span><span class="o">=</span><span class="s2">"previous"</span><span class="p">,</span>
-            <span class="n">bounds_error</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-            <span class="n">fill_value</span><span class="o">=</span><span class="p">(</span><span class="n">src_v</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">src_v</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]),</span>
-        <span class="p">)</span>
-        <span class="k">return</span> <span class="n">f</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="n">ResampleMethod</span><span class="o">.</span><span class="n">NEAREST</span><span class="p">:</span>
-        <span class="n">f</span> <span class="o">=</span> <span class="n">interp1d</span><span class="p">(</span>
-            <span class="n">src_t</span><span class="p">,</span>
-            <span class="n">src_v</span><span class="p">,</span>
-            <span class="n">kind</span><span class="o">=</span><span class="s2">"nearest"</span><span class="p">,</span>
-            <span class="n">bounds_error</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-            <span class="n">fill_value</span><span class="o">=</span><span class="p">(</span><span class="n">src_v</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">src_v</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]),</span>
-        <span class="p">)</span>
-        <span class="k">return</span> <span class="n">f</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="n">ResampleMethod</span><span class="o">.</span><span class="n">CUBIC</span><span class="p">:</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">src_t</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">4</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">src_t</span><span class="p">,</span> <span class="n">src_v</span><span class="p">)</span>
-        <span class="n">f</span> <span class="o">=</span> <span class="n">interp1d</span><span class="p">(</span>
-            <span class="n">src_t</span><span class="p">,</span>
-            <span class="n">src_v</span><span class="p">,</span>
-            <span class="n">kind</span><span class="o">=</span><span class="s2">"cubic"</span><span class="p">,</span>
-            <span class="n">bounds_error</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-            <span class="n">fill_value</span><span class="o">=</span><span class="p">(</span><span class="n">src_v</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">src_v</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]),</span>
-        <span class="p">)</span>
-        <span class="k">return</span> <span class="n">f</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="n">ResampleMethod</span><span class="o">.</span><span class="n">LINEAR</span> <span class="ow">or</span> <span class="p">(</span>
+        <span class="n">method</span> <span class="o">==</span> <span class="n">ResampleMethod</span><span class="o">.</span><span class="n">CUBIC</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">source_timestamps</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">CUBIC_MIN_POINTS</span>
+    <span class="p">):</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">target_timestamps</span><span class="p">,</span> <span class="n">source_timestamps</span><span class="p">,</span> <span class="n">source_values</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">method</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">INTERP1D_KIND</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Unknown resample method '</span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s2">'"</span><span class="p">)</span>
+    <span class="n">interpolator</span> <span class="o">=</span> <span class="n">interp1d</span><span class="p">(</span>
+        <span class="n">source_timestamps</span><span class="p">,</span>
+        <span class="n">source_values</span><span class="p">,</span>
+        <span class="n">kind</span><span class="o">=</span><span class="n">INTERP1D_KIND</span><span class="p">[</span><span class="n">method</span><span class="p">],</span>
+        <span class="n">bounds_error</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">fill_value</span><span class="o">=</span><span class="p">(</span><span class="n">source_values</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">source_values</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]),</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">interpolator</span><span class="p">(</span><span class="n">target_timestamps</span><span class="p">)</span></div>
+
 </pre></div>
 
                 </article>

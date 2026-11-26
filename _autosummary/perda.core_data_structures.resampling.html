@@ -413,6 +413,30 @@
 
 </dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="perda.core_data_structures.resampling.interpolate_onto_timestamps">
+<span class="sig-prename descclassname"><span class="pre">perda.core_data_structures.resampling.</span></span><span class="sig-name descname"><span class="pre">interpolate_onto_timestamps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target_timestamps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_timestamps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/core_data_structures/resampling.html#interpolate_onto_timestamps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.core_data_structures.resampling.interpolate_onto_timestamps" title="Link to this definition">#</a></dt>
+<dd><p>Interpolate values sampled at <code class="docutils literal notranslate"><span class="pre">source_timestamps</span></code> onto <code class="docutils literal notranslate"><span class="pre">target_timestamps</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>target_timestamps</strong> (<em>NDArray</em><em>[</em><em>np.float64</em><em>]</em>) – Timestamps to produce values at.</p></li>
+<li><p><strong>source_timestamps</strong> (<em>NDArray</em><em>[</em><em>np.float64</em><em>]</em>) – Timestamps the source values were sampled at.</p></li>
+<li><p><strong>source_values</strong> (<em>NDArray</em><em>[</em><em>np.float64</em><em>]</em>) – Source values, same length as <code class="docutils literal notranslate"><span class="pre">source_timestamps</span></code>.</p></li>
+<li><p><strong>method</strong> (<a class="reference internal" href="#perda.core_data_structures.resampling.ResampleMethod" title="perda.core_data_structures.resampling.ResampleMethod"><em>ResampleMethod</em></a>) – Interpolation strategy.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Values at <code class="docutils literal notranslate"><span class="pre">target_timestamps</span></code>. Targets outside the source range take the nearest end value.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>NDArray[np.float64]</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Cubic interpolation falls back to linear when there are fewer than 4 source points.</p>
+</dd></dl>
+
 </section>
 
 
@@ -469,6 +493,7 @@
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.core_data_structures.resampling.ResampleMethod.ZOH"><code class="docutils literal notranslate"><span class="pre">ResampleMethod.ZOH</span></code></a></li>
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.core_data_structures.resampling.interpolate_onto_timestamps"><code class="docutils literal notranslate"><span class="pre">interpolate_onto_timestamps()</span></code></a></li>
 </ul>
   </nav></div>
 
