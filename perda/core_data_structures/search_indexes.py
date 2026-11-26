@@ -16,35 +16,32 @@ def normalize_search_text(text: str) -> str:
     Returns
     -------
     str
-        Normalized text, e.g. "pcm.wheelSpeeds.frontRight" becomes
-        "pcm wheel speeds front right".
+        Normalized text, e.g. "pcm.wheelSpeeds.frontRight" becomes "pcm wheel speeds front right".
     """
     spaced = re.sub(r"([a-z0-9])([A-Z])", r"\1 \2", text).replace(".", " ")
     return " ".join(spaced.split()).lower()
 
 
 class VariableKeywordIndex(BaseModel):
-    """Normalized searchable text per variable, built once at parse time."""
+    """Normalized searchable text per variable."""
 
-    row_to_var_id: list[int] = Field(
-        description="Maps index row position to variable ID"
-    )
-    normalized_text: list[str] = Field(
+    id_to_normalized_text: dict[int, str] = Field(
         description="Lower-cased text of each variable's name and description, with "
         "camelCase and period boundaries split into separate words"
     )
 
 
 class VariableSemanticIndex(BaseModel):
-    """Vector index over variable description embeddings, built once at parse time."""
+    """Vector index over variable description embeddings, keyed by variable ID."""
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
-    faiss_index: faiss.IndexFlatIP = Field(
-        description="Inner-product index holding L2-normalized description vectors"
+    faiss_index: faiss.IndexIDMap2 = Field(
+        description="Inner-product index holding L2-normalized description vectors, "
+        "with variable IDs as FAISS IDs"
     )
-    row_to_var_id: list[int] = Field(
-        description="Maps index row position to variable ID"
+    id_to_descript: dict[int, str] = Field(
+        description="Description each stored vector was embedded from"
     )
 
 
@@ -64,16 +61,13 @@ def variable_keyword_index_from_csv_mappings(
     Returns
     -------
     VariableKeywordIndex
-        Normalized text for each variable, aligned with ``row_to_var_id``.
+        Normalized text for each variable, keyed by variable ID.
     """
-    var_ids = list(id_to_cpp_name.keys())
-
     return VariableKeywordIndex(
-        row_to_var_id=var_ids,
-        normalized_text=[
-            normalize_search_text(
-                f"{id_to_cpp_name[var_id]} {id_to_descript.get(var_id, '')}"
+        id_to_normalized_text={
+            var_id: normalize_search_text(
+                f"{cpp_name} {id_to_descript.get(var_id, '')}"
             )
-            for var_id in var_ids
-        ],
+            for var_id, cpp_name in id_to_cpp_name.items()
+        }
     )

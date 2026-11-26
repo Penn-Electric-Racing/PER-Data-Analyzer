@@ -4,13 +4,7 @@ import pytest
 from perda.analyzer.csv import parse_csv
 from perda.core_data_structures.data_instance import DataInstance
 from perda.core_data_structures.search_indexes import normalize_search_text
-from perda.utils.search import build_semantic_index, keyword_score, search
-
-
-def test_build_semantic_index_returns_none_without_sentence_transformers(
-    no_sentence_transformers,
-):
-    assert build_semantic_index({1: "voltage"}, verbose=0) is None
+from perda.utils.search import keyword_score, search
 
 
 def test_parse_degrades_gracefully_without_sentence_transformers(
@@ -21,14 +15,6 @@ def test_parse_degrades_gracefully_without_sentence_transformers(
 
     results = search(srd, "voltage")
     assert results[0].cpp_name == "ams.pack.voltage"
-
-
-def test_build_semantic_index_returns_none_for_empty_mapping():
-    assert build_semantic_index({}, verbose=0) is None
-
-
-def test_build_semantic_index_returns_none_when_model_fails(failing_encoder):
-    assert build_semantic_index({1: "voltage"}, verbose=0) is None
 
 
 @pytest.mark.parametrize(
@@ -84,18 +70,25 @@ def test_normalize_search_text(raw, expected):
 
 def test_keyword_index_covers_all_variables(search_csv):
     srd = parse_csv(search_csv(), verbose=0)
-    assert srd.keyword_index.row_to_var_id == list(srd.id_to_cpp_name.keys())
-    assert len(srd.keyword_index.normalized_text) == len(srd.id_to_cpp_name)
+    assert list(srd.keyword_index.id_to_normalized_text) == list(srd.id_to_cpp_name)
 
 
-def test_keyword_index_not_rebuilt_on_add(search_csv):
-    srd = parse_csv(search_csv(), verbose=0)
-    rows_before = list(srd.keyword_index.row_to_var_id)
-
-    srd["test.newVar"] = DataInstance(
-        timestamp_np=np.array([0]),
-        value_np=np.array([1.0]),
-        label="New custom variable",
+@pytest.mark.parametrize(
+    "build_search_index", [False, True], ids=["keyword", "semantic"]
+)
+@pytest.mark.parametrize(
+    "cpp_name, label",
+    [
+        pytest.param("test.newVar", "brake pressure", id="add"),
+        pytest.param("ams.pack.voltage", "accumulator potential", id="relabel"),
+    ],
+)
+def test_search_finds_assigned_variable(
+    search_csv, fake_encoder, build_search_index, cpp_name, label
+):
+    srd = parse_csv(search_csv(), verbose=0, build_search_index=build_search_index)
+    srd[cpp_name] = DataInstance(
+        timestamp_np=np.array([0]), value_np=np.array([1.0]), label=label
     )
 
-    assert srd.keyword_index.row_to_var_id == rows_before
+    assert search(srd, label, top_n=1)[0].cpp_name == cpp_name

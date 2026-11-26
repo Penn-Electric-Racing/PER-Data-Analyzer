@@ -1,4 +1,3 @@
-import builtins
 import textwrap
 
 import numpy as np
@@ -7,7 +6,6 @@ import pytest
 from perda.core_data_structures.data_instance import DataInstance
 from perda.core_data_structures.single_run_data import SingleRunData
 from perda.units import Timescale
-from perda.utils.search import _load_encoder
 
 
 @pytest.fixture
@@ -369,35 +367,3 @@ def search_csv(tmp_path):
         return str(path)
 
     return _write
-
-
-@pytest.fixture
-def no_sentence_transformers(monkeypatch):
-    """Make importing sentence-transformers fail, as in a base install.
-
-    Clears the encoder cache on both sides to reset between tests.
-    """
-    real_import = builtins.__import__
-
-    def blocked_import(name, *args, **kwargs):
-        if name == "sentence_transformers":
-            raise ImportError(f"No module named {name!r}")
-        return real_import(name, *args, **kwargs)
-
-    _load_encoder.cache_clear()
-    monkeypatch.setattr(builtins, "__import__", blocked_import)
-    yield
-    _load_encoder.cache_clear()
-
-
-@pytest.fixture
-def failing_encoder(monkeypatch):
-    """Make the encoder loader raise, as when a model download fails."""
-
-    def blow_up(model_id):
-        raise RuntimeError("model load failure")
-
-    _load_encoder.cache_clear()
-    monkeypatch.setattr("perda.utils.search._load_encoder", blow_up)
-    yield
-    _load_encoder.cache_clear()
