@@ -50,7 +50,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/perda.core_data_structures.search_indexes';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="perda.core_data_structures.single_run_data" href="perda.core_data_structures.single_run_data.html" />
+    <link rel="next" title="perda.core_data_structures.semantic_embedding" href="perda.core_data_structures.semantic_embedding.html" />
     <link rel="prev" title="perda.core_data_structures.resampling" href="perda.core_data_structures.resampling.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -276,6 +276,7 @@
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.masking.html">perda.core_data_structures.masking</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.resampling.html">perda.core_data_structures.resampling</a></li>
 <li class="toctree-l3 current active"><a class="current reference internal" href="#">perda.core_data_structures.search_indexes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.semantic_embedding.html">perda.core_data_structures.semantic_embedding</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.single_run_data.html">perda.core_data_structures.single_run_data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.summarize.html">perda.core_data_structures.summarize</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.variable_patterns.html">perda.core_data_structures.variable_patterns</a></li>
@@ -389,24 +390,17 @@
 <dt class="sig sig-object py" id="perda.core_data_structures.search_indexes.VariableKeywordIndex">
 <em class="property"><span class="pre">pydantic</span> <span class="pre">model</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">perda.core_data_structures.search_indexes.</span></span><span class="sig-name descname"><span class="pre">VariableKeywordIndex</span></span><a class="reference internal" href="../_modules/perda/core_data_structures/search_indexes.html#VariableKeywordIndex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.core_data_structures.search_indexes.VariableKeywordIndex" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
-<p>Normalized searchable text per variable, built once at parse time.</p>
+<p>Normalized searchable text per variable.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Fields<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><a class="reference internal" href="#perda.core_data_structures.search_indexes.VariableKeywordIndex.normalized_text" title="perda.core_data_structures.search_indexes.VariableKeywordIndex.normalized_text"><code class="xref py py-obj docutils literal notranslate"><span class="pre">normalized_text</span> <span class="pre">(list[str])</span></code></a></p></li>
-<li><p><a class="reference internal" href="#perda.core_data_structures.search_indexes.VariableKeywordIndex.row_to_var_id" title="perda.core_data_structures.search_indexes.VariableKeywordIndex.row_to_var_id"><code class="xref py py-obj docutils literal notranslate"><span class="pre">row_to_var_id</span> <span class="pre">(list[int])</span></code></a></p></li>
+<li><p><a class="reference internal" href="#perda.core_data_structures.search_indexes.VariableKeywordIndex.id_to_normalized_text" title="perda.core_data_structures.search_indexes.VariableKeywordIndex.id_to_normalized_text"><code class="xref py py-obj docutils literal notranslate"><span class="pre">id_to_normalized_text</span> <span class="pre">(dict[int,</span> <span class="pre">str])</span></code></a></p></li>
 </ul>
 </dd>
 </dl>
 <dl class="py attribute pydantic_field">
-<dt class="sig sig-object py" id="perda.core_data_structures.search_indexes.VariableKeywordIndex.row_to_var_id">
-<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">row_to_var_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code><span class="pre">[</span><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code><span class="pre">]</span></em><em class="property"> <span class="pre">[Required]</span></em><a class="headerlink" href="#perda.core_data_structures.search_indexes.VariableKeywordIndex.row_to_var_id" title="Link to this definition">#</a></dt>
-<dd><p>Maps index row position to variable ID</p>
-</dd></dl>
-
-<dl class="py attribute pydantic_field">
-<dt class="sig sig-object py" id="perda.core_data_structures.search_indexes.VariableKeywordIndex.normalized_text">
-<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">normalized_text</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code><span class="pre">[</span><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><span class="pre">]</span></em><em class="property"> <span class="pre">[Required]</span></em><a class="headerlink" href="#perda.core_data_structures.search_indexes.VariableKeywordIndex.normalized_text" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="perda.core_data_structures.search_indexes.VariableKeywordIndex.id_to_normalized_text">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">id_to_normalized_text</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code><span class="pre">[</span><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code><span class="pre">,</span> <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><span class="pre">]</span></em><em class="property"> <span class="pre">[Required]</span></em><a class="headerlink" href="#perda.core_data_structures.search_indexes.VariableKeywordIndex.id_to_normalized_text" title="Link to this definition">#</a></dt>
 <dd><p>Lower-cased text of each variable’s name and description, with camelCase and period boundaries split into separate words</p>
 </dd></dl>
 
@@ -416,7 +410,7 @@
 <dt class="sig sig-object py" id="perda.core_data_structures.search_indexes.VariableSemanticIndex">
 <em class="property"><span class="pre">pydantic</span> <span class="pre">model</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">perda.core_data_structures.search_indexes.</span></span><span class="sig-name descname"><span class="pre">VariableSemanticIndex</span></span><a class="reference internal" href="../_modules/perda/core_data_structures/search_indexes.html#VariableSemanticIndex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.core_data_structures.search_indexes.VariableSemanticIndex" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
-<p>Vector index over variable description embeddings, built once at parse time.</p>
+<p>Vector index over variable description embeddings, keyed by variable ID.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Config<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -425,21 +419,21 @@
 </dd>
 <dt class="field-even">Fields<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
-<li><p><a class="reference internal" href="#perda.core_data_structures.search_indexes.VariableSemanticIndex.faiss_index" title="perda.core_data_structures.search_indexes.VariableSemanticIndex.faiss_index"><code class="xref py py-obj docutils literal notranslate"><span class="pre">faiss_index</span> <span class="pre">(faiss.swigfaiss.IndexFlatIP)</span></code></a></p></li>
-<li><p><a class="reference internal" href="#perda.core_data_structures.search_indexes.VariableSemanticIndex.row_to_var_id" title="perda.core_data_structures.search_indexes.VariableSemanticIndex.row_to_var_id"><code class="xref py py-obj docutils literal notranslate"><span class="pre">row_to_var_id</span> <span class="pre">(list[int])</span></code></a></p></li>
+<li><p><a class="reference internal" href="#perda.core_data_structures.search_indexes.VariableSemanticIndex.faiss_index" title="perda.core_data_structures.search_indexes.VariableSemanticIndex.faiss_index"><code class="xref py py-obj docutils literal notranslate"><span class="pre">faiss_index</span> <span class="pre">(faiss.swigfaiss.IndexIDMap2)</span></code></a></p></li>
+<li><p><a class="reference internal" href="#perda.core_data_structures.search_indexes.VariableSemanticIndex.id_to_descript" title="perda.core_data_structures.search_indexes.VariableSemanticIndex.id_to_descript"><code class="xref py py-obj docutils literal notranslate"><span class="pre">id_to_descript</span> <span class="pre">(dict[int,</span> <span class="pre">str])</span></code></a></p></li>
 </ul>
 </dd>
 </dl>
 <dl class="py attribute pydantic_field">
 <dt class="sig sig-object py" id="perda.core_data_structures.search_indexes.VariableSemanticIndex.faiss_index">
-<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">faiss_index</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">IndexFlatIP</span></code></em><em class="property"> <span class="pre">[Required]</span></em><a class="headerlink" href="#perda.core_data_structures.search_indexes.VariableSemanticIndex.faiss_index" title="Link to this definition">#</a></dt>
-<dd><p>Inner-product index holding L2-normalized description vectors</p>
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">faiss_index</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">IndexIDMap2</span></code></em><em class="property"> <span class="pre">[Required]</span></em><a class="headerlink" href="#perda.core_data_structures.search_indexes.VariableSemanticIndex.faiss_index" title="Link to this definition">#</a></dt>
+<dd><p>Inner-product index holding L2-normalized description vectors, with variable IDs as FAISS IDs</p>
 </dd></dl>
 
 <dl class="py attribute pydantic_field">
-<dt class="sig sig-object py" id="perda.core_data_structures.search_indexes.VariableSemanticIndex.row_to_var_id">
-<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">row_to_var_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code><span class="pre">[</span><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code><span class="pre">]</span></em><em class="property"> <span class="pre">[Required]</span></em><a class="headerlink" href="#perda.core_data_structures.search_indexes.VariableSemanticIndex.row_to_var_id" title="Link to this definition">#</a></dt>
-<dd><p>Maps index row position to variable ID</p>
+<dt class="sig sig-object py" id="perda.core_data_structures.search_indexes.VariableSemanticIndex.id_to_descript">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">id_to_descript</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code><span class="pre">[</span><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code><span class="pre">,</span> <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><span class="pre">]</span></em><em class="property"> <span class="pre">[Required]</span></em><a class="headerlink" href="#perda.core_data_structures.search_indexes.VariableSemanticIndex.id_to_descript" title="Link to this definition">#</a></dt>
+<dd><p>Description each stored vector was embedded from</p>
 </dd></dl>
 
 </dd></dl>
@@ -453,8 +447,7 @@
 <dd class="field-odd"><p><strong>text</strong> (<em>str</em>) – Raw text, such as a C++ variable name joined with its description.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Normalized text, e.g. “pcm.wheelSpeeds.frontRight” becomes
-“pcm wheel speeds front right”.</p>
+<dd class="field-even"><p>Normalized text, e.g. “pcm.wheelSpeeds.frontRight” becomes “pcm wheel speeds front right”.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>str</p>
@@ -474,7 +467,7 @@
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Normalized text for each variable, aligned with <code class="docutils literal notranslate"><span class="pre">row_to_var_id</span></code>.</p>
+<dd class="field-even"><p>Normalized text for each variable, keyed by variable ID.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="#perda.core_data_structures.search_indexes.VariableKeywordIndex" title="perda.core_data_structures.search_indexes.VariableKeywordIndex">VariableKeywordIndex</a></p>
@@ -504,11 +497,11 @@
       </div>
     </a>
     <a class="right-next"
-       href="perda.core_data_structures.single_run_data.html"
+       href="perda.core_data_structures.semantic_embedding.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">perda.core_data_structures.single_run_data</p>
+        <p class="prev-next-title">perda.core_data_structures.semantic_embedding</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -532,13 +525,12 @@
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.core_data_structures.search_indexes.VariableKeywordIndex"><code class="docutils literal notranslate"><span class="pre">VariableKeywordIndex</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.core_data_structures.search_indexes.VariableKeywordIndex.row_to_var_id"><code class="docutils literal notranslate"><span class="pre">VariableKeywordIndex.row_to_var_id</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.core_data_structures.search_indexes.VariableKeywordIndex.normalized_text"><code class="docutils literal notranslate"><span class="pre">VariableKeywordIndex.normalized_text</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.core_data_structures.search_indexes.VariableKeywordIndex.id_to_normalized_text"><code class="docutils literal notranslate"><span class="pre">VariableKeywordIndex.id_to_normalized_text</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.core_data_structures.search_indexes.VariableSemanticIndex"><code class="docutils literal notranslate"><span class="pre">VariableSemanticIndex</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.core_data_structures.search_indexes.VariableSemanticIndex.faiss_index"><code class="docutils literal notranslate"><span class="pre">VariableSemanticIndex.faiss_index</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.core_data_structures.search_indexes.VariableSemanticIndex.row_to_var_id"><code class="docutils literal notranslate"><span class="pre">VariableSemanticIndex.row_to_var_id</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.core_data_structures.search_indexes.VariableSemanticIndex.id_to_descript"><code class="docutils literal notranslate"><span class="pre">VariableSemanticIndex.id_to_descript</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.core_data_structures.search_indexes.normalize_search_text"><code class="docutils literal notranslate"><span class="pre">normalize_search_text()</span></code></a></li>

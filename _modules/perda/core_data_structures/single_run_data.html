@@ -316,8 +316,10 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">.search_indexes</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">VariableKeywordIndex</span><span class="p">,</span>
     <span class="n">VariableSemanticIndex</span><span class="p">,</span>
+    <span class="n">normalize_search_text</span><span class="p">,</span>
     <span class="n">variable_keyword_index_from_csv_mappings</span><span class="p">,</span>
 <span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.semantic_embedding</span><span class="w"> </span><span class="kn">import</span> <span class="n">clone_semantic_index</span><span class="p">,</span> <span class="n">update_semantic_index</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.summarize</span><span class="w"> </span><span class="kn">import</span> <span class="n">summarize_run</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.variable_patterns</span><span class="w"> </span><span class="kn">import</span> <span class="n">is_pattern</span><span class="p">,</span> <span class="n">match_pattern</span>
 
@@ -393,15 +395,13 @@
         <span class="n">description</span><span class="o">=</span><span class="s2">"Vector index over variable descriptions. None when semantic search is disabled or unavailable"</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">keyword_index</span><span class="p">:</span> <span class="n">VariableKeywordIndex</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
-        <span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">VariableKeywordIndex</span><span class="p">(</span>
-            <span class="n">row_to_var_id</span><span class="o">=</span><span class="p">[],</span> <span class="n">normalized_text</span><span class="o">=</span><span class="p">[]</span>
-        <span class="p">),</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">VariableKeywordIndex</span><span class="p">(</span><span class="n">id_to_normalized_text</span><span class="o">=</span><span class="p">{}),</span>
         <span class="n">description</span><span class="o">=</span><span class="s2">"Normalized name and description text backing keyword search"</span><span class="p">,</span>
     <span class="p">)</span>
 
     <span class="nd">@model_validator</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">"after"</span><span class="p">)</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_build_keyword_index</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SingleRunData</span><span class="p">:</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">keyword_index</span><span class="o">.</span><span class="n">row_to_var_id</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">keyword_index</span><span class="o">.</span><span class="n">id_to_normalized_text</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">keyword_index</span> <span class="o">=</span> <span class="n">variable_keyword_index_from_csv_mappings</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">id_to_cpp_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">id_to_descript</span>
             <span class="p">)</span>
@@ -448,8 +448,10 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">"Cannot assign </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">instances</span><span class="p">)</span><span class="si">}</span><span class="s2"> DataInstance(s) to </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">cpp_names</span><span class="p">)</span><span class="si">}</span><span class="s2"> variable(s): </span><span class="si">{</span><span class="n">cpp_names</span><span class="si">}</span><span class="s2">"</span>
             <span class="p">)</span>
-        <span class="k">for</span> <span class="n">cpp_name</span><span class="p">,</span> <span class="n">di</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">cpp_names</span><span class="p">,</span> <span class="n">instances</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_assign</span><span class="p">(</span><span class="n">cpp_name</span><span class="p">,</span> <span class="n">di</span><span class="p">)</span>
+        <span class="n">var_ids</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_assign</span><span class="p">(</span><span class="n">cpp_name</span><span class="p">,</span> <span class="n">di</span><span class="p">)</span> <span class="k">for</span> <span class="n">cpp_name</span><span class="p">,</span> <span class="n">di</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">cpp_names</span><span class="p">,</span> <span class="n">instances</span><span class="p">)</span>
+        <span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_search_indexes</span><span class="p">(</span><span class="n">var_ids</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""Summary of the run: logging unit, time range in seconds, and variable and point counts."""</span>
@@ -499,8 +501,12 @@
             <span class="n">data_start_time</span><span class="o">=</span><span class="n">start</span><span class="p">,</span>
             <span class="n">data_end_time</span><span class="o">=</span><span class="n">end</span><span class="p">,</span>
             <span class="n">timestamp_unit</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timestamp_unit</span><span class="p">,</span>
-            <span class="n">semantic_index</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">semantic_index</span><span class="p">,</span>
-            <span class="n">keyword_index</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">keyword_index</span><span class="p">,</span>
+            <span class="n">semantic_index</span><span class="o">=</span><span class="p">(</span>
+                <span class="kc">None</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">semantic_index</span> <span class="ow">is</span> <span class="kc">None</span>
+                <span class="k">else</span> <span class="n">clone_semantic_index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">semantic_index</span><span class="p">)</span>
+            <span class="p">),</span>
+            <span class="n">keyword_index</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">keyword_index</span><span class="o">.</span><span class="n">model_copy</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
         <span class="p">)</span></div>
 
 
@@ -565,7 +571,7 @@
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"No variable names match pattern: </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">names</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_assign</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cpp_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">di</span><span class="p">:</span> <span class="n">DataInstance</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_assign</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cpp_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">di</span><span class="p">:</span> <span class="n">DataInstance</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">cpp_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cpp_name_to_id</span><span class="p">:</span>
             <span class="n">var_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cpp_name_to_id</span><span class="p">[</span><span class="n">cpp_name</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">di</span><span class="o">.</span><span class="n">var_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">di</span><span class="o">.</span><span class="n">var_id</span> <span class="o">!=</span> <span class="n">var_id</span><span class="p">:</span>
@@ -576,6 +582,7 @@
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                     <span class="sa">f</span><span class="s2">"Cannot store DataInstance named '</span><span class="si">{</span><span class="n">di</span><span class="o">.</span><span class="n">cpp_name</span><span class="si">}</span><span class="s2">' under '</span><span class="si">{</span><span class="n">cpp_name</span><span class="si">}</span><span class="s2">'"</span>
                 <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">total_data_points</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">di</span><span class="p">)</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id_to_instance</span><span class="p">[</span><span class="n">var_id</span><span class="p">])</span>
             <span class="n">label</span> <span class="o">=</span> <span class="n">di</span><span class="o">.</span><span class="n">label</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">id_to_instance</span><span class="p">[</span><span class="n">var_id</span><span class="p">]</span><span class="o">.</span><span class="n">label</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">id_to_instance</span><span class="p">[</span><span class="n">var_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">DataInstance</span><span class="p">(</span>
                 <span class="n">timestamp_np</span><span class="o">=</span><span class="n">di</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">,</span>
@@ -585,9 +592,10 @@
                 <span class="n">cpp_name</span><span class="o">=</span><span class="n">cpp_name</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">id_to_descript</span><span class="p">[</span><span class="n">var_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">label</span> <span class="ow">or</span> <span class="s2">""</span>
-            <span class="k">return</span>
+            <span class="k">return</span> <span class="n">var_id</span>
 
         <span class="n">var_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_free_var_id</span><span class="p">(</span><span class="n">di</span><span class="o">.</span><span class="n">var_id</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">total_data_points</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">di</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">id_to_instance</span><span class="p">[</span><span class="n">var_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">DataInstance</span><span class="p">(</span>
             <span class="n">timestamp_np</span><span class="o">=</span><span class="n">di</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">,</span>
             <span class="n">value_np</span><span class="o">=</span><span class="n">di</span><span class="o">.</span><span class="n">value_np</span><span class="p">,</span>
@@ -598,6 +606,18 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">cpp_name_to_id</span><span class="p">[</span><span class="n">cpp_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">var_id</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">id_to_cpp_name</span><span class="p">[</span><span class="n">var_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">cpp_name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">id_to_descript</span><span class="p">[</span><span class="n">var_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">di</span><span class="o">.</span><span class="n">label</span> <span class="ow">or</span> <span class="s2">""</span>
+        <span class="k">return</span> <span class="n">var_id</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_update_search_indexes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var_ids</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">var_id</span> <span class="ow">in</span> <span class="n">var_ids</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">keyword_index</span><span class="o">.</span><span class="n">id_to_normalized_text</span><span class="p">[</span><span class="n">var_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">normalize_search_text</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">id_to_cpp_name</span><span class="p">[</span><span class="n">var_id</span><span class="p">]</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">id_to_descript</span><span class="p">[</span><span class="n">var_id</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">semantic_index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">update_semantic_index</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">semantic_index</span><span class="p">,</span>
+                <span class="p">{</span><span class="n">var_id</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">id_to_descript</span><span class="p">[</span><span class="n">var_id</span><span class="p">]</span> <span class="k">for</span> <span class="n">var_id</span> <span class="ow">in</span> <span class="n">var_ids</span><span class="p">},</span>
+            <span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_free_var_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">preferred</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">preferred</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">preferred</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">id_to_instance</span><span class="p">:</span>

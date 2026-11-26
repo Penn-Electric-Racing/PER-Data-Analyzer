@@ -305,25 +305,16 @@
 <span></span><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">lru_cache</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span>
 
-<span class="kn">import</span><span class="w"> </span><span class="nn">faiss</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">numpy.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">NDArray</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">Field</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">rapidfuzz</span><span class="w"> </span><span class="kn">import</span> <span class="n">fuzz</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">..constants</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">SECTION_DIVIDER</span><span class="p">,</span>
-    <span class="n">SENTENCE_EMBEDDING_DIMENSION</span><span class="p">,</span>
-    <span class="n">SENTENCE_EMBEDDING_MODEL_ID</span><span class="p">,</span>
-    <span class="n">title_block</span><span class="p">,</span>
-<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">SECTION_DIVIDER</span><span class="p">,</span> <span class="n">title_block</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..core_data_structures.search_indexes</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">VariableSemanticIndex</span><span class="p">,</span>
     <span class="n">normalize_search_text</span><span class="p">,</span>
 <span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..core_data_structures.semantic_embedding</span><span class="w"> </span><span class="kn">import</span> <span class="n">embed_texts</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..core_data_structures.single_run_data</span><span class="w"> </span><span class="kn">import</span> <span class="n">SingleRunData</span>
 
 <span class="n">SCORE_COLUMN_WIDTH</span> <span class="o">=</span> <span class="mi">7</span>
@@ -349,85 +340,6 @@
             <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">cpp_name</span><span class="si">:</span><span class="s2">&lt;</span><span class="si">{</span><span class="n">NAME_COLUMN_WIDTH</span><span class="si">}}</span><span class="s2">  "</span>
             <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">descript</span><span class="si">}</span><span class="s2">"</span>
         <span class="p">)</span></div>
-
-
-
-<span class="nd">@lru_cache</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">_load_encoder</span><span class="p">(</span><span class="n">model_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span> <span class="n">NDArray</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Load a sentence-transformers model and return its bound encode callable. Cached so</span>
-<span class="sd">    the model is loaded at most once per process and shared by every run.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    model_id : str</span>
-<span class="sd">        HuggingFace identifier of the model to load.</span>
-
-<span class="sd">    Notes</span>
-<span class="sd">    -----</span>
-<span class="sd">    Raises ImportError when the ``semantic`` extra is absent; callers are expected to</span>
-<span class="sd">    catch that and fall back to keyword search. Callers coerce the returned vectors to</span>
-<span class="sd">    float32, so the encoder's own dtype is not relied on.</span>
-<span class="sd">    """</span>
-    <span class="kn">from</span><span class="w"> </span><span class="nn">sentence_transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">SentenceTransformer</span>
-
-    <span class="k">return</span> <span class="n">SentenceTransformer</span><span class="p">(</span><span class="n">model_id</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span>
-
-
-<div class="viewcode-block" id="build_semantic_index">
-<a class="viewcode-back" href="../../../_autosummary/perda.utils.search.html#perda.utils.search.build_semantic_index">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">build_semantic_index</span><span class="p">(</span>
-    <span class="n">id_to_descript</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">VariableSemanticIndex</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Encode every variable description into a L2-normalized and FAISS inner-product index.</span>
-<span class="sd">    Cosine similarity scores range [-1, 1].</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    id_to_descript : dict[int, str]</span>
-<span class="sd">        Mapping from variable ID to its human-readable description.</span>
-<span class="sd">    verbose : int, optional</span>
-<span class="sd">        Verbosity level. 0 for no output, 1 or higher for status and warnings. Default is 1.</span>
-
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    VariableSemanticIndex | None</span>
-<span class="sd">        The built index, or None if the optional dependencies or model are unavailable.</span>
-<span class="sd">    """</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">id_to_descript</span><span class="p">:</span>
-        <span class="k">return</span> <span class="kc">None</span>
-
-    <span class="k">try</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">verbose</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">"Building semantic search index..."</span><span class="p">)</span>
-
-        <span class="n">encode</span> <span class="o">=</span> <span class="n">_load_encoder</span><span class="p">(</span><span class="n">SENTENCE_EMBEDDING_MODEL_ID</span><span class="p">)</span>
-        <span class="n">descriptions</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">id_to_descript</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
-        <span class="n">vectors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">encode</span><span class="p">(</span><span class="n">descriptions</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
-
-        <span class="n">faiss</span><span class="o">.</span><span class="n">normalize_L2</span><span class="p">(</span><span class="n">vectors</span><span class="p">)</span>
-        <span class="n">faiss_index</span> <span class="o">=</span> <span class="n">faiss</span><span class="o">.</span><span class="n">IndexFlatIP</span><span class="p">(</span><span class="n">SENTENCE_EMBEDDING_DIMENSION</span><span class="p">)</span>
-        <span class="n">faiss_index</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">vectors</span><span class="p">)</span>
-
-        <span class="k">return</span> <span class="n">VariableSemanticIndex</span><span class="p">(</span>
-            <span class="n">faiss_index</span><span class="o">=</span><span class="n">faiss_index</span><span class="p">,</span>
-            <span class="n">row_to_var_id</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">id_to_descript</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span>
-        <span class="p">)</span>
-    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">verbose</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span>
-                <span class="s2">"Warning: sentence-transformers is not installed. "</span>
-                <span class="s2">"Falling back to keyword-only search."</span>
-            <span class="p">)</span>
-        <span class="k">return</span> <span class="kc">None</span>
-    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">verbose</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">"Warning: semantic index unavailable (</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">). "</span>
-                <span class="s2">"Falling back to keyword-only search."</span>
-            <span class="p">)</span>
-        <span class="k">return</span> <span class="kc">None</span></div>
 
 
 
@@ -492,35 +404,30 @@
     <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">top_n</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">SearchResult</span><span class="p">]:</span>
-    <span class="n">encode</span> <span class="o">=</span> <span class="n">_load_encoder</span><span class="p">(</span><span class="n">SENTENCE_EMBEDDING_MODEL_ID</span><span class="p">)</span>
-    <span class="n">query_vector</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">encode</span><span class="p">([</span><span class="n">query</span><span class="p">]),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
-    <span class="n">faiss</span><span class="o">.</span><span class="n">normalize_L2</span><span class="p">(</span><span class="n">query_vector</span><span class="p">)</span>
-
     <span class="n">num_results</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">top_n</span><span class="p">,</span> <span class="n">index</span><span class="o">.</span><span class="n">faiss_index</span><span class="o">.</span><span class="n">ntotal</span><span class="p">)</span>
-    <span class="n">scores</span><span class="p">,</span> <span class="n">rows</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">faiss_index</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">query_vector</span><span class="p">,</span> <span class="n">num_results</span><span class="p">)</span>
+    <span class="n">scores</span><span class="p">,</span> <span class="n">var_ids</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">faiss_index</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">embed_texts</span><span class="p">([</span><span class="n">query</span><span class="p">]),</span> <span class="n">num_results</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="p">[</span>
         <span class="n">SearchResult</span><span class="p">(</span>
             <span class="n">rank</span><span class="o">=</span><span class="n">rank</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
             <span class="n">score</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">score</span><span class="p">),</span>
-            <span class="n">var_id</span><span class="o">=</span><span class="n">index</span><span class="o">.</span><span class="n">row_to_var_id</span><span class="p">[</span><span class="n">row</span><span class="p">],</span>
-            <span class="n">cpp_name</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">id_to_cpp_name</span><span class="p">[</span><span class="n">index</span><span class="o">.</span><span class="n">row_to_var_id</span><span class="p">[</span><span class="n">row</span><span class="p">]],</span>
-            <span class="n">descript</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">id_to_descript</span><span class="p">[</span><span class="n">index</span><span class="o">.</span><span class="n">row_to_var_id</span><span class="p">[</span><span class="n">row</span><span class="p">]],</span>
+            <span class="n">var_id</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">var_id</span><span class="p">),</span>
+            <span class="n">cpp_name</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">id_to_cpp_name</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">var_id</span><span class="p">)],</span>
+            <span class="n">descript</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">id_to_descript</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">var_id</span><span class="p">)],</span>
         <span class="p">)</span>
-        <span class="k">for</span> <span class="n">rank</span><span class="p">,</span> <span class="p">(</span><span class="n">score</span><span class="p">,</span> <span class="n">row</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">scores</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">rows</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
-        <span class="k">if</span> <span class="n">row</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">for</span> <span class="n">rank</span><span class="p">,</span> <span class="p">(</span><span class="n">score</span><span class="p">,</span> <span class="n">var_id</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">scores</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">var_ids</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="k">if</span> <span class="n">var_id</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span>
     <span class="p">]</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_keyword_search</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">SingleRunData</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">top_n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">SearchResult</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">"""Rank variables by fuzzy matching query terms against normalized text."""</span>
     <span class="n">query_terms</span> <span class="o">=</span> <span class="n">normalize_search_text</span><span class="p">(</span><span class="n">query</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
-    <span class="n">index</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">keyword_index</span>
 
     <span class="n">ranked</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
         <span class="p">(</span>
-            <span class="p">(</span><span class="n">keyword_score</span><span class="p">(</span><span class="n">query_terms</span><span class="p">,</span> <span class="n">text</span><span class="p">),</span> <span class="n">index</span><span class="o">.</span><span class="n">row_to_var_id</span><span class="p">[</span><span class="n">row</span><span class="p">])</span>
-            <span class="k">for</span> <span class="n">row</span><span class="p">,</span> <span class="n">text</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">index</span><span class="o">.</span><span class="n">normalized_text</span><span class="p">)</span>
+            <span class="p">(</span><span class="n">keyword_score</span><span class="p">(</span><span class="n">query_terms</span><span class="p">,</span> <span class="n">text</span><span class="p">),</span> <span class="n">var_id</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">var_id</span><span class="p">,</span> <span class="n">text</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">keyword_index</span><span class="o">.</span><span class="n">id_to_normalized_text</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
         <span class="p">),</span>
         <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">scored</span><span class="p">:</span> <span class="n">scored</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
         <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>

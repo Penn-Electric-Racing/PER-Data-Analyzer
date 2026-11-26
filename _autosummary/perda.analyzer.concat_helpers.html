@@ -276,6 +276,7 @@
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.masking.html">perda.core_data_structures.masking</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.resampling.html">perda.core_data_structures.resampling</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.search_indexes.html">perda.core_data_structures.search_indexes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.semantic_embedding.html">perda.core_data_structures.semantic_embedding</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.single_run_data.html">perda.core_data_structures.single_run_data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.summarize.html">perda.core_data_structures.summarize</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.variable_patterns.html">perda.core_data_structures.variable_patterns</a></li>
@@ -388,10 +389,8 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="perda.analyzer.concat_helpers.concat">
 <span class="sig-prename descclassname"><span class="pre">perda.analyzer.concat_helpers.</span></span><span class="sig-name descname"><span class="pre">concat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">first</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">second</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/analyzer/concat_helpers.html#concat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.analyzer.concat_helpers.concat" title="Link to this definition">#</a></dt>
-<dd><p>Concatenate two Analyzers sequentially in time.</p>
-<p>Variables are matched by cpp_name. Unmatched variables are kept with
-data from only the run that has them. If the two runs use different
-timestamp units the ms run is upscaled to us.</p>
+<dd><p>Concatenate two Analyzers sequentially in time by concatenating their SingleRunData objects.
+See <a class="reference internal" href="#perda.analyzer.concat_helpers.concat_single_run_data" title="perda.analyzer.concat_helpers.concat_single_run_data"><code class="xref py py-func docutils literal notranslate"><span class="pre">concat_single_run_data()</span></code></a> for details on how variables are matched and timestamps are shifted.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -400,17 +399,40 @@ timestamp units the ms run is upscaled to us.</p>
 <li><p><strong>gap</strong> (<em>int</em>) – Gap in timestamp units between the two runs. Default is 1.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>New Analyzer containing the concatenated data</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="perda.analyzer.analyzer.html#perda.analyzer.analyzer.Analyzer" title="perda.analyzer.analyzer.Analyzer">Analyzer</a></p>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="perda.analyzer.analyzer.html#perda.analyzer.analyzer.Analyzer" title="perda.analyzer.analyzer.Analyzer">Analyzer</a></p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">perda.analyzer</span><span class="w"> </span><span class="kn">import</span> <span class="n">concat</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">merged</span> <span class="o">=</span> <span class="n">concat</span><span class="p">(</span><span class="n">aly1</span><span class="p">,</span> <span class="n">aly2</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span> <span class="o">=</span> <span class="n">merged</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s2">"bms.pack.voltage"</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="perda.analyzer.concat_helpers.concat_single_run_data">
+<span class="sig-prename descclassname"><span class="pre">perda.analyzer.concat_helpers.</span></span><span class="sig-name descname"><span class="pre">concat_single_run_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">first</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">second</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/analyzer/concat_helpers.html#concat_single_run_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.analyzer.concat_helpers.concat_single_run_data" title="Link to this definition">#</a></dt>
+<dd><p>Concatenate two SingleRunData objects sequentially in time.</p>
+<p>The second run’s timestamps are shifted so they start <code class="docutils literal notranslate"><span class="pre">gap</span></code> units after the first run ends.
+Variables are matched by <code class="docutils literal notranslate"><span class="pre">cpp_name</span></code>; unmatched variables appear in the result with data from only one run.</p>
+<p>If the two runs use different timestamp units (ms vs us), the ms run is
+upscaled to us so the result is in microseconds.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>first</strong> (<a class="reference internal" href="perda.core_data_structures.single_run_data.html#perda.core_data_structures.single_run_data.SingleRunData" title="perda.core_data_structures.single_run_data.SingleRunData"><em>SingleRunData</em></a>) – First run (earlier in time)</p></li>
+<li><p><strong>second</strong> (<a class="reference internal" href="perda.core_data_structures.single_run_data.html#perda.core_data_structures.single_run_data.SingleRunData" title="perda.core_data_structures.single_run_data.SingleRunData"><em>SingleRunData</em></a>) – Second run (appended after first)</p></li>
+<li><p><strong>gap</strong> (<em>int</em>) – Gap in timestamp units inserted between the two runs. Default is 1.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="perda.core_data_structures.single_run_data.html#perda.core_data_structures.single_run_data.SingleRunData" title="perda.core_data_structures.single_run_data.SingleRunData">SingleRunData</a></p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">merged</span> <span class="o">=</span> <span class="n">concat_single_run_data</span><span class="p">(</span><span class="n">aly1</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">aly2</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -465,6 +487,7 @@ timestamp units the ms run is upscaled to us.</p>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.analyzer.concat_helpers.concat"><code class="docutils literal notranslate"><span class="pre">concat()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.analyzer.concat_helpers.concat_single_run_data"><code class="docutils literal notranslate"><span class="pre">concat_single_run_data()</span></code></a></li>
 </ul>
   </nav></div>
 

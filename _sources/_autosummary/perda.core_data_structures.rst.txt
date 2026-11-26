@@ -19,6 +19,7 @@ perda.core\_data\_structures
    masking
    resampling
    search_indexes
+   semantic_embedding
    single_run_data
    summarize
    variable_patterns

@@ -322,8 +322,7 @@
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    str</span>
-<span class="sd">        Normalized text, e.g. "pcm.wheelSpeeds.frontRight" becomes</span>
-<span class="sd">        "pcm wheel speeds front right".</span>
+<span class="sd">        Normalized text, e.g. "pcm.wheelSpeeds.frontRight" becomes "pcm wheel speeds front right".</span>
 <span class="sd">    """</span>
     <span class="n">spaced</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">"([a-z0-9])([A-Z])"</span><span class="p">,</span> <span class="sa">r</span><span class="s2">"\1 \2"</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"."</span><span class="p">,</span> <span class="s2">" "</span><span class="p">)</span>
     <span class="k">return</span> <span class="s2">" "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">spaced</span><span class="o">.</span><span class="n">split</span><span class="p">())</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span></div>
@@ -333,12 +332,9 @@
 <div class="viewcode-block" id="VariableKeywordIndex">
 <a class="viewcode-back" href="../../../_autosummary/perda.core_data_structures.search_indexes.html#perda.core_data_structures.search_indexes.VariableKeywordIndex">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">VariableKeywordIndex</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""Normalized searchable text per variable, built once at parse time."""</span>
+<span class="w">    </span><span class="sd">"""Normalized searchable text per variable."""</span>
 
-    <span class="n">row_to_var_id</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
-        <span class="n">description</span><span class="o">=</span><span class="s2">"Maps index row position to variable ID"</span>
-    <span class="p">)</span>
-    <span class="n">normalized_text</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+    <span class="n">id_to_normalized_text</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
         <span class="n">description</span><span class="o">=</span><span class="s2">"Lower-cased text of each variable's name and description, with "</span>
         <span class="s2">"camelCase and period boundaries split into separate words"</span>
     <span class="p">)</span></div>
@@ -348,15 +344,16 @@
 <div class="viewcode-block" id="VariableSemanticIndex">
 <a class="viewcode-back" href="../../../_autosummary/perda.core_data_structures.search_indexes.html#perda.core_data_structures.search_indexes.VariableSemanticIndex">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">VariableSemanticIndex</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""Vector index over variable description embeddings, built once at parse time."""</span>
+<span class="w">    </span><span class="sd">"""Vector index over variable description embeddings, keyed by variable ID."""</span>
 
     <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span><span class="n">arbitrary_types_allowed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-    <span class="n">faiss_index</span><span class="p">:</span> <span class="n">faiss</span><span class="o">.</span><span class="n">IndexFlatIP</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
-        <span class="n">description</span><span class="o">=</span><span class="s2">"Inner-product index holding L2-normalized description vectors"</span>
+    <span class="n">faiss_index</span><span class="p">:</span> <span class="n">faiss</span><span class="o">.</span><span class="n">IndexIDMap2</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">"Inner-product index holding L2-normalized description vectors, "</span>
+        <span class="s2">"with variable IDs as FAISS IDs"</span>
     <span class="p">)</span>
-    <span class="n">row_to_var_id</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
-        <span class="n">description</span><span class="o">=</span><span class="s2">"Maps index row position to variable ID"</span>
+    <span class="n">id_to_descript</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">"Description each stored vector was embedded from"</span>
     <span class="p">)</span></div>
 
 
@@ -379,18 +376,15 @@
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    VariableKeywordIndex</span>
-<span class="sd">        Normalized text for each variable, aligned with ``row_to_var_id``.</span>
+<span class="sd">        Normalized text for each variable, keyed by variable ID.</span>
 <span class="sd">    """</span>
-    <span class="n">var_ids</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">id_to_cpp_name</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
-
     <span class="k">return</span> <span class="n">VariableKeywordIndex</span><span class="p">(</span>
-        <span class="n">row_to_var_id</span><span class="o">=</span><span class="n">var_ids</span><span class="p">,</span>
-        <span class="n">normalized_text</span><span class="o">=</span><span class="p">[</span>
-            <span class="n">normalize_search_text</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">id_to_cpp_name</span><span class="p">[</span><span class="n">var_id</span><span class="p">]</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">id_to_descript</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">var_id</span><span class="p">,</span><span class="w"> </span><span class="s1">''</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
+        <span class="n">id_to_normalized_text</span><span class="o">=</span><span class="p">{</span>
+            <span class="n">var_id</span><span class="p">:</span> <span class="n">normalize_search_text</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">cpp_name</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">id_to_descript</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">var_id</span><span class="p">,</span><span class="w"> </span><span class="s1">''</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
             <span class="p">)</span>
-            <span class="k">for</span> <span class="n">var_id</span> <span class="ow">in</span> <span class="n">var_ids</span>
-        <span class="p">],</span>
+            <span class="k">for</span> <span class="n">var_id</span><span class="p">,</span> <span class="n">cpp_name</span> <span class="ow">in</span> <span class="n">id_to_cpp_name</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+        <span class="p">}</span>
     <span class="p">)</span></div>
 
 </pre></div>
