@@ -187,9 +187,10 @@ class DataInstance(BaseModel):
         self,
         ts_start: float | None = None,
         ts_end: float | None = None,
+        offset: float = 0.0,
     ) -> DataInstance:
         """
-        Return a new DataInstance containing only points within the given timestamp range.
+        Return a new DataInstance with only the points in a timestamp range, optionally time-shifted.
 
         Parameters
         ----------
@@ -197,25 +198,46 @@ class DataInstance(BaseModel):
             Lower bound in raw timestamp units (inclusive). Default is None (no lower bound).
         ts_end : float | None, optional
             Upper bound in raw timestamp units (inclusive). Default is None (no upper bound).
+        offset : float, optional
+            Amount to shift the signal by in raw timestamp units (positive moves it later). Default is 0.0.
 
         Returns
         -------
         DataInstance
-            New DataInstance with only in-range data points.
+            New DataInstance with only in-range data points, with values shifted by ``offset``.
+
+        Notes
+        -----
+        The shift moves values, not timestamps: each value becomes the signal's value ``offset`` earlier,
+        linearly interpolated, so the result keeps the original timestamp grid. Values shifted in past either
+        end hold the first or last value, and NaN samples are ignored when interpolating. The shift happens
+        before trimming, so values from just outside the window can move into it.
 
         Examples
         --------
         >>> clipped = di.trim(ts_start=10_000, ts_end=30_000)
+        >>> delayed = di.trim(offset=from_seconds(0.08, aly.data.timestamp_unit))
         """
-        if ts_start is not None and ts_end is not None:
-            mask = (self.timestamp_np >= ts_start) & (self.timestamp_np <= ts_end)
-        elif ts_start is not None:
-            mask = self.timestamp_np >= ts_start
-        else:
-            mask = self.timestamp_np <= ts_end  # type: ignore[operator]
+        values = self.value_np
+        if offset != 0.0:
+            valid = ~np.isnan(values)
+            if valid.any():
+                timestamps = self.timestamp_np.astype(np.float64)
+                values = np.interp(
+                    timestamps,
+                    timestamps[valid] + offset,
+                    values[valid],
+                )
+
+        mask = np.ones(len(self), dtype=np.bool_)
+        if ts_start is not None:
+            mask &= self.timestamp_np >= ts_start
+        if ts_end is not None:
+            mask &= self.timestamp_np <= ts_end
+
         return DataInstance(
             timestamp_np=self.timestamp_np[mask],
-            value_np=self.value_np[mask],
+            value_np=values[mask],
             label=self.label,
             var_id=self.var_id,
             cpp_name=self.cpp_name,

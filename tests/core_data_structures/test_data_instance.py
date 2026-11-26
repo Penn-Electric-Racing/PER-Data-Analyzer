@@ -236,6 +236,23 @@ def test_trim_returns_new_instance(di_simple):
     assert result is not di_simple
 
 
+@pytest.mark.parametrize(
+    "offset, expected_values",
+    [
+        pytest.param(1.0, [0.0, 1.0], id="later_by_one_sample"),
+        pytest.param(-1.0, [2.0, 3.0], id="earlier_by_one_sample"),
+        pytest.param(0.5, [0.5, 1.5], id="sub_sample"),
+        pytest.param(10_000.0, [0.0, 0.0], id="past_start_holds_first"),
+    ],
+)
+def test_trim_offset_shifts_values_on_original_timestamps(
+    di_simple, offset, expected_values
+):
+    result = di_simple.trim(ts_start=1, ts_end=2, offset=offset)
+    np.testing.assert_array_equal(result.timestamp_np, [1, 2])
+    np.testing.assert_allclose(result.value_np, expected_values)
+
+
 def test_apply_ufunc_left_join_add_matches_operator(di_simple, di_sparse):
     result_ufunc = apply_ufunc_left_join(di_simple, di_sparse, np.add)
     result_op = di_simple + di_sparse
