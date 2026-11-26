@@ -504,9 +504,10 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">ts_start</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">ts_end</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">offset</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataInstance</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Return a new DataInstance containing only points within the given timestamp range.</span>
+<span class="sd">        Return a new DataInstance with only the points in a timestamp range, optionally time-shifted.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -514,25 +515,46 @@
 <span class="sd">            Lower bound in raw timestamp units (inclusive). Default is None (no lower bound).</span>
 <span class="sd">        ts_end : float | None, optional</span>
 <span class="sd">            Upper bound in raw timestamp units (inclusive). Default is None (no upper bound).</span>
+<span class="sd">        offset : float, optional</span>
+<span class="sd">            Amount to shift the signal by in raw timestamp units (positive moves it later). Default is 0.0.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        DataInstance</span>
-<span class="sd">            New DataInstance with only in-range data points.</span>
+<span class="sd">            New DataInstance with only in-range data points, with values shifted by ``offset``.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The shift moves values, not timestamps: each value becomes the signal's value ``offset`` earlier,</span>
+<span class="sd">        linearly interpolated, so the result keeps the original timestamp grid. Values shifted in past either</span>
+<span class="sd">        end hold the first or last value, and NaN samples are ignored when interpolating. The shift happens</span>
+<span class="sd">        before trimming, so values from just outside the window can move into it.</span>
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
 <span class="sd">        &gt;&gt;&gt; clipped = di.trim(ts_start=10_000, ts_end=30_000)</span>
+<span class="sd">        &gt;&gt;&gt; delayed = di.trim(offset=from_seconds(0.08, aly.data.timestamp_unit))</span>
 <span class="sd">        """</span>
-        <span class="k">if</span> <span class="n">ts_start</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">ts_end</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">mask</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">timestamp_np</span> <span class="o">&gt;=</span> <span class="n">ts_start</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">timestamp_np</span> <span class="o">&lt;=</span> <span class="n">ts_end</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">ts_start</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">timestamp_np</span> <span class="o">&gt;=</span> <span class="n">ts_start</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">timestamp_np</span> <span class="o">&lt;=</span> <span class="n">ts_end</span>  <span class="c1"># type: ignore[operator]</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_np</span>
+        <span class="k">if</span> <span class="n">offset</span> <span class="o">!=</span> <span class="mf">0.0</span><span class="p">:</span>
+            <span class="n">valid</span> <span class="o">=</span> <span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">valid</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+                <span class="n">timestamps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">timestamp_np</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+                <span class="n">values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span>
+                    <span class="n">timestamps</span><span class="p">,</span>
+                    <span class="n">timestamps</span><span class="p">[</span><span class="n">valid</span><span class="p">]</span> <span class="o">+</span> <span class="n">offset</span><span class="p">,</span>
+                    <span class="n">values</span><span class="p">[</span><span class="n">valid</span><span class="p">],</span>
+                <span class="p">)</span>
+
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ts_start</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">mask</span> <span class="o">&amp;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">timestamp_np</span> <span class="o">&gt;=</span> <span class="n">ts_start</span>
+        <span class="k">if</span> <span class="n">ts_end</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">mask</span> <span class="o">&amp;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">timestamp_np</span> <span class="o">&lt;=</span> <span class="n">ts_end</span>
+
         <span class="k">return</span> <span class="n">DataInstance</span><span class="p">(</span>
             <span class="n">timestamp_np</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">[</span><span class="n">mask</span><span class="p">],</span>
-            <span class="n">value_np</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">value_np</span><span class="p">[</span><span class="n">mask</span><span class="p">],</span>
+            <span class="n">value_np</span><span class="o">=</span><span class="n">values</span><span class="p">[</span><span class="n">mask</span><span class="p">],</span>
             <span class="n">label</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">,</span>
             <span class="n">var_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">var_id</span><span class="p">,</span>
             <span class="n">cpp_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cpp_name</span><span class="p">,</span>

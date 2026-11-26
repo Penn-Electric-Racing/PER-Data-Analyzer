@@ -315,7 +315,6 @@
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.preprocessing.html">perda.utils.preprocessing</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.search.html">perda.utils.search</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.signal_processing.html">perda.utils.signal_processing</a></li>
-<li class="toctree-l3"><a class="reference internal" href="perda.utils.time_alignment.html">perda.utils.time_alignment</a></li>
 </ul>
 </details></li>
 </ul>
@@ -520,24 +519,31 @@ do the math on <code class="docutils literal notranslate"><span class="pre">.val
 
 <dl class="py method">
 <dt class="sig sig-object py" id="perda.core_data_structures.data_instance.DataInstance.trim">
-<span class="sig-name descname"><span class="pre">trim</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts_start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts_end</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/core_data_structures/data_instance.html#DataInstance.trim"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.core_data_structures.data_instance.DataInstance.trim" title="Link to this definition">#</a></dt>
-<dd><p>Return a new DataInstance containing only points within the given timestamp range.</p>
+<span class="sig-name descname"><span class="pre">trim</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts_start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts_end</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/core_data_structures/data_instance.html#DataInstance.trim"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.core_data_structures.data_instance.DataInstance.trim" title="Link to this definition">#</a></dt>
+<dd><p>Return a new DataInstance with only the points in a timestamp range, optionally time-shifted.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ts_start</strong> (<em>float</em><em> | </em><em>None</em><em>, </em><em>optional</em>) – Lower bound in raw timestamp units (inclusive). Default is None (no lower bound).</p></li>
 <li><p><strong>ts_end</strong> (<em>float</em><em> | </em><em>None</em><em>, </em><em>optional</em>) – Upper bound in raw timestamp units (inclusive). Default is None (no upper bound).</p></li>
+<li><p><strong>offset</strong> (<em>float</em><em>, </em><em>optional</em>) – Amount to shift the signal by in raw timestamp units (positive moves it later). Default is 0.0.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>New DataInstance with only in-range data points.</p>
+<dd class="field-even"><p>New DataInstance with only in-range data points, with values shifted by <code class="docutils literal notranslate"><span class="pre">offset</span></code>.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance">DataInstance</a></p>
 </dd>
 </dl>
+<p class="rubric">Notes</p>
+<p>The shift moves values, not timestamps: each value becomes the signal’s value <code class="docutils literal notranslate"><span class="pre">offset</span></code> earlier,
+linearly interpolated, so the result keeps the original timestamp grid. Values shifted in past either
+end hold the first or last value, and NaN samples are ignored when interpolating. The shift happens
+before trimming, so values from just outside the window can move into it.</p>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">clipped</span> <span class="o">=</span> <span class="n">di</span><span class="o">.</span><span class="n">trim</span><span class="p">(</span><span class="n">ts_start</span><span class="o">=</span><span class="mi">10_000</span><span class="p">,</span> <span class="n">ts_end</span><span class="o">=</span><span class="mi">30_000</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">delayed</span> <span class="o">=</span> <span class="n">di</span><span class="o">.</span><span class="n">trim</span><span class="p">(</span><span class="n">offset</span><span class="o">=</span><span class="n">from_seconds</span><span class="p">(</span><span class="mf">0.08</span><span class="p">,</span> <span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">timestamp_unit</span><span class="p">))</span>
 </pre></div>
 </div>
 </dd></dl>

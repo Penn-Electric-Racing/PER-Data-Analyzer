@@ -23,4 +23,3 @@ perda.utils
    preprocessing
    search
    signal_processing
-   time_alignment
