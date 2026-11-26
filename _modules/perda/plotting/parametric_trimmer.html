@@ -303,11 +303,12 @@
                   
   <h1>Source code for perda.plotting.parametric_trimmer</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ipywidgets</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">widgets</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">plotly.graph_objects</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">go</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="kn">import</span> <span class="n">float64</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">numpy.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">NDArray</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">..units</span><span class="w"> </span><span class="kn">import</span> <span class="n">Timescale</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..units</span><span class="w"> </span><span class="kn">import</span> <span class="n">Timescale</span><span class="p">,</span> <span class="n">to_seconds</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.defaults</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">FONT_SIZE_LARGE</span><span class="p">,</span>
     <span class="n">FONT_SIZE_MEDIUM</span><span class="p">,</span>
@@ -316,9 +317,11 @@
     <span class="n">PLOT_BGCOLOR</span><span class="p">,</span>
     <span class="n">PLOT_HEIGHT</span><span class="p">,</span>
     <span class="n">PLOT_WIDTH</span><span class="p">,</span>
+    <span class="n">TIME_COLORSCALE</span><span class="p">,</span>
     <span class="n">TITLE_X</span><span class="p">,</span>
     <span class="n">TITLE_XANCHOR</span><span class="p">,</span>
     <span class="n">TITLE_YANCHOR</span><span class="p">,</span>
+    <span class="n">TRIMMER_MARKER_SIZE</span><span class="p">,</span>
 <span class="p">)</span>
 
 
@@ -327,35 +330,36 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">plot_parametric_trimmer</span><span class="p">(</span>
     <span class="n">x</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">y</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span>
+    <span class="n">timestamps</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">],</span>
     <span class="n">timestamp_unit</span><span class="p">:</span> <span class="n">Timescale</span><span class="p">,</span>
-    <span class="n">timestamps</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">x_label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"X"</span><span class="p">,</span>
     <span class="n">y_label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"Y"</span><span class="p">,</span>
     <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">equal_aspect</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">PLOT_WIDTH</span><span class="p">,</span>
     <span class="n">height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">PLOT_HEIGHT</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">widgets</span><span class="o">.</span><span class="n">VBox</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Interactive parametric curve (y against x) with a range slider for picking a sub-window of samples.</span>
-
-<span class="sd">    Drag the two slider handles to hide points outside the selected range. The labels under the slider show the index and raw timestamp of the first and last visible point, which can be passed directly to trimming functions such as ``trim_single_run_data(ts_start=..., ts_end=...)``. Designed for Jupyter notebooks.</span>
+<span class="sd">    Interactive parametric curve (y against x), colored by time, with a range slider for picking a time window.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    x : NDArray[float64]</span>
-<span class="sd">        X-axis values, e.g. longitude or East position.</span>
+<span class="sd">        X-axis values, e.g. East position.</span>
 <span class="sd">    y : NDArray[float64]</span>
-<span class="sd">        Y-axis values, e.g. latitude or North position. Must have the same length as ``x``.</span>
+<span class="sd">        Y-axis values, e.g. North position. Must have the same length as ``x``.</span>
+<span class="sd">    timestamps : NDArray[np.int64]</span>
+<span class="sd">        Raw timestamp of each point, in ``timestamp_unit``. Must have the same length as ``x``.</span>
 <span class="sd">    timestamp_unit : Timescale</span>
-<span class="sd">        Unit of ``timestamps``, shown next to the timestamp in the slider labels. Ignored if ``timestamps`` is None. Pass ``aly.data.timestamp_unit``.</span>
-<span class="sd">    timestamps : NDArray[float64] | None, optional</span>
-<span class="sd">        Raw timestamp of each point (in ``timestamp_unit``, not converted to seconds), shown in the slider labels. Default is None (labels show sample index only).</span>
+<span class="sd">        Unit of ``timestamps``. Pass ``aly.data.timestamp_unit``.</span>
 <span class="sd">    x_label : str, optional</span>
 <span class="sd">        X-axis label. Default is ``"X"``.</span>
 <span class="sd">    y_label : str, optional</span>
 <span class="sd">        Y-axis label. Default is ``"Y"``.</span>
 <span class="sd">    title : str | None, optional</span>
 <span class="sd">        Title shown above the plot. Default is None (no title).</span>
+<span class="sd">    equal_aspect : bool, optional</span>
+<span class="sd">        Draw one unit in x the same length as one unit in y, so spatial data is not stretched. Default is True.</span>
 <span class="sd">    width : int, optional</span>
 <span class="sd">        Figure width in pixels. Default is PLOT_WIDTH (1200).</span>
 <span class="sd">    height : int, optional</span>
@@ -364,18 +368,14 @@
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    ipywidgets.VBox</span>
-<span class="sd">        Widget containing the figure, the slider and the labels. Display it as the last expression in a notebook cell or with ``display(widget)``. The figure is ``widget.children[0]`` and can be customized with ``update_layout`` like any Plotly figure.</span>
-
-<span class="sd">    Raises</span>
-<span class="sd">    ------</span>
-<span class="sd">    ValueError</span>
-<span class="sd">        If ``x`` is empty, or ``y`` (or ``timestamps``, when given) does not have the same length as ``x``.</span>
+<span class="sd">        Widget containing the figure, the slider and the label.</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
 <span class="sd">    &gt;&gt;&gt; from perda.plotting import plot_parametric_trimmer</span>
+<span class="sd">    &gt;&gt;&gt; pos_x, pos_y = aly.data["posX", "posY"]</span>
 <span class="sd">    &gt;&gt;&gt; widget = plot_parametric_trimmer(</span>
-<span class="sd">    ...     lon_arr, lat_arr, aly.data.timestamp_unit, timestamps=ts_arr, x_label="Longitude", y_label="Latitude"</span>
+<span class="sd">    ...     pos_x.value_np, pos_y.value_np, pos_x.timestamp_np, aly.data.timestamp_unit, x_label="X (m)", y_label="Y (m)"</span>
 <span class="sd">    ... )</span>
 <span class="sd">    &gt;&gt;&gt; display(widget)</span>
 <span class="sd">    """</span>
@@ -384,19 +384,29 @@
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"x and y are empty; there is nothing to trim."</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="o">!=</span> <span class="n">n</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"x and y have different lengths (</span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2"> vs </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">)</span><span class="si">}</span><span class="s2">)."</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">timestamps</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">timestamps</span><span class="p">)</span> <span class="o">!=</span> <span class="n">n</span><span class="p">:</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">timestamps</span><span class="p">)</span> <span class="o">!=</span> <span class="n">n</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
             <span class="sa">f</span><span class="s2">"timestamps has </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">timestamps</span><span class="p">)</span><span class="si">}</span><span class="s2"> values but x and y have </span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">; there must be one timestamp per point."</span>
         <span class="p">)</span>
+
+    <span class="n">elapsed_s</span> <span class="o">=</span> <span class="n">to_seconds</span><span class="p">(</span>
+        <span class="p">(</span><span class="n">timestamps</span> <span class="o">-</span> <span class="n">timestamps</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span> <span class="n">timestamp_unit</span>
+    <span class="p">)</span>
 
     <span class="n">fig</span> <span class="o">=</span> <span class="n">go</span><span class="o">.</span><span class="n">FigureWidget</span><span class="p">()</span>
     <span class="n">fig</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span>
         <span class="n">go</span><span class="o">.</span><span class="n">Scattergl</span><span class="p">(</span>
             <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span>
             <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span>
-            <span class="n">mode</span><span class="o">=</span><span class="s2">"lines+markers"</span><span class="p">,</span>
-            <span class="n">marker</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span>
-            <span class="n">line</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+            <span class="n">mode</span><span class="o">=</span><span class="s2">"markers"</span><span class="p">,</span>
+            <span class="n">marker</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
+                <span class="n">size</span><span class="o">=</span><span class="n">TRIMMER_MARKER_SIZE</span><span class="p">,</span>
+                <span class="n">color</span><span class="o">=</span><span class="n">elapsed_s</span><span class="p">,</span>
+                <span class="n">colorscale</span><span class="o">=</span><span class="n">TIME_COLORSCALE</span><span class="p">,</span>
+                <span class="n">colorbar</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">"Time (s)"</span><span class="p">),</span>
+                <span class="n">showscale</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="n">hovertemplate</span><span class="o">=</span><span class="s2">"x: %</span><span class="si">{x}</span><span class="s2">&lt;br&gt;y: %</span><span class="si">{y}</span><span class="s2">&lt;br&gt;t: %</span><span class="si">{marker.color:.2f}</span><span class="s2"> s&lt;extra&gt;&lt;/extra&gt;"</span><span class="p">,</span>
         <span class="p">)</span>
     <span class="p">)</span>
     <span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span>
@@ -417,6 +427,8 @@
         <span class="n">xaxis</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">tickfont</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">FONT_SIZE_SMALL</span><span class="p">)),</span>
         <span class="n">yaxis</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">tickfont</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">FONT_SIZE_SMALL</span><span class="p">)),</span>
     <span class="p">)</span>
+    <span class="k">if</span> <span class="n">equal_aspect</span><span class="p">:</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">update_yaxes</span><span class="p">(</span><span class="n">scaleanchor</span><span class="o">=</span><span class="s2">"x"</span><span class="p">,</span> <span class="n">scaleratio</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
     <span class="n">range_slider</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">IntRangeSlider</span><span class="p">(</span>
         <span class="n">value</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span>
@@ -425,32 +437,30 @@
         <span class="n">step</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
         <span class="n">description</span><span class="o">=</span><span class="s2">"Trim:"</span><span class="p">,</span>
         <span class="n">continuous_update</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">readout</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">layout</span><span class="o">=</span><span class="n">widgets</span><span class="o">.</span><span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s2">"100%"</span><span class="p">),</span>
     <span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_label</span><span class="p">(</span><span class="n">idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">timestamps</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="sa">f</span><span class="s2">"index: </span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2"> | timestamp: </span><span class="si">{</span><span class="n">timestamps</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">timestamp_unit</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">"</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s2">"index: </span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2">"</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">window_text</span><span class="p">(</span><span class="n">first</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">last</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">elapsed_s</span><span class="p">[</span><span class="n">first</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> s to </span><span class="si">{</span><span class="n">elapsed_s</span><span class="p">[</span><span class="n">last</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> s "</span>
+            <span class="sa">f</span><span class="s2">"(</span><span class="si">{</span><span class="n">last</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">first</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2"> points, </span><span class="si">{</span><span class="n">elapsed_s</span><span class="p">[</span><span class="n">last</span><span class="p">]</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">elapsed_s</span><span class="p">[</span><span class="n">first</span><span class="p">]</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> s) | "</span>
+            <span class="sa">f</span><span class="s2">"ts_start=</span><span class="si">{</span><span class="n">timestamps</span><span class="p">[</span><span class="n">first</span><span class="p">]</span><span class="si">}</span><span class="s2">, ts_end=</span><span class="si">{</span><span class="n">timestamps</span><span class="p">[</span><span class="n">last</span><span class="p">]</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">timestamp_unit</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">)"</span>
+        <span class="p">)</span>
 
-    <span class="n">start_label</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Label</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Start </span><span class="si">{</span><span class="n">_label</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-    <span class="n">end_label</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Label</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="sa">f</span><span class="s2">"End </span><span class="si">{</span><span class="n">_label</span><span class="p">(</span><span class="n">n</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-    <span class="n">label_box</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">HBox</span><span class="p">(</span>
-        <span class="p">[</span><span class="n">start_label</span><span class="p">,</span> <span class="n">end_label</span><span class="p">],</span>
-        <span class="n">layout</span><span class="o">=</span><span class="n">widgets</span><span class="o">.</span><span class="n">Layout</span><span class="p">(</span><span class="n">justify_content</span><span class="o">=</span><span class="s2">"space-between"</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="s2">"90%"</span><span class="p">),</span>
-    <span class="p">)</span>
+    <span class="n">window_label</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Label</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">window_text</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">on_range_change</span><span class="p">(</span><span class="n">change</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">lo</span><span class="p">,</span> <span class="n">hi</span> <span class="o">=</span> <span class="n">change</span><span class="p">[</span><span class="s2">"new"</span><span class="p">]</span>
+        <span class="n">first</span><span class="p">,</span> <span class="n">last</span> <span class="o">=</span> <span class="n">change</span><span class="p">[</span><span class="s2">"new"</span><span class="p">]</span>
         <span class="k">with</span> <span class="n">fig</span><span class="o">.</span><span class="n">batch_update</span><span class="p">():</span>
-            <span class="n">fig</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">lo</span> <span class="p">:</span> <span class="n">hi</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
-            <span class="n">fig</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">lo</span> <span class="p">:</span> <span class="n">hi</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
-        <span class="n">start_label</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"Start </span><span class="si">{</span><span class="n">_label</span><span class="p">(</span><span class="n">lo</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
-        <span class="n">end_label</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"End </span><span class="si">{</span><span class="n">_label</span><span class="p">(</span><span class="n">hi</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">first</span> <span class="p">:</span> <span class="n">last</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">first</span> <span class="p">:</span> <span class="n">last</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">marker</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="n">elapsed_s</span><span class="p">[</span><span class="n">first</span> <span class="p">:</span> <span class="n">last</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="n">window_label</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">window_text</span><span class="p">(</span><span class="n">first</span><span class="p">,</span> <span class="n">last</span><span class="p">)</span>
 
     <span class="n">range_slider</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">on_range_change</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="s2">"value"</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">widgets</span><span class="o">.</span><span class="n">VBox</span><span class="p">([</span><span class="n">fig</span><span class="p">,</span> <span class="n">range_slider</span><span class="p">,</span> <span class="n">label_box</span><span class="p">])</span></div>
+    <span class="k">return</span> <span class="n">widgets</span><span class="o">.</span><span class="n">VBox</span><span class="p">([</span><span class="n">fig</span><span class="p">,</span> <span class="n">range_slider</span><span class="p">,</span> <span class="n">window_label</span><span class="p">])</span></div>
 
 </pre></div>
 

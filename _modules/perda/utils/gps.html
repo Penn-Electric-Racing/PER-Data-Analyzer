@@ -602,7 +602,8 @@
     <span class="n">height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">PLOT_HEIGHT</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">widgets</span><span class="o">.</span><span class="n">VBox</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Interactive GPS track plot (longitude vs latitude) with a range slider for picking a time window of the log.</span>
+<span class="sd">    Interactive GPS track plot in metres, colored by time, with a range slider for picking a time window of the log.</span>
+<span class="sd">    Latitude and longitude are projected to East/North metres around the track's median point.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -611,7 +612,7 @@
 <span class="sd">    lon : DataInstance</span>
 <span class="sd">        Longitude in degrees.</span>
 <span class="sd">    timestamp_unit : Timescale</span>
-<span class="sd">        Unit of the raw timestamps, shown next to the timestamps in the slider labels. Pass ``aly.data.timestamp_unit``.</span>
+<span class="sd">        Unit of the raw timestamps. Pass ``aly.data.timestamp_unit``.</span>
 <span class="sd">    title : str | None, optional</span>
 <span class="sd">        Title shown above the plot. Default is None (no title).</span>
 <span class="sd">    width : int, optional</span>
@@ -641,15 +642,16 @@
     <span class="kn">from</span><span class="w"> </span><span class="nn">..plotting.parametric_trimmer</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_parametric_trimmer</span>
 
     <span class="n">lat_aligned</span><span class="p">,</span> <span class="n">lon_aligned</span> <span class="o">=</span> <span class="n">left_join_data_instances</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">)</span>
+    <span class="n">east_m</span><span class="p">,</span> <span class="n">north_m</span> <span class="o">=</span> <span class="n">gps_to_enu</span><span class="p">(</span><span class="n">lat_aligned</span><span class="o">.</span><span class="n">value_np</span><span class="p">,</span> <span class="n">lon_aligned</span><span class="o">.</span><span class="n">value_np</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">plot_parametric_trimmer</span><span class="p">(</span>
-        <span class="n">x</span><span class="o">=</span><span class="n">lon_aligned</span><span class="o">.</span><span class="n">value_np</span><span class="p">,</span>
-        <span class="n">y</span><span class="o">=</span><span class="n">lat_aligned</span><span class="o">.</span><span class="n">value_np</span><span class="p">,</span>
+        <span class="n">x</span><span class="o">=</span><span class="n">east_m</span><span class="p">,</span>
+        <span class="n">y</span><span class="o">=</span><span class="n">north_m</span><span class="p">,</span>
         <span class="n">timestamps</span><span class="o">=</span><span class="n">lat_aligned</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">,</span>
-        <span class="n">x_label</span><span class="o">=</span><span class="s2">"Longitude"</span><span class="p">,</span>
-        <span class="n">y_label</span><span class="o">=</span><span class="s2">"Latitude"</span><span class="p">,</span>
-        <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
         <span class="n">timestamp_unit</span><span class="o">=</span><span class="n">timestamp_unit</span><span class="p">,</span>
+        <span class="n">x_label</span><span class="o">=</span><span class="s2">"East (m)"</span><span class="p">,</span>
+        <span class="n">y_label</span><span class="o">=</span><span class="s2">"North (m)"</span><span class="p">,</span>
+        <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
         <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span>
         <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">,</span>
     <span class="p">)</span></div>
