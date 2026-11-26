@@ -315,7 +315,6 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">..plotting.data_instance_plotter</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_time_series</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..plotting.defaults</span><span class="w"> </span><span class="kn">import</span> <span class="n">PLOT_WIDTH</span><span class="p">,</span> <span class="n">SUBPLOT_VERTICAL_SPACING</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..units</span><span class="w"> </span><span class="kn">import</span> <span class="n">Timescale</span><span class="p">,</span> <span class="n">convert_time</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">..utils.data_summary</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataInstanceSummary</span><span class="p">,</span> <span class="n">data_instance_summary</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.analyzer</span><span class="w"> </span><span class="kn">import</span> <span class="n">Analyzer</span>
 
 <span class="c1"># Common unit that every run's timestamps are converted to before overlaying, so</span>
@@ -631,9 +630,9 @@
 
 <div class="viewcode-block" id="RunCollection.compare_summary">
 <a class="viewcode-back" href="../../../_autosummary/perda.analyzer.run_collection.html#perda.analyzer.run_collection.RunCollection.compare_summary">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">compare_summary</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cpp_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">DataInstanceSummary</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compare_summary</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cpp_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">DataInstance</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Summarize a variable's statistics across every run in the collection.</span>
+<span class="sd">        Collect a variable from every run in the collection; print each one for its summary.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -642,18 +641,17 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        dict[str, DataInstanceSummary]</span>
-<span class="sd">            Summary per run filename, for runs that contain the variable.</span>
+<span class="sd">        dict[str, DataInstance]</span>
+<span class="sd">            The variable per run filename, for runs that contain the variable.</span>
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
-<span class="sd">        &gt;&gt;&gt; for filename, summary in col.compare_summary("bms.pack.voltage").items():</span>
-<span class="sd">        ...     print(f"{filename}: {summary.max_value}")</span>
+<span class="sd">        &gt;&gt;&gt; for filename, di in col.compare_summary("bms.pack.voltage").items():</span>
+<span class="sd">        ...     print(filename)</span>
+<span class="sd">        ...     print(di)</span>
 <span class="sd">        """</span>
         <span class="k">return</span> <span class="p">{</span>
-            <span class="n">run</span><span class="o">.</span><span class="n">file_path</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">data_instance_summary</span><span class="p">(</span>
-                <span class="n">analyzer</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">cpp_name</span><span class="p">],</span> <span class="n">source_time_unit</span><span class="o">=</span><span class="n">analyzer</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">timestamp_unit</span>
-            <span class="p">)</span>
+            <span class="n">run</span><span class="o">.</span><span class="n">file_path</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">analyzer</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">cpp_name</span><span class="p">]</span>
             <span class="k">for</span> <span class="n">run</span><span class="p">,</span> <span class="n">analyzer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iter_analyzers</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">cpp_name</span> <span class="ow">in</span> <span class="n">analyzer</span><span class="o">.</span><span class="n">data</span>
         <span class="p">}</span></div>

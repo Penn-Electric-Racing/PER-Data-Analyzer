@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>perda.utils.gps_analysis &#8212; PERDA</title>
+    <title>perda.utils.gps &#8212; PERDA</title>
   
   
   
@@ -46,7 +46,7 @@
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../../_static/copybutton.js?v=f281be69"></script>
     <script src="../../../_static/design-tabs.js?v=f930bc37"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/perda/utils/gps_analysis';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/perda/utils/gps';</script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
@@ -284,7 +284,7 @@
     
     <li class="breadcrumb-item"><a href="../../index.html" class="nav-link">Module code</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">perda.utils.gps_analysis</span></li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">perda.utils.gps</span></li>
   </ul>
 </nav>
 </div>
@@ -301,24 +301,31 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <h1>Source code for perda.utils.gps_analysis</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+  <h1>Source code for perda.utils.gps</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">plotly.graph_objects</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">go</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">numpy.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">NDArray</span>
 
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">ipywidgets</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">widgets</span>
+<span class="k">except</span> <span class="ne">ModuleNotFoundError</span><span class="p">:</span>
+    <span class="k">pass</span>
+
 <span class="kn">from</span><span class="w"> </span><span class="nn">..constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">EARTH_RADIUS_METERS</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..core_data_structures.data_instance</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataInstance</span><span class="p">,</span> <span class="n">left_join_data_instances</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">..plotting.defaults</span><span class="w"> </span><span class="kn">import</span> <span class="n">MAP_STYLE</span><span class="p">,</span> <span class="n">PLOT_HEIGHT</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..plotting.defaults</span><span class="w"> </span><span class="kn">import</span> <span class="n">PLOT_HEIGHT</span><span class="p">,</span> <span class="n">PLOT_WIDTH</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..plotting.map_trace</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_map_trace</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..plotting.parametric_overlay</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_parametric_overlay</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..units</span><span class="w"> </span><span class="kn">import</span> <span class="n">Timescale</span>
 
-<span class="c1"># Outlier filtering thresholds (m). float("inf") disables a filter.</span>
 <span class="n">GPS_MAX_RADIUS_M</span> <span class="o">=</span> <span class="mf">5_000.0</span>
 <span class="n">GPS_MAX_JUMP_M</span> <span class="o">=</span> <span class="mf">30.0</span>
 
 
 <div class="viewcode-block" id="gps_to_enu">
-<a class="viewcode-back" href="../../../_autosummary/perda.utils.gps_analysis.html#perda.utils.gps_analysis.gps_to_enu">[docs]</a>
+<a class="viewcode-back" href="../../../_autosummary/perda.utils.gps.html#perda.utils.gps.gps_to_enu">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">gps_to_enu</span><span class="p">(</span>
     <span class="n">lat</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">lon</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
@@ -362,7 +369,7 @@
 
 
 <div class="viewcode-block" id="filter_gps_cartesian">
-<a class="viewcode-back" href="../../../_autosummary/perda.utils.gps_analysis.html#perda.utils.gps_analysis.filter_gps_cartesian">[docs]</a>
+<a class="viewcode-back" href="../../../_autosummary/perda.utils.gps.html#perda.utils.gps.filter_gps_cartesian">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">filter_gps_cartesian</span><span class="p">(</span>
     <span class="n">lat</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">lon</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
@@ -386,9 +393,11 @@
 <span class="sd">    lon : NDArray[np.float64]</span>
 <span class="sd">        Longitude values in degrees.</span>
 <span class="sd">    max_radius_m : float, optional</span>
-<span class="sd">        Points farther than this many metres from the centre of all points are dropped. Use ``float("inf")`` to disable. Default is GPS_MAX_RADIUS_M (5000).</span>
+<span class="sd">        Points farther than this many metres from the centre of all points are dropped.</span>
+<span class="sd">        Use ``float("inf")`` to disable. Default is GPS_MAX_RADIUS_M (5000).</span>
 <span class="sd">    max_jump_m : float, optional</span>
-<span class="sd">        Points more than this many metres from the previous point are dropped as GPS glitches. Use ``float("inf")`` to disable. Default is GPS_MAX_JUMP_M (30).</span>
+<span class="sd">        Points more than this many metres from the previous point are dropped as GPS glitches.</span>
+<span class="sd">        Use ``float("inf")`` to disable. Default is GPS_MAX_JUMP_M (30).</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -411,7 +420,7 @@
 
 
 <div class="viewcode-block" id="plot_gps_comparison">
-<a class="viewcode-back" href="../../../_autosummary/perda.utils.gps_analysis.html#perda.utils.gps_analysis.plot_gps_comparison">[docs]</a>
+<a class="viewcode-back" href="../../../_autosummary/perda.utils.gps.html#perda.utils.gps.plot_gps_comparison">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">plot_gps_comparison</span><span class="p">(</span>
     <span class="n">runs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="nb">str</span><span class="p">]],</span>
     <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -421,20 +430,22 @@
     <span class="n">height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">PLOT_HEIGHT</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Overlay GPS tracks from multiple runs on a shared East/North frame in metres.</span>
-
-<span class="sd">    Each run is projected to East/North coordinates around one shared reference point (median of all points across all runs), outliers are removed with :func:`filter_gps_cartesian`, and the result is plotted with :func:`perda.plotting.plot_parametric_overlay`. Runs with no points left after filtering are skipped.</span>
+<span class="sd">    Plot GPS tracks from multiple runs on a shared East/North frame in metres, using the median</span>
+<span class="sd">    of all points across all runs as the origin reference, and with outliers filtered out.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    runs : list[tuple[NDArray[np.float64], NDArray[np.float64], str]]</span>
-<span class="sd">        One ``(lat_array, lon_array, label)`` tuple per run, with latitude and longitude in degrees. ``lat_array`` and ``lon_array`` must be the same length. ``label`` is the legend name.</span>
+<span class="sd">        One ``(lat_array, lon_array, label)`` tuple per run, with latitude and longitude in degrees.</span>
+<span class="sd">        ``lat_array`` and ``lon_array`` must be the same length. ``label`` is the legend name.</span>
 <span class="sd">    title : str | None, optional</span>
 <span class="sd">        Title shown above the plot. Default is None (no title).</span>
 <span class="sd">    max_radius_m : float, optional</span>
-<span class="sd">        Outlier filter: points farther than this many metres from the centre of the run are dropped. Use ``float("inf")`` to disable. Default is GPS_MAX_RADIUS_M (5000).</span>
+<span class="sd">        Outlier filter: points farther than this many metres from the centre of the run are dropped.</span>
+<span class="sd">        Use ``float("inf")`` to disable. Default is GPS_MAX_RADIUS_M (5000).</span>
 <span class="sd">    max_jump_m : float, optional</span>
-<span class="sd">        Outlier filter: points more than this many metres from the previous point are dropped. Use ``float("inf")`` to disable. Default is GPS_MAX_JUMP_M (30).</span>
+<span class="sd">        Outlier filter: points more than this many metres from the previous point are dropped.</span>
+<span class="sd">        Use ``float("inf")`` to disable. Default is GPS_MAX_JUMP_M (30).</span>
 <span class="sd">    width : int, optional</span>
 <span class="sd">        Figure width in pixels. Default is PLOT_HEIGHT (700), making a square plot.</span>
 <span class="sd">    height : int, optional</span>
@@ -443,12 +454,8 @@
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    go.Figure</span>
-<span class="sd">        Plotly figure with one marker trace per run, in metres East/North of a shared reference point. Change anything not exposed here (fonts, marker size, colors, ...) with ``fig.update_layout`` or ``fig.update_traces`` before calling ``fig.show()``.</span>
-
-<span class="sd">    Raises</span>
-<span class="sd">    ------</span>
-<span class="sd">    ValueError</span>
-<span class="sd">        If two runs share the same label.</span>
+<span class="sd">        Plotly figure with one marker trace per run. Change anything not exposed here (fonts, marker size, colors, ...)</span>
+<span class="sd">        with ``fig.update_layout`` or ``fig.update_traces`` before calling ``fig.show()``.</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
@@ -492,7 +499,7 @@
 
 
 <div class="viewcode-block" id="create_representative_gps_image">
-<a class="viewcode-back" href="../../../_autosummary/perda.utils.gps_analysis.html#perda.utils.gps_analysis.create_representative_gps_image">[docs]</a>
+<a class="viewcode-back" href="../../../_autosummary/perda.utils.gps.html#perda.utils.gps.create_representative_gps_image">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">create_representative_gps_image</span><span class="p">(</span>
     <span class="n">lat_raw</span><span class="p">:</span> <span class="n">DataInstance</span><span class="p">,</span>
     <span class="n">lon_raw</span><span class="p">:</span> <span class="n">DataInstance</span><span class="p">,</span>
@@ -501,14 +508,12 @@
     <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">max_radius_m</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">GPS_MAX_RADIUS_M</span><span class="p">,</span>
     <span class="n">max_jump_m</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">GPS_MAX_JUMP_M</span><span class="p">,</span>
-    <span class="n">map_style</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">MAP_STYLE</span><span class="p">,</span>
     <span class="n">width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">PLOT_HEIGHT</span><span class="p">,</span>
     <span class="n">height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">PLOT_HEIGHT</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Draw a log's GPS track on an interactive map background.</span>
-
-<span class="sd">    Aligns longitude (and speed) onto latitude's timestamps, trims away the stationary start and end of the log if speed is given, removes outliers with :func:`filter_gps_cartesian`, then plots with :func:`perda.plotting.plot_map_trace`.</span>
+<span class="sd">    Plot a log's GPS track on an interactive map background, with outliers filtered out. Additionally</span>
+<span class="sd">    applies a velocity threshold to show only the span of the log where the vehicle is moving, if velocity data is provided.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -517,17 +522,19 @@
 <span class="sd">    lon_raw : DataInstance</span>
 <span class="sd">        Longitude in degrees.</span>
 <span class="sd">    vel_raw : DataInstance | None, optional</span>
-<span class="sd">        Vehicle speed, used to cut off the stationary start and end of the log. Default is None (show every point).</span>
+<span class="sd">        Vehicle speed, used to cut off the stationary start and end of the log.</span>
+<span class="sd">        Default is None (show every point).</span>
 <span class="sd">    vel_thresh : float, optional</span>
-<span class="sd">        Only the span between the first and last moment speed exceeds this value is shown. Same unit as ``vel_raw``. Ignored if ``vel_raw`` is None. Default is 0.5.</span>
+<span class="sd">        Only the span between the first and last moment speed exceeds this value is shown.</span>
+<span class="sd">        Same unit as ``vel_raw``. Ignored if ``vel_raw`` is None. Default is 0.5.</span>
 <span class="sd">    title : str | None, optional</span>
 <span class="sd">        Title shown above the map. Default is None (no title).</span>
 <span class="sd">    max_radius_m : float, optional</span>
-<span class="sd">        Outlier filter: points farther than this many metres from the centre of the track are dropped. Use ``float("inf")`` to disable. Default is GPS_MAX_RADIUS_M (5000).</span>
+<span class="sd">        Outlier filter: points farther than this many metres from the centre of the track are dropped.</span>
+<span class="sd">        Use ``float("inf")`` to disable. Default is GPS_MAX_RADIUS_M (5000).</span>
 <span class="sd">    max_jump_m : float, optional</span>
-<span class="sd">        Outlier filter: points more than this many metres from the previous point are dropped. Use ``float("inf")`` to disable. Default is GPS_MAX_JUMP_M (30).</span>
-<span class="sd">    map_style : str, optional</span>
-<span class="sd">        Background map tiles, any Plotly MapLibre style name such as ``"open-street-map"``, ``"carto-positron"`` or ``"satellite"``. Default is MAP_STYLE (``"open-street-map"``, needs no API key).</span>
+<span class="sd">        Outlier filter: points more than this many metres from the previous point are dropped.</span>
+<span class="sd">        Use ``float("inf")`` to disable. Default is GPS_MAX_JUMP_M (30).</span>
 <span class="sd">    width : int, optional</span>
 <span class="sd">        Figure width in pixels. Default is PLOT_HEIGHT (700), making a square map.</span>
 <span class="sd">    height : int, optional</span>
@@ -578,7 +585,71 @@
         <span class="n">lat_filtered</span><span class="p">,</span>
         <span class="n">lon_filtered</span><span class="p">,</span>
         <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
-        <span class="n">map_style</span><span class="o">=</span><span class="n">map_style</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="plot_gps_trimmer">
+<a class="viewcode-back" href="../../../_autosummary/perda.utils.gps.html#perda.utils.gps.plot_gps_trimmer">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_gps_trimmer</span><span class="p">(</span>
+    <span class="n">lat</span><span class="p">:</span> <span class="n">DataInstance</span><span class="p">,</span>
+    <span class="n">lon</span><span class="p">:</span> <span class="n">DataInstance</span><span class="p">,</span>
+    <span class="n">timestamp_unit</span><span class="p">:</span> <span class="n">Timescale</span><span class="p">,</span>
+    <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">PLOT_WIDTH</span><span class="p">,</span>
+    <span class="n">height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">PLOT_HEIGHT</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">widgets</span><span class="o">.</span><span class="n">VBox</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Interactive GPS track plot (longitude vs latitude) with a range slider for picking a time window of the log.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    lat : DataInstance</span>
+<span class="sd">        Latitude in degrees. Its timestamps define the points shown and the timestamps in the slider labels.</span>
+<span class="sd">    lon : DataInstance</span>
+<span class="sd">        Longitude in degrees.</span>
+<span class="sd">    timestamp_unit : Timescale</span>
+<span class="sd">        Unit of the raw timestamps, shown next to the timestamps in the slider labels. Pass ``aly.data.timestamp_unit``.</span>
+<span class="sd">    title : str | None, optional</span>
+<span class="sd">        Title shown above the plot. Default is None (no title).</span>
+<span class="sd">    width : int, optional</span>
+<span class="sd">        Figure width in pixels. Default is PLOT_WIDTH (1200).</span>
+<span class="sd">    height : int, optional</span>
+<span class="sd">        Figure height in pixels. Default is PLOT_HEIGHT (700).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    ipywidgets.VBox</span>
+<span class="sd">        Widget containing the figure, the slider and the labels.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from perda.core_data_structures import trim_single_run_data</span>
+<span class="sd">    &gt;&gt;&gt; from perda.utils import plot_gps_trimmer</span>
+<span class="sd">    &gt;&gt;&gt; widget = plot_gps_trimmer(</span>
+<span class="sd">    ...     aly.data["pcm.vnav.posLla.latitude"],</span>
+<span class="sd">    ...     aly.data["pcm.vnav.posLla.longitude"],</span>
+<span class="sd">    ...     aly.data.timestamp_unit,</span>
+<span class="sd">    ...     title="GPS Track",</span>
+<span class="sd">    ... )</span>
+<span class="sd">    &gt;&gt;&gt; display(widget)</span>
+<span class="sd">    &gt;&gt;&gt; # After reading the start/end timestamps off the slider:</span>
+<span class="sd">    &gt;&gt;&gt; trimmed = trim_single_run_data(aly.data, ts_start=436_000, ts_end=1_552_000)</span>
+<span class="sd">    """</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">..plotting.parametric_trimmer</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_parametric_trimmer</span>
+
+    <span class="n">lat_aligned</span><span class="p">,</span> <span class="n">lon_aligned</span> <span class="o">=</span> <span class="n">left_join_data_instances</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">plot_parametric_trimmer</span><span class="p">(</span>
+        <span class="n">x</span><span class="o">=</span><span class="n">lon_aligned</span><span class="o">.</span><span class="n">value_np</span><span class="p">,</span>
+        <span class="n">y</span><span class="o">=</span><span class="n">lat_aligned</span><span class="o">.</span><span class="n">value_np</span><span class="p">,</span>
+        <span class="n">timestamps</span><span class="o">=</span><span class="n">lat_aligned</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">,</span>
+        <span class="n">x_label</span><span class="o">=</span><span class="s2">"Longitude"</span><span class="p">,</span>
+        <span class="n">y_label</span><span class="o">=</span><span class="s2">"Latitude"</span><span class="p">,</span>
+        <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
+        <span class="n">timestamp_unit</span><span class="o">=</span><span class="n">timestamp_unit</span><span class="p">,</span>
         <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span>
         <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">,</span>
     <span class="p">)</span></div>

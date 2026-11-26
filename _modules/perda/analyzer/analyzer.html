@@ -302,10 +302,7 @@
                 <article class="bd-article">
                   
   <h1>Source code for perda.analyzer.analyzer</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">io</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
-
-<span class="kn">from</span><span class="w"> </span><span class="nn">plotly</span><span class="w"> </span><span class="kn">import</span> <span class="n">graph_objects</span> <span class="k">as</span> <span class="n">go</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">plotly</span><span class="w"> </span><span class="kn">import</span> <span class="n">graph_objects</span> <span class="k">as</span> <span class="n">go</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">..core_data_structures.data_instance</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataInstance</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..core_data_structures.single_run_data</span><span class="w"> </span><span class="kn">import</span> <span class="n">SingleRunData</span>
@@ -318,7 +315,6 @@
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..units</span><span class="w"> </span><span class="kn">import</span> <span class="n">from_seconds</span><span class="p">,</span> <span class="n">to_seconds</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..utils.accel_calculator</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">..utils.data_summary</span><span class="w"> </span><span class="kn">import</span> <span class="n">single_run_summary</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..utils.diff</span><span class="w"> </span><span class="kn">import</span> <span class="n">DIFF_BUCKET_SIZE_S</span><span class="p">,</span> <span class="n">diff</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..utils.frequency_analysis</span><span class="w"> </span><span class="kn">import</span> <span class="n">analyze_frequency</span> <span class="k">as</span> <span class="n">_analyze_frequency</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..utils.integrate</span><span class="w"> </span><span class="kn">import</span> <span class="n">smoothed_filtered_integration</span>
@@ -379,12 +375,7 @@
 
 <span class="sd">    Summary stats for one variable</span>
 <span class="sd">    ------------------------------</span>
-<span class="sd">    &gt;&gt;&gt; from perda.utils import data_instance_summary</span>
-<span class="sd">    &gt;&gt;&gt; summary = data_instance_summary(</span>
-<span class="sd">    ...     aly.data["pcm.wheelSpeeds.frontRight"], source_time_unit=aly.data.timestamp_unit</span>
-<span class="sd">    ... )</span>
-<span class="sd">    &gt;&gt;&gt; print(summary)          # formatted block</span>
-<span class="sd">    &gt;&gt;&gt; summary.max_value       # or read the fields directly</span>
+<span class="sd">    &gt;&gt;&gt; print(aly.data["pcm.wheelSpeeds.frontRight"])   # count, time range, min, max, average</span>
 <span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -438,20 +429,8 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">apply_preprocessing</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">preprocessing</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Return a summary of all variables in the loaded run data."""</span>
-        <span class="n">old_stdout</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span>
-
-        <span class="n">buffer</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">()</span>
-        <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span> <span class="o">=</span> <span class="n">buffer</span>
-
-        <span class="n">single_run_summary</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
-
-        <span class="n">output</span> <span class="o">=</span> <span class="n">buffer</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span>
-        <span class="n">buffer</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-
-        <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span> <span class="o">=</span> <span class="n">old_stdout</span>
-
-        <span class="k">return</span> <span class="n">output</span>
+<span class="w">        </span><span class="sd">"""Return a summary of the loaded run data."""</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Analyzer.search">
 <a class="viewcode-back" href="../../../_autosummary/perda.analyzer.analyzer.html#perda.analyzer.analyzer.Analyzer.search">[docs]</a>

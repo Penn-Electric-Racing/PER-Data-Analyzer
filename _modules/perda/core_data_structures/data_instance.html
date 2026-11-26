@@ -313,6 +313,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">..units</span><span class="w"> </span><span class="kn">import</span> <span class="n">Timescale</span><span class="p">,</span> <span class="n">from_seconds</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.joins</span><span class="w"> </span><span class="kn">import</span> <span class="n">inner_join</span><span class="p">,</span> <span class="n">left_join</span><span class="p">,</span> <span class="n">outer_join</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.resampling</span><span class="w"> </span><span class="kn">import</span> <span class="n">ResampleMethod</span><span class="p">,</span> <span class="n">_interpolate</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.summarize</span><span class="w"> </span><span class="kn">import</span> <span class="n">summarize_time_series</span>
 
 
 <div class="viewcode-block" id="DataInstance">
@@ -397,14 +398,15 @@
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Human-readable one-line summary of this DataInstance.</span>
+<span class="sd">        Summary of this DataInstance: name line, count, time range, min, max and average.</span>
 
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        str</span>
-<span class="sd">            ``Label | ID: &lt;var_id&gt; | C++ Name: &lt;cpp_name&gt;``</span>
+<span class="sd">        Timestamps are shown in raw units, since a DataInstance does not know its log's unit.</span>
 <span class="sd">        """</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="si">}</span><span class="s2"> | ID: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">var_id</span><span class="si">}</span><span class="s2"> | C++ Name: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">cpp_name</span><span class="si">}</span><span class="s2">"</span>
+        <span class="k">return</span> <span class="n">summarize_time_series</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="si">}</span><span class="s2"> | ID: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">var_id</span><span class="si">}</span><span class="s2"> | C++ Name: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">cpp_name</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">timestamp_np</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">value_np</span><span class="p">,</span>
+        <span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>

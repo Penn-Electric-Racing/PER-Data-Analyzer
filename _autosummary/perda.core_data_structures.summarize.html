@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>perda.utils.gps_trimmer &#8212; PERDA</title>
+    <title>perda.core_data_structures.summarize &#8212; PERDA</title>
   
   
   
@@ -47,11 +47,11 @@
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=f281be69"></script>
     <script src="../_static/design-tabs.js?v=f930bc37"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/perda.utils.gps_trimmer';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/perda.core_data_structures.summarize';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="perda.utils.integrate" href="perda.utils.integrate.html" />
-    <link rel="prev" title="perda.utils.gps_analysis" href="perda.utils.gps_analysis.html" />
+    <link rel="next" title="perda.core_data_structures.variable_patterns" href="perda.core_data_structures.variable_patterns.html" />
+    <link rel="prev" title="perda.core_data_structures.split_helpers" href="perda.core_data_structures.split_helpers.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
@@ -269,7 +269,7 @@
 </ul>
 </details></li>
 <li class="toctree-l2"><a class="reference internal" href="perda.constants.html">perda.constants</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="perda.core_data_structures.html">perda.core_data_structures</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="perda.core_data_structures.html">perda.core_data_structures</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.data_instance.html">perda.core_data_structures.data_instance</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.deduplication.html">perda.core_data_structures.deduplication</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.joins.html">perda.core_data_structures.joins</a></li>
@@ -278,6 +278,7 @@
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.search_indexes.html">perda.core_data_structures.search_indexes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.single_run_data.html">perda.core_data_structures.single_run_data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.split_helpers.html">perda.core_data_structures.split_helpers</a></li>
+<li class="toctree-l3 current active"><a class="current reference internal" href="#">perda.core_data_structures.summarize</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.variable_patterns.html">perda.core_data_structures.variable_patterns</a></li>
 </ul>
 </details></li>
@@ -304,13 +305,11 @@
 </ul>
 </details></li>
 <li class="toctree-l2"><a class="reference internal" href="perda.units.html">perda.units</a></li>
-<li class="toctree-l2 current active has-children"><a class="reference internal" href="perda.utils.html">perda.utils</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 has-children"><a class="reference internal" href="perda.utils.html">perda.utils</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.accel_calculator.html">perda.utils.accel_calculator</a></li>
-<li class="toctree-l3"><a class="reference internal" href="perda.utils.data_summary.html">perda.utils.data_summary</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.diff.html">perda.utils.diff</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.frequency_analysis.html">perda.utils.frequency_analysis</a></li>
-<li class="toctree-l3"><a class="reference internal" href="perda.utils.gps_analysis.html">perda.utils.gps_analysis</a></li>
-<li class="toctree-l3 current active"><a class="current reference internal" href="#">perda.utils.gps_trimmer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.utils.gps.html">perda.utils.gps</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.integrate.html">perda.utils.integrate</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.preprocessing.html">perda.utils.preprocessing</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.search.html">perda.utils.search</a></li>
@@ -366,9 +365,9 @@
     <li class="breadcrumb-item"><a href="perda.html" class="nav-link">perda</a></li>
     
     
-    <li class="breadcrumb-item"><a href="perda.utils.html" class="nav-link">perda.utils</a></li>
+    <li class="breadcrumb-item"><a href="perda.core_data_structures.html" class="nav-link">perda.core_data_structures</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">perda.utils.gps_trimmer</span></li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">perda.core_data_structures.summarize</span></li>
   </ul>
 </nav>
 </div>
@@ -385,45 +384,50 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="module-perda.utils.gps_trimmer">
-<span id="perda-utils-gps-trimmer"></span><h1>perda.utils.gps_trimmer<a class="headerlink" href="#module-perda.utils.gps_trimmer" title="Link to this heading">#</a></h1>
+  <section id="module-perda.core_data_structures.summarize">
+<span id="perda-core-data-structures-summarize"></span><h1>perda.core_data_structures.summarize<a class="headerlink" href="#module-perda.core_data_structures.summarize" title="Link to this heading">#</a></h1>
 <dl class="py function">
-<dt class="sig sig-object py" id="perda.utils.gps_trimmer.plot_gps_trimmer">
-<span class="sig-prename descclassname"><span class="pre">perda.utils.gps_trimmer.</span></span><span class="sig-name descname"><span class="pre">plot_gps_trimmer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lon</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp_unit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">700</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/utils/gps_trimmer.html#plot_gps_trimmer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.utils.gps_trimmer.plot_gps_trimmer" title="Link to this definition">#</a></dt>
-<dd><p>Interactive GPS track plot (longitude vs latitude) with a range slider for picking a time window of the log.</p>
-<p>Drag the two slider handles to hide points outside the selected range. The labels under the slider show the sample index and the raw timestamp (in the log’s own unit, e.g. ms or us, not seconds) of the first and last visible point. Pass those timestamps straight to <code class="docutils literal notranslate"><span class="pre">trim_single_run_data(data,</span> <span class="pre">ts_start=...,</span> <span class="pre">ts_end=...)</span></code> or <code class="docutils literal notranslate"><span class="pre">DataInstance.trim</span></code> to cut the log to that window. Designed for Jupyter notebooks.</p>
+<dt class="sig sig-object py" id="perda.core_data_structures.summarize.summarize_run">
+<span class="sig-prename descclassname"><span class="pre">perda.core_data_structures.summarize.</span></span><span class="sig-name descname"><span class="pre">summarize_run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timestamp_unit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_start_time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_end_time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variable_count</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_data_points</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/core_data_structures/summarize.html#summarize_run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.core_data_structures.summarize.summarize_run" title="Link to this definition">#</a></dt>
+<dd><p>Format the overall information of a run.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>lat</strong> (<a class="reference internal" href="perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance"><em>DataInstance</em></a>) – Latitude in degrees. Its timestamps define the points shown and the timestamps in the slider labels.</p></li>
-<li><p><strong>lon</strong> (<a class="reference internal" href="perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance"><em>DataInstance</em></a>) – Longitude in degrees. Does not need to share timestamps with <code class="docutils literal notranslate"><span class="pre">lat</span></code>: it is automatically aligned onto <code class="docutils literal notranslate"><span class="pre">lat</span></code>’s timestamps with <code class="docutils literal notranslate"><span class="pre">left_join_data_instances</span></code> (linear interpolation).</p></li>
-<li><p><strong>timestamp_unit</strong> (<a class="reference internal" href="perda.units.html#perda.units.Timescale" title="perda.units.Timescale"><em>Timescale</em></a>) – Unit of the raw timestamps, shown next to the timestamps in the slider labels. Pass <code class="docutils literal notranslate"><span class="pre">aly.data.timestamp_unit</span></code>.</p></li>
-<li><p><strong>title</strong> (<em>str</em><em> | </em><em>None</em><em>, </em><em>optional</em>) – Title shown above the plot. Default is None (no title).</p></li>
-<li><p><strong>width</strong> (<em>int</em><em>, </em><em>optional</em>) – Figure width in pixels. Default is PLOT_WIDTH (1200).</p></li>
-<li><p><strong>height</strong> (<em>int</em><em>, </em><em>optional</em>) – Figure height in pixels. Default is PLOT_HEIGHT (700).</p></li>
+<li><p><strong>timestamp_unit</strong> (<a class="reference internal" href="perda.units.html#perda.units.Timescale" title="perda.units.Timescale"><em>Timescale</em></a>) – Native timestamp unit of the run.</p></li>
+<li><p><strong>data_start_time</strong> (<em>int</em>) – First timestamp of the run, in <code class="docutils literal notranslate"><span class="pre">timestamp_unit</span></code>.</p></li>
+<li><p><strong>data_end_time</strong> (<em>int</em>) – Last timestamp of the run, in <code class="docutils literal notranslate"><span class="pre">timestamp_unit</span></code>.</p></li>
+<li><p><strong>variable_count</strong> (<em>int</em>) – Number of variables in the run.</p></li>
+<li><p><strong>total_data_points</strong> (<em>int</em>) – Number of data points across all variables.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Widget containing the figure, the slider and the labels. Display it as the last expression in a notebook cell or with <code class="docutils literal notranslate"><span class="pre">display(widget)</span></code>.</p>
+<dd class="field-even"><p>Multi-line summary block with the time range in seconds.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>ipywidgets.VBox</p>
+<dd class="field-odd"><p>str</p>
 </dd>
 </dl>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">perda.core_data_structures</span><span class="w"> </span><span class="kn">import</span> <span class="n">trim_single_run_data</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">perda.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_gps_trimmer</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">widget</span> <span class="o">=</span> <span class="n">plot_gps_trimmer</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">"pcm.vnav.posLla.latitude"</span><span class="p">],</span>
-<span class="gp">... </span>    <span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">"pcm.vnav.posLla.longitude"</span><span class="p">],</span>
-<span class="gp">... </span>    <span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">timestamp_unit</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">title</span><span class="o">=</span><span class="s2">"GPS Track"</span><span class="p">,</span>
-<span class="gp">... </span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">display</span><span class="p">(</span><span class="n">widget</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># After reading the start/end timestamps off the slider:</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">trimmed</span> <span class="o">=</span> <span class="n">trim_single_run_data</span><span class="p">(</span><span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">ts_start</span><span class="o">=</span><span class="mi">436_000</span><span class="p">,</span> <span class="n">ts_end</span><span class="o">=</span><span class="mi">1_552_000</span><span class="p">)</span>
-</pre></div>
-</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="perda.core_data_structures.summarize.summarize_time_series">
+<span class="sig-prename descclassname"><span class="pre">perda.core_data_structures.summarize.</span></span><span class="sig-name descname"><span class="pre">summarize_time_series</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">header</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp_np</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value_np</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/core_data_structures/summarize.html#summarize_time_series"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.core_data_structures.summarize.summarize_time_series" title="Link to this definition">#</a></dt>
+<dd><p>Format count, time range, min, max and time-weighted average of a time series.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>header</strong> (<em>str</em>) – First line of the summary, e.g. the variable’s label and name.</p></li>
+<li><p><strong>timestamp_np</strong> (<em>NDArray</em><em>[</em><em>np.int64</em><em>]</em>) – Raw timestamps, in the log’s native unit.</p></li>
+<li><p><strong>value_np</strong> (<em>NDArray</em><em>[</em><em>np.float64</em><em>]</em>) – Values, same length as <code class="docutils literal notranslate"><span class="pre">timestamp_np</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Multi-line summary block. Timestamps are reported in raw units.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
 </dd></dl>
 
 </section>
@@ -439,20 +443,20 @@
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="perda.utils.gps_analysis.html"
+       href="perda.core_data_structures.split_helpers.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">perda.utils.gps_analysis</p>
+        <p class="prev-next-title">perda.core_data_structures.split_helpers</p>
       </div>
     </a>
     <a class="right-next"
-       href="perda.utils.integrate.html"
+       href="perda.core_data_structures.variable_patterns.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">perda.utils.integrate</p>
+        <p class="prev-next-title">perda.core_data_structures.variable_patterns</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -475,7 +479,8 @@
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.utils.gps_trimmer.plot_gps_trimmer"><code class="docutils literal notranslate"><span class="pre">plot_gps_trimmer()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.core_data_structures.summarize.summarize_run"><code class="docutils literal notranslate"><span class="pre">summarize_run()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.core_data_structures.summarize.summarize_time_series"><code class="docutils literal notranslate"><span class="pre">summarize_time_series()</span></code></a></li>
 </ul>
   </nav></div>
 
@@ -483,7 +488,7 @@
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="../_sources/_autosummary/perda.utils.gps_trimmer.rst.txt"
+      <li><a href="../_sources/_autosummary/perda.core_data_structures.summarize.rst.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div></div>

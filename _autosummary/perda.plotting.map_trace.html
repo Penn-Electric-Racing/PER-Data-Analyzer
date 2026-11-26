@@ -278,6 +278,7 @@
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.search_indexes.html">perda.core_data_structures.search_indexes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.single_run_data.html">perda.core_data_structures.single_run_data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.split_helpers.html">perda.core_data_structures.split_helpers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.summarize.html">perda.core_data_structures.summarize</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.variable_patterns.html">perda.core_data_structures.variable_patterns</a></li>
 </ul>
 </details></li>
@@ -306,11 +307,9 @@
 <li class="toctree-l2"><a class="reference internal" href="perda.units.html">perda.units</a></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="perda.utils.html">perda.utils</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.accel_calculator.html">perda.utils.accel_calculator</a></li>
-<li class="toctree-l3"><a class="reference internal" href="perda.utils.data_summary.html">perda.utils.data_summary</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.diff.html">perda.utils.diff</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.frequency_analysis.html">perda.utils.frequency_analysis</a></li>
-<li class="toctree-l3"><a class="reference internal" href="perda.utils.gps_analysis.html">perda.utils.gps_analysis</a></li>
-<li class="toctree-l3"><a class="reference internal" href="perda.utils.gps_trimmer.html">perda.utils.gps_trimmer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.utils.gps.html">perda.utils.gps</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.integrate.html">perda.utils.integrate</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.preprocessing.html">perda.utils.preprocessing</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.search.html">perda.utils.search</a></li>
@@ -389,17 +388,17 @@
 <span id="perda-plotting-map-trace"></span><h1>perda.plotting.map_trace<a class="headerlink" href="#module-perda.plotting.map_trace" title="Link to this heading">#</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="perda.plotting.map_trace.plot_map_trace">
-<span class="sig-prename descclassname"><span class="pre">perda.plotting.map_trace.</span></span><span class="sig-name descname"><span class="pre">plot_map_trace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lon</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">map_style</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'open-street-map'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zoom_padding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">700</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">700</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/plotting/map_trace.html#plot_map_trace"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.plotting.map_trace.plot_map_trace" title="Link to this definition">#</a></dt>
-<dd><p>Draw a path of latitude/longitude points on top of an interactive background map.</p>
-<p>The map is automatically centered and zoomed to fit all points.</p>
+<span class="sig-prename descclassname"><span class="pre">perda.plotting.map_trace.</span></span><span class="sig-name descname"><span class="pre">plot_map_trace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lon</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zoom_padding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">700</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">700</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/plotting/map_trace.html#plot_map_trace"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.plotting.map_trace.plot_map_trace" title="Link to this definition">#</a></dt>
+<dd><p>Draw a path of latitude/longitude points on top of an interactive background map. The map is
+automatically centered and zoomed to fit all points.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>lat</strong> (<em>NDArray</em><em>[</em><em>float64</em><em>]</em>) – Latitude of each point, in degrees.</p></li>
 <li><p><strong>lon</strong> (<em>NDArray</em><em>[</em><em>float64</em><em>]</em>) – Longitude of each point, in degrees. Must have the same length as <code class="docutils literal notranslate"><span class="pre">lat</span></code>.</p></li>
 <li><p><strong>title</strong> (<em>str</em><em> | </em><em>None</em><em>, </em><em>optional</em>) – Title shown above the map. Default is None (no title).</p></li>
-<li><p><strong>map_style</strong> (<em>str</em><em>, </em><em>optional</em>) – Background map tiles, any Plotly MapLibre style name such as <code class="docutils literal notranslate"><span class="pre">&quot;open-street-map&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;carto-positron&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;satellite&quot;</span></code>. Default is MAP_STYLE (<code class="docutils literal notranslate"><span class="pre">&quot;open-street-map&quot;</span></code>, needs no API key).</p></li>
-<li><p><strong>zoom_padding</strong> (<em>float</em><em>, </em><em>optional</em>) – Extra space shown around the points when auto-zooming, as a fraction of the path’s extent. 0 fits the path tightly. Default is MAP_ZOOM_PADDING (0.4).</p></li>
+<li><p><strong>zoom_padding</strong> (<em>float</em><em>, </em><em>optional</em>) – Extra space shown around the points when auto-zooming, as a fraction of the path’s extent.
+Default is MAP_ZOOM_PADDING (0.4).</p></li>
 <li><p><strong>width</strong> (<em>int</em><em>, </em><em>optional</em>) – Figure width in pixels. Default is PLOT_HEIGHT (700), making a square map.</p></li>
 <li><p><strong>height</strong> (<em>int</em><em>, </em><em>optional</em>) – Figure height in pixels. Default is PLOT_HEIGHT (700).</p></li>
 </ul>
@@ -416,7 +415,7 @@
 </dl>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">perda.plotting</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_map_trace</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span> <span class="o">=</span> <span class="n">plot_map_trace</span><span class="p">(</span><span class="n">lat_array</span><span class="p">,</span> <span class="n">lon_array</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">"Lap Track"</span><span class="p">,</span> <span class="n">map_style</span><span class="o">=</span><span class="s2">"carto-positron"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span> <span class="o">=</span> <span class="n">plot_map_trace</span><span class="p">(</span><span class="n">lat_array</span><span class="p">,</span> <span class="n">lon_array</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">"Lap Track"</span><span class="p">)</span>
 </pre></div>
 </div>
 </dd></dl>

@@ -1,0 +1,8 @@
+perda.core\_data\_structures.summarize
+======================================
+
+.. automodule:: perda.core_data_structures.summarize
+   :members:
+   :undoc-members:
+   :show-inheritance:
+

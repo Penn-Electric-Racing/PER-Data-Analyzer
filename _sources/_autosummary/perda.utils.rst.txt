@@ -14,11 +14,9 @@ perda.utils
    :recursive:
 
    accel_calculator
-   data_summary
    diff
    frequency_analysis
-   gps_analysis
-   gps_trimmer
+   gps
    integrate
    preprocessing
    search

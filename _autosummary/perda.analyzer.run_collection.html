@@ -278,6 +278,7 @@
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.search_indexes.html">perda.core_data_structures.search_indexes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.single_run_data.html">perda.core_data_structures.single_run_data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.split_helpers.html">perda.core_data_structures.split_helpers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.summarize.html">perda.core_data_structures.summarize</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.core_data_structures.variable_patterns.html">perda.core_data_structures.variable_patterns</a></li>
 </ul>
 </details></li>
@@ -306,11 +307,9 @@
 <li class="toctree-l2"><a class="reference internal" href="perda.units.html">perda.units</a></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="perda.utils.html">perda.utils</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.accel_calculator.html">perda.utils.accel_calculator</a></li>
-<li class="toctree-l3"><a class="reference internal" href="perda.utils.data_summary.html">perda.utils.data_summary</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.diff.html">perda.utils.diff</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.frequency_analysis.html">perda.utils.frequency_analysis</a></li>
-<li class="toctree-l3"><a class="reference internal" href="perda.utils.gps_analysis.html">perda.utils.gps_analysis</a></li>
-<li class="toctree-l3"><a class="reference internal" href="perda.utils.gps_trimmer.html">perda.utils.gps_trimmer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perda.utils.gps.html">perda.utils.gps</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.integrate.html">perda.utils.integrate</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.preprocessing.html">perda.utils.preprocessing</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perda.utils.search.html">perda.utils.search</a></li>
@@ -405,21 +404,22 @@ one at a time, so that a collection spanning an entire season stays cheap to hol
 <dl class="py method">
 <dt class="sig sig-object py" id="perda.analyzer.run_collection.RunCollection.compare_summary">
 <span class="sig-name descname"><span class="pre">compare_summary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cpp_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/analyzer/run_collection.html#RunCollection.compare_summary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.analyzer.run_collection.RunCollection.compare_summary" title="Link to this definition">#</a></dt>
-<dd><p>Summarize a variable’s statistics across every run in the collection.</p>
+<dd><p>Collect a variable from every run in the collection; print each one for its summary.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>cpp_name</strong> (<em>str</em>) – C++ name of the variable to summarize.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Summary per run filename, for runs that contain the variable.</p>
+<dd class="field-even"><p>The variable per run filename, for runs that contain the variable.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dict[str, <a class="reference internal" href="perda.utils.data_summary.html#perda.utils.data_summary.DataInstanceSummary" title="perda.utils.data_summary.DataInstanceSummary">DataInstanceSummary</a>]</p>
+<dd class="field-odd"><p>dict[str, <a class="reference internal" href="perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance">DataInstance</a>]</p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">filename</span><span class="p">,</span> <span class="n">summary</span> <span class="ow">in</span> <span class="n">col</span><span class="o">.</span><span class="n">compare_summary</span><span class="p">(</span><span class="s2">"bms.pack.voltage"</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">summary</span><span class="o">.</span><span class="n">max_value</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">filename</span><span class="p">,</span> <span class="n">di</span> <span class="ow">in</span> <span class="n">col</span><span class="o">.</span><span class="n">compare_summary</span><span class="p">(</span><span class="s2">"bms.pack.voltage"</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="n">di</span><span class="p">)</span>
 </pre></div>
 </div>
 </dd></dl>

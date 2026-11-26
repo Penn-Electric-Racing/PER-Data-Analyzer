@@ -329,15 +329,13 @@
     <span class="n">lat</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">lon</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">map_style</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">MAP_STYLE</span><span class="p">,</span>
     <span class="n">zoom_padding</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">MAP_ZOOM_PADDING</span><span class="p">,</span>
     <span class="n">width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">PLOT_HEIGHT</span><span class="p">,</span>
     <span class="n">height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">PLOT_HEIGHT</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Draw a path of latitude/longitude points on top of an interactive background map.</span>
-
-<span class="sd">    The map is automatically centered and zoomed to fit all points.</span>
+<span class="sd">    Draw a path of latitude/longitude points on top of an interactive background map. The map is</span>
+<span class="sd">    automatically centered and zoomed to fit all points.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -347,10 +345,9 @@
 <span class="sd">        Longitude of each point, in degrees. Must have the same length as ``lat``.</span>
 <span class="sd">    title : str | None, optional</span>
 <span class="sd">        Title shown above the map. Default is None (no title).</span>
-<span class="sd">    map_style : str, optional</span>
-<span class="sd">        Background map tiles, any Plotly MapLibre style name such as ``"open-street-map"``, ``"carto-positron"`` or ``"satellite"``. Default is MAP_STYLE (``"open-street-map"``, needs no API key).</span>
 <span class="sd">    zoom_padding : float, optional</span>
-<span class="sd">        Extra space shown around the points when auto-zooming, as a fraction of the path's extent. 0 fits the path tightly. Default is MAP_ZOOM_PADDING (0.4).</span>
+<span class="sd">        Extra space shown around the points when auto-zooming, as a fraction of the path's extent.</span>
+<span class="sd">        Default is MAP_ZOOM_PADDING (0.4).</span>
 <span class="sd">    width : int, optional</span>
 <span class="sd">        Figure width in pixels. Default is PLOT_HEIGHT (700), making a square map.</span>
 <span class="sd">    height : int, optional</span>
@@ -369,7 +366,7 @@
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
 <span class="sd">    &gt;&gt;&gt; from perda.plotting import plot_map_trace</span>
-<span class="sd">    &gt;&gt;&gt; fig = plot_map_trace(lat_array, lon_array, title="Lap Track", map_style="carto-positron")</span>
+<span class="sd">    &gt;&gt;&gt; fig = plot_map_trace(lat_array, lon_array, title="Lap Track")</span>
 <span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">lat</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">lon</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -403,7 +400,7 @@
             <span class="n">font</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">FONT_SIZE_LARGE</span><span class="p">),</span>
         <span class="p">),</span>
         <span class="nb">map</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
-            <span class="n">style</span><span class="o">=</span><span class="n">map_style</span><span class="p">,</span>
+            <span class="n">style</span><span class="o">=</span><span class="n">MAP_STYLE</span><span class="p">,</span>
             <span class="n">center</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">lat</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">center_lat</span><span class="p">),</span> <span class="n">lon</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">center_lon</span><span class="p">)),</span>
             <span class="n">zoom</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">zoom</span><span class="p">),</span>
         <span class="p">),</span>

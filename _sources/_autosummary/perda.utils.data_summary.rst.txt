@@ -1,8 +1,0 @@
-perda.utils.data\_summary
-=========================
-
-.. automodule:: perda.utils.data_summary
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
