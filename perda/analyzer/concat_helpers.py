@@ -15,19 +15,7 @@ from .analyzer import Analyzer
 
 
 def _upscale_to_us(data: SingleRunData) -> SingleRunData:
-    """
-    Convert a millisecond-unit SingleRunData to microseconds in place.
-
-    Parameters
-    ----------
-    data : SingleRunData
-        Data with timestamp_unit == Timescale.MS
-
-    Returns
-    -------
-    SingleRunData
-        New SingleRunData with all timestamps scaled to microseconds
-    """
+    """Convert a millisecond-unit SingleRunData to microseconds in place."""
     new_instances = {}
     for var_id, di in data.id_to_instance.items():
         new_instances[var_id] = DataInstance(
@@ -59,14 +47,7 @@ def _merge_semantic_indexes(
     second_id_to_new: dict[int, int],
     merged_id_to_descript: dict[int, str],
 ) -> VariableSemanticIndex | None:
-    """
-    Combine both runs' semantic indexes under the merged variable IDs.
-
-    Notes
-    -----
-    Stored vectors are copied rather than re-embedded. Only variables whose run had no
-    index are embedded. Returns None when neither run has an index.
-    """
+    """Combine both runs' semantic indexes under the merged variable IDs."""
     if first.semantic_index is None and second.semantic_index is None:
         return None
 
@@ -81,7 +62,7 @@ def _merge_semantic_indexes(
     return merged
 
 
-def _concat_single_run_data(
+def concat_single_run_data(
     first: SingleRunData,
     second: SingleRunData,
     gap: int = 1,
@@ -89,9 +70,8 @@ def _concat_single_run_data(
     """
     Concatenate two SingleRunData objects sequentially in time.
 
-    The second run's timestamps are shifted so they start ``gap`` units after
-    the first run ends.  Variables are matched by ``cpp_name``; unmatched
-    variables appear in the result with data from only one run.
+    The second run's timestamps are shifted so they start ``gap`` units after the first run ends.
+    Variables are matched by ``cpp_name``; unmatched variables appear in the result with data from only one run.
 
     If the two runs use different timestamp units (ms vs us), the ms run is
     upscaled to us so the result is in microseconds.
@@ -108,7 +88,6 @@ def _concat_single_run_data(
     Returns
     -------
     SingleRunData
-        New SingleRunData containing the concatenated data
 
     Examples
     --------
@@ -226,11 +205,8 @@ def concat(
     gap: int = 1,
 ) -> Analyzer:
     """
-    Concatenate two Analyzers sequentially in time.
-
-    Variables are matched by cpp_name. Unmatched variables are kept with
-    data from only the run that has them. If the two runs use different
-    timestamp units the ms run is upscaled to us.
+    Concatenate two Analyzers sequentially in time by concatenating their SingleRunData objects.
+    See :func:`concat_single_run_data` for details on how variables are matched and timestamps are shifted.
 
     Parameters
     ----------
@@ -244,7 +220,6 @@ def concat(
     Returns
     -------
     Analyzer
-        New Analyzer containing the concatenated data
 
     Examples
     --------
@@ -253,5 +228,5 @@ def concat(
     >>> fig = merged.plot("bms.pack.voltage")
     """
     merged = object.__new__(Analyzer)
-    merged.data = _concat_single_run_data(first.data, second.data, gap=gap)
+    merged.data = concat_single_run_data(first.data, second.data, gap=gap)
     return merged

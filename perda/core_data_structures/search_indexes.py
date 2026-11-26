@@ -16,16 +16,10 @@ def normalize_search_text(text: str) -> str:
     Returns
     -------
     str
-        Normalized text, e.g. "pcm.wheelSpeeds.frontRight" becomes
-        "pcm wheel speeds front right".
+        Normalized text, e.g. "pcm.wheelSpeeds.frontRight" becomes "pcm wheel speeds front right".
     """
     spaced = re.sub(r"([a-z0-9])([A-Z])", r"\1 \2", text).replace(".", " ")
     return " ".join(spaced.split()).lower()
-
-
-def keyword_search_text(cpp_name: str, descript: str) -> str:
-    """Normalized keyword text for one variable's name and description."""
-    return normalize_search_text(f"{cpp_name} {descript}")
 
 
 class VariableKeywordIndex(BaseModel):
@@ -71,7 +65,9 @@ def variable_keyword_index_from_csv_mappings(
     """
     return VariableKeywordIndex(
         id_to_normalized_text={
-            var_id: keyword_search_text(cpp_name, id_to_descript.get(var_id, ""))
+            var_id: normalize_search_text(
+                f"{cpp_name} {id_to_descript.get(var_id, '')}"
+            )
             for var_id, cpp_name in id_to_cpp_name.items()
         }
     )

@@ -12,7 +12,7 @@ from .data_instance import DataInstance
 from .search_indexes import (
     VariableKeywordIndex,
     VariableSemanticIndex,
-    keyword_search_text,
+    normalize_search_text,
     variable_keyword_index_from_csv_mappings,
 )
 from .semantic_embedding import clone_semantic_index, update_semantic_index
@@ -298,8 +298,8 @@ class SingleRunData(BaseModel):
 
     def _update_search_indexes(self, var_ids: list[int]) -> None:
         for var_id in var_ids:
-            self.keyword_index.id_to_normalized_text[var_id] = keyword_search_text(
-                self.id_to_cpp_name[var_id], self.id_to_descript[var_id]
+            self.keyword_index.id_to_normalized_text[var_id] = normalize_search_text(
+                f"{self.id_to_cpp_name[var_id]} {self.id_to_descript[var_id]}"
             )
         if self.semantic_index is not None:
             update_semantic_index(

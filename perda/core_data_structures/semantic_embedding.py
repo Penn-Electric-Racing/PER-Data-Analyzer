@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from functools import lru_cache
-from typing import Callable, Iterable
+from typing import Callable
 
 import faiss
 import numpy as np
@@ -22,11 +22,10 @@ def load_encoder(model_id: str) -> Callable[[list[str]], NDArray]:
     model_id : str
         HuggingFace identifier of the model to load.
 
-    Notes
-    -----
-    Raises ImportError when the ``semantic`` extra is absent; callers are expected to
-    catch that and fall back to keyword search. Callers coerce the returned vectors to
-    float32, so the encoder's own dtype is not relied on.
+    Raises
+    -------
+    ImportError
+        When the ``semantic`` extra is absent, callers are expected to catch and fall back to keyword search.
     """
     from sentence_transformers import SentenceTransformer
 
@@ -39,10 +38,6 @@ def empty_semantic_index() -> VariableSemanticIndex:
         faiss_index=faiss.IndexIDMap2(faiss.IndexFlatIP(SENTENCE_EMBEDDING_DIMENSION)),
         id_to_descript={},
     )
-
-
-def _ids_array(var_ids: Iterable[int]) -> NDArray[np.int64]:
-    return np.fromiter(var_ids, dtype=np.int64)
 
 
 def embed_texts(texts: list[str]) -> NDArray[np.float32]:
@@ -75,7 +70,7 @@ def update_semantic_index(
     if not changed:
         return
 
-    var_ids = _ids_array(changed)
+    var_ids = np.fromiter(changed, dtype=np.int64)
     index.faiss_index.remove_ids(faiss.IDSelectorBatch(var_ids))
     index.faiss_index.add_with_ids(embed_texts(list(changed.values())), var_ids)
     index.id_to_descript.update(changed)
@@ -107,10 +102,13 @@ def copy_semantic_vectors(
     if not id_map:
         return
 
-    target_ids = _ids_array(id_map.values())
+    target_ids = np.fromiter(id_map.values(), dtype=np.int64)
     target.faiss_index.remove_ids(faiss.IDSelectorBatch(target_ids))
     target.faiss_index.add_with_ids(
-        source.faiss_index.reconstruct_batch(_ids_array(id_map)), target_ids
+        source.faiss_index.reconstruct_batch(
+            np.fromiter(id_map.keys(), dtype=np.int64)
+        ),
+        target_ids,
     )
     target.id_to_descript.update(
         {
