@@ -13,6 +13,7 @@ from .search_indexes import (
     VariableSemanticIndex,
     variable_keyword_index_from_csv_mappings,
 )
+from .summarize import summarize_run
 from .variable_patterns import is_pattern, match_pattern
 
 VariableKey = str | int | DataInstance
@@ -31,6 +32,7 @@ class SingleRunData(BaseModel):
     Examples
     --------
     >>> data = aly.data
+    >>> print(data)   # run summary
     >>> di = data["pcm.wheelSpeeds.frontRight"]
     >>> "pcm.wheelSpeeds.frontRight" in data
     >>> data["my.new.var"] = DataInstance(timestamp_np=ts, value_np=vals, label="My var", cpp_name="my.new.var")
@@ -139,6 +141,16 @@ class SingleRunData(BaseModel):
             )
         for cpp_name, di in zip(cpp_names, instances):
             self._assign(cpp_name, di)
+
+    def __str__(self) -> str:
+        """Summary of the run: logging unit, time range in seconds, and variable and point counts."""
+        return summarize_run(
+            self.timestamp_unit,
+            self.data_start_time,
+            self.data_end_time,
+            len(self.id_to_instance),
+            self.total_data_points,
+        )
 
     def __contains__(self, key: str | int) -> bool:
         """Check if a variable ID, variable name, or any match of a wildcard pattern exists."""
