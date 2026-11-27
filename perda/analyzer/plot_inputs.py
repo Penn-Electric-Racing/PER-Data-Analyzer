@@ -4,9 +4,7 @@ from ..core_data_structures.data_instance import DataInstance
 from ..core_data_structures.single_run_data import SingleRunData
 
 VariableInput = str | int | DataInstance
-PlotVariables = (
-    VariableInput | Sequence[VariableInput | Sequence[VariableInput | None] | None]
-)
+PlotVariables = VariableInput | Sequence[VariableInput | Sequence[VariableInput | None] | None]
 AxisTitles = str | Sequence[str | None] | None
 
 
@@ -71,9 +69,7 @@ def lookup_subplot_data_instances(
         return [
             di
             for item in subplot_variables
-            for di in lookup_subplot_data_instances(
-                data, item, ts_start_raw, ts_end_raw
-            )
+            for di in lookup_subplot_data_instances(data, item, ts_start_raw, ts_end_raw)
         ]
     matches = data[(subplot_variables,)]
     if ts_start_raw is None and ts_end_raw is None:
@@ -81,9 +77,7 @@ def lookup_subplot_data_instances(
     return [di.trim(ts_start_raw, ts_end_raw) for di in matches]
 
 
-def axis_titles_per_subplot(
-    titles: AxisTitles, n_subplots: int
-) -> list[str | None] | None:
+def axis_titles_per_subplot(titles: AxisTitles, n_subplots: int) -> list[str | None] | None:
     """Repeat a single axis title across every subplot; lists and None pass through."""
     if isinstance(titles, str):
         return [titles for _ in range(n_subplots)]

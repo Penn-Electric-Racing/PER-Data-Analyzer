@@ -44,9 +44,7 @@ def test_ned_velocity_skips_and_warns_when_missing(empty_srd, capsys):
 def test_wheelspeeds_converted_correctly(ws_srd):
     result = apply_preprocessing(ws_srd, [convert_wheelspeeds_to_m_per_s])
     expected = mph_to_m_per_s(np.array([10.0, 20.0, 30.0, 40.0]))
-    np.testing.assert_array_almost_equal(
-        result["pcm.wheelSpeeds.frontRight"].value_np, expected
-    )
+    np.testing.assert_array_almost_equal(result["pcm.wheelSpeeds.frontRight"].value_np, expected)
 
 
 def test_wheelspeeds_backups_created(ws_srd):
@@ -107,9 +105,7 @@ def test_motor_data_auto_inversion_ignores_negative_outlier(motor_srd):
 def test_motor_data_inversion_can_be_forced_off(motor_srd):
     original = motor_srd["pcm.moc.motor.angularSpeed"].value_np.copy()
     result = correct_motor_data(invert_rpm=False)(motor_srd)
-    np.testing.assert_array_almost_equal(
-        result["pcm.moc.motor.angularSpeed"].value_np, original
-    )
+    np.testing.assert_array_almost_equal(result["pcm.moc.motor.angularSpeed"].value_np, original)
 
 
 def test_motor_data_backup_is_original(motor_srd):
@@ -131,9 +127,7 @@ def test_motor_data_wheel_speed_computed_correctly(motor_srd):
         * tire_r_m
         / (60.0 * DEFAULT_GEAR_RATIO)
     )
-    np.testing.assert_array_almost_equal(
-        result["pcm.moc.motor.wheelSpeed"].value_np, expected
-    )
+    np.testing.assert_array_almost_equal(result["pcm.moc.motor.wheelSpeed"].value_np, expected)
 
 
 def test_motor_data_skips_and_warns_when_missing(empty_srd, capsys):
@@ -180,9 +174,7 @@ def test_steering_angle_overwrites_existing_angle(steering_srd):
     np.testing.assert_almost_equal(
         result["ludwig.steeringWheel.angle"].value_np[0], -97.0, decimal=6
     )
-    np.testing.assert_almost_equal(
-        result["ludwig.steeringWheel.angle"].value_np[1], 0.0, decimal=6
-    )
+    np.testing.assert_almost_equal(result["ludwig.steeringWheel.angle"].value_np[1], 0.0, decimal=6)
     np.testing.assert_almost_equal(
         result["ludwig.steeringWheel.angle"].value_np[2], 97.0, decimal=6
     )
@@ -212,9 +204,7 @@ def test_steering_angle_skips_and_warns_when_missing(empty_srd, capsys):
 
 
 def test_steering_angle_partial_application_returns_new_step():
-    custom = correct_steering_angle(
-        calibration=((1.0, -180.0), (3.0, 0.0), (5.0, 180.0))
-    )
+    custom = correct_steering_angle(calibration=((1.0, -180.0), (3.0, 0.0), (5.0, 180.0)))
     assert callable(custom)
     assert custom is not correct_steering_angle
 
@@ -320,8 +310,7 @@ def test_wheelspeeds_partial_application_uses_custom_variable_names():
         DEFAULT_WHEELSPEED_RL,
     ]
     instances = {
-        i
-        + 1: DataInstance(
+        i + 1: DataInstance(
             timestamp_np=ts,
             value_np=vals.copy(),
             label=name,
@@ -345,9 +334,7 @@ def test_wheelspeeds_partial_application_uses_custom_variable_names():
     result = reconfigured(custom_srd)
 
     assert "my.ws.fr_mph" in result
-    np.testing.assert_array_almost_equal(
-        result["my.ws.fr"].value_np, mph_to_m_per_s(vals)
-    )
+    np.testing.assert_array_almost_equal(result["my.ws.fr"].value_np, mph_to_m_per_s(vals))
 
 
 def test_motor_data_partial_application_uses_custom_gear_ratio(motor_srd):
@@ -357,15 +344,9 @@ def test_motor_data_partial_application_uses_custom_gear_ratio(motor_srd):
 
     tire_r_m = in_to_m(DEFAULT_TIRE_RADIUS_IN)
     expected = (
-        np.array([1000.0, 2000.0, 3000.0, 0.0])
-        * 2.0
-        * np.pi
-        * tire_r_m
-        / (60.0 * custom_ratio)
+        np.array([1000.0, 2000.0, 3000.0, 0.0]) * 2.0 * np.pi * tire_r_m / (60.0 * custom_ratio)
     )
-    np.testing.assert_array_almost_equal(
-        result[DEFAULT_MOTOR_WHEELSPEED].value_np, expected
-    )
+    np.testing.assert_array_almost_equal(result[DEFAULT_MOTOR_WHEELSPEED].value_np, expected)
 
 
 def test_motor_data_partial_application_uses_custom_tire_radius(motor_srd):
@@ -381,9 +362,7 @@ def test_motor_data_partial_application_uses_custom_tire_radius(motor_srd):
         * tire_r_m
         / (60.0 * DEFAULT_GEAR_RATIO)
     )
-    np.testing.assert_array_almost_equal(
-        result[DEFAULT_MOTOR_WHEELSPEED].value_np, expected
-    )
+    np.testing.assert_array_almost_equal(result[DEFAULT_MOTOR_WHEELSPEED].value_np, expected)
 
 
 def test_steering_angle_kwargs_partial_application(steering_srd):

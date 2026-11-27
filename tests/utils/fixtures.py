@@ -102,12 +102,8 @@ def spatial_signal_factory():
         ts = np.arange(n, dtype=np.int64)
         dist = np.arange(n, dtype=np.float64) * dx
         signal = np.sin(2 * np.pi * freq_per_m * dist).astype(np.float64)
-        signal_di = DataInstance(
-            timestamp_np=ts, value_np=signal, label=label, var_id=1
-        )
-        distance_di = DataInstance(
-            timestamp_np=ts, value_np=dist, label="distance", var_id=2
-        )
+        signal_di = DataInstance(timestamp_np=ts, value_np=signal, label=label, var_id=1)
+        distance_di = DataInstance(timestamp_np=ts, value_np=dist, label="distance", var_id=2)
         return signal_di, distance_di
 
     return _factory
@@ -195,8 +191,7 @@ def ws_srd():
         "pcm.wheelSpeeds.backLeft",
     ]
     instances = {
-        i
-        + 1: DataInstance(
+        i + 1: DataInstance(
             timestamp_np=ts,
             value_np=vals.copy(),
             label=name,
@@ -249,9 +244,7 @@ def steering_srd():
     """
     ts = np.arange(4, dtype=np.int64)
     raw_volts = np.array([1.86, 2.93, 3.96, 2.93], dtype=np.float64)
-    stale_angles = np.array(
-        [-90.0, 5.0, 85.0, 5.0], dtype=np.float64
-    )  # deliberately wrong
+    stale_angles = np.array([-90.0, 5.0, 85.0, 5.0], dtype=np.float64)  # deliberately wrong
     return SingleRunData(
         id_to_instance={
             1: DataInstance(
@@ -342,9 +335,7 @@ def accel_scenario():
     signal_vals = np.zeros(n)
     signal_vals[10:] = 1.0
     signal_di = DataInstance(timestamp_np=ts, value_np=signal_vals, label="sig")
-    dist_di = DataInstance(
-        timestamp_np=ts, value_np=np.linspace(0, 200, n), label="dist"
-    )
+    dist_di = DataInstance(timestamp_np=ts, value_np=np.linspace(0, 200, n), label="dist")
     return signal_di, dist_di
 
 

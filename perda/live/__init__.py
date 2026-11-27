@@ -1,6 +1,4 @@
 """
-perda.live
-----------
 Live data acquisition from the CDP IPC server.
 
 Quick start

@@ -42,9 +42,7 @@ def test_vlines_drawn_once_per_subplot(di_simple):
         pytest.param(True, True, "log", "log", id="log_both"),
     ],
 )
-def test_log_scaling_applies_to_every_axis(
-    di_simple, log_x, log_y, expected_x, expected_y
-):
+def test_log_scaling_applies_to_every_axis(di_simple, log_x, log_y, expected_x, expected_y):
     fig = plot_time_series(
         rows=[[di_simple], [di_simple]],
         right_rows=[[di_simple], []],
@@ -63,12 +61,8 @@ def test_log_scaling_applies_to_every_axis(
     "build_rows, build_right_rows",
     [
         pytest.param(lambda di: [[]], lambda di: None, id="no_data"),
-        pytest.param(
-            lambda di: [[di.trim(100, 200)]], lambda di: None, id="empty_data_instance"
-        ),
-        pytest.param(
-            lambda di: [[di]], lambda di: [[], []], id="right_rows_length_mismatch"
-        ),
+        pytest.param(lambda di: [[di.trim(100, 200)]], lambda di: None, id="empty_data_instance"),
+        pytest.param(lambda di: [[di]], lambda di: [[], []], id="right_rows_length_mismatch"),
     ],
 )
 def test_plot_time_series_invalid_raises(di_simple, build_rows, build_right_rows):

@@ -24,10 +24,7 @@ _TIMESTAMP_UNIT = Timescale.MS
 
 
 class LiveAnalyzer:
-    """
-    Live data analyzer that pulls time-series data from the CDP IPC server
-    and exposes a plotting interface analogous to ``Analyzer``.
-    """
+    """Live data analyzer that pulls time-series data from the CDP IPC server, with an ``Analyzer``-like plot API."""
 
     def __init__(self, host: str, port: int, timeout: float, range_timeout: float):
         self._host = host
@@ -45,6 +42,7 @@ class LiveAnalyzer:
         timeout: float = _DEFAULT_TIMEOUT,
         range_timeout: float = _DEFAULT_RANGE_TIMEOUT,
     ) -> "LiveAnalyzer":
+        """Connect to a CDP server running on this machine."""
         return cls("127.0.0.1", port, timeout, range_timeout)
 
     @classmethod
@@ -54,6 +52,7 @@ class LiveAnalyzer:
         timeout: float = _DEFAULT_TIMEOUT,
         range_timeout: float = _DEFAULT_RANGE_TIMEOUT,
     ) -> "LiveAnalyzer":
+        """Connect to the Penn Electric Racing dataserver."""
         return cls(_DATASERVER_HOST, port, timeout, range_timeout)
 
     @classmethod
@@ -64,6 +63,7 @@ class LiveAnalyzer:
         timeout: float = _DEFAULT_TIMEOUT,
         range_timeout: float = _DEFAULT_RANGE_TIMEOUT,
     ) -> "LiveAnalyzer":
+        """Connect to a CDP server at the given host."""
         return cls(host, port, timeout, range_timeout)
 
     def _check_connection(self) -> None:
@@ -77,6 +77,7 @@ class LiveAnalyzer:
             )
 
     def is_connected(self, refresh: bool = False) -> bool:
+        """Whether the server is reachable, re-checking it first if ``refresh`` is True."""
         if refresh:
             try:
                 with self._client():
@@ -86,6 +87,7 @@ class LiveAnalyzer:
         return self._connected
 
     def ensure_connected(self) -> None:
+        """Raise CDPException if the server is unreachable."""
         if not self.is_connected(refresh=True):
             raise CDPException("Lost connection to CDP server")
 
@@ -94,6 +96,7 @@ class LiveAnalyzer:
         var: str,
         time_secs: int = _DEFAULT_TIME_SECS,
     ) -> DataInstance:
+        """Fetch the last ``time_secs`` seconds of a variable."""
         self.ensure_connected()
         with self._client() as client:
             return client.get_range(var, time_secs)
@@ -103,6 +106,7 @@ class LiveAnalyzer:
         access_string: str,
         value_type: ValueType,
     ) -> Union[float, bool, int]:
+        """Read the current value of a variable."""
         self.ensure_connected()
         with self._client() as client:
             return client.get(access_string, value_type)
@@ -113,6 +117,7 @@ class LiveAnalyzer:
         value: Union[float, bool, int],
         value_type: ValueType,
     ) -> None:
+        """Write a value to a variable."""
         self.ensure_connected()
         with self._client() as client:
             client.set(access_string, value, value_type)
@@ -131,6 +136,7 @@ class LiveAnalyzer:
         width: int = PLOT_WIDTH,
         height: int = PLOT_HEIGHT,
     ) -> go.Figure:
+        """Plot recent data for ``var_1``, with ``var_2`` on an optional right y-axis."""
         self.ensure_connected()
 
         left_dis = self._normalize_input(var_1, time_secs)
@@ -160,6 +166,7 @@ class LiveAnalyzer:
         width: int = PLOT_WIDTH,
         height: int = PLOT_HEIGHT,
     ) -> go.Figure:
+        """Plot sampling-frequency diagnostics for recent data of a variable."""
         di = self.fetch(var, time_secs)
         return _analyze_frequency(
             di,

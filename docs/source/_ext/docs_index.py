@@ -18,18 +18,12 @@ MEMBER_KINDS = {"attribute", "pydantic_field"}
 class DocsIndexEntry(BaseModel):
     name: str = Field(description="Fully qualified name, or the docname of a page")
     kind: str = Field(description="Object type, e.g. class or method, or page")
-    summary: str = Field(
-        description="First paragraph of the docstring, or the page title"
-    )
-    text: str = Field(
-        description="The object's documentation, as the text builder renders it"
-    )
+    summary: str = Field(description="First paragraph of the docstring, or the page title")
+    text: str = Field(description="The object's documentation, as the text builder renders it")
 
 
 class DocsIndex(BaseModel):
-    entries: list[DocsIndexEntry] = Field(
-        description="Every documented object and page"
-    )
+    entries: list[DocsIndexEntry] = Field(description="Every documented object and page")
 
 
 # Filled page by page during the build, then written out by write_index
@@ -104,11 +98,7 @@ def record_entries(app: Sphinx, doctree: nodes.document, docname: str) -> None:
 
     # findall collects top-level objects (classes, functions) and objects nested inside a class's desc_content
     # (methods, nested classes). Attributes and pydantic fields are left out: they stay inside their class's entry.
-    descs = [
-        desc
-        for desc in doctree.findall(addnodes.desc)
-        if desc["objtype"] not in MEMBER_KINDS
-    ]
+    descs = [desc for desc in doctree.findall(addnodes.desc) if desc["objtype"] not in MEMBER_KINDS]
 
     # No documented objects means a hand-written page (or an autosummary package page)
     if not descs:
@@ -118,9 +108,7 @@ def record_entries(app: Sphinx, doctree: nodes.document, docname: str) -> None:
         text = render_text(app, [child.deepcopy() for child in doctree.children])
         if title is not None and text:
             ENTRIES.append(
-                DocsIndexEntry(
-                    name=docname, kind="page", summary=title.astext(), text=text
-                )
+                DocsIndexEntry(name=docname, kind="page", summary=title.astext(), text=text)
             )
         return
 
@@ -137,8 +125,7 @@ def record_entries(app: Sphinx, doctree: nodes.document, docname: str) -> None:
             (
                 child.astext()
                 for child in content.children
-                if isinstance(child, nodes.paragraph)
-                and not child.astext().startswith("Bases: ")
+                if isinstance(child, nodes.paragraph) and not child.astext().startswith("Bases: ")
             ),
             "",
         )

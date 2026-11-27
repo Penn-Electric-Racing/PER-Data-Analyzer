@@ -1,5 +1,6 @@
 """
 Python client library for communicating with the Rust CDP IPC server.
+
 Supports getting and setting values, as well as fetching time-series ranges.
 """
 
@@ -227,7 +228,8 @@ class CDPClient:
             access_string: The access path (e.g. "vehicle.speed")
             value_type:    Expected type of the value
 
-        Returns:
+        Returns
+        -------
             The requested value as float, bool, or int
         """
         sock, addr = self._check_connected()
@@ -261,7 +263,8 @@ class CDPClient:
             value_type:    Expected type of the value
             time_secs:     How many seconds of history to retrieve (u32)
 
-        Returns:
+        Returns
+        -------
             A DataInstance with the assembled time-series data
         """
         from perda.analyzer import DataInstance
@@ -321,18 +324,11 @@ class CDPClient:
                     if storage_interval > 0:
                         expected_samples = (time_secs * 1000) // storage_interval
                     else:
-                        logger.warning(
-                            "storage_interval is zero; terminating on timeout"
-                        )
+                        logger.warning("storage_interval is zero; terminating on timeout")
 
                 # Terminate early if we have all expected samples
-                if (
-                    expected_samples is not None
-                    and total_samples_received >= expected_samples
-                ):
-                    logger.debug(
-                        f"get_range complete: {total_samples_received} samples received"
-                    )
+                if expected_samples is not None and total_samples_received >= expected_samples:
+                    logger.debug(f"get_range complete: {total_samples_received} samples received")
                     break
 
         finally:
@@ -408,9 +404,7 @@ class CDPClient:
             bit  7   : 1 = Get/GetRanged, 0 = Set
         """
         if len(access_string.encode("utf-8")) > self.ACCESS_STRING_SIZE:
-            raise CDPException(
-                f"Access string too long (max {self.ACCESS_STRING_SIZE} bytes)"
-            )
+            raise CDPException(f"Access string too long (max {self.ACCESS_STRING_SIZE} bytes)")
 
         sig = value_type.value & 0b11
 
@@ -426,9 +420,7 @@ class CDPClient:
 
         if mode == "get_range":
             # time_secs packed as u32 LE into the 8-byte value field
-            packet[1 + self.ACCESS_STRING_SIZE :] = (
-                struct.pack("<I", time_secs) + b"\x00" * 4
-            )
+            packet[1 + self.ACCESS_STRING_SIZE :] = struct.pack("<I", time_secs) + b"\x00" * 4
         else:
             packet[1 + self.ACCESS_STRING_SIZE :] = struct.pack("<d", value)
 
@@ -445,9 +437,7 @@ class CDPClient:
             self._raise_server_error(status)
 
         if len(response) != 9:
-            raise CDPProtocolError(
-                f"Invalid GET response length: expected 9, got {len(response)}"
-            )
+            raise CDPProtocolError(f"Invalid GET response length: expected 9, got {len(response)}")
 
         float_value = struct.unpack("<d", response[1:9])[0]
 

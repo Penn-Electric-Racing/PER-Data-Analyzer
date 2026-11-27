@@ -30,9 +30,7 @@ def test_group_variables_by_subplot(variables, expected):
         pytest.param("cpp.var_a", ["cpp.var_a"], id="single_name"),
         pytest.param(2, ["cpp.var_b"], id="single_id"),
         pytest.param("cpp.*", ["cpp.var_a", "cpp.var_b"], id="pattern"),
-        pytest.param(
-            ["cpp.var_b", None, ["cpp.var_a"]], ["cpp.var_b", "cpp.var_a"], id="nested"
-        ),
+        pytest.param(["cpp.var_b", None, ["cpp.var_a"]], ["cpp.var_b", "cpp.var_a"], id="nested"),
     ],
 )
 def test_lookup_subplot_data_instances(srd_basic, subplot_variables, expected_names):

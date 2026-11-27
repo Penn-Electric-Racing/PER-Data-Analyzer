@@ -54,7 +54,9 @@ def plot_parametric_curve(
     Returns
     -------
     go.Figure
-        Plotly figure. Change anything not exposed here (fonts, colors, margins, equal axis scaling, ...) with ``fig.update_layout``, ``fig.update_xaxes``, ``fig.update_yaxes`` or ``fig.update_traces`` before calling ``fig.show()``.
+        Plotly figure. Change anything not exposed here (fonts, colors, margins, equal axis scaling, ...) with
+        ``fig.update_layout``, ``fig.update_xaxes``, ``fig.update_yaxes`` or ``fig.update_traces`` before calling
+        ``fig.show()``.
 
     Examples
     --------
@@ -86,11 +88,7 @@ def plot_parametric_curve(
         height=height,
         margin=MARGIN,
         plot_bgcolor=PLOT_BGCOLOR,
-        xaxis=dict(
-            tickfont=dict(size=FONT_SIZE_SMALL), type="log" if log_x else "linear"
-        ),
-        yaxis=dict(
-            tickfont=dict(size=FONT_SIZE_SMALL), type="log" if log_y else "linear"
-        ),
+        xaxis=dict(tickfont=dict(size=FONT_SIZE_SMALL), type="log" if log_x else "linear"),
+        yaxis=dict(tickfont=dict(size=FONT_SIZE_SMALL), type="log" if log_y else "linear"),
     )
     return fig

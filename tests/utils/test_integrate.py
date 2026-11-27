@@ -48,9 +48,7 @@ def test_integrate_zero_length_returns_zero():
         timestamp_np=np.array([0, 1, 2], dtype=np.int64),
         value_np=np.array([1.0, 1.0, 1.0], dtype=np.float64),
     )
-    result = integrate_over_time_range(
-        di, start_time=1, end_time=1, source_time_unit=Timescale.MS
-    )
+    result = integrate_over_time_range(di, start_time=1, end_time=1, source_time_unit=Timescale.MS)
     assert result == 0.0
 
 
@@ -111,9 +109,7 @@ def test_integrate_parametrized(ts, vals, start, end, expected):
     assert result == pytest.approx(expected, abs=1e-9)
 
 
-@pytest.mark.parametrize(
-    "function", [integrate_over_time_range, average_over_time_range]
-)
+@pytest.mark.parametrize("function", [integrate_over_time_range, average_over_time_range])
 def test_tuple_input_returns_one_result_per_instance(function):
     constant = DataInstance(
         timestamp_np=np.array([0, 1000], dtype=np.int64),
@@ -135,9 +131,7 @@ def test_average_constant_signal():
         timestamp_np=np.array([0, 1000], dtype=np.int64),
         value_np=np.array([5.0, 5.0], dtype=np.float64),
     )
-    avg = average_over_time_range(
-        di, source_time_unit=Timescale.MS, target_time_unit=Timescale.S
-    )
+    avg = average_over_time_range(di, source_time_unit=Timescale.MS, target_time_unit=Timescale.S)
     assert pytest.approx(avg, abs=1e-9) == 5.0
 
 
@@ -147,9 +141,7 @@ def test_average_linear_ramp_midpoint():
         timestamp_np=np.array([0, 1000], dtype=np.int64),
         value_np=np.array([0.0, 2.0], dtype=np.float64),
     )
-    avg = average_over_time_range(
-        di, source_time_unit=Timescale.MS, target_time_unit=Timescale.S
-    )
+    avg = average_over_time_range(di, source_time_unit=Timescale.MS, target_time_unit=Timescale.S)
     assert pytest.approx(avg, abs=1e-9) == 1.0
 
 
@@ -191,9 +183,7 @@ def test_average_zero_time_range_returns_zero():
         timestamp_np=np.array([0, 1, 2], dtype=np.int64),
         value_np=np.array([1.0, 1.0, 1.0], dtype=np.float64),
     )
-    avg = average_over_time_range(
-        di, start_time=5, end_time=5, source_time_unit=Timescale.MS
-    )
+    avg = average_over_time_range(di, start_time=5, end_time=5, source_time_unit=Timescale.MS)
     assert avg == 0.0
 
 

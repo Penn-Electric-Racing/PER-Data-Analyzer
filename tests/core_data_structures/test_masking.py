@@ -10,9 +10,7 @@ def test_filter_values_keeps_matching_rows(di_simple):
 
 
 def test_filter_timestamps_keeps_matching_rows(di_simple):
-    result = apply_ufunc_filter(
-        di_simple, lambda ts: ts >= 2, apply_to=FilterOptions.TIMESTAMPS
-    )
+    result = apply_ufunc_filter(di_simple, lambda ts: ts >= 2, apply_to=FilterOptions.TIMESTAMPS)
     np.testing.assert_array_equal(result.timestamp_np, [2, 3])
 
 

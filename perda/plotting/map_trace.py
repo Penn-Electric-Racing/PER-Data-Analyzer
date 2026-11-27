@@ -28,8 +28,9 @@ def plot_map_trace(
     height: int = PLOT_HEIGHT,
 ) -> go.Figure:
     """
-    Draw a path of latitude/longitude points on top of an interactive background map. The map is
-    automatically centered and zoomed to fit all points.
+    Draw a path of latitude/longitude points on top of an interactive background map.
+
+    The map is automatically centered and zoomed to fit all points.
 
     Parameters
     ----------
@@ -50,7 +51,9 @@ def plot_map_trace(
     Returns
     -------
     go.Figure
-        Plotly figure with a map background. Change anything not exposed here (line color, marker size, zoom, ...) with ``fig.update_layout`` or ``fig.update_traces`` before calling ``fig.show()``, e.g. ``fig.update_layout(map_zoom=16)``.
+        Plotly figure with a map background. Change anything not exposed here (line color, marker size, zoom, ...) with
+        ``fig.update_layout`` or ``fig.update_traces`` before calling ``fig.show()``, e.g.
+        ``fig.update_layout(map_zoom=16)``.
 
     Raises
     ------
@@ -63,9 +66,7 @@ def plot_map_trace(
     >>> fig = plot_map_trace(lat_array, lon_array, title="Lap Track")
     """
     if len(lat) != len(lon):
-        raise ValueError(
-            f"lat and lon have different lengths ({len(lat)} vs {len(lon)})."
-        )
+        raise ValueError(f"lat and lon have different lengths ({len(lat)} vs {len(lon)}).")
     if len(lat) == 0:
         raise ValueError("lat and lon are empty.")
 

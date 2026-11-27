@@ -43,7 +43,8 @@ def plot_parametric_overlay(
     x_by_series : dict[str, NDArray[float64]]
         Maps each curve's legend name to its x values. Curves are drawn in dictionary order.
     y_by_series : dict[str, NDArray[float64]]
-        Maps each curve's legend name to its y values. Must have the same keys as ``x_by_series``, and each array the same length as the matching x array.
+        Maps each curve's legend name to its y values. Must have the same keys as ``x_by_series``, and each array the
+        same length as the matching x array.
     x_label : str, optional
         X-axis label. Default is ``"X"``.
     y_label : str, optional
@@ -51,9 +52,11 @@ def plot_parametric_overlay(
     title : str | None, optional
         Title shown above the plot. Default is None (no title).
     mode : {"lines", "markers", "lines+markers"}, optional
-        Draw each curve as connected lines, as separate dots, or both. Use ``"markers"`` for noisy data where connecting lines would be misleading. Default is ``"lines"``.
+        Draw each curve as connected lines, as separate dots, or both. Use ``"markers"`` for noisy data where connecting
+        lines would be misleading. Default is ``"lines"``.
     equal_aspect : bool, optional
-        Lock the axes so one unit in x is drawn the same length as one unit in y. Use this for spatial data such as positions in metres, so shapes are not stretched. Default is False.
+        Lock the axes so one unit in x is drawn the same length as one unit in y. Use this for spatial data such as
+        positions in metres, so shapes are not stretched. Default is False.
     show_legend : bool, optional
         Whether to show the legend listing each curve. Default is True.
     log_x : bool, optional
@@ -68,7 +71,8 @@ def plot_parametric_overlay(
     Returns
     -------
     go.Figure
-        Plotly figure with one trace per curve, named by its key. Change anything not exposed here (fonts, colors, marker size, ...) with ``fig.update_layout`` or ``fig.update_traces`` before calling ``fig.show()``.
+        Plotly figure with one trace per curve, named by its key. Change anything not exposed here (fonts, colors,
+        marker size, ...) with ``fig.update_layout`` or ``fig.update_traces`` before calling ``fig.show()``.
 
     Raises
     ------
@@ -123,12 +127,8 @@ def plot_parametric_overlay(
         height=height,
         margin=MARGIN,
         plot_bgcolor=PLOT_BGCOLOR,
-        xaxis=dict(
-            tickfont=dict(size=FONT_SIZE_SMALL), type="log" if log_x else "linear"
-        ),
-        yaxis=dict(
-            tickfont=dict(size=FONT_SIZE_SMALL), type="log" if log_y else "linear"
-        ),
+        xaxis=dict(tickfont=dict(size=FONT_SIZE_SMALL), type="log" if log_x else "linear"),
+        yaxis=dict(tickfont=dict(size=FONT_SIZE_SMALL), type="log" if log_y else "linear"),
         legend=dict(font=dict(size=FONT_SIZE_SMALL)),
     )
     if equal_aspect:

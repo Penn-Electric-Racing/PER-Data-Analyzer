@@ -86,9 +86,7 @@ def test_lowpass_preserves_metadata(sine_di_factory):
 def test_lowpass_tuple_input_returns_tuple(sine_di_factory):
     di_a = sine_di_factory(freq_hz=5.0, label="a", var_id=1)
     di_b = sine_di_factory(freq_hz=5.0, label="b", var_id=2)
-    results = lowpass_filter(
-        (di_a, di_b), cutoff_hz=20.0, source_time_unit=Timescale.MS
-    )
+    results = lowpass_filter((di_a, di_b), cutoff_hz=20.0, source_time_unit=Timescale.MS)
     assert isinstance(results, tuple)
     assert len(results) == 2
 
@@ -106,12 +104,8 @@ def test_lowpass_skips_when_cutoff_above_nyquist(sine_di_factory, capsys):
 
 def test_lowpass_timescale_ms_vs_us(sine_di_ms, sine_di_us):
     """Same physical signal filtered identically regardless of timestamp unit."""
-    result_ms = lowpass_filter(
-        sine_di_ms, cutoff_hz=20.0, source_time_unit=Timescale.MS
-    )
-    result_us = lowpass_filter(
-        sine_di_us, cutoff_hz=20.0, source_time_unit=Timescale.US
-    )
+    result_ms = lowpass_filter(sine_di_ms, cutoff_hz=20.0, source_time_unit=Timescale.MS)
+    result_us = lowpass_filter(sine_di_us, cutoff_hz=20.0, source_time_unit=Timescale.US)
     assert isinstance(result_ms, DataInstance)
     assert isinstance(result_us, DataInstance)
     np.testing.assert_allclose(result_ms.value_np, result_us.value_np, atol=1e-10)
@@ -127,18 +121,14 @@ def test_zscore_removes_spike(uniform_di):
         label="spike",
         var_id=1,
     )
-    result = zscore_filter(
-        di, window_s=0.5, threshold=3.0, source_time_unit=Timescale.MS
-    )
+    result = zscore_filter(di, window_s=0.5, threshold=3.0, source_time_unit=Timescale.MS)
     assert isinstance(result, DataInstance)
     assert result.value_np[250] < 10.0
 
 
 def test_zscore_keeps_clean_signal(uniform_di):
     """A clean constant signal should be unchanged."""
-    result = zscore_filter(
-        uniform_di, window_s=0.5, threshold=3.0, source_time_unit=Timescale.MS
-    )
+    result = zscore_filter(uniform_di, window_s=0.5, threshold=3.0, source_time_unit=Timescale.MS)
     assert isinstance(result, DataInstance)
     np.testing.assert_allclose(result.value_np, uniform_di.value_np, atol=1e-10)
 
@@ -154,17 +144,13 @@ def test_zscore_removes_multiple_spikes(n_spikes: int, uniform_di):
         label="spikes",
         var_id=1,
     )
-    result = zscore_filter(
-        di, window_s=0.5, threshold=3.0, source_time_unit=Timescale.MS
-    )
+    result = zscore_filter(di, window_s=0.5, threshold=3.0, source_time_unit=Timescale.MS)
     assert isinstance(result, DataInstance)
     assert np.all(result.value_np[spike_indices] < 10.0)
 
 
 def test_zscore_preserves_timestamps(uniform_di):
-    result = zscore_filter(
-        uniform_di, window_s=2.0, threshold=4.8, source_time_unit=Timescale.MS
-    )
+    result = zscore_filter(uniform_di, window_s=2.0, threshold=4.8, source_time_unit=Timescale.MS)
     np.testing.assert_array_equal(result.timestamp_np, uniform_di.timestamp_np)
 
 
@@ -232,17 +218,13 @@ def test_compute_fft_tuple_input_returns_pair_per_signal(sine_di_factory):
 
 def test_compute_fft_peak_normalization_max_is_one(sine_di_factory):
     di = sine_di_factory(freq_hz=10.0)
-    _, mags = compute_fft(
-        di, source_time_unit=Timescale.MS, normalization=FFTNormalization.PEAK
-    )
+    _, mags = compute_fft(di, source_time_unit=Timescale.MS, normalization=FFTNormalization.PEAK)
     assert np.max(mags) == pytest.approx(1.0)
 
 
 def test_compute_fft_l2_normalization_has_unit_norm(sine_di_factory):
     di = sine_di_factory(freq_hz=10.0)
-    _, mags = compute_fft(
-        di, source_time_unit=Timescale.MS, normalization=FFTNormalization.L2
-    )
+    _, mags = compute_fft(di, source_time_unit=Timescale.MS, normalization=FFTNormalization.L2)
     assert np.linalg.norm(mags) == pytest.approx(1.0)
 
 
@@ -258,9 +240,7 @@ def test_compute_fft_normalization_removes_amplitude_scale(
         label="scaled_sine",
         var_id=2,
     )
-    _, mags = compute_fft(
-        di, source_time_unit=Timescale.MS, normalization=normalization
-    )
+    _, mags = compute_fft(di, source_time_unit=Timescale.MS, normalization=normalization)
     _, mags_scaled = compute_fft(
         di_scaled, source_time_unit=Timescale.MS, normalization=normalization
     )
@@ -271,9 +251,7 @@ def test_compute_fft_normalization_removes_amplitude_scale(
 def test_compute_fft_normalization_constant_signal_stays_finite(
     normalization: FFTNormalization, uniform_di
 ):
-    _, mags = compute_fft(
-        uniform_di, source_time_unit=Timescale.MS, normalization=normalization
-    )
+    _, mags = compute_fft(uniform_di, source_time_unit=Timescale.MS, normalization=normalization)
     assert np.all(np.isfinite(mags))
 
 
@@ -311,9 +289,7 @@ def test_lowpass_by_distance_attenuates_high_spatial_freq(spatial_signal_factory
     Signal at 2.0 1/m is 4x the cutoff (0.5 1/m) below Nyquist.
     """
     signal_di, distance_di = spatial_signal_factory(freq_per_m=2.0, n=600, dx=0.1)
-    result = lowpass_filter_by_distance(
-        signal_di, distance_di, cutoff_freq_per_meter=0.5
-    )
+    result = lowpass_filter_by_distance(signal_di, distance_di, cutoff_freq_per_meter=0.5)
     assert isinstance(result, DataInstance)
     mid = slice(len(result.value_np) // 4, 3 * len(result.value_np) // 4)
     rms_in = np.sqrt(np.mean(signal_di.value_np[mid] ** 2))
@@ -323,9 +299,7 @@ def test_lowpass_by_distance_attenuates_high_spatial_freq(spatial_signal_factory
 
 def test_lowpass_by_distance_preserves_timestamps(spatial_signal_factory):
     signal_di, distance_di = spatial_signal_factory(freq_per_m=0.5)
-    result = lowpass_filter_by_distance(
-        signal_di, distance_di, cutoff_freq_per_meter=0.5
-    )
+    result = lowpass_filter_by_distance(signal_di, distance_di, cutoff_freq_per_meter=0.5)
     assert isinstance(result, DataInstance)
     np.testing.assert_array_equal(result.timestamp_np, signal_di.timestamp_np)
 
@@ -339,9 +313,7 @@ def test_lowpass_by_distance_with_stationary_segments():
     signal_di = DataInstance(timestamp_np=ts, value_np=signal, label="sig", var_id=1)
     distance_di = DataInstance(timestamp_np=ts, value_np=dist, label="dist", var_id=2)
 
-    result = lowpass_filter_by_distance(
-        signal_di, distance_di, cutoff_freq_per_meter=1.0
-    )
+    result = lowpass_filter_by_distance(signal_di, distance_di, cutoff_freq_per_meter=1.0)
     assert isinstance(result, DataInstance)
     assert len(result) == n
     np.testing.assert_array_equal(result.timestamp_np, ts)
@@ -356,9 +328,7 @@ def test_lowpass_by_distance_stationary_segment_gets_constant_output():
     signal_di = DataInstance(timestamp_np=ts, value_np=signal, label="sig", var_id=1)
     distance_di = DataInstance(timestamp_np=ts, value_np=dist, label="dist", var_id=2)
 
-    result = lowpass_filter_by_distance(
-        signal_di, distance_di, cutoff_freq_per_meter=1.0
-    )
+    result = lowpass_filter_by_distance(signal_di, distance_di, cutoff_freq_per_meter=1.0)
     assert isinstance(result, DataInstance)
     assert np.all(result.value_np[:100] == result.value_np[0])
 
@@ -378,14 +348,10 @@ def test_lowpass_by_distance_all_stationary_raises():
         lowpass_filter_by_distance(signal_di, distance_di, cutoff_freq_per_meter=0.5)
 
 
-def test_lowpass_by_distance_skips_when_cutoff_above_nyquist(
-    spatial_signal_factory, capsys
-):
+def test_lowpass_by_distance_skips_when_cutoff_above_nyquist(spatial_signal_factory, capsys):
     # dx=0.1 m -> fs=10 1/m -> Nyquist=5 1/m; use cutoff=6 1/m to trigger skip
     signal_di, distance_di = spatial_signal_factory(freq_per_m=0.5, n=300, dx=0.1)
-    result = lowpass_filter_by_distance(
-        signal_di, distance_di, cutoff_freq_per_meter=6.0
-    )
+    result = lowpass_filter_by_distance(signal_di, distance_di, cutoff_freq_per_meter=6.0)
     assert isinstance(result, DataInstance)
     np.testing.assert_array_equal(result.value_np, signal_di.value_np)
     assert "Nyquist" in capsys.readouterr().out
@@ -399,9 +365,7 @@ def test_lowpass_by_distance_tuple_input_returns_tuple(spatial_signal_factory):
         label="b",
         var_id=2,
     )
-    results = lowpass_filter_by_distance(
-        (signal_di, di_b), distance_di, cutoff_freq_per_meter=0.5
-    )
+    results = lowpass_filter_by_distance((signal_di, di_b), distance_di, cutoff_freq_per_meter=0.5)
     assert isinstance(results, tuple)
     assert len(results) == 2
 
@@ -409,12 +373,8 @@ def test_lowpass_by_distance_tuple_input_returns_tuple(spatial_signal_factory):
 def test_compute_fft_spatial_peak_at_correct_frequency(spatial_signal_factory):
     """Spatial FFT peak should land at the injected spatial frequency."""
     target_freq = 2.0
-    signal_di, distance_di = spatial_signal_factory(
-        freq_per_m=target_freq, n=1000, dx=0.05
-    )
-    freqs, mags = compute_fft(
-        signal_di, distance_di=distance_di, source_time_unit=Timescale.MS
-    )
+    signal_di, distance_di = spatial_signal_factory(freq_per_m=target_freq, n=1000, dx=0.05)
+    freqs, mags = compute_fft(signal_di, distance_di=distance_di, source_time_unit=Timescale.MS)
     peak_freq = freqs[np.argmax(mags)]
     assert abs(peak_freq - target_freq) < 0.2
 
@@ -429,9 +389,7 @@ def test_compute_fft_spatial_with_duplicate_distances():
     di = DataInstance(timestamp_np=ts, value_np=signal, label="sig", var_id=1)
     distance_di = DataInstance(timestamp_np=ts, value_np=dist, label="dist", var_id=2)
 
-    freqs, mags = compute_fft(
-        di, distance_di=distance_di, source_time_unit=Timescale.MS
-    )
+    freqs, mags = compute_fft(di, distance_di=distance_di, source_time_unit=Timescale.MS)
     peak_freq = freqs[np.argmax(mags)]
     assert abs(peak_freq - target_freq) < 0.2
 
@@ -440,9 +398,7 @@ def test_compute_fft_spatial_all_stationary_raises():
     """All-zero distance steps should raise ValueError in spatial FFT mode."""
     n = 100
     ts = np.arange(n, dtype=np.int64)
-    di = DataInstance(
-        timestamp_np=ts, value_np=np.ones(n, dtype=np.float64), label="sig", var_id=1
-    )
+    di = DataInstance(timestamp_np=ts, value_np=np.ones(n, dtype=np.float64), label="sig", var_id=1)
     distance_di = DataInstance(
         timestamp_np=ts, value_np=np.zeros(n, dtype=np.float64), label="dist", var_id=2
     )

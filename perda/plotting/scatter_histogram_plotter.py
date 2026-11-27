@@ -80,7 +80,9 @@ def plot_scatter_and_histogram(
     Returns
     -------
     go.Figure
-        Plotly figure. Change anything not exposed here (fonts, colors, margins, log axes, ...) with ``fig.update_layout``, ``fig.update_xaxes``, ``fig.update_yaxes`` or ``fig.update_traces`` before calling ``fig.show()``. Target one panel with ``row=1`` (line plot) or ``row=2`` (histogram) and ``col=1``.
+        Plotly figure. Change anything not exposed here (fonts, colors, margins, log axes, ...) with
+        ``fig.update_layout``, ``fig.update_xaxes``, ``fig.update_yaxes`` or ``fig.update_traces`` before calling
+        ``fig.show()``. Target one panel with ``row=1`` (line plot) or ``row=2`` (histogram) and ``col=1``.
 
     Examples
     --------

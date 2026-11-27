@@ -14,8 +14,9 @@ from .search_indexes import VariableSemanticIndex
 @lru_cache(maxsize=1)
 def load_encoder(model_id: str) -> Callable[[list[str]], NDArray]:
     """
-    Load a sentence-transformers model and return its bound encode callable. Cached so
-    the model is loaded at most once per process and shared by every run.
+    Load a sentence-transformers model and return its bound encode callable.
+
+    Cached so the model is loaded at most once per process and shared by every run.
 
     Parameters
     ----------
@@ -23,7 +24,7 @@ def load_encoder(model_id: str) -> Callable[[list[str]], NDArray]:
         HuggingFace identifier of the model to load.
 
     Raises
-    -------
+    ------
     ImportError
         When the ``semantic`` extra is absent, callers are expected to catch and fall back to keyword search.
     """
@@ -48,9 +49,7 @@ def embed_texts(texts: list[str]) -> NDArray[np.float32]:
     return vectors
 
 
-def update_semantic_index(
-    index: VariableSemanticIndex, id_to_descript: dict[int, str]
-) -> None:
+def update_semantic_index(index: VariableSemanticIndex, id_to_descript: dict[int, str]) -> None:
     """
     Embed and store the given descriptions in place, replacing any older vector per ID.
 
@@ -105,25 +104,18 @@ def copy_semantic_vectors(
     target_ids = np.fromiter(id_map.values(), dtype=np.int64)
     target.faiss_index.remove_ids(faiss.IDSelectorBatch(target_ids))
     target.faiss_index.add_with_ids(
-        source.faiss_index.reconstruct_batch(
-            np.fromiter(id_map.keys(), dtype=np.int64)
-        ),
+        source.faiss_index.reconstruct_batch(np.fromiter(id_map.keys(), dtype=np.int64)),
         target_ids,
     )
     target.id_to_descript.update(
-        {
-            target_id: source.id_to_descript[source_id]
-            for source_id, target_id in id_map.items()
-        }
+        {target_id: source.id_to_descript[source_id] for source_id, target_id in id_map.items()}
     )
 
 
 def clone_semantic_index(index: VariableSemanticIndex) -> VariableSemanticIndex:
     """Independent copy of a semantic index, so updating one never changes the other."""
     clone = empty_semantic_index()
-    copy_semantic_vectors(
-        index, clone, {var_id: var_id for var_id in index.id_to_descript}
-    )
+    copy_semantic_vectors(index, clone, {var_id: var_id for var_id in index.id_to_descript})
     return clone
 
 
@@ -132,6 +124,7 @@ def build_semantic_index(
 ) -> VariableSemanticIndex | None:
     """
     Encode every variable description into a L2-normalized and FAISS inner-product index.
+
     Cosine similarity scores range [-1, 1].
 
     Parameters
@@ -166,7 +159,6 @@ def build_semantic_index(
     except Exception as e:
         if verbose >= 1:
             print(
-                f"Warning: semantic index unavailable ({e}). "
-                "Falling back to keyword-only search."
+                f"Warning: semantic index unavailable ({e}). Falling back to keyword-only search."
             )
         return None

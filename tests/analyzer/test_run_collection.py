@@ -101,9 +101,7 @@ def test_plot_comparison_overlays_every_run(two_run_collection):
 
 def test_plot_comparison_aligns_mixed_timestamp_units(write_log):
     ms_log = write_log("ms_log.csv", "PER Log: Thu Jun 11 10:00:00 2026", (0.0, 1.0))
-    us_log = write_log(
-        "us_log.csv", "PER Log: Thu Jun 11 12:00:00 2026 v2.0", (0.0, 1.0)
-    )
+    us_log = write_log("us_log.csv", "PER Log: Thu Jun 11 12:00:00 2026 v2.0", (0.0, 1.0))
     us_log.write_text(
         "PER Log: Thu Jun 11 12:00:00 2026 v2.0\n"
         "Value voltage (ams.pack.voltage): 1\n"

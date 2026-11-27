@@ -42,18 +42,14 @@ class DataInstance(BaseModel):
 
     timestamp_np: NDArray = Field(description="Timestamps as a 1D NumPy array")
     value_np: NDArray = Field(description="Values as a 1D NumPy array")
-    label: str | None = Field(
-        default=None, description="Human-readable label for this variable"
-    )
+    label: str | None = Field(default=None, description="Human-readable label for this variable")
     var_id: int | None = Field(default=None, description="Unique variable ID")
     cpp_name: str | None = Field(default=None, description="C++ variable name")
 
     @field_validator("timestamp_np")
     @classmethod
     def validate_timestamp(cls, v: Any) -> NDArray:
-        """
-        Validate that timestamp array is 1-dimensional, positive, and strictly increasing.
-        """
+        """Validate that timestamp array is 1-dimensional, positive, and strictly increasing."""
         v = v.astype(np.int64)
         if v.ndim != 1:
             raise ValueError("timestamp_np must be 1-dimensional array.")
@@ -66,18 +62,14 @@ class DataInstance(BaseModel):
     @field_validator("value_np")
     @classmethod
     def validate_value(cls, v: Any) -> NDArray:
-        """
-        Validate that value array is 1-dimensional
-        """
+        """Validate that value array is 1-dimensional."""
         v = v.astype(np.float64)
         if v.ndim != 1:
             raise ValueError("value_np must be 1-dimensional array.")
         return v
 
     def model_post_init(self, __context: Any) -> None:
-        """
-        Post-initialization validation that timestamp and value arrays have the same length.
-        """
+        """Post-initialization validation that timestamp and value arrays have the same length."""
         if self.timestamp_np.shape[0] != self.value_np.shape[0]:
             raise ValueError("timestamp_np and value_np must have the same length.")
 
@@ -94,15 +86,11 @@ class DataInstance(BaseModel):
         )
 
     def __len__(self) -> int:
-        """
-        Get number of data points in this DataInstance.
-        """
+        """Get number of data points in this DataInstance."""
         return self.timestamp_np.shape[0]
 
     def __add__(self, other: DataInstance | int | float) -> DataInstance:
-        """
-        Add two DataInstances or add a scalar to a DataInstance.
-        """
+        """Add two DataInstances or add a scalar to a DataInstance."""
         if isinstance(other, DataInstance):
             return apply_ufunc_left_join(self, other, np.add)
         if np.isscalar(other):
@@ -115,9 +103,7 @@ class DataInstance(BaseModel):
         raise TypeError("add expects (DataInstance, DataInstance|scalar) in any order")
 
     def __sub__(self, other: DataInstance | int | float) -> DataInstance:
-        """
-        Subtract a DataInstance or scalar from this DataInstance.
-        """
+        """Subtract a DataInstance or scalar from this DataInstance."""
         if isinstance(other, DataInstance):
             return apply_ufunc_left_join(self, other, np.subtract)
         if np.isscalar(other):
@@ -130,9 +116,7 @@ class DataInstance(BaseModel):
         raise TypeError("sub expects (DataInstance, DataInstance|scalar)")
 
     def __mul__(self, other: DataInstance | int | float) -> DataInstance:
-        """
-        Multiply two DataInstances or multiply a DataInstance by a scalar.
-        """
+        """Multiply two DataInstances or multiply a DataInstance by a scalar."""
         if isinstance(other, DataInstance):
             return apply_ufunc_left_join(self, other, np.multiply)
         if np.isscalar(other):
@@ -145,9 +129,7 @@ class DataInstance(BaseModel):
         raise TypeError("mul expects (DataInstance, DataInstance|scalar)")
 
     def __truediv__(self, other: DataInstance | int | float) -> DataInstance:
-        """
-        Divide this DataInstance by another DataInstance or scalar.
-        """
+        """Divide this DataInstance by another DataInstance or scalar."""
         if isinstance(other, DataInstance):
             return apply_ufunc_left_join(self, other, np.true_divide)
         if np.isscalar(other):
@@ -160,9 +142,7 @@ class DataInstance(BaseModel):
         raise TypeError("div expects (DataInstance, DataInstance|scalar)")
 
     def __pow__(self, other: DataInstance | int | float) -> DataInstance:
-        """
-        Raise this DataInstance to the power of another DataInstance or scalar.
-        """
+        """Raise this DataInstance to the power of another DataInstance or scalar."""
         if isinstance(other, DataInstance):
             return apply_ufunc_left_join(self, other, np.power)
         if np.isscalar(other):
@@ -175,9 +155,7 @@ class DataInstance(BaseModel):
         raise TypeError("pow_ expects (DataInstance, DataInstance|scalar)")
 
     def __neg__(self) -> DataInstance:
-        """
-        Negate all values in this DataInstance.
-        """
+        """Negate all values in this DataInstance."""
         return DataInstance(
             timestamp_np=self.timestamp_np,
             value_np=np.negative(self.value_np),
@@ -348,9 +326,7 @@ def left_join_data_instances(
     )
 
     results: list[DataInstance] = [
-        DataInstance(
-            timestamp_np=ts, value_np=left_val, label=left.label, var_id=left.var_id
-        ),
+        DataInstance(timestamp_np=ts, value_np=left_val, label=left.label, var_id=left.var_id),
         DataInstance(
             timestamp_np=ts,
             value_np=first_right_val,
@@ -366,9 +342,7 @@ def left_join_data_instances(
             target_f, di.timestamp_np.astype(np.float64), di.value_np, method
         )
         results.append(
-            DataInstance(
-                timestamp_np=ts, value_np=vals, label=di.label, var_id=di.var_id
-            )
+            DataInstance(timestamp_np=ts, value_np=vals, label=di.label, var_id=di.var_id)
         )
 
     return tuple(results)
@@ -605,9 +579,7 @@ def apply_ufunc_inner_join(
     >>> from perda.core_data_structures import apply_ufunc_inner_join
     >>> larger = apply_ufunc_inner_join(a, b, np.maximum, tolerance=1_000)
     """
-    left_aligned, right_aligned = inner_join_data_instances(
-        left, right, tolerance=tolerance
-    )
+    left_aligned, right_aligned = inner_join_data_instances(left, right, tolerance=tolerance)
     result_val = ufunc(left_aligned.value_np, right_aligned.value_np)
 
     return DataInstance(

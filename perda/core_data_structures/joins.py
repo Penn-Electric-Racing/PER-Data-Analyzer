@@ -134,8 +134,7 @@ def inner_join(
     method: ResampleMethod = ResampleMethod.LINEAR,
 ) -> tuple[NDArray, NDArray, NDArray]:
     """
-    Inner join: keep only left timestamps that have a right timestamp within tolerance,
-    then interpolate right values onto those timestamps.
+    Inner join: keep left timestamps with a right timestamp within tolerance, then interpolate onto them.
 
     Parameters
     ----------
@@ -174,9 +173,7 @@ def inner_join(
     idx = np.searchsorted(right_ts, left_ts)
     idx_hi = np.clip(idx, 0, len(right_ts) - 1)
     idx_lo = np.clip(idx - 1, 0, len(right_ts) - 1)
-    min_dist = np.minimum(
-        np.abs(left_ts - right_ts[idx_lo]), np.abs(left_ts - right_ts[idx_hi])
-    )
+    min_dist = np.minimum(np.abs(left_ts - right_ts[idx_lo]), np.abs(left_ts - right_ts[idx_hi]))
 
     keep = min_dist <= tolerance
     timestamps = left_ts[keep]

@@ -8,5 +8,5 @@ SENTENCE_EMBEDDING_DIMENSION = 384
 
 
 def title_block(title: str) -> str:
-    """Format a title as ``===== Title =====``"""
+    """Format a title as ``===== Title =====``."""
     return f"{TITLE_DELIMITER} {title} {TITLE_DELIMITER}"

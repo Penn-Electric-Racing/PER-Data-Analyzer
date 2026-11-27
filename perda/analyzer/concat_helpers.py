@@ -206,6 +206,7 @@ def concat(
 ) -> Analyzer:
     """
     Concatenate two Analyzers sequentially in time by concatenating their SingleRunData objects.
+
     See :func:`concat_single_run_data` for details on how variables are matched and timestamps are shifted.
 
     Parameters

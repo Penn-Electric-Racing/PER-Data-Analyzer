@@ -19,9 +19,9 @@ NAME_COLUMN_WIDTH = 40
 
 
 class SearchResult(BaseModel):
-    rank: int = Field(
-        description="1-based position in the result list (1 = best match)."
-    )
+    """One ranked match from a variable search."""
+
+    rank: int = Field(description="1-based position in the result list (1 = best match).")
     score: float = Field(description="Relevance score (higher is better).")
     var_id: int = Field(description="Internal variable ID.")
     cpp_name: str = Field(description="C++ variable name used for data access.")
@@ -156,9 +156,9 @@ def keyword_score(query_terms: list[str], normalized_text: str) -> float:
     Scoring each term separately makes matching order-independent, so "front wheel
     speed" still matches a variable stored as "wheel speeds front right".
     """
-    return sum(
-        fuzz.partial_ratio(term, normalized_text) / 100.0 for term in query_terms
-    ) / len(query_terms)
+    return sum(fuzz.partial_ratio(term, normalized_text) / 100.0 for term in query_terms) / len(
+        query_terms
+    )
 
 
 def _print_search_results(query: str, results: list[SearchResult]) -> None:

@@ -118,8 +118,9 @@ def plot_gps_comparison(
     height: int = PLOT_HEIGHT,
 ) -> go.Figure:
     """
-    Plot GPS tracks from multiple runs on a shared East/North frame in metres, using the median
-    of all points across all runs as the origin reference, and with outliers filtered out.
+    Plot GPS tracks from multiple runs on a shared East/North frame in metres, with outliers filtered out.
+
+    The origin is the median of all points across all runs.
 
     Parameters
     ----------
@@ -197,8 +198,9 @@ def create_representative_gps_image(
     height: int = PLOT_HEIGHT,
 ) -> go.Figure | None:
     """
-    Plot a log's GPS track on an interactive map background, with outliers filtered out. Additionally
-    applies a velocity threshold to show only the span of the log where the vehicle is moving, if velocity data is provided.
+    Plot a log's GPS track on an interactive map background, with outliers filtered out.
+
+    If velocity data is provided, only the span of the log where the vehicle is moving is shown.
 
     Parameters
     ----------
@@ -228,7 +230,9 @@ def create_representative_gps_image(
     Returns
     -------
     go.Figure | None
-        Plotly figure with a map background, or None if speed never exceeds ``vel_thresh`` or no points remain after filtering. Change anything not exposed here (line color, zoom, ...) with ``fig.update_layout`` or ``fig.update_traces`` before calling ``fig.show()``.
+        Plotly figure with a map background, or None if speed never exceeds ``vel_thresh`` or no points remain after
+        filtering. Change anything not exposed here (line color, zoom, ...) with ``fig.update_layout`` or
+        ``fig.update_traces`` before calling ``fig.show()``.
 
     Examples
     --------
@@ -256,9 +260,7 @@ def create_representative_gps_image(
         lat_trimmed = lat_aligned.value_np
 
     # Filter outliers
-    cartesian_mask = filter_gps_cartesian(
-        lat_trimmed, lon_trimmed, max_radius_m, max_jump_m
-    )
+    cartesian_mask = filter_gps_cartesian(lat_trimmed, lon_trimmed, max_radius_m, max_jump_m)
     lat_filtered = lat_trimmed[cartesian_mask]
     lon_filtered = lon_trimmed[cartesian_mask]
 
@@ -285,6 +287,7 @@ def plot_gps_trimmer(
 ) -> widgets.VBox:
     """
     Interactive GPS track plot in metres, colored by time, with a range slider for picking a time window of the log.
+
     Latitude and longitude are projected to East/North metres around the track's median point.
 
     Parameters
