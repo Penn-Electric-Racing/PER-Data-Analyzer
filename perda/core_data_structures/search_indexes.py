@@ -65,9 +65,7 @@ def variable_keyword_index_from_csv_mappings(
     """
     return VariableKeywordIndex(
         id_to_normalized_text={
-            var_id: normalize_search_text(
-                f"{cpp_name} {id_to_descript.get(var_id, '')}"
-            )
+            var_id: normalize_search_text(f"{cpp_name} {id_to_descript.get(var_id, '')}")
             for var_id, cpp_name in id_to_cpp_name.items()
         }
     )

@@ -59,7 +59,9 @@ def analyze_frequency(
     Returns
     -------
     go.Figure
-        Plotly figure with frequency time-series and frequency histogram subplots. Change anything not exposed here (fonts, colors, log axes, ...) with ``fig.update_layout``, ``fig.update_xaxes``, ``fig.update_yaxes`` or ``fig.update_traces`` before calling ``fig.show()``.
+        Plotly figure with frequency time-series and frequency histogram subplots. Change anything not exposed here
+        (fonts, colors, log axes, ...) with ``fig.update_layout``, ``fig.update_xaxes``, ``fig.update_yaxes`` or
+        ``fig.update_traces`` before calling ``fig.show()``.
 
     Examples
     --------
@@ -112,11 +114,7 @@ def analyze_frequency(
     )
     print(
         "Frequency (Hz)"
-        + (
-            f"    (Expected: {expected_frequency_hz:{W}.3f} Hz)"
-            if expected_frequency_hz
-            else ""
-        )
+        + (f"    (Expected: {expected_frequency_hz:{W}.3f} Hz)" if expected_frequency_hz else "")
     )
     print(
         f"    {'Mean:':<{W_Label - 4}} {mean_freq:{W}.3f}    {'Median:':<{W_Label - 4}} {median_freq:.3f}"
@@ -124,18 +122,14 @@ def analyze_frequency(
     print(
         f"    {'Std dev:':<{W_Label - 4}} {std_freq:{W}.3f}    {'Min:':<{W_Label - 4}} {min_freq:.3f}    {'Max:':<{W_Label - 4}} {max_freq:.3f}"
     )
-    print(
-        f"    {'P5:':<{W_Label - 4}} {p5:{W}.3f}    {'P95:':<{W_Label - 4}} {p95:.3f}"
-    )
+    print(f"    {'P5:':<{W_Label - 4}} {p5:{W}.3f}    {'P95:':<{W_Label - 4}} {p95:.3f}")
 
     print("Gaps")
     print(f"    {'Threshold:':<{W_Label - 4}} {gap_threshold} s")
     print(f"    {'Detected:':<{W_Label - 4}} {n_gaps}")
 
     line_label = (
-        f"Expected {expected_frequency_hz} Hz"
-        if expected_frequency_hz is not None
-        else None
+        f"Expected {expected_frequency_hz} Hz" if expected_frequency_hz is not None else None
     )
     return plot_scatter_and_histogram(
         x=ts_s,

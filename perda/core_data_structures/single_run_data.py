@@ -56,12 +56,8 @@ class SingleRunData(BaseModel):
     id_to_instance: dict[int, DataInstance] = Field(
         description="Mapping from variable ID to DataInstance"
     )
-    cpp_name_to_id: dict[str, int] = Field(
-        description="Mapping from variable name to variable ID"
-    )
-    id_to_cpp_name: dict[int, str] = Field(
-        description="Mapping from variable ID to variable name"
-    )
+    cpp_name_to_id: dict[str, int] = Field(description="Mapping from variable name to variable ID")
+    id_to_cpp_name: dict[int, str] = Field(description="Mapping from variable ID to variable name")
     id_to_descript: dict[int, str] = Field(
         description="Mapping from variable ID to variable description"
     )
@@ -71,9 +67,7 @@ class SingleRunData(BaseModel):
         default=None,
         description="Timestamp when this run log was recorded",
     )
-    total_data_points: int = Field(
-        description="Total number of data points across all variables"
-    )
+    total_data_points: int = Field(description="Total number of data points across all variables")
     data_start_time: int = Field(description="Start timestamp in log timestamp unit")
     data_end_time: int = Field(description="End timestamp in log timestamp unit")
     timestamp_unit: Timescale = Field(
@@ -142,9 +136,7 @@ class SingleRunData(BaseModel):
             raise ValueError(
                 f"Cannot assign {len(instances)} DataInstance(s) to {len(cpp_names)} variable(s): {cpp_names}"
             )
-        var_ids = [
-            self._assign(cpp_name, di) for cpp_name, di in zip(cpp_names, instances)
-        ]
+        var_ids = [self._assign(cpp_name, di) for cpp_name, di in zip(cpp_names, instances)]
         self._update_search_indexes(var_ids)
 
     def __str__(self) -> str:
@@ -177,10 +169,7 @@ class SingleRunData(BaseModel):
         SingleRunData
             New run data; the original is not changed.
         """
-        trimmed = {
-            var_id: di.trim(ts_start, ts_end)
-            for var_id, di in self.id_to_instance.items()
-        }
+        trimmed = {var_id: di.trim(ts_start, ts_end) for var_id, di in self.id_to_instance.items()}
         start = self.data_start_time if ts_start is None else int(ts_start)
         end = self.data_end_time if ts_end is None else int(ts_end)
         return SingleRunData(
@@ -194,16 +183,14 @@ class SingleRunData(BaseModel):
             data_end_time=end,
             timestamp_unit=self.timestamp_unit,
             semantic_index=(
-                None
-                if self.semantic_index is None
-                else clone_semantic_index(self.semantic_index)
+                None if self.semantic_index is None else clone_semantic_index(self.semantic_index)
             ),
             keyword_index=self.keyword_index.model_copy(deep=True),
         )
 
     def split(self, split_timestamps: Sequence[float]) -> list[SingleRunData]:
         """
-        Split into consecutive runs at the given timestamps/
+        Split into consecutive runs at the given timestamps.
 
         Parameters
         ----------
@@ -215,10 +202,7 @@ class SingleRunData(BaseModel):
         -------
         list[SingleRunData]
         """
-        if any(
-            later < earlier
-            for earlier, later in zip(split_timestamps, split_timestamps[1:])
-        ):
+        if any(later < earlier for earlier, later in zip(split_timestamps, split_timestamps[1:])):
             raise ValueError(
                 f"split_timestamps must be in increasing order: {list(split_timestamps)}"
             )

@@ -65,9 +65,7 @@ def fake_encoder(monkeypatch):
         vectors = np.zeros((len(texts), SENTENCE_EMBEDDING_DIMENSION))
         for row, text in enumerate(texts):
             for word in text.lower().split():
-                vectors[
-                    row, zlib.crc32(word.encode()) % SENTENCE_EMBEDDING_DIMENSION
-                ] += 1
+                vectors[row, zlib.crc32(word.encode()) % SENTENCE_EMBEDDING_DIMENSION] += 1
         return vectors
 
     monkeypatch.setattr(
@@ -104,8 +102,6 @@ def failing_encoder(monkeypatch):
         raise RuntimeError("model load failure")
 
     load_encoder.cache_clear()
-    monkeypatch.setattr(
-        "perda.core_data_structures.semantic_embedding.load_encoder", blow_up
-    )
+    monkeypatch.setattr("perda.core_data_structures.semantic_embedding.load_encoder", blow_up)
     yield
     load_encoder.cache_clear()

@@ -57,7 +57,7 @@ def apply_sos_filter(
 
     count = int(valid.sum())
     if count < min_samples:
-        print(f"Too few valid points " f"({count} < {min_samples}), skipping")
+        print(f"Too few valid points ({count} < {min_samples}), skipping")
         return None
 
     filtered = np.full_like(signal, np.nan)
@@ -129,16 +129,14 @@ def lowpass_filter(
     """
     if not isinstance(di, DataInstance):
         return tuple(
-            lowpass_filter(instance, cutoff_hz, source_time_unit, order)
-            for instance in di
+            lowpass_filter(instance, cutoff_hz, source_time_unit, order) for instance in di
         )
 
     ts_s = to_seconds(di.timestamp_np.astype(np.float64), source_time_unit)
     dt = float(np.median(np.diff(ts_s)))
     if dt <= 0 or not np.isfinite(dt):
         raise ValueError(
-            "Non-positive median time step "
-            f"({dt:.6f} s). Cannot determine sample rate."
+            f"Non-positive median time step ({dt:.6f} s). Cannot determine sample rate."
         )
 
     fs = 1.0 / dt
@@ -220,9 +218,7 @@ def lowpass_filter_by_distance(
     """
     if not isinstance(di, DataInstance):
         return tuple(
-            lowpass_filter_by_distance(
-                instance, distance_di, cutoff_freq_per_meter, order
-            )
+            lowpass_filter_by_distance(instance, distance_di, cutoff_freq_per_meter, order)
             for instance in di
         )
 
@@ -239,9 +235,7 @@ def lowpass_filter_by_distance(
 
     positive_diffs = diffs[diffs > 0]
     if positive_diffs.size == 0:
-        raise ValueError(
-            "No positive distance steps found. Cannot determine spatial sample rate."
-        )
+        raise ValueError("No positive distance steps found. Cannot determine spatial sample rate.")
 
     dx_median = float(np.median(positive_diffs))
     fs = 1.0 / dx_median
@@ -326,16 +320,14 @@ def zscore_filter(
     """
     if not isinstance(di, DataInstance):
         return tuple(
-            zscore_filter(instance, window_s, threshold, source_time_unit)
-            for instance in di
+            zscore_filter(instance, window_s, threshold, source_time_unit) for instance in di
         )
 
     ts_s = to_seconds(di.timestamp_np.astype(np.float64), source_time_unit)
     dt = float(np.median(np.diff(ts_s)))
     if dt <= 0:
         raise ValueError(
-            "Non-positive median time step "
-            f"({dt:.6f} s). Cannot determine sample rate."
+            f"Non-positive median time step ({dt:.6f} s). Cannot determine sample rate."
         )
 
     fs = 1.0 / dt
@@ -418,7 +410,8 @@ def compute_fft(
         If provided, the FFT is computed in the spatial domain and the sample spacing is derived from cumulative
         distance in meters (interpolated onto ``di``'s timestamp grid). Default is None (time domain, result in Hz).
     normalization : FFTNormalization, optional
-        Scales the magnitudes of each signal individually, so a spectra with different units or sizes can be compared by shape.
+        Scales the magnitudes of each signal individually, so a spectra with different units or sizes can be compared by
+        shape.
         ``PEAK`` divides by the largest magnitude, ``L2`` divides by the L2 norm of the magnitudes. Default is ``NONE``.
 
     Returns
@@ -446,8 +439,7 @@ def compute_fft(
     """
     if not isinstance(di, DataInstance):
         return tuple(
-            compute_fft(instance, source_time_unit, distance_di, normalization)
-            for instance in di
+            compute_fft(instance, source_time_unit, distance_di, normalization) for instance in di
         )
 
     signal = di.value_np.astype(np.float64)
@@ -463,17 +455,14 @@ def compute_fft(
         positive_diffs = np.diff(dist_values)
         positive_diffs = positive_diffs[positive_diffs > 0]
         if positive_diffs.size == 0 or not np.all(np.isfinite(positive_diffs)):
-            raise ValueError(
-                "No positive distance steps found; cannot compute spatial FFT."
-            )
+            raise ValueError("No positive distance steps found; cannot compute spatial FFT.")
         dx = float(np.median(positive_diffs))
     else:
         ts_s = to_seconds(di.timestamp_np.astype(np.float64), source_time_unit)
         dt = float(np.median(np.diff(ts_s)))
         if dt <= 0:
             raise ValueError(
-                "Non-positive median time step "
-                f"({dt:.6f} s). Cannot determine sample rate."
+                f"Non-positive median time step ({dt:.6f} s). Cannot determine sample rate."
             )
         dx = dt
 

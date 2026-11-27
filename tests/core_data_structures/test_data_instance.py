@@ -245,9 +245,7 @@ def test_trim_returns_new_instance(di_simple):
         pytest.param(10_000.0, [0.0, 0.0], id="past_start_holds_first"),
     ],
 )
-def test_trim_offset_shifts_values_on_original_timestamps(
-    di_simple, offset, expected_values
-):
+def test_trim_offset_shifts_values_on_original_timestamps(di_simple, offset, expected_values):
     result = di_simple.trim(ts_start=1, ts_end=2, offset=offset)
     np.testing.assert_array_equal(result.timestamp_np, [1, 2])
     np.testing.assert_allclose(result.value_np, expected_values)
@@ -266,31 +264,21 @@ def test_apply_ufunc_left_join_timestamps_equal_left(di_simple, di_sparse):
 
 
 def test_apply_ufunc_outer_join_timestamps_are_union():
-    a = DataInstance(
-        timestamp_np=np.array([0, 2], dtype=np.int64), value_np=np.array([0.0, 2.0])
-    )
-    b = DataInstance(
-        timestamp_np=np.array([1, 3], dtype=np.int64), value_np=np.array([1.0, 3.0])
-    )
+    a = DataInstance(timestamp_np=np.array([0, 2], dtype=np.int64), value_np=np.array([0.0, 2.0]))
+    b = DataInstance(timestamp_np=np.array([1, 3], dtype=np.int64), value_np=np.array([1.0, 3.0]))
     result = apply_ufunc_outer_join(a, b, np.add, drop_nan=False, fill=0.0)
     np.testing.assert_array_equal(result.timestamp_np, [0, 1, 2, 3])
 
 
 def test_apply_ufunc_outer_join_drop_nan_true_no_nans():
-    a = DataInstance(
-        timestamp_np=np.array([0, 4], dtype=np.int64), value_np=np.array([0.0, 4.0])
-    )
-    b = DataInstance(
-        timestamp_np=np.array([0, 4], dtype=np.int64), value_np=np.array([0.0, 4.0])
-    )
+    a = DataInstance(timestamp_np=np.array([0, 4], dtype=np.int64), value_np=np.array([0.0, 4.0]))
+    b = DataInstance(timestamp_np=np.array([0, 4], dtype=np.int64), value_np=np.array([0.0, 4.0]))
     result = apply_ufunc_outer_join(a, b, np.add, drop_nan=True)
     assert not np.any(np.isnan(result.value_np))
 
 
 def test_apply_ufunc_outer_join_drop_nan_false_uses_fill():
-    a = DataInstance(
-        timestamp_np=np.array([0, 2], dtype=np.int64), value_np=np.array([1.0, 3.0])
-    )
+    a = DataInstance(timestamp_np=np.array([0, 2], dtype=np.int64), value_np=np.array([1.0, 3.0]))
     b = DataInstance(
         timestamp_np=np.array([5, 10], dtype=np.int64), value_np=np.array([10.0, 20.0])
     )
@@ -303,9 +291,7 @@ def test_apply_ufunc_inner_join_tolerance_zero_exact_only():
         timestamp_np=np.array([0, 1, 2, 3], dtype=np.int64),
         value_np=np.array([1.0, 2.0, 3.0, 4.0]),
     )
-    b = DataInstance(
-        timestamp_np=np.array([0, 2], dtype=np.int64), value_np=np.array([10.0, 30.0])
-    )
+    b = DataInstance(timestamp_np=np.array([0, 2], dtype=np.int64), value_np=np.array([10.0, 30.0]))
     result = apply_ufunc_inner_join(a, b, np.add, tolerance=0)
     np.testing.assert_array_equal(result.timestamp_np, [0, 2])
 
@@ -315,9 +301,7 @@ def test_apply_ufunc_inner_join_tolerance_filters_unmatched():
         timestamp_np=np.array([0, 5, 10], dtype=np.int64),
         value_np=np.array([0.0, 5.0, 10.0]),
     )
-    b = DataInstance(
-        timestamp_np=np.array([0, 10], dtype=np.int64), value_np=np.array([0.0, 10.0])
-    )
+    b = DataInstance(timestamp_np=np.array([0, 10], dtype=np.int64), value_np=np.array([0.0, 10.0]))
     result = apply_ufunc_inner_join(a, b, np.add, tolerance=3)
     np.testing.assert_array_equal(result.timestamp_np, [0, 10])
 

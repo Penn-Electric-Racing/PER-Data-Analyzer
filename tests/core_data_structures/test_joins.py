@@ -41,9 +41,7 @@ from perda.core_data_structures.resampling import ResampleMethod
         ),
     ],
 )
-def test_left_join_interpolation_method(
-    method, right_ts, right_vals, query_ts, expected_rv
-):
+def test_left_join_interpolation_method(method, right_ts, right_vals, query_ts, expected_rv):
     left_vals = np.ones(len(query_ts))
     ts, _, rv = left_join(query_ts, left_vals, right_ts, right_vals, method=method)
     np.testing.assert_array_equal(ts, query_ts)
@@ -182,9 +180,7 @@ def test_join_empty_input_raises(join_fn, kwargs):
 def test_outer_join_timestamps_are_union():
     left_ts = np.array([0, 2, 4], dtype=np.int64)
     right_ts = np.array([1, 3, 5], dtype=np.int64)
-    ts, _, _ = outer_join(
-        left_ts, np.ones(3), right_ts, np.ones(3), drop_nan=False, fill=0.0
-    )
+    ts, _, _ = outer_join(left_ts, np.ones(3), right_ts, np.ones(3), drop_nan=False, fill=0.0)
     np.testing.assert_array_equal(ts, np.union1d(left_ts, right_ts))
 
 
@@ -248,9 +244,7 @@ def test_inner_join_zero_tolerance_exact_matches_only():
 def test_inner_join_tolerance(tolerance, expected_ts):
     left_ts = np.array([0, 5, 10], dtype=np.int64)
     right_ts = np.array([0, 10], dtype=np.int64)
-    ts, _, _ = inner_join(
-        left_ts, np.ones(3), right_ts, np.ones(2), tolerance=tolerance
-    )
+    ts, _, _ = inner_join(left_ts, np.ones(3), right_ts, np.ones(2), tolerance=tolerance)
     np.testing.assert_array_equal(ts, expected_ts)
 
 
@@ -274,9 +268,7 @@ def test_inner_join_preserves_left_values():
 def test_inner_join_right_values_interpolated_not_snapped():
     left_ts = np.array([0, 5, 10], dtype=np.int64)
     right_ts = np.array([0, 10], dtype=np.int64)
-    _, _, rv = inner_join(
-        left_ts, np.ones(3), right_ts, np.array([0.0, 10.0]), tolerance=5
-    )
+    _, _, rv = inner_join(left_ts, np.ones(3), right_ts, np.array([0.0, 10.0]), tolerance=5)
     np.testing.assert_allclose(rv[1], 5.0)
 
 
@@ -292,21 +284,15 @@ def test_left_join_data_instances_list_right_returns_n_plus_one(
     assert len(result) == 3
 
 
-def test_left_join_data_instances_all_share_timestamps(
-    di_simple, di_sparse, di_two_points
-):
+def test_left_join_data_instances_all_share_timestamps(di_simple, di_sparse, di_two_points):
     la, rb, rc = left_join_data_instances(di_simple, [di_sparse, di_two_points])
     np.testing.assert_array_equal(la.timestamp_np, rb.timestamp_np)
     np.testing.assert_array_equal(la.timestamp_np, rc.timestamp_np)
 
 
 def test_left_join_data_instances_method_forwarded(di_simple, di_two_points):
-    _, rb_zoh = left_join_data_instances(
-        di_simple, di_two_points, method=ResampleMethod.ZOH
-    )
-    _, rb_lin = left_join_data_instances(
-        di_simple, di_two_points, method=ResampleMethod.LINEAR
-    )
+    _, rb_zoh = left_join_data_instances(di_simple, di_two_points, method=ResampleMethod.ZOH)
+    _, rb_lin = left_join_data_instances(di_simple, di_two_points, method=ResampleMethod.LINEAR)
     assert not np.allclose(rb_zoh.value_np, rb_lin.value_np)
 
 
@@ -348,9 +334,7 @@ def test_outer_join_data_instances_union_timestamps(di_simple, di_sparse):
         assert ts in left.timestamp_np
 
 
-@pytest.mark.parametrize(
-    "op", [operator.add, operator.sub, operator.mul, operator.truediv]
-)
+@pytest.mark.parametrize("op", [operator.add, operator.sub, operator.mul, operator.truediv])
 def test_binary_op_uses_left_timestamps(di_simple, di_sparse, op):
     result = op(di_simple, di_sparse)
     np.testing.assert_array_equal(result.timestamp_np, di_simple.timestamp_np)

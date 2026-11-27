@@ -44,9 +44,7 @@ def test_interpolate_exact_at_knots(method):
 def test_interpolate_linear_interior():
     src_t = np.array([0.0, 10.0])
     src_v = np.array([0.0, 10.0])
-    result = interpolate_onto_timestamps(
-        np.array([5.0]), src_t, src_v, ResampleMethod.LINEAR
-    )
+    result = interpolate_onto_timestamps(np.array([5.0]), src_t, src_v, ResampleMethod.LINEAR)
     np.testing.assert_allclose(result, [5.0])
 
 
@@ -61,18 +59,14 @@ def test_interpolate_linear_multiple_points():
 def test_interpolate_zoh_holds_previous_value():
     src_t = np.array([0.0, 4.0, 8.0])
     src_v = np.array([10.0, 20.0, 30.0])
-    result = interpolate_onto_timestamps(
-        np.array([1.0, 3.0]), src_t, src_v, ResampleMethod.ZOH
-    )
+    result = interpolate_onto_timestamps(np.array([1.0, 3.0]), src_t, src_v, ResampleMethod.ZOH)
     np.testing.assert_allclose(result, [10.0, 10.0])
 
 
 def test_interpolate_zoh_at_knot_returns_knot_value():
     src_t = np.array([0.0, 5.0, 10.0])
     src_v = np.array([1.0, 2.0, 3.0])
-    result = interpolate_onto_timestamps(
-        np.array([5.0]), src_t, src_v, ResampleMethod.ZOH
-    )
+    result = interpolate_onto_timestamps(np.array([5.0]), src_t, src_v, ResampleMethod.ZOH)
     np.testing.assert_allclose(result, [2.0])
 
 
@@ -80,18 +74,14 @@ def test_interpolate_nearest_close_to_knot():
     src_t = np.array([0.0, 10.0])
     src_v = np.array([0.0, 100.0])
     # 1.0 is closer to 0.0 than to 10.0
-    result = interpolate_onto_timestamps(
-        np.array([1.0]), src_t, src_v, ResampleMethod.NEAREST
-    )
+    result = interpolate_onto_timestamps(np.array([1.0]), src_t, src_v, ResampleMethod.NEAREST)
     np.testing.assert_allclose(result, [0.0])
 
 
 def test_interpolate_cubic_fallback_fewer_than_4_points():
     src_t = np.array([0.0, 5.0, 10.0])
     src_v = np.array([0.0, 5.0, 10.0])
-    result = interpolate_onto_timestamps(
-        np.array([2.5, 7.5]), src_t, src_v, ResampleMethod.CUBIC
-    )
+    result = interpolate_onto_timestamps(np.array([2.5, 7.5]), src_t, src_v, ResampleMethod.CUBIC)
     np.testing.assert_allclose(result, [2.5, 7.5])
 
 

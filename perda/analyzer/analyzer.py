@@ -10,13 +10,13 @@ from ..plotting.defaults import (
     SUBPLOT_VERTICAL_SPACING,
 )
 from ..units import from_seconds, to_seconds
-from ..utils.accel_calculator import *
+from ..utils.accel_calculator import AccelSegmentResult, compute_accel_results, detect_accel_event
 from ..utils.diff import DIFF_BUCKET_SIZE_S, diff
 from ..utils.frequency_analysis import analyze_frequency as _analyze_frequency
 from ..utils.integrate import smoothed_filtered_integration
 from ..utils.preprocessing import PreprocessingStep, apply_preprocessing
 from ..utils.search import SearchResult, search
-from .csv import *
+from .csv import parse_csv
 from .plot_inputs import (
     AxisTitles,
     PlotVariables,
@@ -179,28 +179,40 @@ class Analyzer:
         """
         Plot variables from the log against time, optionally as stacked subplots with split y-axes.
 
-        The shape of ``vars`` decides the layout. A single variable or a flat list gives one plot. A list containing inner lists gives one subplot per entry, top to bottom, all sharing one time axis. ``vars_alt`` adds an independent right-hand y-axis, per subplot. Concat boundaries (if any) are drawn as dashed vertical lines.
+        The shape of ``vars`` decides the layout. A single variable or a flat list gives one plot. A list containing
+        inner lists gives one subplot per entry, top to bottom, all sharing one time axis. ``vars_alt`` adds an
+        independent right-hand y-axis, per subplot. Concat boundaries (if any) are drawn as dashed vertical lines.
 
         Parameters
         ----------
         vars : str | int | DataInstance | list
-            Variables for the left (or only) y-axis. Each variable can be a name (``"pcm.wheelSpeeds.frontRight"``), a wildcard pattern matching several names (``"pcm.vnav.*"``), a variable ID (``42``), or a DataInstance (e.g. a derived signal). Pass a flat list for one plot, or a list of lists for subplots, e.g. ``[["a", "b"], "c"]`` gives two subplots; a non-list entry counts as a list of one.
+            Variables for the left (or only) y-axis. Each variable can be a name (``"pcm.wheelSpeeds.frontRight"``), a
+            wildcard pattern matching several names (``"pcm.vnav.*"``), a variable ID (``42``), or a DataInstance (e.g.
+            a derived signal). Pass a flat list for one plot, or a list of lists for subplots, e.g. ``[["a", "b"],
+            "c"]`` gives two subplots; a non-list entry counts as a list of one.
         vars_alt : str | int | DataInstance | list | None, optional
-            Variables for a right-hand y-axis, drawn dashed. Same forms and nesting rules as ``vars``, and must give the same number of subplots. A ``None`` (or ``[None]``) entry leaves that subplot with a single y-axis, e.g. ``[None, "steering"]``. Default is None (no right axes).
+            Variables for a right-hand y-axis, drawn dashed. Same forms and nesting rules as ``vars``, and must give the
+            same number of subplots. A ``None`` (or ``[None]``) entry leaves that subplot with a single y-axis, e.g.
+            ``[None, "steering"]``. Default is None (no right axes).
         ts_start : float | None, optional
-            Start of the time window in seconds on the log clock. Earlier data is excluded. Default is None (from the start of the log).
+            Start of the time window in seconds on the log clock. Earlier data is excluded. Default is None (from the
+            start of the log).
         ts_end : float | None, optional
-            End of the time window in seconds on the log clock. Later data is excluded. Default is None (to the end of the log).
+            End of the time window in seconds on the log clock. Later data is excluded. Default is None (to the end of
+            the log).
         title : str | None, optional
             Title shown above the figure. Default is None (no title).
         y_title : str | list[str | None] | None, optional
-            Left y-axis label, e.g. ``"Speed (mph)"``. With subplots, a list with one entry per subplot (``None`` for no label), or one string used on every subplot. Default is None (no labels).
+            Left y-axis label, e.g. ``"Speed (mph)"``. With subplots, a list with one entry per subplot (``None`` for no
+            label), or one string used on every subplot. Default is None (no labels).
         y_title_alt : str | list[str | None] | None, optional
-            Right y-axis label, same forms as ``y_title``. Ignored for subplots without ``vars_alt``. Default is None (no labels).
+            Right y-axis label, same forms as ``y_title``. Ignored for subplots without ``vars_alt``. Default is None
+            (no labels).
         show_legend : bool, optional
             Whether to show the legend listing each variable. Default is True.
         max_points : int | None, optional
-            Maximum number of points drawn per variable. Longer signals are evenly downsampled (every Nth point), which speeds up rendering of large logs. Default is None (draw every point).
+            Maximum number of points drawn per variable. Longer signals are evenly downsampled (every Nth point), which
+            speeds up rendering of large logs. Default is None (draw every point).
         log_x : bool, optional
             Use a logarithmic time (x) axis. Default is False (linear).
         log_y : bool, optional
@@ -208,14 +220,18 @@ class Analyzer:
         width : int, optional
             Figure width in pixels. Default is PLOT_WIDTH (1200).
         height : int | None, optional
-            Figure height in pixels. Default is None, which gives PLOT_HEIGHT (700) for one plot and SUBPLOT_HEIGHT (350) per subplot otherwise.
+            Figure height in pixels. Default is None, which gives PLOT_HEIGHT (700) for one plot and SUBPLOT_HEIGHT
+            (350) per subplot otherwise.
         vertical_spacing : float, optional
-            Gap between subplots as a fraction of the figure height (0 to 1). Default is SUBPLOT_VERTICAL_SPACING (0.12).
+            Gap between subplots as a fraction of the figure height (0 to 1). Default is SUBPLOT_VERTICAL_SPACING
+            (0.12).
 
         Returns
         -------
         go.Figure
-            Plotly figure. Change anything not exposed here (fonts, colors, margins, axis ranges, ...) with ``fig.update_layout``, ``fig.update_xaxes``, ``fig.update_yaxes`` or ``fig.update_traces`` before calling ``fig.show()``. Target one subplot with ``row=i, col=1``, and its right axis with ``secondary_y=True``.
+            Plotly figure. Change anything not exposed here (fonts, colors, margins, axis ranges, ...) with
+            ``fig.update_layout``, ``fig.update_xaxes``, ``fig.update_yaxes`` or ``fig.update_traces`` before calling
+            ``fig.show()``. Target one subplot with ``row=i, col=1``, and its right axis with ``secondary_y=True``.
 
         Notes
         -----
@@ -227,7 +243,12 @@ class Analyzer:
         --------
         >>> fig = aly.plot("pcm.wheelSpeeds.frontRight")
         >>> fig = aly.plot("pcm.wheelSpeeds.*", title="Wheel Speeds")
-        >>> fig = aly.plot("pcm.moc.motor.requestedTorque", vars_alt="pcm.wheelSpeeds.frontRight", ts_start=10.0, ts_end=30.0)
+        >>> fig = aly.plot(
+        ...     "pcm.moc.motor.requestedTorque",
+        ...     vars_alt="pcm.wheelSpeeds.frontRight",
+        ...     ts_start=10.0,
+        ...     ts_end=30.0,
+        ... )
         >>> # Two subplots: velocities alone, then attitude with steering angle on a right axis
         >>> fig = aly.plot(
         ...     vars=[["pcm.vnav.bodyVelocity.*", "pcm.wheelSpeeds.frontRight"], ["pcm.vnav.rpy.*"]],
@@ -245,9 +266,7 @@ class Analyzer:
         left_variables = group_variables_by_subplot(vars)
         n_subplots = len(left_variables)
         right_variables = (
-            [None] * n_subplots
-            if vars_alt is None
-            else group_variables_by_subplot(vars_alt)
+            [None] * n_subplots if vars_alt is None else group_variables_by_subplot(vars_alt)
         )
 
         unit = self.data.timestamp_unit
@@ -316,7 +335,8 @@ class Analyzer:
         Returns
         -------
         go.Figure
-            Bar chart of diff counts over time between the two streams. Customize further with ``fig.update_layout`` before calling ``fig.show()``.
+            Bar chart of diff counts over time between the two streams. Customize further with ``fig.update_layout``
+            before calling ``fig.show()``.
 
         Examples
         --------
@@ -369,7 +389,8 @@ class Analyzer:
         Returns
         -------
         go.Figure
-            Plotly figure with frequency diagnostics. Customize further with ``fig.update_layout`` before calling ``fig.show()``.
+            Plotly figure with frequency diagnostics. Customize further with ``fig.update_layout`` before calling
+            ``fig.show()``.
 
         Examples
         --------
@@ -388,8 +409,7 @@ class Analyzer:
 
     def get_accel_times(self) -> list[AccelSegmentResult]:
         """
-        Intelligently detect and extract segments of the log where an
-        acceleration run occurs, then compute acceleration times.
+        Detect acceleration runs in the log and compute their acceleration times.
 
         Returns
         -------
@@ -403,8 +423,7 @@ class Analyzer:
         ...     print(r)
         """
         speed_obj = (
-            self.data["pcm.wheelSpeeds.frontRight"]
-            + self.data["pcm.wheelSpeeds.frontLeft"]
+            self.data["pcm.wheelSpeeds.frontRight"] + self.data["pcm.wheelSpeeds.frontLeft"]
         ) / 2.0
         signal_obj = detect_accel_event(
             torque_obj=self.data["pcm.moc.motor.requestedTorque"], speed_obj=speed_obj

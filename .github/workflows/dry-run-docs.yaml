@@ -29,7 +29,7 @@ jobs:
           pip install -r requirements-dev.txt
           pip install -e .
 
-      # Same builds as deploy-docs.yml, without publishing anything
+      # Same builds as deploy-docs.yaml, without publishing anything
       - name: Build Documentation
         run: |
           cd docs

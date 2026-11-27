@@ -176,7 +176,8 @@ def plot_diff_counts(
 ) -> go.Figure:
     """Plot how many diff events of each kind happened in each time bucket.
 
-    Draws total datapoints present as a faint gray background bar, with base-only extras, incoming-only extras and value mismatches overlaid on top.
+    Draws total datapoints present as a faint gray background bar, with base-only extras, incoming-only extras and value
+    mismatches overlaid on top.
 
     Parameters
     ----------
@@ -200,7 +201,8 @@ def plot_diff_counts(
     Returns
     -------
     go.Figure
-        Bucketed bar chart of diff counts over time. Customize further with ``fig.update_layout`` or ``fig.update_traces`` before calling ``fig.show()``.
+        Bucketed bar chart of diff counts over time. Customize further with ``fig.update_layout`` or
+        ``fig.update_traces`` before calling ``fig.show()``.
 
     Examples
     --------
@@ -278,7 +280,8 @@ def diff(
     Returns
     -------
     go.Figure
-        Bucketed bar chart of diff counts over time. Customize further with ``fig.update_layout`` before calling ``fig.show()``.
+        Bucketed bar chart of diff counts over time. Customize further with ``fig.update_layout`` before calling
+        ``fig.show()``.
     """
     base_cpp_name_to_id = rpi_data.cpp_name_to_id
     base_id_to_instance = rpi_data.id_to_instance
@@ -339,22 +342,18 @@ def diff(
         total=len(shared_cpp_name_to_instances),
     )
     for _, (rpi_di, server_di) in pbar:
-        rpi_ts_s = to_seconds(
-            rpi_di.timestamp_np.astype(np.float64), rpi_data.timestamp_unit
-        )
+        rpi_ts_s = to_seconds(rpi_di.timestamp_np.astype(np.float64), rpi_data.timestamp_unit)
         server_ts_s = to_seconds(
             server_di.timestamp_np.astype(np.float64), server_data.timestamp_unit
         )
-        rpi_extra_ts, server_extra_ts, var_diff_ts, var_matched_ts = (
-            _get_diff_timestamps(
-                rpi_ts_s,
-                rpi_di.value_np,
-                server_ts_s,
-                server_di.value_np,
-                timestamp_tolerance_s=timestamp_tolerance_s,
-                diff_rtol=diff_rtol,
-                diff_atol=diff_atol,
-            )
+        rpi_extra_ts, server_extra_ts, var_diff_ts, var_matched_ts = _get_diff_timestamps(
+            rpi_ts_s,
+            rpi_di.value_np,
+            server_ts_s,
+            server_di.value_np,
+            timestamp_tolerance_s=timestamp_tolerance_s,
+            diff_rtol=diff_rtol,
+            diff_atol=diff_atol,
         )
         rpi_extra_ts_list.append(rpi_extra_ts)
         server_extra_ts_list.append(server_extra_ts)
@@ -372,22 +371,16 @@ def diff(
     pbar.close()
 
     rpi_extra_all = (
-        np.concatenate(rpi_extra_ts_list)
-        if rpi_extra_ts_list
-        else np.array([], dtype=np.float64)
+        np.concatenate(rpi_extra_ts_list) if rpi_extra_ts_list else np.array([], dtype=np.float64)
     )
     server_extra_all = (
         np.concatenate(server_extra_ts_list)
         if server_extra_ts_list
         else np.array([], dtype=np.float64)
     )
-    diff_all = (
-        np.concatenate(diff_ts_list) if diff_ts_list else np.array([], dtype=np.float64)
-    )
+    diff_all = np.concatenate(diff_ts_list) if diff_ts_list else np.array([], dtype=np.float64)
     total_present_all = (
-        np.concatenate(
-            rpi_extra_ts_list + server_extra_ts_list + matched_ts_list + diff_ts_list
-        )
+        np.concatenate(rpi_extra_ts_list + server_extra_ts_list + matched_ts_list + diff_ts_list)
         if (rpi_extra_ts_list + server_extra_ts_list + matched_ts_list + diff_ts_list)
         else np.array([], dtype=np.float64)
     )

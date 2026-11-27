@@ -6,7 +6,7 @@ from ..units import Timescale, convert_time
 
 
 class AccelSegmentResult(BaseModel):
-    """Result of a single segment marked as an acceleration test"""
+    """Result of a single segment marked as an acceleration test."""
 
     start_time: float = Field(description="Timestamp when the segment began.")
     time_to_dist: float = Field(
@@ -55,9 +55,7 @@ def detect_accel_event(
     --------
     >>> signal = detect_accel_event(torque_di, speed_di)
     """
-    torque_interp = np.interp(
-        speed_obj.timestamp_np, torque_obj.timestamp_np, torque_obj.value_np
-    )
+    torque_interp = np.interp(speed_obj.timestamp_np, torque_obj.timestamp_np, torque_obj.value_np)
 
     speed = speed_obj.value_np
     signal_values = np.zeros_like(speed)
@@ -125,9 +123,7 @@ def compute_accel_results(
         future_ends = end_indices[end_indices > start_idx]
         t_end_signal = float(time[future_ends[0]] if len(future_ends) > 0 else time[-1])
 
-        dist_at_start = float(
-            np.interp(t_start, distance_obj.timestamp_np, distance_obj.value_np)
-        )
+        dist_at_start = float(np.interp(t_start, distance_obj.timestamp_np, distance_obj.value_np))
         dist_at_signal_end = float(
             np.interp(t_end_signal, distance_obj.timestamp_np, distance_obj.value_np)
         )
@@ -144,9 +140,7 @@ def compute_accel_results(
             t_target_hit = float(np.interp(target_absolute_dist, future_d, future_t))
             results.append(
                 AccelSegmentResult(
-                    start_time=convert_time(
-                        t_start, source_time_unit, target_time_unit
-                    ),
+                    start_time=convert_time(t_start, source_time_unit, target_time_unit),
                     time_to_dist=convert_time(
                         t_target_hit - t_start, source_time_unit, target_time_unit
                     ),

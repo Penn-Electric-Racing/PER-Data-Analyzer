@@ -45,7 +45,8 @@ def plot_fft_spectrum(
     magnitudes : Sequence[NDArray[float64]]
         Magnitude array for each series, same length as the matching ``frequencies`` entry.
     series_names : Sequence[str]
-        Display name for each series. Used as subplot titles when ``stacked=True`` and as legend entries when ``stacked=False``.
+        Display name for each series. Used as subplot titles when ``stacked=True`` and as legend entries when
+        ``stacked=False``.
     title : str | None, optional
         Title shown above the whole figure. Default is None (no title).
     x_label : str, optional
@@ -53,7 +54,8 @@ def plot_fft_spectrum(
     y_label : str, optional
         Y-axis label. Default is ``"Magnitude"``.
     stacked : bool, optional
-        If True, draw each series in its own subplot, stacked vertically with a shared frequency axis. If False, overlay all series on one plot. Default is True.
+        If True, draw each series in its own subplot, stacked vertically with a shared frequency axis. If False, overlay
+        all series on one plot. Default is True.
     log_x : bool, optional
         Use a logarithmic frequency (x) axis. Default is True.
     log_y : bool, optional
@@ -61,14 +63,18 @@ def plot_fft_spectrum(
     width : int, optional
         Figure width in pixels. Default is PLOT_WIDTH (1200).
     height : int | None, optional
-        Figure height in pixels. Default is None, which gives SUBPLOT_HEIGHT (350) pixels per series when stacked, or PLOT_HEIGHT (700) when overlaid.
+        Figure height in pixels. Default is None, which gives SUBPLOT_HEIGHT (350) pixels per series when stacked, or
+        PLOT_HEIGHT (700) when overlaid.
     vertical_spacing : float, optional
-        Gap between stacked subplots as a fraction of the figure height (0 to 1). Ignored when ``stacked=False``. Default is SUBPLOT_VERTICAL_SPACING (0.12).
+        Gap between stacked subplots as a fraction of the figure height (0 to 1). Ignored when ``stacked=False``.
+        Default is SUBPLOT_VERTICAL_SPACING (0.12).
 
     Returns
     -------
     go.Figure
-        Plotly figure. Change anything not exposed here (fonts, colors, margins, axis ranges, ...) with ``fig.update_layout``, ``fig.update_xaxes``, ``fig.update_yaxes`` or ``fig.update_traces`` before calling ``fig.show()``.
+        Plotly figure. Change anything not exposed here (fonts, colors, margins, axis ranges, ...) with
+        ``fig.update_layout``, ``fig.update_xaxes``, ``fig.update_yaxes`` or ``fig.update_traces`` before calling
+        ``fig.show()``.
 
     Examples
     --------
@@ -95,9 +101,7 @@ def plot_fft_spectrum(
             vertical_spacing=vertical_spacing,
         )
 
-        for i, (xf, yf, name) in enumerate(
-            zip(frequencies, magnitudes, series_names), 1
-        ):
+        for i, (xf, yf, name) in enumerate(zip(frequencies, magnitudes, series_names), 1):
             fig.add_trace(
                 go.Scattergl(
                     x=xf,

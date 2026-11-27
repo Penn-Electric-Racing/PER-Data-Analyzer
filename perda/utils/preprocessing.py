@@ -271,9 +271,7 @@ class ConvertWheelspeedsToMPerS:
         ]
         missing = [v for v in cols if v not in data]
         if missing:
-            print(
-                f"WARNING: convert_wheelspeeds_to_m_per_s skipped — missing variables: {missing}"
-            )
+            print(f"WARNING: convert_wheelspeeds_to_m_per_s skipped — missing variables: {missing}")
             return data
 
         for col in cols:
@@ -369,20 +367,14 @@ class CorrectMotorData:
         if data is None:
             return CorrectMotorData(
                 gear_ratio=_keep_current_if_unset(gear_ratio, self.gear_ratio),
-                tire_radius_in=_keep_current_if_unset(
-                    tire_radius_in, self.tire_radius_in
-                ),
+                tire_radius_in=_keep_current_if_unset(tire_radius_in, self.tire_radius_in),
                 motor_rpm=_keep_current_if_unset(motor_rpm, self.motor_rpm),
-                motor_wheelspeed=_keep_current_if_unset(
-                    motor_wheelspeed, self.motor_wheelspeed
-                ),
+                motor_wheelspeed=_keep_current_if_unset(motor_wheelspeed, self.motor_wheelspeed),
                 invert_rpm=_keep_current_if_unset(invert_rpm, self.invert_rpm),
             )
 
         if self.motor_rpm not in data:
-            print(
-                f"WARNING: correct_motor_data skipped — missing variable: {self.motor_rpm}"
-            )
+            print(f"WARNING: correct_motor_data skipped — missing variable: {self.motor_rpm}")
             return data
 
         di = data[self.motor_rpm]
@@ -502,9 +494,7 @@ class CorrectSteeringAngle:
             return CorrectSteeringAngle(
                 calibration=_keep_current_if_unset(calibration, tuple(self.pts)),
                 steering_raw=_keep_current_if_unset(steering_raw, self.steering_raw),
-                steering_angle=_keep_current_if_unset(
-                    steering_angle, self.steering_angle
-                ),
+                steering_angle=_keep_current_if_unset(steering_angle, self.steering_angle),
             )
 
         if self.steering_raw not in data:
@@ -515,9 +505,7 @@ class CorrectSteeringAngle:
 
         raw_di = data[self.steering_raw]
         raw_volts: NDArray[float64] = raw_di.value_np.astype(np.float64)
-        recomputed: NDArray[float64] = np.polyval(self.coeffs, raw_volts).astype(
-            np.float64
-        )
+        recomputed: NDArray[float64] = np.polyval(self.coeffs, raw_volts).astype(np.float64)
 
         backup_name = self.steering_angle + "_original"
         if self.steering_angle in data and backup_name not in data:

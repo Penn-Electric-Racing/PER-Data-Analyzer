@@ -66,14 +66,18 @@ def plot_binned_counts(
 ) -> go.Figure:
     """Count how many values of each series fall into fixed-width bins, and draw the counts as overlaid bar charts.
 
-    Every series is binned on the same grid, which spans the smallest to largest value across all series, so bars line up for comparison. Typical use: how many events of each kind happened in each time window. Bars are drawn in the order given, so put the largest (background) series first.
+    Every series is binned on the same grid, which spans the smallest to largest value across all series, so bars line
+    up for comparison. Typical use: how many events of each kind happened in each time window. Bars are drawn in the
+    order given, so put the largest (background) series first.
 
     Parameters
     ----------
     values_by_series : dict[str, npt.NDArray[np.float64]]
-        Maps each series' legend name to the values to count, e.g. ``{"Errors": error_times_s, "Warnings": warning_times_s}``. Empty arrays are allowed and give all-zero bars.
+        Maps each series' legend name to the values to count, e.g. ``{"Errors": error_times_s, "Warnings":
+        warning_times_s}``. Empty arrays are allowed and give all-zero bars.
     bin_width : float
-        Width of each bin (bar), in the same unit as the values, e.g. seconds. Smaller bins show finer detail but noisier counts.
+        Width of each bin (bar), in the same unit as the values, e.g. seconds. Smaller bins show finer detail but
+        noisier counts.
     title : str | None, optional
         Title shown above the plot. Default is None (no title).
     x_label : str | None, optional
@@ -92,7 +96,10 @@ def plot_binned_counts(
     Returns
     -------
     go.Figure
-        Plotly figure with one bar trace per series, named by its key. Change anything not exposed here with ``fig.update_layout`` or ``fig.update_traces`` before calling ``fig.show()``. Style one series with ``fig.update_traces(marker_color="gray", opacity=0.4, selector=dict(name="Errors"))``. Returns an empty figure if every series is empty.
+        Plotly figure with one bar trace per series, named by its key. Change anything not exposed here with
+        ``fig.update_layout`` or ``fig.update_traces`` before calling ``fig.show()``. Style one series with
+        ``fig.update_traces(marker_color="gray", opacity=0.4, selector=dict(name="Errors"))``. Returns an empty figure
+        if every series is empty.
 
     Examples
     --------
@@ -112,9 +119,7 @@ def plot_binned_counts(
     bin_start = float(min(values.min() for values in non_empty))
     bin_end = float(max(values.max() for values in non_empty))
     n_bins = max(int((bin_end - bin_start) / bin_width) + 1, 1)
-    bin_midpoints = (
-        np.arange(n_bins, dtype=np.float64) * bin_width + bin_start + bin_width * 0.5
-    )
+    bin_midpoints = np.arange(n_bins, dtype=np.float64) * bin_width + bin_start + bin_width * 0.5
 
     fig = go.Figure()
     for name, values in values_by_series.items():
@@ -144,9 +149,7 @@ def plot_binned_counts(
         margin=MARGIN,
         plot_bgcolor=PLOT_BGCOLOR,
         xaxis=dict(tickfont=dict(size=FONT_SIZE_SMALL)),
-        yaxis=dict(
-            tickfont=dict(size=FONT_SIZE_SMALL), type="log" if log_y else "linear"
-        ),
+        yaxis=dict(tickfont=dict(size=FONT_SIZE_SMALL), type="log" if log_y else "linear"),
         legend=dict(font=dict(size=FONT_SIZE_SMALL)),
     )
 

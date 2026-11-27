@@ -73,9 +73,7 @@ def test_keyword_index_covers_all_variables(search_csv):
     assert list(srd.keyword_index.id_to_normalized_text) == list(srd.id_to_cpp_name)
 
 
-@pytest.mark.parametrize(
-    "build_search_index", [False, True], ids=["keyword", "semantic"]
-)
+@pytest.mark.parametrize("build_search_index", [False, True], ids=["keyword", "semantic"])
 @pytest.mark.parametrize(
     "cpp_name, label",
     [
@@ -87,8 +85,6 @@ def test_search_finds_assigned_variable(
     search_csv, fake_encoder, build_search_index, cpp_name, label
 ):
     srd = parse_csv(search_csv(), verbose=0, build_search_index=build_search_index)
-    srd[cpp_name] = DataInstance(
-        timestamp_np=np.array([0]), value_np=np.array([1.0]), label=label
-    )
+    srd[cpp_name] = DataInstance(timestamp_np=np.array([0]), value_np=np.array([1.0]), label=label)
 
     assert search(srd, label, top_n=1)[0].cpp_name == cpp_name

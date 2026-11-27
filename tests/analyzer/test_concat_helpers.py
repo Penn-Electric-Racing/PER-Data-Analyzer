@@ -98,9 +98,7 @@ def test_concat_variables_union_of_both_runs():
 
 
 def test_concat_variable_only_in_first_kept():
-    first = _make_srd(
-        {"only_first": ([0, 1], [9.0, 9.0]), "shared": ([0, 1], [1.0, 2.0])}
-    )
+    first = _make_srd({"only_first": ([0, 1], [9.0, 9.0]), "shared": ([0, 1], [1.0, 2.0])})
     second = _make_srd({"shared": ([0, 1], [3.0, 4.0])})
     result = concat_single_run_data(first, second)
     assert "only_first" in result
@@ -109,9 +107,7 @@ def test_concat_variable_only_in_first_kept():
 
 def test_concat_variable_only_in_second_kept():
     first = _make_srd({"shared": ([0, 1], [1.0, 2.0])})
-    second = _make_srd(
-        {"shared": ([0, 1], [3.0, 4.0]), "only_second": ([0, 1], [7.0, 8.0])}
-    )
+    second = _make_srd({"shared": ([0, 1], [3.0, 4.0]), "only_second": ([0, 1], [7.0, 8.0])})
     result = concat_single_run_data(first, second)
     assert "only_second" in result
 
@@ -157,9 +153,7 @@ def test_concat_same_unit_no_upscale():
     [
         pytest.param(True, True, [], id="both_indexed"),
         pytest.param(True, False, [["rear speed"]], id="first_indexed"),
-        pytest.param(
-            False, True, [["front speed", "shared signal"]], id="second_indexed"
-        ),
+        pytest.param(False, True, [["front speed", "shared signal"]], id="second_indexed"),
     ],
 )
 def test_concat_merges_semantic_indexes(

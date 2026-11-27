@@ -7,17 +7,6 @@ repos:
           - --extra-keys
           - metadata.kernelspec metadata.language_info.version
 
-  - repo: https://github.com/PyCQA/autoflake
-    rev: v2.3.1
-    hooks:
-      - id: autoflake
-        exclude: conftest\.py$
-        args:
-          - --in-place
-          - --remove-all-unused-imports
-          - --expand-star-imports
-          - --ignore-init-module-imports
-
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
     hooks:
@@ -26,17 +15,12 @@ repos:
       - id: check-yaml
       - id: check-added-large-files
 
-  - repo: https://github.com/psf/black
-    rev: 25.1.0
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.17.6
     hooks:
-      - id: black
-      - id: black-jupyter
-
-  - repo: https://github.com/pycqa/isort
-    rev: 6.0.1
-    hooks:
-      - id: isort
-        args: ["--profile", "black"]
+      - id: ruff-check
+        args: [--fix]
+      - id: ruff-format
 
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.19.1

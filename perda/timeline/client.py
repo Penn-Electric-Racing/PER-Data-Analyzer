@@ -26,22 +26,18 @@ def _float(value: object) -> object:
 
 def _request_token(password: str) -> str:
     try:
-        response = requests.post(
-            f"{SERVER_URL}{TOKEN_ENDPOINT}", json={"password": password}
-        )
+        response = requests.post(f"{SERVER_URL}{TOKEN_ENDPOINT}", json={"password": password})
     except requests.RequestException as error:
         raise ConnectionError(f"Could not reach {SERVER_URL}: {error}") from error
     if response.status_code == 401:
         raise ConnectionError("Login failed: incorrect password")
     if not response.ok:
-        raise ConnectionError(
-            f"Login failed (HTTP {response.status_code}): {response.text}"
-        )
+        raise ConnectionError(f"Login failed (HTTP {response.status_code}): {response.text}")
     return response.json()["token"]
 
 
 class TimelineClient:
-    # Sends SQL to the timeline server (read only)
+    """Read-only SQL client for the timeline server."""
 
     def __init__(self, password: str | None = None) -> None:
         if password is None:
@@ -50,6 +46,7 @@ class TimelineClient:
         self._var_id_cache: dict[str, int | None] = {}
 
     def sizes(self) -> pl.DataFrame:
+        """Disk usage of the timeline tables."""
         return self.sql(
             "SELECT 'samples (hypertable)' AS object,"
             "       pg_size_pretty(hypertable_size('timeline_samples')) AS size"
@@ -63,6 +60,7 @@ class TimelineClient:
         params: Sequence[object] | None = None,
         max_rows: int = DEFAULT_MAX_ROWS,
     ) -> pl.DataFrame:
+        """Run a read-only SQL query and return at most ``max_rows`` rows."""
         response = requests.post(
             f"{SERVER_URL}{QUERY_ENDPOINT}",
             headers={"Authorization": f"Bearer {self._token}"},
@@ -86,6 +84,7 @@ class TimelineClient:
         )
 
     def overview(self) -> pl.DataFrame:
+        """Session count, minutes, rows and variables per test day."""
         return self.sql(
             "SELECT test_day, count(*) AS sessions,"
             "       round(sum(duration_s)/60.0) AS minutes,"
@@ -140,6 +139,7 @@ class TimelineClient:
         min_samples: int = 1,
     ) -> pl.DataFrame:
         """Find sessions where a variable crossed a threshold.
+
         Answered entirely from the summary tier -- no raw samples are read.
 
         Parameters
@@ -248,9 +248,7 @@ class TimelineClient:
         """
         var_id = self.var_id(var_key)
         if var_id is None:
-            return pl.DataFrame(
-                {"session_id": [], "ts_utc": [], "t_rel_us": [], "value": []}
-            )
+            return pl.DataFrame({"session_id": [], "ts_utc": [], "t_rel_us": [], "value": []})
 
         # Query `samples` directly rather than through v_samples: joining
         # `variables` to resolve var_key turns into a hash join applied *after*
@@ -272,9 +270,7 @@ class TimelineClient:
             params,
         )
         if not frame.height:
-            return pl.DataFrame(
-                {"session_id": [], "ts_utc": [], "t_rel_us": [], "value": []}
-            )
+            return pl.DataFrame({"session_id": [], "ts_utc": [], "t_rel_us": [], "value": []})
 
         starts = self.sql(
             "SELECT session_id,"
@@ -305,12 +301,8 @@ class TimelineClient:
             The canonical ``var_id``, or None if the key is not catalogued.
         """
         if var_key not in self._var_id_cache:
-            found = self.sql(
-                "SELECT var_id FROM timeline_variables WHERE var_key = %s", (var_key,)
-            )
-            self._var_id_cache[var_key] = (
-                int(found["var_id"][0]) if found.height else None
-            )
+            found = self.sql("SELECT var_id FROM timeline_variables WHERE var_key = %s", (var_key,))
+            self._var_id_cache[var_key] = int(found["var_id"][0]) if found.height else None
         return self._var_id_cache[var_key]
 
     def load(

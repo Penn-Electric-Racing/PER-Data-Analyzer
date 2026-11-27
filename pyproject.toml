@@ -6,7 +6,7 @@ authors = [
     {name = "Penn Electric Racing Software"}
 ]
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.13"
 dynamic = ["dependencies", "version"]
 
 [project.optional-dependencies]
@@ -35,7 +35,6 @@ full = [
 ]
 
 [tool.setuptools.packages.find]
-where = ["."]
 include = ["perda*"]
 
 [tool.setuptools.package-data]
@@ -54,6 +53,39 @@ build-backend = "setuptools.build_meta"
 testpaths = ["tests"]
 addopts = "--import-mode=importlib"
 pythonpath = ["."]
+
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint]
+select = [
+    "E4",    # pycodestyle: import placement (e.g. imports not at top of file)
+    "E7",    # pycodestyle: statement errors (e.g. bare except, lambda assignment)
+    "E9",    # pycodestyle: syntax / IO errors
+    "F",     # pyflakes: unused imports and variables, undefined names
+    "I",     # isort: import sorting
+    "D",     # pydocstyle: docstring presence and formatting (numpy convention below)
+    "W505",  # docstring / comment line length (limit set by max-doc-length below)
+]
+ignore = [
+    "D100",  # missing module docstring
+    "D104",  # missing package (__init__.py) docstring
+    "D105",  # missing docstring on dunder methods
+    "D401",  # imperative mood on the first line: too opinionated
+]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401", "F403"]  # re-exports and star imports are intentional
+"conftest.py" = ["F401", "F403"]  # fixtures are pulled in by star import
+"tests/**" = ["D"]                # tests don't need docstrings
+"notebooks/**" = ["D"]            # notebooks don't need docstrings
+"docs/**" = ["D", "E402"]         # Sphinx config edits sys.path before importing
+
+[tool.ruff.lint.pycodestyle]
+max-doc-length = 120
+
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"
 
 [tool.mypy]
 files = ["perda"]

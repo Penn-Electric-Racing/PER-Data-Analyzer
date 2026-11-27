@@ -37,9 +37,7 @@ def access_remote_log(password: str, log_path: str, **kwargs) -> Analyzer:
     """
     s3_client, bucket_name = _create_s3_client_via_data_server(password)
 
-    temp_file = tempfile.NamedTemporaryFile(
-        suffix=".csv", prefix="perda_", delete=False
-    )
+    temp_file = tempfile.NamedTemporaryFile(suffix=".csv", prefix="perda_", delete=False)
     temp_file.close()
     local_path = Path(temp_file.name)
 

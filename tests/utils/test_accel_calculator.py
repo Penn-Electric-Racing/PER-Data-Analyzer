@@ -79,9 +79,7 @@ def test_detect_accel_event_event_ends_when_speed_drops():
         label="speed",
         var_id=2,
     )
-    result = detect_accel_event(
-        torque, speed, torque_threshold=100, speed_threshold=0.5
-    )
+    result = detect_accel_event(torque, speed, torque_threshold=100, speed_threshold=0.5)
     assert result.value_np[3] == 0.0
 
 
@@ -92,33 +90,25 @@ def test_detect_accel_event_label(accel_torque, accel_speed):
 
 def test_compute_accel_results_returns_list(accel_scenario):
     sig, dist = accel_scenario
-    results = compute_accel_results(
-        sig, dist, target_dist=75, source_time_unit=Timescale.MS
-    )
+    results = compute_accel_results(sig, dist, target_dist=75, source_time_unit=Timescale.MS)
     assert isinstance(results, list)
 
 
 def test_compute_accel_results_one_event_detected(accel_scenario):
     sig, dist = accel_scenario
-    results = compute_accel_results(
-        sig, dist, target_dist=75, source_time_unit=Timescale.MS
-    )
+    results = compute_accel_results(sig, dist, target_dist=75, source_time_unit=Timescale.MS)
     assert len(results) == 1
 
 
 def test_compute_accel_results_dist_reached_matches_target(accel_scenario):
     sig, dist = accel_scenario
-    results = compute_accel_results(
-        sig, dist, target_dist=75, source_time_unit=Timescale.MS
-    )
+    results = compute_accel_results(sig, dist, target_dist=75, source_time_unit=Timescale.MS)
     assert results[0].dist_reached == 75
 
 
 def test_compute_accel_results_time_to_dist_positive(accel_scenario):
     sig, dist = accel_scenario
-    results = compute_accel_results(
-        sig, dist, target_dist=75, source_time_unit=Timescale.MS
-    )
+    results = compute_accel_results(sig, dist, target_dist=75, source_time_unit=Timescale.MS)
     assert results[0].time_to_dist > 0
 
 
@@ -138,9 +128,7 @@ def test_compute_accel_results_skips_segment_shorter_than_target():
     signal_vals[2:8] = 1.0
     sig = DataInstance(timestamp_np=ts, value_np=signal_vals, label="sig")
     dist = DataInstance(timestamp_np=ts, value_np=np.linspace(0, 10, n), label="dist")
-    results = compute_accel_results(
-        sig, dist, target_dist=75, source_time_unit=Timescale.MS
-    )
+    results = compute_accel_results(sig, dist, target_dist=75, source_time_unit=Timescale.MS)
     assert results == []
 
 

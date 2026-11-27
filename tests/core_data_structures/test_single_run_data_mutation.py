@@ -94,12 +94,8 @@ def test_setitem_replace_rejects_metadata_change(srd_basic, metadata):
 )
 def test_setitem_multiple_keys(srd_basic, key):
     srd_basic[key] = (
-        DataInstance(
-            timestamp_np=np.array([0], dtype=np.int64), value_np=np.array([7.0])
-        ),
-        DataInstance(
-            timestamp_np=np.array([0], dtype=np.int64), value_np=np.array([8.0])
-        ),
+        DataInstance(timestamp_np=np.array([0], dtype=np.int64), value_np=np.array([7.0])),
+        DataInstance(timestamp_np=np.array([0], dtype=np.int64), value_np=np.array([8.0])),
     )
     np.testing.assert_allclose(srd_basic["cpp.var_a"].value_np, [7.0])
     np.testing.assert_allclose(srd_basic["cpp.new"].value_np, [8.0])
@@ -115,12 +111,8 @@ def test_setitem_by_id_replaces_existing_variable(srd_basic):
 
 def test_setitem_pattern_assigns_in_sorted_order(srd_basic):
     srd_basic["cpp.var_*"] = (
-        DataInstance(
-            timestamp_np=np.array([0], dtype=np.int64), value_np=np.array([10.0])
-        ),
-        DataInstance(
-            timestamp_np=np.array([0], dtype=np.int64), value_np=np.array([20.0])
-        ),
+        DataInstance(timestamp_np=np.array([0], dtype=np.int64), value_np=np.array([10.0])),
+        DataInstance(timestamp_np=np.array([0], dtype=np.int64), value_np=np.array([20.0])),
     )
     np.testing.assert_allclose(srd_basic["cpp.var_a"].value_np, [10.0])
     np.testing.assert_allclose(srd_basic["cpp.var_b"].value_np, [20.0])
@@ -138,9 +130,7 @@ def test_setitem_pattern_assigns_in_sorted_order(srd_basic):
 def test_setitem_multiple_invalid_raises(srd_basic, key, value_count, exc_type):
     with pytest.raises(exc_type):
         srd_basic[key] = tuple(
-            DataInstance(
-                timestamp_np=np.array([0], dtype=np.int64), value_np=np.array([0.0])
-            )
+            DataInstance(timestamp_np=np.array([0], dtype=np.int64), value_np=np.array([0.0]))
             for _ in range(value_count)
         )
 
@@ -198,9 +188,7 @@ def test_setitem_updates_search_indexes(
     assert {var_id: keyword_text[var_id] for var_id in expected_text} == expected_text
     assert fake_encoder[batches_before:] == expected_batches
     assert srd_semantic.semantic_index.id_to_descript == srd_semantic.id_to_descript
-    assert srd_semantic.semantic_index.faiss_index.ntotal == len(
-        srd_semantic.id_to_cpp_name
-    )
+    assert srd_semantic.semantic_index.faiss_index.ntotal == len(srd_semantic.id_to_cpp_name)
 
 
 def test_setitem_skips_embedding_when_description_unchanged(srd_semantic, fake_encoder):

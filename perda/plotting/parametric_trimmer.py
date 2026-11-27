@@ -69,7 +69,8 @@ def plot_parametric_trimmer(
     >>> from perda.plotting import plot_parametric_trimmer
     >>> pos_x, pos_y = aly.data["posX", "posY"]
     >>> widget = plot_parametric_trimmer(
-    ...     pos_x.value_np, pos_y.value_np, pos_x.timestamp_np, aly.data.timestamp_unit, x_label="X (m)", y_label="Y (m)"
+    ...     pos_x.value_np, pos_y.value_np, pos_x.timestamp_np, aly.data.timestamp_unit,
+    ...     x_label="X (m)", y_label="Y (m)",
     ... )
     >>> display(widget)
     """
@@ -83,9 +84,7 @@ def plot_parametric_trimmer(
             f"timestamps has {len(timestamps)} values but x and y have {n}; there must be one timestamp per point."
         )
 
-    elapsed_s = to_seconds(
-        (timestamps - timestamps[0]).astype(np.float64), timestamp_unit
-    )
+    elapsed_s = to_seconds((timestamps - timestamps[0]).astype(np.float64), timestamp_unit)
 
     fig = go.FigureWidget()
     fig.add_trace(

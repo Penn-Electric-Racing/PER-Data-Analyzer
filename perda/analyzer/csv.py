@@ -36,24 +36,26 @@ VARIABLE_LINE_PATTERN = re.compile(
 
 
 class ParsedVariableLine(BaseModel):
+    """One variable declaration line from the CSV header."""
+
     cpp_name: str = Field(description="C++ name of the variable")
     description: str = Field(description="Human readable description of the variable")
     var_id: int = Field(description="Numeric ID the data rows refer to")
 
 
 class VariableMappings(BaseModel):
-    id_to_cpp_name: dict[int, str] = Field(
-        description="Mapping from variable ID to variable name"
-    )
+    """Variable ID, name and description lookups parsed from the CSV header."""
+
+    id_to_cpp_name: dict[int, str] = Field(description="Mapping from variable ID to variable name")
     id_to_descript: dict[int, str] = Field(
         description="Mapping from variable ID to variable description"
     )
-    skip_rows: int = Field(
-        description="Number of leading rows before the numeric data section"
-    )
+    skip_rows: int = Field(description="Number of leading rows before the numeric data section")
 
 
 class ParsedData(BaseModel):
+    """Raw per-variable timestamp and value chunks read from the CSV data section."""
+
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     timestamp_chunks: dict[int, list[NDArray[np.int64]]] = Field(
@@ -116,9 +118,7 @@ def parse_variable_mapping_line(line: str) -> ParsedVariableLine:
     )
 
 
-def parse_variable_id_mappings(
-    file_handle: TextIO, verbose: int = 1
-) -> VariableMappings:
+def parse_variable_id_mappings(file_handle: TextIO, verbose: int = 1) -> VariableMappings:
     """
     Read the variable ID and name mapping lines that follow the file header.
 
@@ -292,9 +292,9 @@ def parse_data_lines(
         if valid_df.is_empty():
             continue
 
-        valid_df = valid_df.with_columns(
-            (pl.col("timestamp") + ts_offset).alias("timestamp")
-        ).sort(["var_id", "timestamp"])
+        valid_df = valid_df.with_columns((pl.col("timestamp") + ts_offset).alias("timestamp")).sort(
+            ["var_id", "timestamp"]
+        )
         timestamps = valid_df["timestamp"].to_numpy()
         values = valid_df["value"].to_numpy()
 
@@ -302,9 +302,7 @@ def parse_data_lines(
         block_start_times.append(int(timestamps.min()))
         block_end_times.append(int(timestamps.max()))
 
-        slice_map = _find_start_end_indices_for_each_unique_value(
-            valid_df["var_id"].to_numpy()
-        )
+        slice_map = _find_start_end_indices_for_each_unique_value(valid_df["var_id"].to_numpy())
         for var_id, (start, end) in slice_map.items():
             timestamp_chunks.setdefault(var_id, []).append(timestamps[start:end].copy())
             value_chunks.setdefault(var_id, []).append(values[start:end].copy())
@@ -404,7 +402,8 @@ def parse_csv(
     verbose : int, optional
         Verbosity level. 0 for no output, 1 for basic output, 2 for detailed output. Default is 1.
     build_search_index : bool, optional
-        Whether to vectorize variable descriptions for semantic search. Requires the ``semantic`` extra and adds noticeable time to parsing. Default is False.
+        Whether to vectorize variable descriptions for semantic search. Requires the ``semantic`` extra and adds
+        noticeable time to parsing. Default is False.
 
     Returns
     -------
@@ -413,7 +412,8 @@ def parse_csv(
 
     Notes
     -----
-    The timestamp unit is auto-detected from the header suffix: "v2.0" means microseconds, anything else means milliseconds.
+    The timestamp unit is auto-detected from the header suffix: "v2.0" means microseconds, anything else means
+    milliseconds.
     """
     with open(file_path, "r") as f:
         header_line = f.readline()
@@ -452,9 +452,7 @@ def parse_csv(
 
     return SingleRunData(
         id_to_instance=id_to_instance,
-        cpp_name_to_id={
-            cpp_name: var_id for var_id, cpp_name in mappings.id_to_cpp_name.items()
-        },
+        cpp_name_to_id={cpp_name: var_id for var_id, cpp_name in mappings.id_to_cpp_name.items()},
         id_to_cpp_name=mappings.id_to_cpp_name,
         id_to_descript=mappings.id_to_descript,
         creation_time=creation_time,

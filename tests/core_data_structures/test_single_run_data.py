@@ -47,12 +47,8 @@ def test_getitem_invalid_raises(srd_basic, bad_key, exc_type):
         pytest.param("cpp.*", ["cpp.var_a", "cpp.var_b"], id="trailing_wildcard"),
         pytest.param("*_b", ["cpp.var_b"], id="leading_wildcard_single_match"),
         pytest.param("cpp.var_*", ["cpp.var_a", "cpp.var_b"], id="partial_segment"),
-        pytest.param(
-            ("cpp.var_b", 1), ["cpp.var_b", "cpp.var_a"], id="tuple_keeps_order"
-        ),
-        pytest.param(
-            ("*_b", "cpp.var_a"), ["cpp.var_b", "cpp.var_a"], id="tuple_with_pattern"
-        ),
+        pytest.param(("cpp.var_b", 1), ["cpp.var_b", "cpp.var_a"], id="tuple_keeps_order"),
+        pytest.param(("*_b", "cpp.var_a"), ["cpp.var_b", "cpp.var_a"], id="tuple_with_pattern"),
     ],
 )
 def test_getitem_multiple_returns_tuple(srd_basic, key, expected_names):
@@ -132,9 +128,7 @@ def test_split_gives_one_more_run_than_split_points(
     srd_basic, split_timestamps, expected_timestamps
 ):
     runs = srd_basic.split(split_timestamps)
-    assert [
-        run["cpp.var_a"].timestamp_np.tolist() for run in runs
-    ] == expected_timestamps
+    assert [run["cpp.var_a"].timestamp_np.tolist() for run in runs] == expected_timestamps
 
 
 def test_split_rejects_unsorted_points(srd_basic):
@@ -148,8 +142,6 @@ def test_trim_copies_search_indexes(srd_semantic):
         timestamp_np=np.array([0]), value_np=np.array([1.0]), label="Brake pressure"
     )
 
-    assert list(trimmed.keyword_index.id_to_normalized_text) == list(
-        trimmed.id_to_cpp_name
-    )
+    assert list(trimmed.keyword_index.id_to_normalized_text) == list(trimmed.id_to_cpp_name)
     assert trimmed.semantic_index.id_to_descript == trimmed.id_to_descript
     assert trimmed.semantic_index.faiss_index.ntotal == len(trimmed.id_to_cpp_name)

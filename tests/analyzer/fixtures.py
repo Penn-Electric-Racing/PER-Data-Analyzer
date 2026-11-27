@@ -106,8 +106,6 @@ def write_log(tmp_path):
 @pytest.fixture
 def two_run_collection(write_log):
     """Collection of two logs, supplied newest-first to exercise chronological sorting."""
-    older = write_log(
-        "log_old.csv", "PER Log: Thu Jun 11 10:00:00 2026 v2.0", (5.0, 6.0)
-    )
+    older = write_log("log_old.csv", "PER Log: Thu Jun 11 10:00:00 2026 v2.0", (5.0, 6.0))
     newer = write_log("log_new.csv", "PER Log: Thu Jun 11 12:00:00 2026 v2.0", (15.0,))
     return from_paths([newer, older])

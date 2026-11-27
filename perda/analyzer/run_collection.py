@@ -78,9 +78,7 @@ class RunCollection:
         str
             One line per run, preceded by a count.
         """
-        listing = "\n".join(
-            f"  [{i}] {run}" for i, run in enumerate(self._runs_by_date)
-        )
+        listing = "\n".join(f"  [{i}] {run}" for i, run in enumerate(self._runs_by_date))
         return f"RunCollection with {len(self)} run(s):\n{listing}"
 
     def __len__(self) -> int:
@@ -262,7 +260,8 @@ class RunCollection:
         vars : str | Sequence[str]
             C++ name of the variable to compare, or a list of names for one subplot each, top to bottom.
         max_points : int | None, optional
-            Maximum number of points drawn per run. Longer signals are evenly downsampled (every Nth point), which speeds up rendering. Default is None (draw every point).
+            Maximum number of points drawn per run. Longer signals are evenly downsampled (every Nth point), which
+            speeds up rendering. Default is None (draw every point).
         log_x : bool, optional
             Use a logarithmic time (x) axis. Default is False (linear).
         log_y : bool, optional
@@ -270,14 +269,17 @@ class RunCollection:
         width : int, optional
             Figure width in pixels. Default is PLOT_WIDTH (1200).
         height : int | None, optional
-            Figure height in pixels. Default is None, which gives PLOT_HEIGHT for one subplot and SUBPLOT_HEIGHT per subplot otherwise.
+            Figure height in pixels. Default is None, which gives PLOT_HEIGHT for one subplot and SUBPLOT_HEIGHT per
+            subplot otherwise.
         vertical_spacing : float, optional
-            Gap between subplots as a fraction of the figure height (0 to 1). Default is SUBPLOT_VERTICAL_SPACING (0.12).
+            Gap between subplots as a fraction of the figure height (0 to 1). Default is SUBPLOT_VERTICAL_SPACING
+            (0.12).
 
         Returns
         -------
         go.Figure
-            Plotly figure with one trace per run and variable. Change anything not exposed here (fonts, colors, ...) with ``fig.update_layout`` or ``fig.update_traces`` before calling ``fig.show()``.
+            Plotly figure with one trace per run and variable. Change anything not exposed here (fonts, colors, ...)
+            with ``fig.update_layout`` or ``fig.update_traces`` before calling ``fig.show()``.
 
         Examples
         --------
@@ -331,9 +333,7 @@ class RunCollection:
         }
 
 
-def _shift_to_run_start(
-    run: RunMetadata, analyzer: Analyzer, cpp_name: str
-) -> DataInstance:
+def _shift_to_run_start(run: RunMetadata, analyzer: Analyzer, cpp_name: str) -> DataInstance:
     di = analyzer.data[cpp_name]
     relative_timestamps = di.timestamp_np - analyzer.data.data_start_time
     return DataInstance(
