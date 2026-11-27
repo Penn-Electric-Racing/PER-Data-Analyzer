@@ -1,0 +1,41 @@
+name: Dry Run Documentation
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+
+      - name: Install Pandoc
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pandoc
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements-dev.txt
+          pip install -e .
+
+      # Same builds as deploy-docs.yml, without publishing anything
+      - name: Build Documentation
+        run: |
+          cd docs
+          sphinx-build -b html source build
+
+      - name: Build Docs Index
+        run: |
+          cd docs
+          sphinx-build -b text source build_index
