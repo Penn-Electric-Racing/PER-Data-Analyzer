@@ -5,6 +5,7 @@ from scipy.signal import butter
 from perda.core_data_structures.data_instance import DataInstance
 from perda.units import Timescale
 from perda.utils.signal_processing import (
+    FFTNormalization,
     apply_sos_filter,
     compute_fft,
     lowpass_filter,
@@ -227,6 +228,62 @@ def test_compute_fft_tuple_input_returns_pair_per_signal(sine_di_factory):
     for freqs, mags in spectra:
         np.testing.assert_array_equal(freqs, single_freqs)
         np.testing.assert_array_equal(mags, single_mags)
+
+
+def test_compute_fft_peak_normalization_max_is_one(sine_di_factory):
+    di = sine_di_factory(freq_hz=10.0)
+    _, mags = compute_fft(
+        di, source_time_unit=Timescale.MS, normalization=FFTNormalization.PEAK
+    )
+    assert np.max(mags) == pytest.approx(1.0)
+
+
+def test_compute_fft_l2_normalization_has_unit_norm(sine_di_factory):
+    di = sine_di_factory(freq_hz=10.0)
+    _, mags = compute_fft(
+        di, source_time_unit=Timescale.MS, normalization=FFTNormalization.L2
+    )
+    assert np.linalg.norm(mags) == pytest.approx(1.0)
+
+
+@pytest.mark.parametrize("normalization", [FFTNormalization.PEAK, FFTNormalization.L2])
+def test_compute_fft_normalization_removes_amplitude_scale(
+    normalization: FFTNormalization, sine_di_factory
+):
+    """Scaled copies of a signal should have identical normalized spectra."""
+    di = sine_di_factory(freq_hz=10.0)
+    di_scaled = DataInstance(
+        timestamp_np=di.timestamp_np,
+        value_np=di.value_np * 1000.0,
+        label="scaled_sine",
+        var_id=2,
+    )
+    _, mags = compute_fft(
+        di, source_time_unit=Timescale.MS, normalization=normalization
+    )
+    _, mags_scaled = compute_fft(
+        di_scaled, source_time_unit=Timescale.MS, normalization=normalization
+    )
+    np.testing.assert_allclose(mags, mags_scaled, atol=1e-12)
+
+
+@pytest.mark.parametrize("normalization", [FFTNormalization.PEAK, FFTNormalization.L2])
+def test_compute_fft_normalization_constant_signal_stays_finite(
+    normalization: FFTNormalization, uniform_di
+):
+    _, mags = compute_fft(
+        uniform_di, source_time_unit=Timescale.MS, normalization=normalization
+    )
+    assert np.all(np.isfinite(mags))
+
+
+def test_compute_fft_tuple_input_passes_normalization(sine_di_factory):
+    di = sine_di_factory(freq_hz=10.0)
+    spectra = compute_fft(
+        (di, di), source_time_unit=Timescale.MS, normalization=FFTNormalization.PEAK
+    )
+    for _, mags in spectra:
+        assert np.max(mags) == pytest.approx(1.0)
 
 
 def test_filter_wildcard_round_trip(srd_basic):
