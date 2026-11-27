@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
+from enum import Enum
 from typing import overload
 
 import numpy as np
@@ -12,6 +13,14 @@ from scipy.signal import butter, sosfiltfilt
 
 from ..core_data_structures.data_instance import DataInstance, left_join_data_instances
 from ..units import Timescale, to_seconds
+
+
+class FFTNormalization(str, Enum):
+    """How to scale an FFT magnitude spectrum."""
+
+    NONE = "none"
+    PEAK = "peak"
+    L2 = "l2"
 
 
 def apply_sos_filter(
@@ -372,6 +381,7 @@ def compute_fft(
     di: DataInstance,
     source_time_unit: Timescale,
     distance_di: DataInstance | None = None,
+    normalization: FFTNormalization = FFTNormalization.NONE,
 ) -> tuple[NDArray[float64], NDArray[float64]]: ...
 
 
@@ -380,6 +390,7 @@ def compute_fft(
     di: Sequence[DataInstance],
     source_time_unit: Timescale,
     distance_di: DataInstance | None = None,
+    normalization: FFTNormalization = FFTNormalization.NONE,
 ) -> tuple[tuple[NDArray[float64], NDArray[float64]], ...]: ...
 
 
@@ -387,6 +398,7 @@ def compute_fft(
     di: DataInstance | Sequence[DataInstance],
     source_time_unit: Timescale,
     distance_di: DataInstance | None = None,
+    normalization: FFTNormalization = FFTNormalization.NONE,
 ) -> (
     tuple[NDArray[float64], NDArray[float64]]
     | tuple[tuple[NDArray[float64], NDArray[float64]], ...]
@@ -403,19 +415,25 @@ def compute_fft(
     source_time_unit : Timescale
         Timestamp unit. Used only in time-domain mode. Pass ``aly.data.timestamp_unit``.
     distance_di : DataInstance | None, optional
-        If provided, the FFT is computed in the spatial domain and the
-        sample spacing is derived from cumulative distance in meters
-        (interpolated onto ``di``'s timestamp grid). Default is None
-        (time domain, result in Hz).
+        If provided, the FFT is computed in the spatial domain and the sample spacing is derived from cumulative
+        distance in meters (interpolated onto ``di``'s timestamp grid). Default is None (time domain, result in Hz).
+    normalization : FFTNormalization, optional
+        Scales the magnitudes of each signal individually, so a spectra with different units or sizes can be compared by shape.
+        ``PEAK`` divides by the largest magnitude, ``L2`` divides by the L2 norm of the magnitudes. Default is ``NONE``.
 
     Returns
     -------
     frequencies : NDArray[float64]
         Frequency axis values.
     magnitudes : NDArray[float64]
-        FFT magnitude (``abs(rfft(signal - mean))``).
+        FFT magnitude (``abs(rfft(signal - mean))``), scaled per ``normalization``.
 
     Given several signals, returns one ``(frequencies, magnitudes)`` pair per signal.
+
+    Notes
+    -----
+    Each signal is normalized on its own. An all-zero spectrum (constant
+    signal) is returned unscaled.
 
     Examples
     --------
@@ -424,10 +442,12 @@ def compute_fft(
     >>> freqs, mags = compute_fft(di, source_time_unit=aly.data.timestamp_unit)
     >>> fig = plot_fft_spectrum([freqs], [mags], [di.label])
     >>> freqs, mags = zip(*compute_fft(aly.data["pcm.vnav.*"], source_time_unit=aly.data.timestamp_unit))
+    >>> freqs, mags = compute_fft(di, source_time_unit=aly.data.timestamp_unit, normalization=FFTNormalization.PEAK)
     """
     if not isinstance(di, DataInstance):
         return tuple(
-            compute_fft(instance, source_time_unit, distance_di) for instance in di
+            compute_fft(instance, source_time_unit, distance_di, normalization)
+            for instance in di
         )
 
     signal = di.value_np.astype(np.float64)
@@ -459,4 +479,18 @@ def compute_fft(
 
     frequencies: NDArray[float64] = rfftfreq(len(signal_clean), d=dx)
     magnitudes: NDArray[float64] = np.abs(rfft(signal_clean - np.mean(signal_clean)))
-    return frequencies, magnitudes
+    return frequencies, _normalize_magnitudes(magnitudes, normalization)
+
+
+def _normalize_magnitudes(
+    magnitudes: NDArray[float64], normalization: FFTNormalization
+) -> NDArray[float64]:
+    if normalization == FFTNormalization.PEAK:
+        scale = float(np.max(magnitudes))
+    elif normalization == FFTNormalization.L2:
+        scale = float(np.linalg.norm(magnitudes))
+    else:
+        return magnitudes
+    if scale == 0:
+        return magnitudes
+    return magnitudes / scale
