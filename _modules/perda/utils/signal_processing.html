@@ -305,6 +305,7 @@
 <span></span><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Sequence</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">overload</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
@@ -316,6 +317,17 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">..core_data_structures.data_instance</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataInstance</span><span class="p">,</span> <span class="n">left_join_data_instances</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..units</span><span class="w"> </span><span class="kn">import</span> <span class="n">Timescale</span><span class="p">,</span> <span class="n">to_seconds</span>
+
+
+<div class="viewcode-block" id="FFTNormalization">
+<a class="viewcode-back" href="../../../_autosummary/perda.utils.signal_processing.html#perda.utils.signal_processing.FFTNormalization">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">FFTNormalization</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""How to scale an FFT magnitude spectrum."""</span>
+
+    <span class="n">NONE</span> <span class="o">=</span> <span class="s2">"none"</span>
+    <span class="n">PEAK</span> <span class="o">=</span> <span class="s2">"peak"</span>
+    <span class="n">L2</span> <span class="o">=</span> <span class="s2">"l2"</span></div>
+
 
 
 <div class="viewcode-block" id="apply_sos_filter">
@@ -688,6 +700,7 @@
     <span class="n">di</span><span class="p">:</span> <span class="n">DataInstance</span><span class="p">,</span>
     <span class="n">source_time_unit</span><span class="p">:</span> <span class="n">Timescale</span><span class="p">,</span>
     <span class="n">distance_di</span><span class="p">:</span> <span class="n">DataInstance</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">normalization</span><span class="p">:</span> <span class="n">FFTNormalization</span> <span class="o">=</span> <span class="n">FFTNormalization</span><span class="o">.</span><span class="n">NONE</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
 
 
@@ -696,6 +709,7 @@
     <span class="n">di</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">DataInstance</span><span class="p">],</span>
     <span class="n">source_time_unit</span><span class="p">:</span> <span class="n">Timescale</span><span class="p">,</span>
     <span class="n">distance_di</span><span class="p">:</span> <span class="n">DataInstance</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">normalization</span><span class="p">:</span> <span class="n">FFTNormalization</span> <span class="o">=</span> <span class="n">FFTNormalization</span><span class="o">.</span><span class="n">NONE</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]],</span> <span class="o">...</span><span class="p">]:</span> <span class="o">...</span>
 
 
@@ -705,6 +719,7 @@
     <span class="n">di</span><span class="p">:</span> <span class="n">DataInstance</span> <span class="o">|</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">DataInstance</span><span class="p">],</span>
     <span class="n">source_time_unit</span><span class="p">:</span> <span class="n">Timescale</span><span class="p">,</span>
     <span class="n">distance_di</span><span class="p">:</span> <span class="n">DataInstance</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">normalization</span><span class="p">:</span> <span class="n">FFTNormalization</span> <span class="o">=</span> <span class="n">FFTNormalization</span><span class="o">.</span><span class="n">NONE</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span>
     <span class="nb">tuple</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]]</span>
     <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]],</span> <span class="o">...</span><span class="p">]</span>
@@ -721,19 +736,25 @@
 <span class="sd">    source_time_unit : Timescale</span>
 <span class="sd">        Timestamp unit. Used only in time-domain mode. Pass ``aly.data.timestamp_unit``.</span>
 <span class="sd">    distance_di : DataInstance | None, optional</span>
-<span class="sd">        If provided, the FFT is computed in the spatial domain and the</span>
-<span class="sd">        sample spacing is derived from cumulative distance in meters</span>
-<span class="sd">        (interpolated onto ``di``'s timestamp grid). Default is None</span>
-<span class="sd">        (time domain, result in Hz).</span>
+<span class="sd">        If provided, the FFT is computed in the spatial domain and the sample spacing is derived from cumulative</span>
+<span class="sd">        distance in meters (interpolated onto ``di``'s timestamp grid). Default is None (time domain, result in Hz).</span>
+<span class="sd">    normalization : FFTNormalization, optional</span>
+<span class="sd">        Scales the magnitudes of each signal individually, so a spectra with different units or sizes can be compared by shape.</span>
+<span class="sd">        ``PEAK`` divides by the largest magnitude, ``L2`` divides by the L2 norm of the magnitudes. Default is ``NONE``.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    frequencies : NDArray[float64]</span>
 <span class="sd">        Frequency axis values.</span>
 <span class="sd">    magnitudes : NDArray[float64]</span>
-<span class="sd">        FFT magnitude (``abs(rfft(signal - mean))``).</span>
+<span class="sd">        FFT magnitude (``abs(rfft(signal - mean))``), scaled per ``normalization``.</span>
 
 <span class="sd">    Given several signals, returns one ``(frequencies, magnitudes)`` pair per signal.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Each signal is normalized on its own. An all-zero spectrum (constant</span>
+<span class="sd">    signal) is returned unscaled.</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
@@ -742,10 +763,12 @@
 <span class="sd">    &gt;&gt;&gt; freqs, mags = compute_fft(di, source_time_unit=aly.data.timestamp_unit)</span>
 <span class="sd">    &gt;&gt;&gt; fig = plot_fft_spectrum([freqs], [mags], [di.label])</span>
 <span class="sd">    &gt;&gt;&gt; freqs, mags = zip(*compute_fft(aly.data["pcm.vnav.*"], source_time_unit=aly.data.timestamp_unit))</span>
+<span class="sd">    &gt;&gt;&gt; freqs, mags = compute_fft(di, source_time_unit=aly.data.timestamp_unit, normalization=FFTNormalization.PEAK)</span>
 <span class="sd">    """</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">di</span><span class="p">,</span> <span class="n">DataInstance</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span>
-            <span class="n">compute_fft</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="n">source_time_unit</span><span class="p">,</span> <span class="n">distance_di</span><span class="p">)</span> <span class="k">for</span> <span class="n">instance</span> <span class="ow">in</span> <span class="n">di</span>
+            <span class="n">compute_fft</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="n">source_time_unit</span><span class="p">,</span> <span class="n">distance_di</span><span class="p">,</span> <span class="n">normalization</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">instance</span> <span class="ow">in</span> <span class="n">di</span>
         <span class="p">)</span>
 
     <span class="n">signal</span> <span class="o">=</span> <span class="n">di</span><span class="o">.</span><span class="n">value_np</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
@@ -777,8 +800,22 @@
 
     <span class="n">frequencies</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]</span> <span class="o">=</span> <span class="n">rfftfreq</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">signal_clean</span><span class="p">),</span> <span class="n">d</span><span class="o">=</span><span class="n">dx</span><span class="p">)</span>
     <span class="n">magnitudes</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">rfft</span><span class="p">(</span><span class="n">signal_clean</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">signal_clean</span><span class="p">)))</span>
-    <span class="k">return</span> <span class="n">frequencies</span><span class="p">,</span> <span class="n">magnitudes</span></div>
+    <span class="k">return</span> <span class="n">frequencies</span><span class="p">,</span> <span class="n">_normalize_magnitudes</span><span class="p">(</span><span class="n">magnitudes</span><span class="p">,</span> <span class="n">normalization</span><span class="p">)</span></div>
 
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_normalize_magnitudes</span><span class="p">(</span>
+    <span class="n">magnitudes</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span> <span class="n">normalization</span><span class="p">:</span> <span class="n">FFTNormalization</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]:</span>
+    <span class="k">if</span> <span class="n">normalization</span> <span class="o">==</span> <span class="n">FFTNormalization</span><span class="o">.</span><span class="n">PEAK</span><span class="p">:</span>
+        <span class="n">scale</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">magnitudes</span><span class="p">))</span>
+    <span class="k">elif</span> <span class="n">normalization</span> <span class="o">==</span> <span class="n">FFTNormalization</span><span class="o">.</span><span class="n">L2</span><span class="p">:</span>
+        <span class="n">scale</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">magnitudes</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">magnitudes</span>
+    <span class="k">if</span> <span class="n">scale</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">magnitudes</span>
+    <span class="k">return</span> <span class="n">magnitudes</span> <span class="o">/</span> <span class="n">scale</span>
 </pre></div>
 
                 </article>

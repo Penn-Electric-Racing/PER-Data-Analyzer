@@ -385,6 +385,28 @@
                   
   <section id="module-perda.utils.signal_processing">
 <span id="perda-utils-signal-processing"></span><h1>perda.utils.signal_processing<a class="headerlink" href="#module-perda.utils.signal_processing" title="Link to this heading">#</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="perda.utils.signal_processing.FFTNormalization">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">perda.utils.signal_processing.</span></span><span class="sig-name descname"><span class="pre">FFTNormalization</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/utils/signal_processing.html#FFTNormalization"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.utils.signal_processing.FFTNormalization" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<p>How to scale an FFT magnitude spectrum.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="perda.utils.signal_processing.FFTNormalization.L2">
+<span class="sig-name descname"><span class="pre">L2</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'l2'</span></em><a class="headerlink" href="#perda.utils.signal_processing.FFTNormalization.L2" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="perda.utils.signal_processing.FFTNormalization.NONE">
+<span class="sig-name descname"><span class="pre">NONE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'none'</span></em><a class="headerlink" href="#perda.utils.signal_processing.FFTNormalization.NONE" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="perda.utils.signal_processing.FFTNormalization.PEAK">
+<span class="sig-name descname"><span class="pre">PEAK</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'peak'</span></em><a class="headerlink" href="#perda.utils.signal_processing.FFTNormalization.PEAK" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 <dl class="py function">
 <dt class="sig sig-object py" id="perda.utils.signal_processing.apply_sos_filter">
 <span class="sig-prename descclassname"><span class="pre">perda.utils.signal_processing.</span></span><span class="sig-name descname"><span class="pre">apply_sos_filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">signal</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/utils/signal_processing.html#apply_sos_filter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.utils.signal_processing.apply_sos_filter" title="Link to this definition">#</a></dt>
@@ -416,7 +438,7 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="perda.utils.signal_processing.compute_fft">
-<span class="sig-prename descclassname"><span class="pre">perda.utils.signal_processing.</span></span><span class="sig-name descname"><span class="pre">compute_fft</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">di</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_time_unit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distance_di</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/utils/signal_processing.html#compute_fft"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.utils.signal_processing.compute_fft" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">perda.utils.signal_processing.</span></span><span class="sig-name descname"><span class="pre">compute_fft</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">di</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_time_unit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distance_di</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalization</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">FFTNormalization.NONE</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/perda/utils/signal_processing.html#compute_fft"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#perda.utils.signal_processing.compute_fft" title="Link to this definition">#</a></dt>
 <dd><p>Compute the real FFT magnitude spectrum of a DataInstance.</p>
 <p>NaN values are dropped before the transform.  The signal is
 mean-subtracted to suppress the DC component.</p>
@@ -425,10 +447,10 @@ mean-subtracted to suppress the DC component.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>di</strong> (<a class="reference internal" href="perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance"><em>DataInstance</em></a><em> | </em><em>Sequence</em><em>[</em><a class="reference internal" href="perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance"><em>DataInstance</em></a><em>]</em>) – Signal to transform, or several signals transformed independently.</p></li>
 <li><p><strong>source_time_unit</strong> (<a class="reference internal" href="perda.units.html#perda.units.Timescale" title="perda.units.Timescale"><em>Timescale</em></a>) – Timestamp unit. Used only in time-domain mode. Pass <code class="docutils literal notranslate"><span class="pre">aly.data.timestamp_unit</span></code>.</p></li>
-<li><p><strong>distance_di</strong> (<a class="reference internal" href="perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance"><em>DataInstance</em></a><em> | </em><em>None</em><em>, </em><em>optional</em>) – If provided, the FFT is computed in the spatial domain and the
-sample spacing is derived from cumulative distance in meters
-(interpolated onto <code class="docutils literal notranslate"><span class="pre">di</span></code>’s timestamp grid). Default is None
-(time domain, result in Hz).</p></li>
+<li><p><strong>distance_di</strong> (<a class="reference internal" href="perda.core_data_structures.data_instance.html#perda.core_data_structures.data_instance.DataInstance" title="perda.core_data_structures.data_instance.DataInstance"><em>DataInstance</em></a><em> | </em><em>None</em><em>, </em><em>optional</em>) – If provided, the FFT is computed in the spatial domain and the sample spacing is derived from cumulative
+distance in meters (interpolated onto <code class="docutils literal notranslate"><span class="pre">di</span></code>’s timestamp grid). Default is None (time domain, result in Hz).</p></li>
+<li><p><strong>normalization</strong> (<a class="reference internal" href="#perda.utils.signal_processing.FFTNormalization" title="perda.utils.signal_processing.FFTNormalization"><em>FFTNormalization</em></a><em>, </em><em>optional</em>) – Scales the magnitudes of each signal individually, so a spectra with different units or sizes can be compared by shape.
+<code class="docutils literal notranslate"><span class="pre">PEAK</span></code> divides by the largest magnitude, <code class="docutils literal notranslate"><span class="pre">L2</span></code> divides by the L2 norm of the magnitudes. Default is <code class="docutils literal notranslate"><span class="pre">NONE</span></code>.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
@@ -437,18 +459,22 @@ sample spacing is derived from cumulative distance in meters
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><ul class="simple">
 <li><p><strong>frequencies</strong> (<em>NDArray[float64]</em>) – Frequency axis values.</p></li>
-<li><p><strong>magnitudes</strong> (<em>NDArray[float64]</em>) – FFT magnitude (<code class="docutils literal notranslate"><span class="pre">abs(rfft(signal</span> <span class="pre">-</span> <span class="pre">mean))</span></code>).</p></li>
+<li><p><strong>magnitudes</strong> (<em>NDArray[float64]</em>) – FFT magnitude (<code class="docutils literal notranslate"><span class="pre">abs(rfft(signal</span> <span class="pre">-</span> <span class="pre">mean))</span></code>), scaled per <code class="docutils literal notranslate"><span class="pre">normalization</span></code>.</p></li>
 <li><p>Given several signals, returns one <code class="docutils literal notranslate"><span class="pre">(frequencies,</span> <span class="pre">magnitudes)</span></code> pair per signal.</p></li>
 </ul>
 </p>
 </dd>
 </dl>
+<p class="rubric">Notes</p>
+<p>Each signal is normalized on its own. An all-zero spectrum (constant
+signal) is returned unscaled.</p>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">perda.plotting</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_fft_spectrum</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">perda.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">compute_fft</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">freqs</span><span class="p">,</span> <span class="n">mags</span> <span class="o">=</span> <span class="n">compute_fft</span><span class="p">(</span><span class="n">di</span><span class="p">,</span> <span class="n">source_time_unit</span><span class="o">=</span><span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">timestamp_unit</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span> <span class="o">=</span> <span class="n">plot_fft_spectrum</span><span class="p">([</span><span class="n">freqs</span><span class="p">],</span> <span class="p">[</span><span class="n">mags</span><span class="p">],</span> <span class="p">[</span><span class="n">di</span><span class="o">.</span><span class="n">label</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">freqs</span><span class="p">,</span> <span class="n">mags</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">compute_fft</span><span class="p">(</span><span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">"pcm.vnav.*"</span><span class="p">],</span> <span class="n">source_time_unit</span><span class="o">=</span><span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">timestamp_unit</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">freqs</span><span class="p">,</span> <span class="n">mags</span> <span class="o">=</span> <span class="n">compute_fft</span><span class="p">(</span><span class="n">di</span><span class="p">,</span> <span class="n">source_time_unit</span><span class="o">=</span><span class="n">aly</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">timestamp_unit</span><span class="p">,</span> <span class="n">normalization</span><span class="o">=</span><span class="n">FFTNormalization</span><span class="o">.</span><span class="n">PEAK</span><span class="p">)</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -598,6 +624,12 @@ replaced with <code class="docutils literal notranslate"><span class="pre">NaN</
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.utils.signal_processing.FFTNormalization"><code class="docutils literal notranslate"><span class="pre">FFTNormalization</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.utils.signal_processing.FFTNormalization.L2"><code class="docutils literal notranslate"><span class="pre">FFTNormalization.L2</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.utils.signal_processing.FFTNormalization.NONE"><code class="docutils literal notranslate"><span class="pre">FFTNormalization.NONE</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.utils.signal_processing.FFTNormalization.PEAK"><code class="docutils literal notranslate"><span class="pre">FFTNormalization.PEAK</span></code></a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.utils.signal_processing.apply_sos_filter"><code class="docutils literal notranslate"><span class="pre">apply_sos_filter()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.utils.signal_processing.compute_fft"><code class="docutils literal notranslate"><span class="pre">compute_fft()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perda.utils.signal_processing.lowpass_filter"><code class="docutils literal notranslate"><span class="pre">lowpass_filter()</span></code></a></li>
